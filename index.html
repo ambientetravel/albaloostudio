@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>alBaloo Studio — Where Code Meets Mythology</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-container">
+      <a href="#" class="logo"><span class="logo-al">al</span>Baloo<span class="logo-dot"> Studio</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about">The Vision</a></li>
+        <li><a href="#whatwedo">What We Do</a></li>
+        <li><a href="#davan">DAVAN</a></li>
+        <li><a href="#roxana">ROXANA</a></li>
+        <li><a href="#podcast">Podcast</a></li>
+        <li><a href="#releases">Releases</a></li>
+        <li><a href="#contact" class="nav-cta">Connect</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section — Cinematic -->
+  <section class="hero" id="hero">
+    <!-- Animated background layers -->
+    <div class="hero-video-bg">
+      <canvas id="heroCanvas"></canvas>
+      <div class="hero-overlay"></div>
+      <div class="hero-grain"></div>
+    </div>
+
+    <!-- Floating audio waveform -->
+    <div class="hero-waveform" id="heroWaveform">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path id="wavePath1" fill="none" stroke="rgba(212,165,116,0.15)" stroke-width="1.5"/>
+        <path id="wavePath2" fill="none" stroke="rgba(168,85,247,0.1)" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <!-- Main hero content -->
+    <div class="container hero-content">
+      <div class="hero-top-row">
+        <span class="hero-badge">
+          <span class="badge-pulse"></span>
+          AI-Crafted Sound &middot; Ancient Stories
+        </span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="title-line title-line-1">Where <span class="gradient-text">code</span></span>
+        <span class="title-line title-line-2">meets <span class="serif-italic">mythology</span></span>
+      </h1>
+
+      <p class="hero-subtitle">Two AI artists. Thousands of years of mythology.<br>One studio born from pure code.</p>
+
+      <div class="hero-buttons">
+        <a href="#davan" class="btn btn-primary btn-glow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Watch the Story
+        </a>
+        <a href="#releases" class="btn btn-outline">Explore Releases</a>
+      </div>
+    </div>
+
+    <!-- Video showcase cards -->
+    <div class="hero-showcase">
+      <div class="showcase-track" id="showcaseTrack">
+        <!-- DAVAN card -->
+        <div class="showcase-card active" data-artist="davan">
+          <div class="showcase-visual davan-gradient">
+            <div class="showcase-motion">
+              <div class="motion-bars">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="showcase-play">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="showcase-label">
+              <span class="showcase-code">DA1</span>
+              <span class="showcase-name">DAVAN</span>
+            </div>
+          </div>
+          <div class="showcase-meta">
+            <strong>The Runner</strong>
+            <span>808 &middot; Santoor &middot; War Drums</span>
+          </div>
+        </div>
+        <!-- ROXANA card -->
+        <div class="showcase-card" data-artist="roxana">
+          <div class="showcase-visual roxana-gradient">
+            <div class="showcase-motion roxana-motion">
+              <div class="motion-wave">
+                <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+                  <path d="M0 30 Q25 10 50 30 T100 30 T150 30 T200 30" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5">
+                    <animate attributeName="d" dur="3s" repeatCount="indefinite" values="M0 30 Q25 10 50 30 T100 30 T150 30 T200 30;M0 30 Q25 50 50 30 T100 30 T150 30 T200 30;M0 30 Q25 10 50 30 T100 30 T150 30 T200 30"/>
+                  </path>
+                  <path d="M0 30 Q25 45 50 30 T100 30 T150 30 T200 30" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1">
+                    <animate attributeName="d" dur="4s" repeatCount="indefinite" values="M0 30 Q25 45 50 30 T100 30 T150 30 T200 30;M0 30 Q25 15 50 30 T100 30 T150 30 T200 30;M0 30 Q25 45 50 30 T100 30 T150 30 T200 30"/>
+                  </path>
+                </svg>
+              </div>
+            </div>
+            <div class="showcase-play">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="showcase-label">
+              <span class="showcase-code roxana-code-label">RX1</span>
+              <span class="showcase-name">ROXANA</span>
+            </div>
+          </div>
+          <div class="showcase-meta">
+            <strong>The Poet</strong>
+            <span>Ney &middot; Oud &middot; Dreamy Synths</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom ticker -->
+    <div class="hero-ticker">
+      <div class="ticker-track">
+        <span>ROSTAM</span><span class="ticker-dot">&middot;</span>
+        <span>ARASH</span><span class="ticker-dot">&middot;</span>
+        <span>KAVEH</span><span class="ticker-dot">&middot;</span>
+        <span>PHEIDIPPIDES</span><span class="ticker-dot">&middot;</span>
+        <span>SPARTANS</span><span class="ticker-dot">&middot;</span>
+        <span>RUMI</span><span class="ticker-dot">&middot;</span>
+        <span>HAFEZ</span><span class="ticker-dot">&middot;</span>
+        <span>SAADI</span><span class="ticker-dot">&middot;</span>
+        <span>KHAYYAM</span><span class="ticker-dot">&middot;</span>
+        <span>MUSHIN</span><span class="ticker-dot">&middot;</span>
+        <span>ERGENEKON</span><span class="ticker-dot">&middot;</span>
+        <span>YUNUS EMRE</span><span class="ticker-dot">&middot;</span>
+        <!-- duplicate for seamless loop -->
+        <span>ROSTAM</span><span class="ticker-dot">&middot;</span>
+        <span>ARASH</span><span class="ticker-dot">&middot;</span>
+        <span>KAVEH</span><span class="ticker-dot">&middot;</span>
+        <span>PHEIDIPPIDES</span><span class="ticker-dot">&middot;</span>
+        <span>SPARTANS</span><span class="ticker-dot">&middot;</span>
+        <span>RUMI</span><span class="ticker-dot">&middot;</span>
+        <span>HAFEZ</span><span class="ticker-dot">&middot;</span>
+        <span>SAADI</span><span class="ticker-dot">&middot;</span>
+        <span>KHAYYAM</span><span class="ticker-dot">&middot;</span>
+        <span>MUSHIN</span><span class="ticker-dot">&middot;</span>
+        <span>ERGENEKON</span><span class="ticker-dot">&middot;</span>
+        <span>YUNUS EMRE</span><span class="ticker-dot">&middot;</span>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- About / Vision Section -->
+  <section class="about section" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-visual">
+          <div class="vision-graphic">
+            <div class="vision-ring ring-outer"></div>
+            <div class="vision-ring ring-inner"></div>
+            <div class="vision-center">
+              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" stroke="url(#visionGrad)" stroke-width="0.5" opacity="0.3"/>
+                <path d="M50 15 L55 45 L85 50 L55 55 L50 85 L45 55 L15 50 L45 45 Z" fill="url(#visionGrad)" opacity="0.15"/>
+                <circle cx="50" cy="50" r="8" fill="url(#visionGrad)" opacity="0.6"/>
+                <defs><linearGradient id="visionGrad" x1="0" y1="0" x2="100" y2="100"><stop stop-color="#d4a574"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="about-content">
+          <span class="section-tag">The Vision</span>
+          <h2 class="section-title">Sound crafted from <span class="gradient-text">code</span>, stories born from <span class="serif-italic">ancient fire</span></h2>
+          <p class="about-text">alBaloo Studio is a music and video studio where AI-generated artists come to life — not as imitations, but as entirely new creative beings. Each artist is built from scratch: their sound, their story, their visual identity, all born from code.</p>
+          <p class="about-text">What connects them is mythology. From the endurance epics of Persia to the whispered poetry of Rumi, from Spartan battle cries to the silk roads of Istanbul — we bridge civilizations through rhythm and melody.</p>
+          <div class="about-pillars">
+            <div class="pillar">
+              <div class="pillar-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              </div>
+              <div>
+                <strong>AI-Generated Sound</strong>
+                <span>Every beat, melody, and vocal crafted through code</span>
+              </div>
+            </div>
+            <div class="pillar">
+              <div class="pillar-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </div>
+              <div>
+                <strong>Mythological Roots</strong>
+                <span>Persian, Greek, Roman, Turkish, Japanese legends</span>
+              </div>
+            </div>
+            <div class="pillar">
+              <div class="pillar-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <div>
+                <strong>Bridging Worlds</strong>
+                <span>Connecting civilizations through rhythm and poetry</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What We Do Section -->
+  <section class="what-we-do section" id="whatwedo">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">What We Do</span>
+        <h2 class="section-title">Three pillars, <span class="gradient-text">one mission</span></h2>
+        <p class="section-desc">We create across three mediums — each AI-crafted, each rooted in the ancient stories that shaped civilizations.</p>
+      </div>
+      <div class="wwd-grid">
+        <!-- Music -->
+        <div class="wwd-card">
+          <div class="wwd-visual wwd-music">
+            <div class="wwd-icon-wrap">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
+            <div class="wwd-eq">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="wwd-content">
+            <h3>Music</h3>
+            <p>AI-generated tracks spanning Persian war drums to Turkish makam, 808 bass to ney melodies. Every beat is code. Every rhythm is mythology reborn.</p>
+            <div class="wwd-tags">
+              <span>Electronic</span>
+              <span>Percussion</span>
+              <span>Fusion</span>
+            </div>
+          </div>
+        </div>
+        <!-- Visual -->
+        <div class="wwd-card wwd-card-featured">
+          <div class="wwd-visual wwd-visuals-art">
+            <div class="wwd-icon-wrap">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            </div>
+            <div class="wwd-frames">
+              <div class="wwd-frame frame-1"></div>
+              <div class="wwd-frame frame-2"></div>
+              <div class="wwd-frame frame-3"></div>
+            </div>
+          </div>
+          <div class="wwd-content">
+            <h3>Visual</h3>
+            <p>Music videos, artist portraits, and album art — all AI-generated surrealist imagery. From Midjourney dreamscapes to animated lyric journeys through ancient ruins.</p>
+            <div class="wwd-tags">
+              <span>AI Art</span>
+              <span>Music Video</span>
+              <span>Surrealist</span>
+            </div>
+          </div>
+        </div>
+        <!-- Podcast -->
+        <div class="wwd-card">
+          <div class="wwd-visual wwd-podcast">
+            <div class="wwd-icon-wrap">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
+            <div class="wwd-soundwave">
+              <svg viewBox="0 0 160 40" preserveAspectRatio="none">
+                <path d="M0 20 Q10 5 20 20 T40 20 T60 20 T80 20 T100 20 T120 20 T140 20 T160 20" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5">
+                  <animate attributeName="d" dur="4s" repeatCount="indefinite" values="M0 20 Q10 5 20 20 T40 20 T60 20 T80 20 T100 20 T120 20 T140 20 T160 20;M0 20 Q10 35 20 20 T40 20 T60 20 T80 20 T100 20 T120 20 T140 20 T160 20;M0 20 Q10 5 20 20 T40 20 T60 20 T80 20 T100 20 T120 20 T140 20 T160 20"/>
+                </path>
+              </svg>
+            </div>
+          </div>
+          <div class="wwd-content">
+            <h3>Podcast</h3>
+            <p>Deep dives into the mythology, ideology, and ancient civilizations behind every artist. AI-crafted episodes exploring the stories that fuel the sound.</p>
+            <div class="wwd-tags">
+              <span>Mythology</span>
+              <span>Deep Dive</span>
+              <span>AI Voices</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DAVAN Section -->
+  <section class="artist-section davan-section section" id="davan">
+    <div class="artist-bg davan-bg"></div>
+    <div class="container">
+      <div class="artist-header">
+        <div class="artist-label-group">
+          <span class="section-tag">Artist 01</span>
+          <div class="artist-code">DA1</div>
+        </div>
+      </div>
+      <div class="artist-grid">
+        <div class="artist-portrait">
+          <div class="portrait-frame davan-frame">
+            <!-- Replace with: <img src="davan-portrait.png" alt="DAVAN"> -->
+            <div class="portrait-placeholder davan-gradient">
+              <div class="portrait-inner">
+                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="100" cy="80" r="35" fill="rgba(255,255,255,0.1)"/>
+                  <path d="M60 180 Q100 130 140 180" fill="rgba(255,255,255,0.08)"/>
+                  <circle cx="100" cy="80" r="25" fill="rgba(255,255,255,0.05)"/>
+                </svg>
+                <span class="portrait-label">DAVAN</span>
+              </div>
+            </div>
+            <div class="portrait-glow davan-glow"></div>
+          </div>
+          <div class="artist-stats-bar">
+            <div class="artist-stat">
+              <span class="stat-val">140+</span>
+              <span class="stat-key">BPM</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="artist-stat">
+              <span class="stat-val">808</span>
+              <span class="stat-key">Bass</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="artist-stat">
+              <span class="stat-val">5</span>
+              <span class="stat-key">Civilizations</span>
+            </div>
+          </div>
+        </div>
+        <div class="artist-info">
+          <h2 class="artist-name">DAVAN</h2>
+          <p class="artist-title-line"><span class="serif-italic">The Runner</span></p>
+          <div class="artist-etymology">
+            <span class="persian-text">دویدن</span>
+            <span class="etymology-meaning">Davidan = to run. DA1 = Day One. Every run is Day One.</span>
+          </div>
+          <p class="artist-desc">Heavy percussion-driven electronic. Minimal lyrics, maximum beats. Male vocal war cry shouts as percussion — no full singing. A sonic warrior who turns ancient mythology into fuel for the modern endurance athlete.</p>
+
+          <div class="sound-signature">
+            <h4 class="sig-title">Sound Signature</h4>
+            <div class="sig-tags">
+              <span class="sig-tag">Tribal Drums</span>
+              <span class="sig-tag">808 Bass Drops</span>
+              <span class="sig-tag">Persian Santoor</span>
+              <span class="sig-tag">War Cry Vocals</span>
+              <span class="sig-tag">Tempo Switches</span>
+            </div>
+          </div>
+
+          <div class="mythology-map">
+            <h4 class="sig-title">Mythology Sources</h4>
+            <div class="myth-items">
+              <div class="myth-item">
+                <span class="myth-flag">Persia</span>
+                <span class="myth-legends">Rostam &middot; Arash &middot; Kaveh</span>
+              </div>
+              <div class="myth-item">
+                <span class="myth-flag">Greece</span>
+                <span class="myth-legends">Pheidippides &middot; Spartans</span>
+              </div>
+              <div class="myth-item">
+                <span class="myth-flag">Rome</span>
+                <span class="myth-legends">Legions &middot; Gladiators</span>
+              </div>
+              <div class="myth-item">
+                <span class="myth-flag">Turkey</span>
+                <span class="myth-legends">Ergenekon</span>
+              </div>
+              <div class="myth-item">
+                <span class="myth-flag">Japan</span>
+                <span class="myth-legends">Mushin</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="artist-album-preview">
+            <div class="album-card davan-gradient">
+              <div class="album-info">
+                <span class="album-label">Debut Album</span>
+                <strong class="album-name">Legends Run</strong>
+                <span class="album-desc">Lone runner on ancient mountain trail. Zagros mountains. Derafsh Kaviani banner colors.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROXANA Section -->
+  <section class="artist-section roxana-section section" id="roxana">
+    <div class="artist-bg roxana-bg"></div>
+    <div class="container">
+      <div class="artist-header">
+        <div class="artist-label-group">
+          <span class="section-tag">Artist 02</span>
+          <div class="artist-code roxana-code">RX1</div>
+        </div>
+      </div>
+      <div class="artist-grid artist-grid-reverse">
+        <div class="artist-info">
+          <h2 class="artist-name roxana-name">ROXANA</h2>
+          <p class="artist-title-line"><span class="serif-italic">The Poet</span></p>
+          <div class="artist-etymology">
+            <span class="persian-text">روشنک</span>
+            <span class="etymology-meaning">Roshanak = bright dawn. The Achaemenid princess who bridged empires.</span>
+          </div>
+          <p class="artist-desc">Diaspora fusion — Persian pop meets Turkish makam meets modern electronic and dance rhythms. Breathy, sensual female vocal weaving between Persian, Turkish, and English. Sensual but artistic — the warmth of desire through music, not explicit.</p>
+
+          <div class="sound-signature">
+            <h4 class="sig-title">Sound Signature</h4>
+            <div class="sig-tags roxana-tags">
+              <span class="sig-tag">Ney &amp; Oud</span>
+              <span class="sig-tag">Baglama</span>
+              <span class="sig-tag">Dreamy Synths</span>
+              <span class="sig-tag">Breathy Vocals</span>
+              <span class="sig-tag">Dance Rhythms</span>
+            </div>
+          </div>
+
+          <div class="mythology-map">
+            <h4 class="sig-title">Master Poets</h4>
+            <div class="myth-items roxana-myths">
+              <div class="myth-item">
+                <span class="myth-flag roxana-flag">Rumi</span>
+                <span class="myth-legends">Mystical love & divine union</span>
+              </div>
+              <div class="myth-item">
+                <span class="myth-flag roxana-flag">Hafez</span>
+                <span class="myth-legends">Wine, longing & hidden meanings</span>
+              </div>
+              <div class="myth-item">
+                <span class="myth-flag roxana-flag">Saadi</span>
+                <span class="myth-legends">Human connection & wisdom</span>
+              </div>
+              <div class="myth-item">
+                <span class="myth-flag roxana-flag">Yunus Emre</span>
+                <span class="myth-legends">Turkish Sufi devotion</span>
+              </div>
+              <div class="myth-item">
+                <span class="myth-flag roxana-flag">Khayyam</span>
+                <span class="myth-legends">Seize the moment, question fate</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bpm-range">
+            <h4 class="sig-title">Tempo Range</h4>
+            <div class="bpm-bar">
+              <div class="bpm-fill"></div>
+              <div class="bpm-label bpm-low">85 BPM <span>Whispered Poetry</span></div>
+              <div class="bpm-label bpm-high">115 BPM <span>Belly-Dance Rhythms</span></div>
+            </div>
+          </div>
+
+          <div class="artist-album-preview">
+            <div class="album-card roxana-gradient">
+              <div class="album-info">
+                <span class="album-label">Debut Album</span>
+                <strong class="album-name">Silk &amp; Smoke</strong>
+                <span class="album-desc">A woman's profile made of flowing silk and smoke. Isfahan to Istanbul. Tea steam becoming calligraphy.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="artist-portrait">
+          <div class="portrait-frame roxana-frame">
+            <!-- Replace with: <img src="roxana-portrait.png" alt="ROXANA"> -->
+            <div class="portrait-placeholder roxana-gradient">
+              <div class="portrait-inner">
+                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="100" cy="80" r="35" fill="rgba(255,255,255,0.1)"/>
+                  <path d="M60 180 Q100 130 140 180" fill="rgba(255,255,255,0.08)"/>
+                  <path d="M75 60 Q100 20 125 60" fill="rgba(255,255,255,0.05)"/>
+                </svg>
+                <span class="portrait-label">ROXANA</span>
+              </div>
+            </div>
+            <div class="portrait-glow roxana-glow"></div>
+          </div>
+          <div class="artist-stats-bar roxana-bar">
+            <div class="artist-stat">
+              <span class="stat-val">85-115</span>
+              <span class="stat-key">BPM</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="artist-stat">
+              <span class="stat-val">3</span>
+              <span class="stat-key">Languages</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="artist-stat">
+              <span class="stat-val">5</span>
+              <span class="stat-key">Poets</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Podcast Section -->
+  <section class="podcast section" id="podcast">
+    <div class="podcast-bg"></div>
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Podcast</span>
+        <h2 class="section-title">Stories behind the <span class="gradient-text">sound</span></h2>
+        <p class="section-desc">AI-crafted deep dives into the mythology, ancient civilizations, and creative ideology behind every artist and every track.</p>
+      </div>
+
+      <!-- Featured episode -->
+      <div class="podcast-featured">
+        <div class="podcast-featured-visual">
+          <div class="podcast-cover-art">
+            <div class="podcast-cover-gradient">
+              <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="100" r="60" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                <circle cx="100" cy="100" r="40" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+                <circle cx="100" cy="100" r="20" fill="rgba(255,255,255,0.06)"/>
+                <path d="M90 85 L115 100 L90 115 Z" fill="rgba(255,255,255,0.3)"/>
+              </svg>
+            </div>
+            <div class="podcast-live-wave">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="podcast-player">
+            <div class="player-progress">
+              <div class="player-bar">
+                <div class="player-fill"></div>
+              </div>
+              <div class="player-times">
+                <span>0:00</span>
+                <span>42:15</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="podcast-featured-info">
+          <span class="podcast-ep-badge">Latest Episode</span>
+          <h3 class="podcast-ep-title">The Shahnameh Runner: How Persian Mythology Fuels Endurance</h3>
+          <p class="podcast-ep-desc">An exploration of the Shahnameh's heroes of resistance — Rostam, Arash the Archer, Kaveh the Blacksmith — and how their stories of endurance map onto the psychology of modern marathon running. Why DAVAN runs with ghosts.</p>
+          <div class="podcast-ep-meta">
+            <span class="ep-meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              42 min
+            </span>
+            <span class="ep-meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              Season 1
+            </span>
+            <span class="ep-meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+              DAVAN
+            </span>
+          </div>
+          <button class="btn btn-primary podcast-play-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play Episode
+          </button>
+        </div>
+      </div>
+
+      <!-- Episode list -->
+      <div class="podcast-episodes">
+        <div class="episode-card">
+          <div class="episode-number">01</div>
+          <div class="episode-info">
+            <h4>The Shahnameh Runner</h4>
+            <p>Persian mythology of endurance — Rostam, Arash, and the psychology of the marathon.</p>
+          </div>
+          <div class="episode-meta-col">
+            <span class="episode-artist-tag davan-ep">DAVAN</span>
+            <span class="episode-duration">42:15</span>
+          </div>
+          <button class="episode-play" aria-label="Play">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+        </div>
+        <div class="episode-card">
+          <div class="episode-number">02</div>
+          <div class="episode-info">
+            <h4>Roshanak: Bright Dawn Between Empires</h4>
+            <p>The Achaemenid princess who bridged Persia and Greece — and why diaspora sound matters.</p>
+          </div>
+          <div class="episode-meta-col">
+            <span class="episode-artist-tag roxana-ep">ROXANA</span>
+            <span class="episode-duration">38:42</span>
+          </div>
+          <button class="episode-play" aria-label="Play">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+        </div>
+        <div class="episode-card">
+          <div class="episode-number">03</div>
+          <div class="episode-info">
+            <h4>Pheidippides to Spartans: Greek Running Mythology</h4>
+            <p>From Marathon to Thermopylae — why the Greeks ran toward death, and how that becomes sound.</p>
+          </div>
+          <div class="episode-meta-col">
+            <span class="episode-artist-tag davan-ep">DAVAN</span>
+            <span class="episode-duration">35:20</span>
+          </div>
+          <button class="episode-play" aria-label="Play">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+        </div>
+        <div class="episode-card">
+          <div class="episode-number">04</div>
+          <div class="episode-info">
+            <h4>Five Poets, One Voice: Rumi to Khayyam</h4>
+            <p>How five master poets across centuries become the lyrical DNA of a single AI artist.</p>
+          </div>
+          <div class="episode-meta-col">
+            <span class="episode-artist-tag roxana-ep">ROXANA</span>
+            <span class="episode-duration">44:08</span>
+          </div>
+          <button class="episode-play" aria-label="Play">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+        </div>
+        <div class="episode-card">
+          <div class="episode-number">05</div>
+          <div class="episode-info">
+            <h4>Ergenekon &amp; Mushin: Wolves and Nothingness</h4>
+            <p>Turkish rebirth mythology meets Japanese flow state — the extremes of endurance consciousness.</p>
+          </div>
+          <div class="episode-meta-col">
+            <span class="episode-artist-tag davan-ep">DAVAN</span>
+            <span class="episode-duration">40:33</span>
+          </div>
+          <button class="episode-play" aria-label="Play">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+        </div>
+        <div class="episode-card">
+          <div class="episode-number">06</div>
+          <div class="episode-info">
+            <h4>Mesopotamia Calling: The Next Three Artists</h4>
+            <p>A preview of what's coming — three new AI artists rooted in Sumerian, Babylonian, and Egyptian sound.</p>
+          </div>
+          <div class="episode-meta-col">
+            <span class="episode-artist-tag studio-ep">STUDIO</span>
+            <span class="episode-duration">Coming Soon</span>
+          </div>
+          <button class="episode-play" aria-label="Play" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Releases Section -->
+  <section class="releases section" id="releases">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Releases</span>
+        <h2 class="section-title">From the <span class="gradient-text">studio</span></h2>
+        <p class="section-desc">Upcoming releases from our AI artists — where ancient mythology meets cutting-edge sound design.</p>
+      </div>
+      <div class="releases-grid">
+        <div class="release-card">
+          <div class="release-cover davan-gradient">
+            <div class="release-cover-inner">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="release-badge">DAVAN</div>
+          </div>
+          <div class="release-info">
+            <h3>Legends Run</h3>
+            <p class="release-artist">DAVAN &middot; DA1</p>
+            <p class="release-desc">The debut. Zagros mountain trails. Persian war drums. Marathon-pace 808s.</p>
+            <div class="release-meta">
+              <span class="release-tag">Album</span>
+              <span class="release-tag">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+        <div class="release-card">
+          <div class="release-cover roxana-gradient">
+            <div class="release-cover-inner">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="release-badge roxana-badge">ROXANA</div>
+          </div>
+          <div class="release-info">
+            <h3>Silk &amp; Smoke</h3>
+            <p class="release-artist">ROXANA &middot; RX1</p>
+            <p class="release-desc">Rumi whispered over ney. Istanbul bazaar beats. Silk unraveling into sound.</p>
+            <div class="release-meta">
+              <span class="release-tag roxana-tag">Album</span>
+              <span class="release-tag roxana-tag">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact section" id="contact">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <span class="section-tag">Connect</span>
+          <h2 class="section-title">Step into the <span class="gradient-text">studio</span></h2>
+          <p class="contact-text">Want to collaborate, license music, or just talk about the intersection of AI, code, and ancient mythology? We'd love to hear from you.</p>
+          <div class="contact-details">
+            <div class="contact-detail">
+              <div class="contact-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <span>hello@albaloostudio.com</span>
+            </div>
+          </div>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Twitter/X">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" class="social-link" aria-label="YouTube">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Spotify">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+            </a>
+          </div>
+        </div>
+        <form class="contact-form" id="contactForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Your name" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="you@example.com" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" placeholder="Collaboration / Licensing / Just saying hi">
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="5" placeholder="Tell us what's on your mind..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            Send Message
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo"><span class="logo-al">al</span>Baloo<span class="logo-dot"> Studio</span></a>
+          <p>Where code meets mythology. AI-crafted artists bridging civilizations through sound.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Studio</h4>
+          <ul>
+            <li><a href="#about">The Vision</a></li>
+            <li><a href="#whatwedo">What We Do</a></li>
+            <li><a href="#podcast">Podcast</a></li>
+            <li><a href="#releases">Releases</a></li>
+            <li><a href="#contact">Connect</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Artists</h4>
+          <ul>
+            <li><a href="#davan">DAVAN — The Runner</a></li>
+            <li><a href="#roxana">ROXANA — The Poet</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 alBaloo Studio. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
