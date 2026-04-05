@@ -13,7 +13,7 @@
   <!-- Navigation -->
   <nav class="navbar" id="navbar">
     <div class="container nav-container">
-      <a href="#" class="logo"><span class="logo-al">al</span>Baloo<span class="logo-dot"> Studio</span></a>
+      <a href="#" class="logo"><img src="logo.png" alt="alBaloo Studio" class="logo-img"></a>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
@@ -33,6 +33,9 @@
   <section class="hero" id="hero">
     <!-- Animated background layers -->
     <div class="hero-video-bg">
+      <video class="hero-video" autoplay muted loop playsinline>
+        <source src="hero-video.mp4" type="video/mp4">
+      </video>
       <canvas id="heroCanvas"></canvas>
       <div class="hero-overlay"></div>
       <div class="hero-grain"></div>
@@ -60,7 +63,7 @@
         <span class="title-line title-line-2">meets <span class="serif-italic">mythology</span></span>
       </h1>
 
-      <p class="hero-subtitle">Two AI artists. Thousands of years of mythology.<br>One studio born from pure code.</p>
+      <p class="hero-subtitle">AI Artists. Thousands of years of mythology.<br>One studio born from pure code.</p>
 
       <div class="hero-buttons">
         <a href="#davan" class="btn btn-primary btn-glow">
@@ -77,6 +80,9 @@
         <!-- DAVAN card -->
         <div class="showcase-card active" data-artist="davan">
           <div class="showcase-visual davan-gradient">
+            <video class="showcase-video" autoplay muted loop playsinline>
+              <source src="davan-card-motion.mp4" type="video/mp4">
+            </video>
             <div class="showcase-motion">
               <div class="motion-bars">
                 <span></span><span></span><span></span><span></span><span></span>
@@ -101,6 +107,9 @@
         <!-- ROXANA card -->
         <div class="showcase-card" data-artist="roxana">
           <div class="showcase-visual roxana-gradient">
+            <video class="showcase-video" autoplay muted loop playsinline>
+              <source src="roxana-motion.mp4" type="video/mp4">
+            </video>
             <div class="showcase-motion roxana-motion">
               <div class="motion-wave">
                 <svg viewBox="0 0 200 60" preserveAspectRatio="none">
@@ -186,9 +195,11 @@
         </div>
         <div class="about-content">
           <span class="section-tag">The Vision</span>
-          <h2 class="section-title">Sound crafted from <span class="gradient-text">code</span>, stories born from <span class="serif-italic">ancient fire</span></h2>
-          <p class="about-text">alBaloo Studio is a music and video studio where AI-generated artists come to life — not as imitations, but as entirely new creative beings. Each artist is built from scratch: their sound, their story, their visual identity, all born from code.</p>
-          <p class="about-text">What connects them is mythology. From the endurance epics of Persia to the whispered poetry of Rumi, from Spartan battle cries to the silk roads of Istanbul — we bridge civilizations through rhythm and melody.</p>
+          <h2 class="section-title">The Alchemy of <span class="gradient-text">alBaloo</span></h2>
+          <p class="about-text">In Farsi, Albaloo is the sour cherry — a brilliant, ruby-red fruit that masterfully balances the sweet nectar of life with a sharp, awakening bite. For millennia, it has been the defining flavor of the Persian palate. Whether woven into a magical tapestry of golden saffron and fragrant rice, or simmered into rich, timeless sweets, Albaloo is the taste of duality. It is the old and the new, the ancient and the modern, the bittersweet symphony of existence.</p>
+          <p class="about-text">As a record label, Albaloo embodies this exact alchemy. We believe music, like our namesake, should encompass the full spectrum of the human experience. We are here to bring the ancient echoes of Oriental mythology and culture into the modern world — not just through instruments, but through the limitless possibilities of Artificial Intelligence.</p>
+          <p class="about-text">By harmonizing ancestral wisdom with advanced AI coding, we are cultivating a new generation of digital artists. We create voices that tell thousand-year-old stories. We sing the ecstatic, soul-stirring poetry of Rumi and the lyrical romance of Hafiz. We pump endurance and cinematic power into your veins with the epic heroics of the Shahnameh.</p>
+          <p class="about-text highlight-text">Give your daily life a taste of Albaloo.</p>
           <div class="about-pillars">
             <div class="pillar">
               <div class="pillar-icon">
@@ -316,17 +327,7 @@
       <div class="artist-grid">
         <div class="artist-portrait">
           <div class="portrait-frame davan-frame">
-            <!-- Replace with: <img src="davan-portrait.png" alt="DAVAN"> -->
-            <div class="portrait-placeholder davan-gradient">
-              <div class="portrait-inner">
-                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="100" cy="80" r="35" fill="rgba(255,255,255,0.1)"/>
-                  <path d="M60 180 Q100 130 140 180" fill="rgba(255,255,255,0.08)"/>
-                  <circle cx="100" cy="80" r="25" fill="rgba(255,255,255,0.05)"/>
-                </svg>
-                <span class="portrait-label">DAVAN</span>
-              </div>
-            </div>
+            <img src="davan-portrait.png" alt="DAVAN — The Runner" class="portrait-img">
             <div class="portrait-glow davan-glow"></div>
           </div>
           <div class="artist-stats-bar">
@@ -484,17 +485,7 @@
         </div>
         <div class="artist-portrait">
           <div class="portrait-frame roxana-frame">
-            <!-- Replace with: <img src="roxana-portrait.png" alt="ROXANA"> -->
-            <div class="portrait-placeholder roxana-gradient">
-              <div class="portrait-inner">
-                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="100" cy="80" r="35" fill="rgba(255,255,255,0.1)"/>
-                  <path d="M60 180 Q100 130 140 180" fill="rgba(255,255,255,0.08)"/>
-                  <path d="M75 60 Q100 20 125 60" fill="rgba(255,255,255,0.05)"/>
-                </svg>
-                <span class="portrait-label">ROXANA</span>
-              </div>
-            </div>
+            <img src="roxana-portrait.png" alt="ROXANA — The Poet" class="portrait-img">
             <div class="portrait-glow roxana-glow"></div>
           </div>
           <div class="artist-stats-bar roxana-bar">
@@ -521,6 +512,12 @@
   <!-- Podcast Section -->
   <section class="podcast section" id="podcast">
     <div class="podcast-bg"></div>
+    <div class="podcast-video-bg">
+      <video class="podcast-hero-video" autoplay muted loop playsinline>
+        <source src="davan-motion.mp4" type="video/mp4">
+      </video>
+      <div class="podcast-video-overlay"></div>
+    </div>
     <div class="container">
       <div class="section-header">
         <span class="section-tag">Podcast</span>
@@ -728,33 +725,25 @@
     <div class="container">
       <div class="contact-grid">
         <div class="contact-info">
-          <span class="section-tag">Connect</span>
-          <h2 class="section-title">Step into the <span class="gradient-text">studio</span></h2>
-          <p class="contact-text">Want to collaborate, license music, or just talk about the intersection of AI, code, and ancient mythology? We'd love to hear from you.</p>
-          <div class="contact-details">
-            <div class="contact-detail">
-              <div class="contact-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </div>
-              <span>hello@albaloostudio.com</span>
-            </div>
-          </div>
+          <span class="section-tag">Step Into the Studio</span>
+          <h2 class="section-title">Where Code Meets <span class="gradient-text">Culture</span></h2>
+          <p class="contact-text">Welcome to the digital orchard. Stepping into the Albaloo Studio is like walking into a laboratory housed within an ancient Persian palace. This is where the magic is mixed, where the sweet and the sour converge, and where history is rewritten in lines of code.</p>
+          <p class="contact-text">Here, algorithms are fed on a diet of millennia-old culture. We use cutting-edge AI not to replace the human soul, but to amplify the voices of the past.</p>
           <div class="social-links">
-            <a href="#" class="social-link" aria-label="Twitter/X">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="#" class="social-link" aria-label="Instagram">
+            <a href="https://www.instagram.com/albaloostudio" class="social-link" aria-label="Instagram">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
             </a>
             <a href="#" class="social-link" aria-label="YouTube">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
             </a>
-            <a href="#" class="social-link" aria-label="Spotify">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+            <a href="https://www.facebook.com/albaloostudio" class="social-link" aria-label="Facebook">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
             </a>
           </div>
         </div>
-        <form class="contact-form" id="contactForm">
+        <form class="contact-form" id="contactForm" action="https://formsubmit.co/albaloostudio@gmail.com" method="POST">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_next" value="https://www.albaloostudio.com">
           <div class="form-row">
             <div class="form-group">
               <label for="name">Name</label>
@@ -787,8 +776,20 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a href="#" class="logo"><span class="logo-al">al</span>Baloo<span class="logo-dot"> Studio</span></a>
-          <p>Where code meets mythology. AI-crafted artists bridging civilizations through sound.</p>
+          <a href="#" class="logo"><img src="logo.png" alt="alBaloo Studio" class="logo-img"></a>
+          <p class="footer-tagline">The Sweet Sour Cherry</p>
+          <p>In Persian, "Albaloo" is the sour cherry — a timeless symbol of duality. The old and the new, the ancient and the modern. The best fusion of mythology and code.</p>
+          <div class="footer-socials">
+            <a href="https://www.instagram.com/albaloostudio" class="social-link" aria-label="Instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" class="social-link" aria-label="YouTube">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+            </a>
+            <a href="https://www.facebook.com/albaloostudio" class="social-link" aria-label="Facebook">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+          </div>
         </div>
         <div class="footer-links">
           <h4>Studio</h4>
