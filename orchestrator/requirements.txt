@@ -1,0 +1,49 @@
+# Albaloo Orchestration Pipeline — Python dependencies
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Target runtime: Python 3.11 or 3.12 (pinned in the GitHub Actions workflow).
+# 3.13+ is untested here — several of these wheels lag a new CPython by a
+# release or two, so CI pins 3.11 deliberately rather than tracking `latest`.
+#
+#   python -m venv .venv && source .venv/bin/activate
+#   pip install -r requirements.txt
+
+# ── Google Search Console (Agent 1) ───────────────────────────────────────────
+# google-api-python-client pulls google-auth transitively; both are pinned
+# explicitly because the service-account credential path is loaded directly
+# from google.oauth2.service_account and must not float independently.
+google-api-python-client>=2.130.0,<3
+google-auth>=2.29.0,<3
+google-auth-httplib2>=0.2.0
+
+# ── LLM providers ─────────────────────────────────────────────────────────────
+openai>=1.40.0,<2               # Agent 1 — gap analysis, structured JSON output
+google-genai>=1.0.0             # Agent 2 — long-context drafting (fa-IR / en), CURRENT SDK
+google-generativeai>=0.7.0,<1   # Agent 2 — legacy fallback; see the note below
+anthropic>=0.34.0,<1            # Agent 3 — channel-specific marketing copy
+
+# ── Transport ─────────────────────────────────────────────────────────────────
+requests>=2.32.0,<3             # outbound webhooks, sitemap fetch
+fastapi>=0.111.0                # Agent 2 webhook receiver
+uvicorn[standard]>=0.30.0       # ASGI server for Agent 2
+pydantic>=2.7.0,<3              # payload models + validation (FastAPI v2 line)
+
+# ── Config & validation ───────────────────────────────────────────────────────
+PyYAML>=6.0.1                   # sites.yml — the domain registry
+python-dotenv>=1.0.1            # local .env loading (no-op in GitHub Actions)
+jsonschema>=4.22.0              # validates payloads against schemas/*.json
+
+# ── Notes ─────────────────────────────────────────────────────────────────────
+# * Gemini SDK, read this one. `google-generativeai` is the package named in the
+#   original spec, but Google has ENDED support for it — importing it prints an
+#   end-of-support FutureWarning, and it receives no further updates or fixes.
+#   `google-genai` is the replacement. agent2_writer_listener.py::_gemini_once
+#   tries google-genai first and falls back to google-generativeai, so both
+#   lines above are listed and either one alone will run. Drop the legacy line
+#   once every host is on google-genai.
+# * anthropic is listed here for completeness even though Agent 3 is not yet
+#   implemented in this directory — it runs on base44/Make.com and shares the
+#   same requirements file when self-hosted.
+# * No SERP-API client is included: opportunity.serp is inferred from Search
+#   Console only (open decision O-4 in ARCHITECTURE.md).

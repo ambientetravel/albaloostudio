@@ -1,0 +1,141 @@
+# Albaloo Orchestration Pipeline — weekly site audit + strategy.
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Agent 5 crawls every active property, Agent 6 turns the findings into a
+# strategy. Needs no Google credentials — it reads public URLs — so this runs
+# whether or not the Search Console grant has happened yet.
+#
+# ── The pin ──────────────────────────────────────────────────────────────────
+# This workflow NEVER passes --sample. The audit score counts findings, so it
+# scales with how many pages were sampled: the same site scores 17 at --sample 3
+# and 40 at --sample 2, with nothing having changed. Scheduled runs therefore
+# take `audit_sample_pages` from sites.yml (pinned at 10), which is the only way
+# week-over-week scores mean anything.
+#
+# To change the sample size, edit sites.yml — and understand that doing so
+# restarts the trend line. Old scores stop being comparable to new ones.
+
+name: Agent 5+6 — Site audit & strategy
+
+on:
+  schedule:
+    # Mondays 05:00 UTC — after the daily scout at 04:15, so a Monday run sees
+    # whatever the scout did that morning.
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Restrict to one domain (blank = every active site)"
+        required: false
+        type: string
+      sample:
+        description: >-
+          Override the pinned sample size. Ad-hoc investigation only — the
+          resulting scores are NOT comparable with the weekly trend line.
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent5-site-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: orchestrator
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Confirm the sample size is pinned
+        # A scheduled run that quietly picks up a different sample size produces
+        # a fake trend. Fail loudly instead.
+        run: |
+          PINNED=$(python -c "import config; s=config.load_sites(); print({x.audit_sample_pages for x in s})")
+          echo "audit_sample_pages across active sites: $PINNED"
+          if [ "$PINNED" != "{10}" ]; then
+            echo "::error::audit_sample_pages is not uniformly 10 — the trend line is broken."
+            echo "::error::Either restore it in sites.yml, or accept the reset and update this check."
+            exit 1
+          fi
+
+      - name: Audit
+        # Deliberately no --sample on the scheduled path.
+        env:
+          PIPELINE_ENVIRONMENT: production
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
+          if [ -n "${{ inputs.sample }}" ]; then
+            echo "::warning::--sample ${{ inputs.sample }} overrides the pin; these scores are not comparable with the weekly trend."
+            ARGS="$ARGS --sample ${{ inputs.sample }}"
+          fi
+          mkdir -p reports
+          python agent5_site_auditor.py $ARGS --format markdown --out reports/audit-$(date -u +%Y-%m-%d).md
+          python agent5_site_auditor.py $ARGS --format json    --out reports/audit-$(date -u +%Y-%m-%d).json
+
+      - name: Strategy
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-5' }}
+        run: |
+          LLM=""
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::notice::No ANTHROPIC_API_KEY — writing the report without the narrative pass."
+            LLM="--no-llm"
+          fi
+          GAPS=""
+          LATEST_BRIEFS=$(ls -d runs/*/briefs 2>/dev/null | tail -1 || true)
+          if [ -n "$LATEST_BRIEFS" ]; then GAPS="--gaps $LATEST_BRIEFS"; fi
+          python agent6_analyst.py \
+            --audit reports/audit-$(date -u +%Y-%m-%d).json \
+            $GAPS $LLM \
+            --out reports/strategy-$(date -u +%Y-%m-%d).md
+
+      - name: Trend
+        # Two numbers, in the job summary, so a regression is visible without
+        # opening an artifact.
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, glob, os
+          files = sorted(glob.glob("reports/audit-*.json"))
+          cur = json.load(open(files[-1]))
+          print("## Site audit\n")
+          s = cur.get("sampling", {})
+          print(f"Sample size **{s.get('sample_pages')}** · "
+                f"{'pinned — comparable with the trend line' if s.get('pinned') else '**OVERRIDDEN — not comparable**'}\n")
+          print("| Site | Score | Findings |")
+          print("|---|---:|---:|")
+          for site in sorted(cur["sites"], key=lambda x: x["score"]):
+              print(f"| `{site['domain']}` | {site['score']} | {len(site['findings'])} |")
+          print(f"\nMean **{cur['totals']['mean_score']}/100** · "
+                f"{cur['totals']['findings']} findings · "
+                f"{cur['totals']['critical']} critical")
+          PY
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-audit
+          path: |
+            orchestrator/reports/
+            orchestrator/runs/
+          retention-days: 365
+          if-no-files-found: warn

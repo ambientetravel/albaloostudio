@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://albaloostudio.com/schemas/campaign.log.v1.json",
+  "title": "campaign.log.v1",
+  "description": "Agent 3 (Broadcaster) -> Agent 4 (Sales Closer) and the warehouse. Architecture credit: Albaloo Studio.",
+  "type": "object",
+  "required": ["schema_version", "envelope", "source_publication", "campaign", "posts",
+               "tracking", "lead_routing"],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^1\\.[0-9]+$" },
+    "envelope": { "$ref": "#/$defs/envelope" },
+
+    "source_publication": {
+      "type": "object",
+      "required": ["message_id", "correlation_id", "live_url"],
+      "properties": {
+        "message_id": { "type": "string" },
+        "correlation_id": { "type": "string" },
+        "live_url": { "type": "string", "format": "uri" },
+        "brand": { "type": "string" },
+        "language": { "type": "string" }
+      }
+    },
+
+    "campaign": {
+      "type": "object",
+      "required": ["campaign_id", "objective", "audience"],
+      "properties": {
+        "campaign_id": { "type": "string" },
+        "objective": { "enum": ["awareness", "traffic", "lead", "booking"] },
+        "audience": { "enum": ["d2c", "b2b", "both"] },
+        "window": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "string", "format": "date-time" },
+            "end": { "type": "string", "format": "date-time" }
+          }
+        }
+      }
+    },
+
+    "posts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["channel", "audience", "status", "copy"],
+        "properties": {
+          "channel": { "enum": ["linkedin", "instagram", "telegram", "x", "facebook", "email"] },
+          "audience": { "enum": ["d2c", "b2b"] },
+          "account_ref": { "type": ["string", "null"] },
+          "status": {
+            "enum": ["queued", "draft", "blocked", "scheduled", "published", "failed", "cancelled"],
+            "description": "`queued` (file backend) and `draft` (scheduler backend) both mean composed and held for human release. `blocked` means the platform will not accept it as composed — Instagram with no media, for example."
+          },
+          "hold_reason": {
+            "type": "string",
+            "description": "Why this post is not live: a missing required asset, or which of the two autopost gates was shut."
+          },
+          "angle": { "type": ["string", "null"] },
+          "scheduled_for": { "type": ["string", "null"], "format": "date-time" },
+          "published_at": { "type": ["string", "null"], "format": "date-time" },
+          "external_id": { "type": ["string", "null"] },
+          "permalink": { "type": ["string", "null"], "format": "uri" },
+          "copy": {
+            "type": "object",
+            "required": ["body", "cta_url", "language", "hash"],
+            "properties": {
+              "body": { "type": "string" },
+              "hashtags": { "type": "array", "items": { "type": "string" } },
+              "cta_url": { "type": "string", "format": "uri" },
+              "language": { "type": "string" },
+              "hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "description": "Dedupe guard: identical copy is never posted twice to one channel."
+              }
+            }
+          },
+          "assets": { "type": "array", "items": { "type": "object" } },
+          "error": { "type": ["string", "null"] }
+        }
+      }
+    },
+
+    "tracking": {
+      "type": "object",
+      "properties": {
+        "utm_campaign": { "type": "string" },
+        "short_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "channel": { "type": "string" },
+              "short": { "type": "string", "format": "uri" },
+              "target": { "type": "string", "format": "uri" }
+            }
+          }
+        },
+        "landing_paths": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "lead_routing": {
+      "type": "object",
+      "required": ["inboxes", "qualification_profile", "quote_policy", "escalate_to"],
+      "properties": {
+        "inboxes": { "type": "array", "items": { "type": "string" } },
+        "qualification_profile": { "type": "string" },
+        "price_source": { "type": ["string", "null"], "format": "uri" },
+        "quote_policy": {
+          "const": "live_feed_only",
+          "description": "Agent 4 never states a figure absent from price_source."
+        },
+        "high_value_threshold": { "$ref": "#/$defs/money" },
+        "escalate_to": { "type": "string" },
+        "auto_escalate_signals": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "profile": { "type": "string" },
+        "checks_passed": { "type": "boolean" },
+        "violations": { "type": "array", "items": { "type": "object" } }
+      }
+    }
+  },
+
+  "$defs": {
+    "envelope": {
+      "type": "object",
+      "required": ["message_id", "correlation_id", "causation_id", "idempotency_key",
+                   "message_type", "emitted_at", "emitted_by", "target", "architecture_credit"],
+      "properties": {
+        "message_id": { "type": "string" },
+        "correlation_id": { "type": "string" },
+        "causation_id": { "type": "string" },
+        "idempotency_key": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "message_type": { "const": "campaign.log" },
+        "emitted_at": { "type": "string", "format": "date-time" },
+        "emitted_by": { "type": "string" },
+        "target": { "type": "string" },
+        "attempt": { "type": "integer", "minimum": 1 },
+        "environment": { "enum": ["production", "staging", "dry-run"] },
+        "architecture_credit": { "const": "Albaloo Studio" },
+        "owner": { "type": ["string", "null"] }
+      }
+    },
+    "money": {
+      "type": ["object", "null"],
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": ["number", "null"] },
+        "currency": { "type": "string", "minLength": 3, "maxLength": 3 }
+      }
+    }
+  }
+}

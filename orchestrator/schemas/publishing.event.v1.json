@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://albaloostudio.com/schemas/publishing.event.v1.json",
+  "title": "publishing.event.v1",
+  "description": "Agent 2 (Writer) -> Agent 3 (Broadcaster). Architecture credit: Albaloo Studio.",
+  "type": "object",
+  "required": ["schema_version", "envelope", "source_brief", "publication", "content_summary",
+               "distribution_hints", "compliance"],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^1\\.[0-9]+$" },
+    "envelope": { "$ref": "#/$defs/envelope" },
+
+    "source_brief": {
+      "type": "object",
+      "required": ["message_id", "correlation_id", "primary_keyword"],
+      "properties": {
+        "message_id": { "type": "string" },
+        "correlation_id": { "type": "string" },
+        "primary_keyword": { "type": "string" },
+        "gap_type": { "type": "string" },
+        "passthrough": {
+          "type": "object",
+          "description": "Keys the writer did not recognise, preserved verbatim so a producer can add a field without a lockstep deploy."
+        }
+      }
+    },
+
+    "publication": {
+      "type": "object",
+      "required": ["status", "live_url", "language", "word_count"],
+      "properties": {
+        "status": { "enum": ["published", "scheduled", "draft", "failed"] },
+        "live_url": { "type": "string", "format": "uri" },
+        "canonical_url": { "type": "string", "format": "uri" },
+        "cms": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string" },
+            "adapter": { "type": ["string", "null"] },
+            "record_id": { "type": ["string", "null"] }
+          }
+        },
+        "published_at": { "type": ["string", "null"], "format": "date-time" },
+        "scheduled_for": { "type": ["string", "null"], "format": "date-time" },
+        "language": { "type": "string" },
+        "word_count": { "type": "integer", "minimum": 0 },
+        "reading_time_min": { "type": "integer", "minimum": 0 },
+        "hero_image": {
+          "type": ["object", "null"],
+          "description": "null when no licensed image with a known credit was available. An image whose credit is unknown is omitted, never guessed.",
+          "required": ["url", "credit", "license"],
+          "properties": {
+            "url": { "type": "string", "format": "uri" },
+            "alt": { "type": "string" },
+            "credit": { "type": ["string", "null"] },
+            "license": { "type": ["string", "null"] }
+          }
+        },
+        "indexation": {
+          "type": "object",
+          "properties": {
+            "sitemap_updated": { "type": "boolean" },
+            "robots": { "type": "string" },
+            "submitted_to_gsc": { "type": "boolean" }
+          }
+        }
+      }
+    },
+
+    "content_summary": {
+      "type": "object",
+      "required": ["title", "key_points", "primary_keyword", "audience", "offer"],
+      "properties": {
+        "title": { "type": "string" },
+        "meta_description": { "type": "string" },
+        "key_points": { "type": "array", "items": { "type": "string" } },
+        "primary_keyword": { "type": "string" },
+        "audience": { "enum": ["d2c", "b2b", "both"] },
+        "offer": {
+          "type": "object",
+          "required": ["has_offer"],
+          "properties": {
+            "has_offer": { "type": "boolean" },
+            "product_ref": { "type": ["string", "null"] },
+            "price_from": { "$ref": "#/$defs/money" },
+            "price_source": { "type": ["string", "null"], "format": "uri" },
+            "price_asof": {
+              "type": ["string", "null"],
+              "format": "date-time",
+              "description": "A price with no price_asof is not a price (ARCHITECTURE.md 7.3)."
+            },
+            "departure_window": {
+              "type": ["object", "null"],
+              "properties": {
+                "start": { "type": "string", "format": "date" },
+                "end": { "type": "string", "format": "date" }
+              }
+            },
+            "visa_regime": {
+              "enum": ["visa_free", "easy_visa", "schengen", "visa_required", null],
+              "description": "visa_free is legal ONLY for AROYA Turkiye+Egypt routes and Seychelles."
+            }
+          }
+        },
+        "quotable_lines": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Lines Agent 3 may reuse verbatim. Anything else it must write fresh, and it may never assert a new fact."
+        }
+      }
+    },
+
+    "distribution_hints": {
+      "type": "object",
+      "required": ["channels", "cta_url"],
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": { "enum": ["linkedin", "instagram", "telegram", "x", "facebook", "email"] }
+        },
+        "b2b_angle": { "type": ["string", "null"] },
+        "d2c_angle": { "type": ["string", "null"] },
+        "cta_url": { "type": "string", "format": "uri" },
+        "utm": {
+          "type": "object",
+          "properties": {
+            "source": { "type": "string" },
+            "medium": { "type": "string" },
+            "campaign": { "type": "string" }
+          }
+        },
+        "hashtags_allowed": { "type": "boolean" },
+        "embargo_until": { "type": ["string", "null"], "format": "date-time" },
+        "assets": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+
+    "compliance": {
+      "type": "object",
+      "required": ["profile", "checks_passed", "violations"],
+      "properties": {
+        "profile": { "type": "string" },
+        "checks_run": { "type": "array", "items": { "type": "string" } },
+        "checks_passed": { "type": "boolean" },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rule", "severity", "excerpt", "message"],
+            "properties": {
+              "rule": { "type": "string" },
+              "severity": { "enum": ["block", "warn"] },
+              "excerpt": { "type": "string" },
+              "message": { "type": "string" },
+              "action": { "enum": ["blocked", "flagged"] }
+            }
+          }
+        },
+        "reviewed_by": { "type": "string" },
+        "human_review_required": { "type": "boolean" }
+      }
+    },
+
+    "generation": {
+      "type": "object",
+      "properties": {
+        "provider": { "type": "string" },
+        "model": { "type": "string" },
+        "input_tokens": { "type": ["integer", "null"] },
+        "output_tokens": { "type": ["integer", "null"] },
+        "attempts": { "type": "integer" },
+        "duration_ms": { "type": "integer" }
+      }
+    }
+  },
+
+  "$defs": {
+    "envelope": {
+      "type": "object",
+      "required": ["message_id", "correlation_id", "causation_id", "idempotency_key",
+                   "message_type", "emitted_at", "emitted_by", "target", "architecture_credit"],
+      "properties": {
+        "message_id": { "type": "string" },
+        "correlation_id": { "type": "string" },
+        "causation_id": {
+          "type": "string",
+          "description": "message_id of the content.brief that caused this event"
+        },
+        "idempotency_key": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "message_type": { "const": "publishing.event" },
+        "emitted_at": { "type": "string", "format": "date-time" },
+        "emitted_by": { "type": "string" },
+        "target": { "type": "string" },
+        "attempt": { "type": "integer", "minimum": 1 },
+        "environment": { "enum": ["production", "staging", "dry-run"] },
+        "architecture_credit": { "const": "Albaloo Studio" },
+        "owner": { "type": ["string", "null"] }
+      }
+    },
+    "money": {
+      "type": ["object", "null"],
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": ["number", "null"] },
+        "currency": { "type": "string", "minLength": 3, "maxLength": 3 }
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(npx *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(python3 *)",
+      "Bash(node *)",
+      "Edit"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Read(**/credentials*.json)",
+      "Read(**/*service-account*.json)",
+      "Edit(**/.env*)",
+      "Bash(git push *)",
+      "Bash(rm -rf *)"
+    ]
+  }
+}

@@ -1,0 +1,88 @@
+# Albaloo Orchestration Pipeline — Agent 1 trigger.
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+
+name: Agent 1 — SEO Scout
+
+on:
+  schedule:
+    # 04:15 UTC daily. Search Console data lags ~2 days, so the script queries
+    # back from today-3d; the exact hour only needs to be off-peak.
+    - cron: "15 4 * * *"
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Restrict to one domain (blank = all eight)"
+        required: false
+        type: string
+      limit:
+        description: "Max briefs per domain"
+        required: false
+        default: "5"
+        type: string
+      dry_run:
+        description: "Build briefs but deliver nothing"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  # Never let two scouts run at once — at-least-once delivery plus a second
+  # concurrent run is how the same gap becomes two articles.
+  group: agent1-seo-scout
+  cancel-in-progress: false
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: orchestrator
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Verify Search Console access
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        # Fails the run if the service account cannot read a property declared
+        # in sites.yml — the usual cause is that only one of the two Google
+        # accounts granted it access (ARCHITECTURE.md §3.1).
+        run: python agent1_seo_scout.py --list-properties
+
+      - name: Run the scout
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1' }}
+          WEBHOOK_SIGNING_SECRET: ${{ secrets.WEBHOOK_SIGNING_SECRET }}
+          AGENT2_WEBHOOK_URL: ${{ secrets.AGENT2_WEBHOOK_URL }}
+          AGENT3_WEBHOOK_URL: ${{ secrets.AGENT3_WEBHOOK_URL }}
+          PIPELINE_ENVIRONMENT: production
+        run: |
+          ARGS="--limit ${{ inputs.limit || '5' }}"
+          if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          python agent1_seo_scout.py $ARGS
+
+      - name: Upload run artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-scout-run
+          path: orchestrator/runs/
+          retention-days: 90
+          if-no-files-found: warn
