@@ -62,3 +62,7 @@ orchestrator/queue/
 orchestrator/bundles/
 
 orchestrator/reports/
+
+# Agent run output — manifests, briefs and dead-letters are per-run artifacts.
+orchestrator/runs/
+orchestrator/bundles/

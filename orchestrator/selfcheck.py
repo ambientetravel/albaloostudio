@@ -105,6 +105,56 @@ ok("visa-free OK for AROYA route",
 ok("Schengen port re-blocks visa-free",
    any(v.rule == "visa_accuracy" for v in
        c("visa-free", context={"route_key": "aroya_turkiye_egypt", "itinerary_ports": ["Istanbul", "Santorini"]})))
+# ── The 8 Aug 2026 over-block ────────────────────────────────────────────────
+# The first live run dead-lettered 3 of 7 briefs, and every one of them was
+# blocked for stating the visa rule CORRECTLY. The gate could not tell "Türkiye
+# and Egypt: no visa needed" (true) from "Dubai: no visa needed" (the lie the
+# rule exists to stop), because it never looked at which destination the claim
+# attached to. Perverse incentive: the more precisely the model stated the rule,
+# the more certainly its brief was thrown away.
+B = compliance.BLOCK
+def blocks(t, **kw): return any(v.severity == B and v.rule == "visa_accuracy" for v in c(t, **kw))
+
+ok("exempt route allowed without context", not blocks("مسیرهای ترکیه و مصر: بدون نیاز به ویزا"),
+   "AROYA Türkiye+Egypt is genuinely visa-free")
+ok("Seychelles allowed", not blocks("مسیر سیشل: بدون نیاز به ویزا"))
+ok("Türkiye+Egypt allowed in English", not blocks("AROYA's Türkiye and Egypt itineraries are visa-free"))
+ok("contrastive taxonomy allowed",
+   not blocks("تفکیک صریح مسیرهای بدون ویزا (ترکیه+مصر، سیشل) از مسیرهای ویزای آسان (خلیج فارس، دبی)"),
+   "the forbidden destination is attached to the EASY-VISA half")
+ok("easy-visa classification allowed", not blocks("Persian Gulf and Dubai are easy visa, not visa-free"))
+ok("Farsi easy-visa classification allowed", not blocks("مسیرهای خلیج فارس و دبی: ویزای آسان، نه بدون ویزا"))
+ok("naming the Schengen ZONE is not naming a port",
+   not blocks("تفکیک روشن مقاصد شنگن از مقاصد بدون ویزا و ویزای آسان"),
+   "«شنگن» is the visa zone; this sentence states the rule")
+
+# …and none of that may weaken the rule where it bites.
+ok("Persian Gulf claim still blocked", blocks("کروز خلیج فارس بدون ویزا برای ایرانیان"))
+ok("UAE claim still blocked", blocks("United Arab Emirates: no visa required"))
+ok("Abu Dhabi / Doha still blocked", blocks("Abu Dhabi and Doha: no visa needed"))
+ok("named Greek port still blocked", blocks("Santorini and Mykonos — visa-free sailing from Istanbul"))
+ok("named Farsi Greek port still blocked", blocks("کروز یونان بدون ویزا از استانبول"))
+ok("Lanzarote is Spain, therefore Schengen", blocks("لانزاروته بدون ویزا"))
+ok("Barcelona still blocked", blocks("Barcelona cruise, no visa needed"))
+ok("itinerary_ports stays authoritative with no place in the prose",
+   blocks("این مسیر بدون ویزا است", context={"itinerary_ports": ["Piraeus", "Santorini"]}))
+ok("negator does not leak across a list-item boundary",
+   blocks("مسیر سیشل: نه بدون ویزا\nکروز دبی بدون ویزا"),
+   "newline ends the clause")
+ok("destination-less claim is a WARN, not a BLOCK",
+   not blocks("مقاصد بدون ویزا") and any(v.rule == "visa_accuracy" for v in c("مقاصد بدون ویزا")))
+
+# assertive_surface: must_avoid enumerates forbidden terms, so scanning it
+# blocks a correct brief for correctly forbidding the thing.
+_surface = compliance.assertive_surface(
+    {"must_include": ["همیشه «خلیج فارس»"],
+     "must_avoid": ["Arabian Gulf", "خلیج عربی", "بدون ویزا", "visa-free"]})
+ok("must_avoid excluded from the checked surface",
+   not any(v.severity == B for v in c(_surface)))
+ok("must_include still checked", "خلیج فارس" in _surface)
+ok("assertive_surface puts one clause per line",
+   compliance.assertive_surface(["a", "b"]) == "a\nb")
+
 ok("price without feed blocked", any(v.rule == "no_invented_facts" for v in c("from €899 per person")))
 ok("تومان price blocked", any(v.rule == "no_invented_facts" for v in c("قیمت از ۱۲۳۴۵۶۷ تومان")))
 ok("price allowed with feed+asof",

@@ -83,6 +83,67 @@ _NO_VISA_CLAIM = re.compile(
 
 _SCHENGEN_MISLABEL = re.compile(r"(?i)\bschengen[-\s]?free\b|بدون\s*شنگن")
 
+# Destinations where a visa-free claim is FALSE. This is the harm the rule
+# exists to prevent, and the only case that earns a BLOCK on its own.
+_VISA_FORBIDDEN_DEST = re.compile(
+    r"(?i)persian\s+gulf|\bdubai\b|\bu\.?a\.?e\.?\b|united\s+arab\s+emirates"
+    r"|\babu\s*dhabi\b|\bdoha\b|\bqatar\b|\bbahrain\b|\bmuscat\b|\boman\b"
+    r"|خلیج\s*فارس|دبی|امارات|ابوظبی|دوحه|قطر|بحرین|مسقط|عمان"
+)
+
+# Destinations where it is TRUE: AROYA's Türkiye+Egypt routes, and Seychelles.
+_VISA_EXEMPT_DEST = re.compile(
+    r"(?i)\bt(ü|u)rkiye\b|\bturkey\b|\begypt\b|\bseychelles\b"
+    r"|ترکیه|تركيه|مصر|سیشل|سیشیل"
+)
+
+# Schengen ports named in the prose itself. `itinerary_ports` in the context is
+# the authoritative signal, but Agent 1 has no itinerary to pass — so a brief
+# saying "Santorini, visa-free" sailed straight through. Deliberately a SUBSET
+# of _SCHENGEN_PORT_MARKERS: «رم» sits inside «مارماریس» and «کن» inside
+# «اسکندریه», so short Persian tokens are excluded from free-text matching and
+# left to the port-list path, where they are compared whole.
+_SCHENGEN_IN_TEXT = re.compile(
+    r"(?i)\bgreece\b|\bgreek\b|\bsantorini\b|\bmykonos\b|\bpiraeus\b|\brhodes\b"
+    r"|\bcrete\b|\bcorfu\b|\bitaly\b|\bitalian\b|\bcivitavecchia\b|\bnaples\b"
+    r"|\bvenice\b|\bgenoa\b|\bspain\b|\bspanish\b|\bbarcelona\b|\bvalencia\b"
+    r"|\bmalaga\b|\bfrance\b|\bfrench\b|\bmarseille\b|\blanzarote\b|\bcanary\b"
+    r"|یونان|سانتورینی|میکونوس|ایتالیا|ناپل|ونیز|اسپانیا|بارسلون|فرانسه|مارسی"
+    r"|لانزاروته|قناری"
+)
+# Note what is NOT here: the word "Schengen" itself. It is the visa zone, not a
+# port, and copy that says «تفکیک مقاصد شنگن از مقاصد بدون ویزا» is stating the
+# rule correctly. Naming a *place* beside a visa-free claim blocks; naming the
+# zone falls through to the warn branch, and a real itinerary still blocks via
+# `itinerary_ports`, which is the authoritative signal.
+
+# "Persian Gulf and Dubai: easy visa, not visa-free" and "separate the visa-free
+# routes (Türkiye, Seychelles) from the easy-visa ones (Gulf, Dubai)" both name
+# a forbidden destination beside a visa-free claim, yet both are correct — the
+# forbidden destination is attached to the *easy-visa* half. This marker is how
+# the gate tells contrastive taxonomy from a false claim.
+_EASY_VISA_MARKER = re.compile(
+    r"(?i)\beasy[-\s]?visa\b|\bvisa[-\s]?on[-\s]?arrival\b"
+    r"|ویزای\s*آسان|ویزا\s*در\s*بدو\s*ورود"
+)
+
+# A brief or an article is a list of discrete instructions, not one long
+# sentence. Without a boundary the ±60-char window around «بدون ویزا» in
+# "Seychelles: no visa needed | Persian Gulf: easy visa" straddles both items
+# and condemns the correct one for its neighbour. Callers must join list items
+# with one of these; assertive_surface() does it for them.
+_CLAUSE_BOUNDARY = re.compile(r"[.!?؟\n؛;•|]")
+
+
+def _clause_bounds(text: str, match: re.Match[str]) -> tuple[int, int]:
+    """Offsets of the single clause containing `match`, never spilling into its neighbours."""
+    before = text[:match.start()]
+    after = text[match.end():]
+    left = max((m.end() for m in _CLAUSE_BOUNDARY.finditer(before)), default=0)
+    right_m = _CLAUSE_BOUNDARY.search(after)
+    right = match.end() + (right_m.start() if right_m else len(after))
+    return left, right
+
 # Negation guard. `visa_accuracy` bans a CLAIM, not a term: "Dubai is not
 # visa-free" is the correct sentence, and "state that Iran stays are not
 # visa-free" is the instruction that enforces the rule. A context-blind match
@@ -100,11 +161,18 @@ _NEG_AFTER = re.compile(
 )
 
 
-def _is_negated(text: str, match: re.Match[str]) -> bool:
-    """True when the surrounding clause denies the claim rather than making it."""
+def _is_negated(text: str, match: re.Match[str], *, lo: int = 0, hi: int | None = None) -> bool:
+    """
+    True when the surrounding clause denies the claim rather than making it.
+
+    `lo`/`hi` bound the search to one clause. Without them a negator belonging
+    to the *previous* item ("…easy visa, not visa-free | Dubai: visa-free")
+    would excuse the next item's real violation.
+    """
+    hi = len(text) if hi is None else hi
     return bool(
-        _NEG_BEFORE.search(text[max(0, match.start() - 60):match.start()])
-        or _NEG_AFTER.search(text[match.end():match.end() + 60])
+        _NEG_BEFORE.search(text[max(lo, match.start() - 60):match.start()])
+        or _NEG_AFTER.search(text[match.end():min(hi, match.end() + 60)])
     )
 
 # ── §7.3 Never invent ────────────────────────────────────────────────────────
@@ -147,6 +215,40 @@ PROFILES: dict[str, dict[str, bool]] = {
         "sanctions_check": True,
     },
 }
+
+
+# Fields that enumerate what the copy must NOT say. Every string in them is a
+# forbidden term by definition, so scanning them guarantees a false positive on
+# a *correctly written* brief — and the more precisely the model states the
+# rule, the more certainly its own brief is dead-lettered. Never check these.
+PROHIBITION_FIELDS = frozenset({"must_avoid", "avoid", "banned_terms", "do_not"})
+
+
+def assertive_surface(obj: Any) -> str:
+    """
+    Flatten a brief/draft into the text the gate should judge: every assertion,
+    no prohibition, one clause per line.
+
+    The newlines matter. These are discrete instructions, not prose — joined by
+    spaces, the window around one item's «بدون ویزا» reaches into the next
+    item's destination and condemns the correct statement for its neighbour.
+    """
+    lines: list[str] = []
+
+    def walk(node: Any, key: str | None = None) -> None:
+        if key in PROHIBITION_FIELDS:
+            return
+        if isinstance(node, dict):
+            for k, v in node.items():
+                walk(v, k)
+        elif isinstance(node, (list, tuple)):
+            for v in node:
+                walk(v, key)
+        elif isinstance(node, str) and node.strip():
+            lines.append(node.strip())
+
+    walk(obj)
+    return "\n".join(lines)
 
 
 def _excerpt(text: str, match: re.Match[str], width: int = 60) -> str:
@@ -195,16 +297,45 @@ def check(
         for m in _NO_VISA_CLAIM.finditer(text):
             if route_ok and not schengen:
                 continue
-            if _is_negated(text, m):
+            lo, hi = _clause_bounds(text, m)
+            if _is_negated(text, m, lo=lo, hi=hi):
                 continue  # "not visa-free" states the rule, it does not break it
-            reason = (
-                "One Schengen port makes the whole itinerary Schengen — even sailing "
-                "from Istanbul."
-                if schengen
-                else "Only AROYA's Türkiye+Egypt routes and Seychelles are visa-free. "
-                "Persian Gulf and Dubai are EASY VISA, not visa-free."
-            )
-            out.append(Violation("visa_accuracy", BLOCK, _excerpt(text, m), reason))
+
+            # Which destination the claim attaches to is the whole question.
+            # "Türkiye and Egypt: no visa needed" is the rule stated correctly;
+            # "Dubai: no visa needed" is the lie the rule exists to stop. A
+            # context-blind match cannot tell them apart, so it blocked every
+            # brief that explained the policy accurately — the better the model
+            # stated the rule, the more certainly the brief was dead-lettered.
+            clause = text[lo:hi]
+            forbidden = _VISA_FORBIDDEN_DEST.search(clause)
+            exempt = _VISA_EXEMPT_DEST.search(clause)
+            # A clause that classifies the forbidden destination as easy-visa is
+            # stating the rule, not breaking it.
+            classified = _EASY_VISA_MARKER.search(clause)
+
+            if forbidden and not classified:
+                out.append(Violation(
+                    "visa_accuracy", BLOCK, _excerpt(text, m),
+                    "Only AROYA's Türkiye+Egypt routes and Seychelles are visa-free. "
+                    "Persian Gulf and Dubai are EASY VISA, not visa-free.",
+                ))
+            elif schengen or _SCHENGEN_IN_TEXT.search(clause):
+                out.append(Violation(
+                    "visa_accuracy", BLOCK, _excerpt(text, m),
+                    "One Schengen port makes the whole itinerary Schengen — even "
+                    "sailing from Istanbul.",
+                ))
+            elif exempt or forbidden:
+                continue  # names a sanctioned exception and nothing else
+            else:
+                # No destination attached. Not a false claim, but vague enough
+                # to become one downstream — surface it without dead-lettering.
+                out.append(Violation(
+                    "visa_accuracy", WARN, _excerpt(text, m),
+                    "A visa-free claim with no destination attached. Name the route: "
+                    "only AROYA Türkiye+Egypt and Seychelles qualify.",
+                ))
         for m in _SCHENGEN_MISLABEL.finditer(text):
             out.append(
                 Violation(

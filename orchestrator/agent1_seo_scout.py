@@ -853,16 +853,17 @@ def self_check_brief(payload: dict[str, Any]) -> list[compliance.Violation]:
     itself says "Arabian Gulf" would poison every downstream prompt.
     """
     brief = payload["brief"]
-    surface = " ".join(
+    # One clause per line, and `must_avoid` excluded — see compliance.assertive_surface.
+    surface = compliance.assertive_surface(
         [
             payload["opportunity"]["primary_keyword"],
             payload["opportunity"]["rationale"],
             brief["working_title"],
             brief["meta"]["title"],
             brief["meta"]["description"],
-            " ".join(section.get("heading", "") for section in brief["outline"]),
-            " ".join(" ".join(s.get("must_cover", [])) for s in brief["outline"]),
-            " ".join(brief["must_include"]),
+            [section.get("heading", "") for section in brief["outline"]],
+            [s.get("must_cover", []) for s in brief["outline"]],
+            brief["must_include"],
         ]
     )
     profile = payload["compliance"]["profile"]

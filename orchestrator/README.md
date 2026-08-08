@@ -37,7 +37,7 @@ Verify the whole thing without a single API key or network call:
 python selfcheck.py
 ```
 
-218 assertions across all six agents — config, the compliance gate, gap
+249 assertions across all six agents — config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry, the
 autopost gates, PII redaction, escalation rules, and every HTTP surface. Exit 0
 means the pipeline is wired correctly.
@@ -122,6 +122,22 @@ Enforced twice — injected into every prompt, then re-checked against the
 generated output in [`compliance.py`](compliance.py). A violation blocks
 publication and dead-letters the payload; it does not warn and continue.
 
+The gate judges a **claim in its clause**, not a term anywhere in the payload.
+That distinction is the whole design, and getting it wrong is expensive in both
+directions. The first live run (8 Aug 2026) dead-lettered 3 of 7 briefs, and
+every one was blocked for stating the visa rule *correctly*: "Türkiye and Egypt:
+no visa needed" is true, "Dubai: no visa needed" is the lie, and a
+context-blind match cannot tell them apart. So:
+
+* prohibition fields (`must_avoid`) are never scanned — every string in them is
+  a forbidden term by definition, and scanning them punishes a correct brief;
+* list items are joined with newlines, so one item's claim cannot borrow its
+  neighbour's destination or its negator;
+* a visa-free claim is read against the destination in its own clause — a
+  forbidden one blocks, a sanctioned exception passes, an easy-visa label means
+  the copy is classifying rather than claiming, and no destination at all is a
+  warning rather than a block.
+
 * **«خلیج فارس» / Persian Gulf.** Never "Arabian Gulf". ("Arabian Sea" is a
   different body of water and is left alone.)
 * **Visa accuracy.** Only AROYA's Türkiye+Egypt routes and Seychelles are
@@ -175,7 +191,7 @@ publication and dead-letters the payload; it does not warn and continue.
 | [`SETUP-DEPLOY.md`](SETUP-DEPLOY.md) | scoped FTP + CI deploys, so no one holds the panel password |
 | [`agent5_site_auditor.py`](agent5_site_auditor.py) | technical + GEO + local crawl, no credentials needed |
 | [`agent6_analyst.py`](agent6_analyst.py) | audit + demand → strategy, calendar, paste-ready JSON-LD |
-| [`selfcheck.py`](selfcheck.py) | 218 assertions, no network |
+| [`selfcheck.py`](selfcheck.py) | 249 assertions, no network |
 | [`schemas/`](schemas) | JSON Schema for the three payloads |
 | `../.github/workflows/agent1-seo-scout.yml` | daily scout, 04:15 UTC |
 | `../.github/workflows/agent5-site-audit.yml` | weekly audit + strategy, Mondays 05:00 UTC |
