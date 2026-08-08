@@ -1,0 +1,64 @@
+# ── secrets / credentials ─────────────────────────────────────────────────
+# res-portal/inc/config.php holds ADMIN_BOOT_USER + ADMIN_BOOT_PASS in plain
+# text. Keep the whole portal out of git until those move to a local-only
+# config; see inc/config.local.php.example.
+res-portal/inc/config.php
+res-portal/inc/config.local.php
+res-portal/data/
+**/config.local.php
+*.key
+*.pem
+.env
+.env.*
+# …but the TEMPLATE must be committed: it documents every secret the pipeline
+# needs and the setup docs link to it. It contains no values.
+!.env.example
+!**/.env.example
+
+# ── captured leads / customer data (PII — never commit) ───────────────────
+_local-leads.jsonl
+**/leads.json
+**/leads.json.php
+**/data/*.json.php
+
+# ── separate repositories (their own git remotes) ────────────────────────
+# exploreorient is now its own repo: github.com/ambientetravel/exploreorient
+exploreorient/
+
+# ── dependencies & build output ──────────────────────────────────────────
+node_modules/
+package-lock.json
+dist/
+.astro/
+
+# ── deploy artefacts ─────────────────────────────────────────────────────
+*.zip
+boutimar-*.zip
+
+# ── OS / editor cruft ────────────────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ── worktrees / scratch ──────────────────────────────────────────────────
+.claude/worktrees/
+
+# local-only test fixture: a JSON copy of the live feed so journey.html
+# can be exercised against the static dev server. The real api/ is PHP on the host.
+boutimar-ir/api/
+
+# local-only widget test fixture (not for deploy)
+boutimar-partner/deploy-boutimar-ir/embed/cruises/_testfeed.json
+
+# widget local test fixture (not deployed — production reads boutimar.ir/data/)
+boutimar-partner/deploy-boutimar-ir/embed/cruises/data/
+
+# ── orchestrator run artefacts (briefs, manifests, dead letters) ─────────
+orchestrator/runs/
+orchestrator/__pycache__/
+orchestrator/queue/
+orchestrator/bundles/
+
+orchestrator/reports/

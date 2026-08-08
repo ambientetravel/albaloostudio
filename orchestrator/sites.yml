@@ -1,0 +1,197 @@
+# Albaloo Orchestration Pipeline — the domain registry.
+# Architecture credit: Albaloo Studio — albaloostudio.com
+#
+# This is the ONLY place a domain is declared. Agent 1 reads it at boot; no
+# other module hardcodes a hostname. Adding a brand = adding a block here.
+#
+# property_uri must match Search Console exactly. Domain properties
+# (`sc-domain:`) are preferred so www/apex/http/https roll into one row; use a
+# URL-prefix property (`https://example.com/`) only where a domain property was
+# never verified.
+#
+# channels[].account_ref is the scheduler's account ID. Every one is null today:
+# the only account connected to the scheduler is instagram/mozzafiatojourney,
+# which is a personal hobby page and is deliberately NOT wired to any brand.
+# See SETUP-SOCIAL.md for what to connect where. Until an account_ref is filled
+# in, Agent 3 composes the copy and holds it in the file queue — it cannot reach
+# a platform it has no account for.
+#
+# Two channel facts that decide the order of work:
+#   * Telegram takes text-only posts, needs no Business-account conversion, and
+#     is where Iranian travel buying actually happens. It is the fastest channel
+#     to get live and the right primary for the fa-IR brands.
+#   * Instagram will not accept a text-only post. A post with no image is held
+#     with `status: blocked`, not attempted — see scheduler.py MEDIA_REQUIRED.
+
+defaults:
+  lookback_days: 90            # GSC window for the demand signal
+  trend_window_days: 28        # short window compared against the long one
+  data_lag_days: 3             # GSC is ~2 days behind; never query today
+  min_impressions: 150         # below this a query is noise, not a gap
+  max_position: 40             # beyond page 4 there is no proximity to exploit
+  max_briefs_per_run: 5
+  compliance_profile: boutimar_v1
+  status: active               # active | hold — see the note below
+
+  # PINNED. The audit score counts findings, so it moves with how many pages
+  # were sampled — a run at 3 and a run at 10 are not comparable, and comparing
+  # them produces an imaginary trend. The cron never passes --sample; it takes
+  # this value, so every scheduled run measures the same way. Change it and you
+  # restart the trend line: old scores stop being comparable to new ones.
+  audit_sample_pages: 10
+
+sites:
+  - domain: boutimar.com
+    property_uri: "sc-domain:boutimar.com"
+    brand: Boutimar
+    locale: en
+    market: INT
+    base_url: "https://boutimar.com"
+    sitemap: "https://boutimar.com/sitemap.xml"    # verified 2026-08-06; not sitemap_index.xml
+    cms:
+      type: wordpress
+      adapter: wordpress_rest
+      content_root: "/"
+      publish_mode: draft
+    channels:
+      - name: linkedin
+        audience: b2b
+        autopost: false
+        account_ref: null          # not connected to the scheduler yet
+      - name: instagram
+        audience: d2c
+        autopost: false
+        account_ref: null          # needs a BRAND Instagram (Business acct + FB Page)
+        requires_media: true
+
+  - domain: boutimar.ir
+    property_uri: "sc-domain:boutimar.ir"
+    brand: Boutimar
+    locale: fa-IR
+    market: IR
+    base_url: "https://boutimar.ir"
+    sitemap: "https://boutimar.ir/sitemap.xml"
+    cms:
+      type: static
+      adapter: boutimar_ir_static
+      content_root: "/"
+      publish_mode: draft
+    data_dependencies:
+      - field: price_from
+        source: "https://boutimar.ir/api/cruises.php"
+    channels:
+      - name: telegram
+        audience: d2c
+        autopost: false
+        account_ref: null          # not connected to the scheduler yet
+      - name: instagram
+        audience: d2c
+        autopost: false
+        account_ref: null          # needs a BRAND Instagram (Business acct + FB Page)
+        requires_media: true
+
+  - domain: exploreorient.com
+    property_uri: "sc-domain:exploreorient.com"
+    brand: Explore Orient
+    locale: en
+    market: INT
+    base_url: "https://exploreorient.com"
+    sitemap: "https://exploreorient.com/sitemap-index.xml"
+    cms:
+      type: astro
+      adapter: astro_pr          # opens a PR against the exploreorient repo
+      content_root: "src/content/"
+      publish_mode: draft
+    channels:
+      - name: linkedin
+        audience: b2b
+        autopost: false
+        account_ref: null          # not connected to the scheduler yet
+
+  - domain: ambientetravel.com
+    property_uri: "sc-domain:ambientetravel.com"
+    brand: Ambiente Travel
+    locale: en
+    market: DACH
+    base_url: "https://ambientetravel.com"
+    sitemap: "https://ambientetravel.com/sitemap.xml"
+    cms:
+      type: base44
+      adapter: base44_entity
+      content_root: "/"
+      publish_mode: draft
+    channels:
+      - name: linkedin
+        audience: b2b
+        autopost: false
+        account_ref: null          # not connected to the scheduler yet
+
+  - domain: cruisebaz.com
+    property_uri: "sc-domain:cruisebaz.com"
+    brand: CruiseBaz
+    locale: fa-IR
+    market: IR
+    base_url: "https://cruisebaz.com"
+    sitemap: "https://cruisebaz.com/sitemap.xml"
+    cms:
+      type: base44
+      adapter: base44_entity
+      content_root: "/"
+      publish_mode: draft
+    channels:
+      - name: telegram
+        audience: d2c
+        autopost: false
+        account_ref: null          # ← fastest channel to get live: text-only, no Meta
+      - name: instagram
+        audience: d2c
+        autopost: false
+        account_ref: null          # needs a BRAND Instagram (Business acct + FB Page)
+        requires_media: true
+
+  - domain: cruise24.ir
+    property_uri: "sc-domain:cruise24.ir"
+    brand: Cruise24
+    locale: fa-IR
+    market: IR
+    status: hold               # not launched — 375-byte coming-soon page as of 2026-08-06
+    base_url: "https://cruise24.ir"
+    sitemap: "https://cruise24.ir/sitemap.xml"
+    cms:
+      type: static
+      adapter: static_bundle     # Agent 2 emits a deploy bundle, not an API push
+      content_root: "/"
+      publish_mode: draft
+    channels: []
+
+  - domain: cruiseshop.ir
+    property_uri: "sc-domain:cruiseshop.ir"
+    brand: CruiseShop
+    locale: fa-IR
+    market: IR
+    base_url: "https://cruiseshop.ir"
+    sitemap: "https://cruiseshop.ir/sitemap.xml"
+    cms:
+      type: static
+      adapter: static_bundle
+      content_root: "/"
+      publish_mode: draft
+    channels: []
+
+  - domain: dmciran.ir
+    property_uri: "sc-domain:dmciran.ir"
+    brand: DMC Iran
+    locale: fa-IR
+    market: IR
+    base_url: "https://dmciran.ir"
+    sitemap: "https://dmciran.ir/sitemap.xml"
+    cms:
+      type: static
+      adapter: static_bundle
+      content_root: "/"
+      publish_mode: draft
+    channels:
+      - name: linkedin
+        audience: b2b
+        autopost: false
+        account_ref: null          # not connected to the scheduler yet

@@ -1,0 +1,1056 @@
+#!/usr/bin/env python3
+"""
+Agent 1 — SEO Scout.
+
+Architecture credit: Albaloo Studio — albaloostudio.com
+Owner: Alireza Mozaffari
+
+Crawls the eight Search Console properties of the travel portfolio with ONE
+service account (ARCHITECTURE.md §3.1), diffs demand (GSC) against supply
+(sitemap), asks OpenAI to classify and rank the gaps, and POSTs a signed
+`content.brief.v1` payload to Agent 2 for each opportunity worth writing.
+
+Runs on a GitHub Actions cron. Reads only — it never mutates a site.
+
+    python agent1_seo_scout.py --list-properties
+    python agent1_seo_scout.py --dry-run
+    python agent1_seo_scout.py --domain boutimar.ir --limit 2
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import random
+import re
+import sys
+import time
+import xml.etree.ElementTree as ET
+from collections import defaultdict
+from datetime import timedelta
+from typing import Any, Iterable
+from urllib.parse import urlparse
+
+import requests
+from google.auth.exceptions import GoogleAuthError
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+import compliance
+import config
+from config import (
+    ARCHITECTURE_CREDIT,
+    ConfigError,
+    Site,
+    build_envelope,
+    idempotency_key,
+    rfc3339,
+    utc_now,
+)
+
+log = logging.getLogger("agent1.seo_scout")
+
+AGENT_ID = "agent1.seo_scout"
+TARGET_ID = "agent2.writer"
+
+GSC_ROW_LIMIT = 25_000          # the API maximum per request
+GSC_PAGE_SLEEP_S = 0.25         # 200 queries/min/site — stay well under it
+MAX_CANDIDATES_TO_LLM = 40      # one batched OpenAI call per domain, not per keyword
+
+# Rough organic CTR by position. Used only to spot a page that ranks well and
+# still under-earns its clicks — i.e. a title/intent problem, not a volume one.
+EXPECTED_CTR = {
+    1: 0.28, 2: 0.15, 3: 0.11, 4: 0.08, 5: 0.06,
+    6: 0.05, 7: 0.04, 8: 0.033, 9: 0.028, 10: 0.025,
+}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 1. Search Console — one service account, eight properties
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+def build_gsc_client():
+    """
+    Authenticate with the single service-account key.
+
+    The two historical Google accounts (alimozzarella@ and contactmozaffari@)
+    are NOT merged by this credential and cannot be — there is no API for that.
+    Each has separately granted this service account **Restricted** access to
+    the properties it owns, which is what makes one key read all eight.
+    See ARCHITECTURE.md §3.1.
+    """
+    info = config.load_service_account_info()
+    try:
+        creds = service_account.Credentials.from_service_account_info(
+            info, scopes=config.GSC_SCOPES
+        )
+    except (ValueError, GoogleAuthError) as exc:
+        raise ConfigError(f"Service account key rejected by google-auth: {exc}") from exc
+
+    log.info("GSC service account: %s", info["client_email"])
+    # cache_discovery=False: the file cache is unusable on a read-only CI runner.
+    return build("searchconsole", "v1", credentials=creds, cache_discovery=False)
+
+
+def list_properties(service) -> list[dict[str, str]]:
+    entries = service.sites().list().execute().get("siteEntry", [])
+    return [
+        {"siteUrl": e.get("siteUrl", ""), "permissionLevel": e.get("permissionLevel", "")}
+        for e in entries
+    ]
+
+
+def audit_access(service, sites: list[Site]) -> list[str]:
+    """
+    Name the properties this key CANNOT see. The usual cause is that step 3 or 4
+    of the setup was completed under only one of the two Google accounts.
+    """
+    visible = {p["siteUrl"] for p in list_properties(service)}
+    missing = [s.property_uri for s in sites if s.property_uri not in visible]
+    if missing:
+        log.warning(
+            "Service account cannot see %d propert%s: %s — add it as a Restricted "
+            "user in Search Console under whichever Google account owns them "
+            "(ARCHITECTURE.md §3.1).",
+            len(missing),
+            "y" if len(missing) == 1 else "ies",
+            ", ".join(missing),
+        )
+    return missing
+
+
+def _search_analytics(
+    service,
+    property_uri: str,
+    start: str,
+    end: str,
+    dimensions: list[str],
+) -> list[dict[str, Any]]:
+    """Paginated searchanalytics.query. Returns raw rows with `keys` intact."""
+    rows: list[dict[str, Any]] = []
+    start_row = 0
+    while True:
+        body = {
+            "startDate": start,
+            "endDate": end,
+            "dimensions": dimensions,
+            "rowLimit": GSC_ROW_LIMIT,
+            "startRow": start_row,
+            "dataState": "final",
+            "type": "web",
+        }
+        try:
+            resp = (
+                service.searchanalytics()
+                .query(siteUrl=property_uri, body=body)
+                .execute()
+            )
+        except HttpError as exc:
+            status = getattr(exc.resp, "status", None)
+            if status == 403:
+                raise PermissionError(
+                    f"403 on {property_uri}: the service account is not a user on this "
+                    "property. Add it in Search Console → Settings → Users and "
+                    "permissions → Restricted."
+                ) from exc
+            if status == 429:
+                log.warning("429 on %s — backing off 30s", property_uri)
+                time.sleep(30)
+                continue
+            raise
+
+        batch = resp.get("rows", [])
+        rows.extend(batch)
+        if len(batch) < GSC_ROW_LIMIT:
+            break
+        start_row += GSC_ROW_LIMIT
+        time.sleep(GSC_PAGE_SLEEP_S)
+    return rows
+
+
+def collect_gsc(service, site: Site) -> dict[str, Any]:
+    """Four passes per property: long window, short window, page map, country map."""
+    end = (utc_now() - timedelta(days=site.data_lag_days)).date()
+    long_start = end - timedelta(days=site.lookback_days)
+    short_start = end - timedelta(days=site.trend_window_days)
+    e, ls, ss = end.isoformat(), long_start.isoformat(), short_start.isoformat()
+
+    long_rows = _search_analytics(service, site.property_uri, ls, e, ["query", "device"])
+    short_rows = _search_analytics(service, site.property_uri, ss, e, ["query"])
+    page_rows = _search_analytics(service, site.property_uri, ls, e, ["query", "page"])
+    country_rows = _search_analytics(service, site.property_uri, ls, e, ["query", "country"])
+
+    log.info(
+        "%s — GSC rows: long=%d short=%d page=%d country=%d (%s → %s)",
+        site.domain, len(long_rows), len(short_rows), len(page_rows), len(country_rows), ls, e,
+    )
+    return {
+        "date_range": {"start": ls, "end": e},
+        "short_range": {"start": ss, "end": e},
+        "long_rows": long_rows,
+        "short_rows": short_rows,
+        "page_rows": page_rows,
+        "country_rows": country_rows,
+        "row_count": len(long_rows) + len(short_rows) + len(page_rows) + len(country_rows),
+    }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 2. Supply — what actually exists on the site
+# ══════════════════════════════════════════════════════════════════════════════
+
+_SITEMAP_NS = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+
+
+def fetch_sitemap_urls(site: Site, session: requests.Session, depth: int = 0) -> set[str]:
+    """
+    Read sitemap.xml, following one level of <sitemapindex>. A failure here is
+    non-fatal: with no supply signal every ranking query looks like a gap, so we
+    degrade to 'unknown supply' and let the LLM step be the judge.
+
+    ElementTree does not resolve external entities and raises on entity
+    declarations, so an untrusted sitemap cannot pull an XXE here.
+    """
+    urls: set[str] = set()
+    try:
+        resp = session.get(site.sitemap, timeout=20, headers={"User-Agent": config.USER_AGENT})
+        resp.raise_for_status()
+        root = ET.fromstring(resp.content)
+    except (requests.RequestException, ET.ParseError) as exc:
+        log.warning("%s — sitemap unavailable (%s): %s", site.domain, site.sitemap, exc)
+        return urls
+
+    tag = root.tag.split("}")[-1]
+    if tag == "sitemapindex" and depth == 0:
+        for loc in root.findall(".//sm:sitemap/sm:loc", _SITEMAP_NS):
+            child = (loc.text or "").strip()
+            if not child:
+                continue
+            urls |= _fetch_child_sitemap(child, session)
+    else:
+        for loc in root.findall(".//sm:url/sm:loc", _SITEMAP_NS):
+            if loc.text:
+                urls.add(loc.text.strip())
+
+    log.info("%s — sitemap lists %d URLs", site.domain, len(urls))
+    return urls
+
+
+def _fetch_child_sitemap(url: str, session: requests.Session) -> set[str]:
+    out: set[str] = set()
+    try:
+        resp = session.get(url, timeout=20, headers={"User-Agent": config.USER_AGENT})
+        resp.raise_for_status()
+        root = ET.fromstring(resp.content)
+    except (requests.RequestException, ET.ParseError) as exc:
+        log.warning("child sitemap failed (%s): %s", url, exc)
+        return out
+    for loc in root.findall(".//sm:url/sm:loc", _SITEMAP_NS):
+        if loc.text:
+            out.add(loc.text.strip())
+    return out
+
+
+_SLUG_SPLIT = re.compile(r"[^0-9a-z؀-ۿ]+")
+
+
+def _slug_tokens(url: str) -> set[str]:
+    path = urlparse(url).path.lower()
+    return {t for t in _SLUG_SPLIT.split(path) if len(t) > 2}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 3. The diff — demand minus supply
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+def _agg(rows: Iterable[dict[str, Any]], key_index: int = 0) -> dict[str, dict[str, float]]:
+    """Aggregate GSC rows on one dimension. Position is impression-weighted."""
+    acc: dict[str, dict[str, float]] = defaultdict(
+        lambda: {"clicks": 0.0, "impressions": 0.0, "pos_weight": 0.0}
+    )
+    for row in rows:
+        keys = row.get("keys") or []
+        if len(keys) <= key_index:
+            continue
+        a = acc[keys[key_index]]
+        imps = float(row.get("impressions", 0))
+        a["clicks"] += float(row.get("clicks", 0))
+        a["impressions"] += imps
+        a["pos_weight"] += float(row.get("position", 0)) * imps
+    out: dict[str, dict[str, float]] = {}
+    for key, a in acc.items():
+        imps = a["impressions"]
+        out[key] = {
+            "clicks": a["clicks"],
+            "impressions": imps,
+            "ctr": (a["clicks"] / imps) if imps else 0.0,
+            "position": (a["pos_weight"] / imps) if imps else 0.0,
+        }
+    return out
+
+
+def _device_split(rows: Iterable[dict[str, Any]]) -> dict[str, dict[str, float]]:
+    per_query: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+    for row in rows:
+        keys = row.get("keys") or []
+        if len(keys) < 2:
+            continue
+        per_query[keys[0]][keys[1].lower()] += float(row.get("impressions", 0))
+    out: dict[str, dict[str, float]] = {}
+    for query, devices in per_query.items():
+        total = sum(devices.values()) or 1.0
+        out[query] = {d: round(v / total, 3) for d, v in devices.items()}
+    return out
+
+
+def _top_by_second_key(rows: Iterable[dict[str, Any]]) -> dict[str, list[tuple[str, float, float]]]:
+    """query -> [(second_key, impressions, position)] sorted by impressions desc."""
+    per_query: dict[str, list[tuple[str, float, float]]] = defaultdict(list)
+    for row in rows:
+        keys = row.get("keys") or []
+        if len(keys) < 2:
+            continue
+        per_query[keys[0]].append(
+            (keys[1], float(row.get("impressions", 0)), float(row.get("position", 0)))
+        )
+    for query in per_query:
+        per_query[query].sort(key=lambda t: t[1], reverse=True)
+    return per_query
+
+
+def _trend(long_ctx: dict[str, float], short_ctx: dict[str, float] | None,
+           long_days: int, short_days: int) -> str:
+    if not short_ctx or not long_ctx["impressions"]:
+        return "flat"
+    long_rate = long_ctx["impressions"] / max(long_days, 1)
+    short_rate = short_ctx["impressions"] / max(short_days, 1)
+    if long_rate <= 0:
+        return "flat"
+    ratio = short_rate / long_rate
+    return "rising" if ratio > 1.15 else "falling" if ratio < 0.85 else "flat"
+
+
+def find_gaps(site: Site, gsc: dict[str, Any], sitemap_urls: set[str]) -> list[dict[str, Any]]:
+    """Turn raw GSC rows into scored, typed gap candidates. No LLM involved yet."""
+    long_agg = _agg(gsc["long_rows"])
+    short_agg = _agg(gsc["short_rows"])
+    devices = _device_split(gsc["long_rows"])
+    pages_by_query = _top_by_second_key(gsc["page_rows"])
+    countries_by_query = _top_by_second_key(gsc["country_rows"])
+    sitemap_tokens = {url: _slug_tokens(url) for url in sitemap_urls}
+
+    candidates: list[dict[str, Any]] = []
+    for query, m in long_agg.items():
+        if m["impressions"] < site.min_impressions or m["position"] > site.max_position:
+            continue
+
+        ranked = pages_by_query.get(query, [])
+        top_url = ranked[0][0] if ranked else None
+        # Cannibalisation: a second URL carrying at least 40% of the leader's
+        # impressions means two pages are splitting one intent.
+        cannibal = (
+            len(ranked) > 1
+            and ranked[0][1] > 0
+            and (ranked[1][1] / ranked[0][1]) >= 0.40
+        )
+
+        query_tokens = {t for t in _SLUG_SPLIT.split(query.lower()) if len(t) > 2}
+        covered = any(
+            query_tokens and len(query_tokens & tokens) >= max(1, len(query_tokens) // 2)
+            for tokens in sitemap_tokens.values()
+        )
+
+        expected = EXPECTED_CTR.get(int(round(m["position"])), 0.02)
+        underperforming = bool(top_url) and m["position"] <= 10 and m["ctr"] < expected * 0.6
+
+        # Already won. A query sitting in the top 3 and earning at least the
+        # expected CTR has nothing left to gain — and must never be typed
+        # missing_page just because the page dimension came back empty, which is
+        # what GSC does for brand-navigational terms.
+        if m["position"] <= 3.0 and m["ctr"] >= expected:
+            continue
+
+        if not top_url and not covered:
+            gap_type = "missing_page"
+        elif cannibal:
+            gap_type = "cannibalisation"
+        elif underperforming:
+            gap_type = "serp_feature_loss"
+        elif top_url and m["position"] > 10:
+            gap_type = "thin_content"
+        else:
+            continue  # ranking, earning its clicks — leave it alone
+
+        # Local score: volume × how close the win is. The LLM refines this; it
+        # does not get to invent it from nothing.
+        proximity = max(0.0, min(1.0, (site.max_position - m["position"]) / site.max_position))
+        local_score = m["impressions"] * (0.35 + 0.65 * proximity)
+
+        countries = countries_by_query.get(query, [])
+        candidates.append(
+            {
+                "query": query,
+                "gap_type": gap_type,
+                "impressions": int(m["impressions"]),
+                "clicks": int(m["clicks"]),
+                "ctr": round(m["ctr"], 4),
+                "position": round(m["position"], 1),
+                "best_position": round(min((p for _, _, p in ranked), default=m["position"]), 1),
+                "trend": _trend(m, short_agg.get(query), site.lookback_days, site.trend_window_days),
+                "current_url": top_url,
+                "competing_urls": [u for u, _, _ in ranked[1:4]],
+                "top_country": countries[0][0] if countries else None,
+                "device_split": devices.get(query, {}),
+                "covered_by_sitemap": covered,
+                "local_score": round(local_score, 1),
+            }
+        )
+
+    candidates.sort(key=lambda c: c["local_score"], reverse=True)
+    log.info("%s — %d gap candidates above threshold", site.domain, len(candidates))
+    return candidates[:MAX_CANDIDATES_TO_LLM]
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 4. OpenAI — classify, prioritise, outline (one batched call per domain)
+# ══════════════════════════════════════════════════════════════════════════════
+
+GAP_ANALYSIS_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["briefs"],
+    "properties": {
+        "briefs": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": [
+                    "primary_keyword", "gap_type", "search_intent", "priority_score",
+                    "priority_inputs", "rationale", "working_title", "content_type",
+                    "target_url_path", "word_count_min", "word_count_max", "outline",
+                    "secondary_keywords", "must_include", "must_avoid",
+                    "meta_title", "meta_description", "schema_org",
+                ],
+                "properties": {
+                    "primary_keyword": {"type": "string"},
+                    "gap_type": {
+                        "type": "string",
+                        "enum": [
+                            "missing_page", "thin_content", "cannibalisation",
+                            "stale_content", "serp_feature_loss",
+                            "competitor_outranking", "untranslated",
+                        ],
+                    },
+                    "search_intent": {
+                        "type": "string",
+                        "enum": ["informational", "commercial", "transactional", "navigational"],
+                    },
+                    "priority_score": {"type": "integer", "minimum": 0, "maximum": 100},
+                    "priority_inputs": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["volume", "position_proximity", "commercial_value", "effort"],
+                        "properties": {
+                            "volume": {"type": "number"},
+                            "position_proximity": {"type": "number"},
+                            "commercial_value": {"type": "number"},
+                            "effort": {"type": "number"},
+                        },
+                    },
+                    "rationale": {"type": "string"},
+                    "working_title": {"type": "string"},
+                    "content_type": {
+                        "type": "string",
+                        "enum": ["guide", "landing", "itinerary", "comparison", "faq",
+                                 "news", "translation"],
+                    },
+                    "target_url_path": {"type": "string"},
+                    "word_count_min": {"type": "integer"},
+                    "word_count_max": {"type": "integer"},
+                    "secondary_keywords": {"type": "array", "items": {"type": "string"}},
+                    "outline": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["h", "heading", "must_cover"],
+                            "properties": {
+                                "h": {"type": "integer", "minimum": 2, "maximum": 3},
+                                "heading": {"type": "string"},
+                                "must_cover": {"type": "array", "items": {"type": "string"}},
+                            },
+                        },
+                    },
+                    "must_include": {"type": "array", "items": {"type": "string"}},
+                    "must_avoid": {"type": "array", "items": {"type": "string"}},
+                    "meta_title": {"type": "string"},
+                    "meta_description": {"type": "string"},
+                    "schema_org": {"type": "array", "items": {"type": "string"}},
+                },
+            },
+        }
+    },
+}
+
+
+def analyse_gaps_with_openai(
+    site: Site, candidates: list[dict[str, Any]], limit: int
+) -> list[dict[str, Any]]:
+    """
+    One call per domain, batched over its candidates. Returns at most `limit`
+    briefs. On any provider failure we fall back to the deterministic builder —
+    a degraded run beats a dead one.
+    """
+    if not candidates:
+        return []
+
+    from openai import OpenAI  # imported here so --dry-run needs no API key
+
+    client = OpenAI(api_key=config.require_env("OPENAI_API_KEY"))
+
+    system = "\n".join(
+        [
+            "You are the SEO analyst of a luxury travel group. You convert Search "
+            "Console gap data into content briefs. You are analytical, not "
+            "promotional: you do not write the article, you specify it.",
+            "",
+            f"Brand: {site.brand}. Domain: {site.domain}. Locale: {site.locale}.",
+            f"Write every brief field in the site's language ({site.locale}); keep "
+            "keywords exactly as they appear in the Search Console data.",
+            "",
+            "target_url_path must be a lowercase ASCII slug beginning with '/' even "
+            "for Farsi pages — the sites do not use percent-encoded URLs.",
+            "Never propose a path that already exists in the supplied sitemap sample.",
+            "",
+            compliance.prompt_constraints(site.compliance_profile),
+            "",
+            "Put the Persian Gulf and visa rules into every brief's must_avoid list "
+            "so the writing agent inherits them.",
+        ]
+    )
+
+    user = json.dumps(
+        {
+            "site": {
+                "domain": site.domain, "brand": site.brand, "locale": site.locale,
+                "market": site.market, "base_url": site.base_url,
+            },
+            "instruction": (
+                f"Select the {limit} highest-value opportunities from the candidates "
+                "and produce one brief for each. Score priority 0-100 using volume, "
+                "position proximity, commercial value and effort. Reject candidates "
+                "that are brand-navigational or that duplicate each other's intent."
+            ),
+            "candidates": candidates,
+        },
+        ensure_ascii=False,
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model=config.OPENAI_MODEL,
+            temperature=0.2,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "gap_analysis",
+                    "strict": True,
+                    "schema": GAP_ANALYSIS_SCHEMA,
+                },
+            },
+        )
+        content = resp.choices[0].message.content or "{}"
+        briefs = json.loads(content).get("briefs", [])
+        usage = getattr(resp, "usage", None)
+        if usage:
+            log.info(
+                "%s — OpenAI %s: %s in / %s out",
+                site.domain, config.OPENAI_MODEL,
+                getattr(usage, "prompt_tokens", "?"), getattr(usage, "completion_tokens", "?"),
+            )
+        return briefs[:limit]
+    except Exception as exc:  # provider outage, quota, schema refusal
+        log.error("%s — OpenAI step failed (%s); using deterministic fallback", site.domain, exc)
+        return [_fallback_brief(site, c) for c in candidates[:limit]]
+
+
+def _fallback_brief(site: Site, c: dict[str, Any]) -> dict[str, Any]:
+    """No-LLM brief. Coarser, but every field the schema needs is present."""
+    slug = re.sub(r"[^a-z0-9]+", "-", c["query"].lower()).strip("-") or "opportunity"
+    return {
+        "primary_keyword": c["query"],
+        "gap_type": c["gap_type"],
+        "search_intent": "commercial",
+        "priority_score": min(100, int(c["local_score"] / max(c["impressions"], 1) * 100) + 40),
+        "priority_inputs": {
+            "volume": min(1.0, c["impressions"] / 5000),
+            "position_proximity": max(0.0, (site.max_position - c["position"]) / site.max_position),
+            "commercial_value": 0.5,
+            "effort": 0.5,
+        },
+        "rationale": (
+            f"{c['impressions']} impressions at position {c['position']} "
+            f"({c['gap_type']}); generated without the LLM step."
+        ),
+        "working_title": c["query"],
+        "content_type": "guide",
+        "target_url_path": f"/{slug}"[:120],
+        "word_count_min": 1200,
+        "word_count_max": 1800,
+        "secondary_keywords": [],
+        "outline": [{"h": 2, "heading": c["query"], "must_cover": []}],
+        "must_include": [],
+        "must_avoid": ["Arabian Gulf", "خلیج عربی", "بدون ویزا", "visa-free"],
+        "meta_title": c["query"][:60],
+        "meta_description": "",
+        "schema_org": ["Article", "BreadcrumbList"],
+    }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 5. Payload assembly — content.brief.v1 (ARCHITECTURE.md §4.1)
+# ══════════════════════════════════════════════════════════════════════════════
+
+_HARD_AVOID = ["Arabian Gulf", "خلیج عربی", "بدون ویزا", "visa-free", "no visa required"]
+
+
+def build_brief_payload(
+    site: Site,
+    analysis: dict[str, Any],
+    candidate: dict[str, Any],
+    gsc_meta: dict[str, Any],
+    run_id: str,
+    callback_url: str,
+    dry_run: bool,
+) -> dict[str, Any]:
+    path = analysis["target_url_path"]
+    if not path.startswith("/"):
+        path = "/" + path
+
+    must_avoid = list(dict.fromkeys(list(analysis.get("must_avoid", [])) + _HARD_AVOID))
+
+    return {
+        "schema_version": config.SCHEMA_VERSION,
+        "envelope": build_envelope(
+            message_type="content.brief",
+            emitted_by=AGENT_ID,
+            target=TARGET_ID,
+            correlation_id=run_id,
+            idem_key=idempotency_key(site.domain, analysis["primary_keyword"], path),
+        ),
+        "site": {
+            "domain": site.domain,
+            "property_uri": site.property_uri,
+            "brand": site.brand,
+            "locale": site.locale,
+            "market": site.market,
+            "base_url": site.base_url,
+            "cms": {
+                "type": site.cms.get("type", "unknown"),
+                "adapter": site.cms.get("adapter"),
+                "content_root": site.cms.get("content_root", "/"),
+                "publish_mode": site.cms.get("publish_mode", "draft"),
+            },
+        },
+        "opportunity": {
+            "gap_type": analysis["gap_type"],
+            "primary_keyword": analysis["primary_keyword"],
+            "keyword_locale": site.locale,
+            "secondary_keywords": analysis.get("secondary_keywords", []),
+            "search_intent": analysis["search_intent"],
+            "gsc": {
+                "date_range": gsc_meta["date_range"],
+                "impressions": candidate["impressions"],
+                "clicks": candidate["clicks"],
+                "ctr": candidate["ctr"],
+                "avg_position": candidate["position"],
+                "best_position": candidate["best_position"],
+                "trend_28d": candidate["trend"],
+                "top_country": candidate["top_country"],
+                "current_url": candidate["current_url"],
+                "device_split": candidate["device_split"],
+            },
+            "serp": {
+                "checked_at": rfc3339(),
+                "competitors": [{"rank": i + 1, "url": u} for i, u in
+                                enumerate(candidate.get("competing_urls", []))],
+                "features": [],
+                "source": "gsc_inference",   # open decision O-4
+            },
+            "priority_score": analysis["priority_score"],
+            "priority_inputs": analysis["priority_inputs"],
+            "rationale": analysis["rationale"],
+        },
+        "brief": {
+            "working_title": analysis["working_title"],
+            "content_type": analysis["content_type"],
+            "target_url_path": path,
+            "language": site.locale,
+            "word_count_target": {
+                "min": analysis["word_count_min"],
+                "max": analysis["word_count_max"],
+            },
+            "reading_level": "general",
+            "tone": "poetic-luxury",
+            "outline": analysis["outline"],
+            "must_include": analysis.get("must_include", []),
+            "must_avoid": must_avoid,
+            "internal_links": [],
+            "external_sources": [],
+            "schema_org": analysis.get("schema_org", ["Article"]),
+            "meta": {
+                "title": analysis["meta_title"],
+                "description": analysis["meta_description"],
+                "og_image_hint": None,
+            },
+            "media": {
+                "hero_required": True,
+                "allowed_sources": ["licensed_library", "supplier_press_kit"],
+                "credit_required": True,
+            },
+            "data_dependencies": site.data_dependencies,
+        },
+        "compliance": {
+            "profile": site.compliance_profile,
+            # .get, not [] — an unknown profile in sites.yml must not take the
+            # run down; it falls back to the strictest defaults.
+            **compliance.PROFILES.get(site.compliance_profile, compliance.PROFILES["boutimar_v1"]),
+            "blocking": True,
+        },
+        "routing": {
+            "callback_url": callback_url,
+            "priority": "high" if analysis["priority_score"] >= 80 else "normal",
+            "deadline": rfc3339(utc_now() + timedelta(days=3)),
+            "dry_run": dry_run,
+        },
+    }
+
+
+def self_check_brief(payload: dict[str, Any]) -> list[compliance.Violation]:
+    """
+    Run the compliance gate on the brief we are about to emit. A brief that
+    itself says "Arabian Gulf" would poison every downstream prompt.
+    """
+    brief = payload["brief"]
+    surface = " ".join(
+        [
+            payload["opportunity"]["primary_keyword"],
+            payload["opportunity"]["rationale"],
+            brief["working_title"],
+            brief["meta"]["title"],
+            brief["meta"]["description"],
+            " ".join(section.get("heading", "") for section in brief["outline"]),
+            " ".join(" ".join(s.get("must_cover", [])) for s in brief["outline"]),
+            " ".join(brief["must_include"]),
+        ]
+    )
+    profile = payload["compliance"]["profile"]
+    if profile not in compliance.PROFILES:
+        log.warning("unknown compliance profile %r — falling back to boutimar_v1", profile)
+        profile = "boutimar_v1"
+    return compliance.check(
+        surface,
+        profile,
+        context={
+            "priced_facts": bool(brief["data_dependencies"]),
+            "price_asof": rfc3339() if brief["data_dependencies"] else None,
+        },
+    )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 6. Delivery — signed POST with bounded retries
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+def deliver(
+    session: requests.Session,
+    url: str,
+    payload: dict[str, Any],
+    secret: str,
+) -> tuple[bool, str]:
+    """At-least-once. 5xx/429/timeouts retry; other 4xx are terminal."""
+    message_id = payload["envelope"]["message_id"]
+    reason = "not attempted"
+
+    for attempt in range(1, config.WEBHOOK_MAX_ATTEMPTS + 1):
+        # Re-serialise per attempt: envelope.attempt is part of the signed body,
+        # so bumping the counter after signing would ship a stale count.
+        payload["envelope"]["attempt"] = attempt
+        body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        headers = config.signed_headers(secret, body, message_id)
+        try:
+            resp = session.post(
+                url, data=body, headers=headers, timeout=config.WEBHOOK_TIMEOUT_S
+            )
+        except requests.RequestException as exc:
+            reason = f"transport error: {exc}"
+        else:
+            if 200 <= resp.status_code < 300:
+                return True, f"{resp.status_code}"
+            reason = f"HTTP {resp.status_code}: {resp.text[:300]}"
+            if resp.status_code not in (408, 429) and resp.status_code < 500:
+                log.error("delivery %s — terminal %s", message_id, reason)
+                return False, reason
+
+        if attempt == config.WEBHOOK_MAX_ATTEMPTS:
+            log.error("delivery %s — giving up after %d attempts: %s",
+                      message_id, attempt, reason)
+            return False, reason
+
+        backoff = (2 ** (attempt - 1)) + random.uniform(0, 0.5)
+        log.warning("delivery %s — attempt %d failed (%s); retrying in %.1fs",
+                    message_id, attempt, reason, backoff)
+        time.sleep(backoff)
+
+    return False, "exhausted"   # unreachable; keeps the type checker honest
+
+
+def write_dead_letter(run_dir, payload: dict[str, Any], reason: str) -> None:
+    dlq = run_dir / "dlq"
+    dlq.mkdir(parents=True, exist_ok=True)
+    envelope = payload["envelope"]
+    (dlq / f"{envelope['message_id']}.json").write_text(
+        json.dumps(
+            {
+                "schema_version": config.SCHEMA_VERSION,
+                "envelope": {**envelope, "message_type": "pipeline.error"},
+                "error": {
+                    "stage": AGENT_ID,
+                    "kind": "transport",
+                    "message": reason,
+                    "retryable": True,
+                    "attempts": envelope.get("attempt", 0),
+                    "original_message_id": envelope["message_id"],
+                },
+                "payload": payload,
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 7. Run
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+def process_site(
+    service,
+    site: Site,
+    session: requests.Session,
+    run_id: str,
+    run_dir,
+    *,
+    limit: int,
+    dry_run: bool,
+    use_llm: bool,
+    webhook_url: str,
+    callback_url: str,
+    secret: str,
+) -> dict[str, Any]:
+    started = time.time()
+    stat: dict[str, Any] = {
+        "domain": site.domain, "status": "ok", "gsc_rows": 0, "candidates": 0,
+        "briefs_emitted": 0, "delivered": 0, "dlq": 0, "blocked": 0, "error": None,
+    }
+    try:
+        gsc = collect_gsc(service, site)
+        stat["gsc_rows"] = gsc["row_count"]
+
+        sitemap_urls = fetch_sitemap_urls(site, session)
+        candidates = find_gaps(site, gsc, sitemap_urls)
+        stat["candidates"] = len(candidates)
+
+        # A held site is not live. Keep gathering its demand — knowing what
+        # people already search for is exactly what you want on launch day —
+        # but write nothing for a site that cannot publish it.
+        if site.on_hold:
+            stat["status"] = "hold"
+            stat["note"] = (
+                f"{len(candidates)} gap candidate(s) recorded; no briefs emitted "
+                "because the site is on hold"
+            )
+            (run_dir / "demand").mkdir(parents=True, exist_ok=True)
+            (run_dir / "demand" / f"{site.domain}.json").write_text(
+                json.dumps(
+                    {"domain": site.domain, "status": "hold",
+                     "date_range": gsc["date_range"], "candidates": candidates},
+                    ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            log.info("%s — on hold; demand banked, no briefs", site.domain)
+            return stat
+
+        if not candidates:
+            return stat
+
+        by_query = {c["query"]: c for c in candidates}
+        analyses = (
+            analyse_gaps_with_openai(site, candidates, limit)
+            if use_llm
+            else [_fallback_brief(site, c) for c in candidates[:limit]]
+        )
+
+        for analysis in analyses:
+            candidate = by_query.get(analysis["primary_keyword"]) or candidates[0]
+            payload = build_brief_payload(
+                site, analysis, candidate, gsc, run_id, callback_url, dry_run
+            )
+
+            violations = self_check_brief(payload)
+            blocking = [v for v in violations if v.severity == compliance.BLOCK]
+            if blocking:
+                stat["blocked"] += 1
+                log.error(
+                    "%s — brief for %r blocked: %s",
+                    site.domain, analysis["primary_keyword"],
+                    "; ".join(f"{v.rule}: {v.message}" for v in blocking),
+                )
+                write_dead_letter(run_dir, payload, f"compliance: {blocking[0].rule}")
+                stat["dlq"] += 1
+                continue
+            payload["compliance"]["preflight"] = compliance.summarise(
+                violations, payload["compliance"]["profile"]
+            )
+            stat["briefs_emitted"] += 1
+
+            briefs_dir = run_dir / "briefs"
+            briefs_dir.mkdir(parents=True, exist_ok=True)
+            (briefs_dir / f"{payload['envelope']['message_id']}.json").write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+
+            if dry_run:
+                log.info(
+                    "[dry-run] %s ← %r (score %s) → %s",
+                    site.domain, analysis["primary_keyword"],
+                    analysis["priority_score"], payload["brief"]["target_url_path"],
+                )
+                continue
+
+            ok, reason = deliver(session, webhook_url, payload, secret)
+            if ok:
+                stat["delivered"] += 1
+            else:
+                stat["dlq"] += 1
+                write_dead_letter(run_dir, payload, reason)
+
+    except (PermissionError, HttpError, ConfigError) as exc:
+        stat["status"] = "failed"
+        stat["error"] = config.redact(str(exc))
+        log.error("%s — aborted: %s", site.domain, stat["error"])
+
+    stat["duration_ms"] = int((time.time() - started) * 1000)
+    return stat
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Agent 1 — SEO Scout. Architecture credit: Albaloo Studio."
+    )
+    parser.add_argument("--domain", action="append", help="restrict to a domain (repeatable)")
+    parser.add_argument("--limit", type=int, default=None, help="max briefs per domain")
+    parser.add_argument("--dry-run", action="store_true", help="build briefs, deliver nothing")
+    parser.add_argument("--no-openai", action="store_true", help="skip the LLM step")
+    parser.add_argument("--list-properties", action="store_true",
+                        help="print every property this service account can read, then exit")
+    parser.add_argument("--verbose", action="store_true")
+    args = parser.parse_args(argv)
+
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format="%(asctime)s %(levelname)-7s %(name)s | %(message)s",
+        datefmt="%H:%M:%S",
+    )
+
+    try:
+        # include_hold: held sites still contribute demand data (see process_site)
+        sites = config.load_sites(only=args.domain, include_hold=True)
+        service = build_gsc_client()
+    except ConfigError as exc:
+        log.error("%s", exc)
+        return 2
+
+    if args.list_properties:
+        props = list_properties(service)
+        print(f"Service account can read {len(props)} propert{'y' if len(props)==1 else 'ies'}:")
+        for p in sorted(props, key=lambda x: x["siteUrl"]):
+            print(f"  {p['permissionLevel']:<24} {p['siteUrl']}")
+        missing = audit_access(service, sites)
+        if missing:
+            print("\nDeclared in sites.yml but NOT readable:")
+            for m in missing:
+                print(f"  ✗ {m}")
+            return 1
+        return 0
+
+    audit_access(service, sites)
+
+    run_id = config.new_run_id()
+    run_dir = config.RUNS_DIR / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    log.info("run %s — %d site(s) — credit: %s", run_id, len(sites), ARCHITECTURE_CREDIT)
+
+    webhook_url = "" if args.dry_run else config.require_env("AGENT2_WEBHOOK_URL")
+    callback_url = config.optional_env("AGENT3_WEBHOOK_URL")
+    secret = "" if args.dry_run else config.require_env("WEBHOOK_SIGNING_SECRET")
+
+    session = requests.Session()
+    stats: list[dict[str, Any]] = []
+    started = utc_now()
+    for site in sites:
+        stats.append(
+            process_site(
+                service, site, session, run_id, run_dir,
+                limit=args.limit or site.max_briefs_per_run,
+                dry_run=args.dry_run,
+                use_llm=not args.no_openai,
+                webhook_url=webhook_url,
+                callback_url=callback_url,
+                secret=secret,
+            )
+        )
+
+    manifest = {
+        "run_id": run_id,
+        "started_at": rfc3339(started),
+        "finished_at": rfc3339(),
+        "architecture_credit": ARCHITECTURE_CREDIT,
+        "owner": config.OWNER,
+        "environment": config.ENVIRONMENT,
+        "dry_run": args.dry_run,
+        "openai_model": None if args.no_openai else config.OPENAI_MODEL,
+        "domains": stats,
+        "totals": {
+            key: sum(s.get(key, 0) for s in stats)
+            for key in ("gsc_rows", "candidates", "briefs_emitted", "delivered", "dlq", "blocked")
+        },
+    }
+    (run_dir / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+    t = manifest["totals"]
+    log.info(
+        "run %s finished — %d briefs, %d delivered, %d dead-lettered, %d blocked",
+        run_id, t["briefs_emitted"], t["delivered"], t["dlq"], t["blocked"],
+    )
+    if any(s["status"] == "failed" for s in stats):
+        return 1
+    return 1 if t["dlq"] else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
