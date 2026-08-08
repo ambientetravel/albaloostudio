@@ -37,7 +37,7 @@ Verify the whole thing without a single API key or network call:
 python selfcheck.py
 ```
 
-249 assertions across all six agents — config, the compliance gate, gap
+252 assertions across all six agents — config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry, the
 autopost gates, PII redaction, escalation rules, and every HTTP surface. Exit 0
 means the pipeline is wired correctly.
@@ -122,22 +122,6 @@ Enforced twice — injected into every prompt, then re-checked against the
 generated output in [`compliance.py`](compliance.py). A violation blocks
 publication and dead-letters the payload; it does not warn and continue.
 
-The gate judges a **claim in its clause**, not a term anywhere in the payload.
-That distinction is the whole design, and getting it wrong is expensive in both
-directions. The first live run (8 Aug 2026) dead-lettered 3 of 7 briefs, and
-every one was blocked for stating the visa rule *correctly*: "Türkiye and Egypt:
-no visa needed" is true, "Dubai: no visa needed" is the lie, and a
-context-blind match cannot tell them apart. So:
-
-* prohibition fields (`must_avoid`) are never scanned — every string in them is
-  a forbidden term by definition, and scanning them punishes a correct brief;
-* list items are joined with newlines, so one item's claim cannot borrow its
-  neighbour's destination or its negator;
-* a visa-free claim is read against the destination in its own clause — a
-  forbidden one blocks, a sanctioned exception passes, an easy-visa label means
-  the copy is classifying rather than claiming, and no destination at all is a
-  warning rather than a block.
-
 * **«خلیج فارس» / Persian Gulf.** Never "Arabian Gulf". ("Arabian Sea" is a
   different body of water and is left alone.)
 * **Visa accuracy.** Only AROYA's Türkiye+Egypt routes and Seychelles are
@@ -148,6 +132,31 @@ context-blind match cannot tell them apart. So:
 * **The partner embed stays brand-neutral** — no «بوتیمار», no boutimar.ir links.
 * No company name in anything resembling an outbound API header; the CruiseHost
   contract belongs to Ambiente Tours.
+
+### A claim in its clause, not a term anywhere
+
+That distinction is the whole design, and getting it wrong is expensive in both
+directions. The first live run (8 Aug 2026) dead-lettered 3 of 7 briefs, and
+every one was blocked for stating the visa rule **correctly**: "Türkiye and
+Egypt: no visa needed" is true, "Dubai: no visa needed" is the lie, and a
+context-blind match cannot tell them apart. The more precisely the model stated
+the rule, the more certainly its own brief was thrown away. So:
+
+* **Prohibition fields (`must_avoid`) are never scanned.** Every string in them
+  is a forbidden term by definition; scanning them punishes a correct brief for
+  correctly forbidding the thing. `compliance.assertive_surface()` strips them
+  for every agent.
+* **List items are joined with newlines**, so one item's claim cannot borrow its
+  neighbour's destination — or its negator.
+* **A visa-free claim is read against the destination in its own clause.** A
+  forbidden one blocks; a sanctioned exception passes; an easy-visa label means
+  the copy is classifying rather than claiming; no destination at all warns.
+* **A question is not a claim.** "Is Dubai visa-free?" is the FAQ shape the GEO
+  work exists to produce — it warns, and the answer beside it is judged on its
+  own.
+
+`persian_gulf_only` gets none of these escapes. It bans a *term*, and "Arabian
+Gulf" is wrong in any framing — question, negation or quotation.
 
 ## What is not wired yet
 
@@ -191,7 +200,7 @@ context-blind match cannot tell them apart. So:
 | [`SETUP-DEPLOY.md`](SETUP-DEPLOY.md) | scoped FTP + CI deploys, so no one holds the panel password |
 | [`agent5_site_auditor.py`](agent5_site_auditor.py) | technical + GEO + local crawl, no credentials needed |
 | [`agent6_analyst.py`](agent6_analyst.py) | audit + demand → strategy, calendar, paste-ready JSON-LD |
-| [`selfcheck.py`](selfcheck.py) | 249 assertions, no network |
+| [`selfcheck.py`](selfcheck.py) | 252 assertions, no network |
 | [`schemas/`](schemas) | JSON Schema for the three payloads |
 | `../.github/workflows/agent1-seo-scout.yml` | daily scout, 04:15 UTC |
 | `../.github/workflows/agent5-site-audit.yml` | weekly audit + strategy, Mondays 05:00 UTC |

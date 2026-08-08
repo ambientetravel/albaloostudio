@@ -141,6 +141,16 @@ ok("itinerary_ports stays authoritative with no place in the prose",
 ok("negator does not leak across a list-item boundary",
    blocks("مسیر سیشل: نه بدون ویزا\nکروز دبی بدون ویزا"),
    "newline ends the clause")
+ok("question heading is not a claim (English)",
+   not blocks("Is the UAE visa-free for a stag group? Answer: no, it is easy visa"),
+   "the FAQ shape the GEO work exists to produce")
+ok("question heading is not a claim (Farsi)",
+   not blocks("آیا سفر به دبی بدون ویزا است؟"))
+ok("a question still warns", any(v.rule == "visa_accuracy"
+   for v in c("Is Dubai visa-free?")), "it must stay visible to Agent 2")
+ok("the ANSWER is still judged on its own",
+   blocks("Is Dubai visa-free\nYes, Dubai is visa-free for everyone"),
+   "the question passes; the false answer beside it does not")
 ok("destination-less claim is a WARN, not a BLOCK",
    not blocks("مقاصد بدون ویزا") and any(v.rule == "visa_accuracy" for v in c("مقاصد بدون ویزا")))
 

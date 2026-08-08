@@ -134,6 +134,16 @@ _EASY_VISA_MARKER = re.compile(
 # with one of these; assertive_surface() does it for them.
 _CLAUSE_BOUNDARY = re.compile(r"[.!?؟\n؛;•|]")
 
+# A question asserts nothing. "Is the UAE visa-free?" is a heading; the answer
+# ("no — easy visa") is the next list item and is judged on its own. Blocking
+# the question blocks the FAQ/question-heading shape the GEO work exists to
+# produce, on every brief, forever.
+_INTERROGATIVE = re.compile(
+    r"(?i)^\s*(is|are|was|were|do|does|did|can|could|will|would|should|has|have"
+    r"|which|what|when|where|how|why)\b"
+    r"|^\s*آیا\b|\bآیا\b"
+)
+
 
 def _clause_bounds(text: str, match: re.Match[str]) -> tuple[int, int]:
     """Offsets of the single clause containing `match`, never spilling into its neighbours."""
@@ -308,6 +318,23 @@ def check(
             # brief that explained the policy accurately — the better the model
             # stated the rule, the more certainly the brief was dead-lettered.
             clause = text[lo:hi]
+
+            # Interrogative: the clause asks rather than claims. Kept as a
+            # warning, not dropped — a question about visa status is precisely
+            # where the writer downstream could answer it wrongly, so it should
+            # stay visible in the compliance block that travels with the brief.
+            # `terminator` is "" at end-of-text, and "" in "?؟" is True — which
+            # made every trailing clause read as a question. Test the truthiness.
+            terminator = text[hi:hi + 1]
+            if (terminator and terminator in "?؟") or _INTERROGATIVE.search(clause):
+                out.append(Violation(
+                    "visa_accuracy", WARN, _excerpt(text, m),
+                    "A question about visa-free status, not a claim. The answer must "
+                    "say easy visa for Persian Gulf/Dubai and Schengen for any "
+                    "Greek, Italian, Spanish or French port.",
+                ))
+                continue
+
             forbidden = _VISA_FORBIDDEN_DEST.search(clause)
             exempt = _VISA_EXEMPT_DEST.search(clause)
             # A clause that classifies the forbidden destination as easy-visa is
