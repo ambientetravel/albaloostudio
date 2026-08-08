@@ -71,6 +71,14 @@ uploaded as a 90-day artifact.
 Exit codes: `0` clean, `1` something was dead-lettered or a domain failed,
 `2` the environment cannot support a run.
 
+**A property nobody has granted yet does not fail the run.** It is a
+configuration gap, not a failure: it is named at startup, logged at ERROR,
+listed under `not_granted` in the manifest, and it persists until a human
+clicks *Add user* in whichever Google account owns it. Failing on it would make
+the daily cron permanently red, and a cron that is always red is a cron nobody
+reads. The `--list-properties` step in CI is the designed place to notice the
+gap; the scout's job is to scout what it can see.
+
 ## Agents 2, 3 and 4
 
 Agent 2 runs on **base44** in production — [BASE44-AGENT2.md](BASE44-AGENT2.md)

@@ -1060,7 +1060,18 @@ def process_site(
                 stat["dlq"] += 1
                 write_dead_letter(run_dir, payload, reason)
 
-    except (PermissionError, HttpError, ConfigError) as exc:
+    except PermissionError as exc:
+        # A property nobody has granted yet is a configuration gap, not a run
+        # failure. It is already named at startup and it persists for as long as
+        # it takes a human to click Add user in another Google account — days,
+        # sometimes weeks. Failing the run on it makes the daily cron
+        # permanently red, and a cron that is always red is a cron nobody reads.
+        # It stays loud (ERROR, named in the manifest) without burying the day
+        # something genuinely breaks.
+        stat["status"] = "not_granted"
+        stat["error"] = config.redact(str(exc))
+        log.error("%s — skipped: %s", site.domain, stat["error"])
+    except (HttpError, ConfigError) as exc:
         stat["status"] = "failed"
         stat["error"] = config.redact(str(exc))
         log.error("%s — aborted: %s", site.domain, stat["error"])
@@ -1166,9 +1177,16 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     t = manifest["totals"]
+    ungranted = [s["domain"] for s in stats if s["status"] == "not_granted"]
+    manifest["not_granted"] = ungranted
+    (run_dir / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
     log.info(
-        "run %s finished — %d briefs, %d delivered, %d dead-lettered, %d blocked",
+        "run %s finished — %d briefs, %d delivered, %d dead-lettered, %d blocked%s",
         run_id, t["briefs_emitted"], t["delivered"], t["dlq"], t["blocked"],
+        f", {len(ungranted)} not granted ({', '.join(ungranted)})" if ungranted else "",
     )
     if any(s["status"] == "failed" for s in stats):
         return 1
