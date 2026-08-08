@@ -47,6 +47,10 @@ RUNS_DIR = Path(os.getenv("RUNS_DIR", BASE_DIR / "runs"))
 
 # ── models (overridable; never pinned inside a prompt) ────────────────────────
 
+# Agent 1's gap analysis: `anthropic` (default) or `openai`. Both do the job;
+# Anthropic is the default because Agents 3, 4 and 6 already require that key,
+# so one vendor means one key, one bill, one thing to rotate.
+GAP_ANALYSIS_PROVIDER = os.getenv("GAP_ANALYSIS_PROVIDER", "anthropic").lower()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-pro")
 

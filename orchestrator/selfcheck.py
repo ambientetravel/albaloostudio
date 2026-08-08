@@ -41,7 +41,10 @@ ok("active sites are not on hold", all(not s.on_hold for s in sites))
 ok("audit sample size is pinned uniformly",
    {s.audit_sample_pages for s in config.load_sites(include_hold=True)} == {10},
    {s.audit_sample_pages for s in config.load_sites(include_hold=True)})
-ok("defaults merged into each site", all(s.min_impressions == 150 for s in sites))
+ok("defaults merged into each site", all(s.min_impressions == 5 for s in sites
+                                         if s.domain != "boutimar.com"))
+ok("boutimar.com overrides the impression floor",
+   next(s.min_impressions for s in sites if s.domain == "boutimar.com") == 20)
 ok("domain filter works", len(config.load_sites(only=["boutimar.ir"])) == 1)
 try:
     config.load_sites(only=["nope.example"]); ok("unknown domain raises", False)
@@ -79,6 +82,24 @@ ok("Arabian SEA allowed", not any(v.rule == "persian_gulf_only" for v in c("cros
 ok("خلیج فارس allowed", not c("سفری به خلیج فارس"))
 ok("visa-free blocked by default", any(v.rule == "visa_accuracy" for v in c("This is visa-free!")))
 ok("بدون ویزا blocked", any(v.rule == "visa_accuracy" for v in c("سفر بدون ویزا")))
+# The gate bans a CLAIM, not a term. A negated claim states the rule correctly —
+# blocking it blocked the very instruction that enforces the rule.
+ok("'not visa-free' is allowed (states the rule)",
+   not any(v.rule == "visa_accuracy" for v in c("Iran stays are not visa-free")))
+ok("'is not visa-free' allowed", not any(v.rule == "visa_accuracy"
+   for v in c("Dubai is not visa-free — an easy visa is required")))
+ok("brief instruction allowed", not any(v.rule == "visa_accuracy" for v in
+   c("Explicitly state that Iran stays are not visa-free")))
+ok("Farsi negation allowed", not any(v.rule == "visa_accuracy"
+   for v in c("این سفر بدون ویزا نیست")))
+ok("bare claim STILL blocked", any(v.rule == "visa_accuracy"
+   for v in c("Dubai is visa-free for all nationalities")))
+ok("Farsi bare claim still blocked", any(v.rule == "visa_accuracy"
+   for v in c("سفر به دبی بدون ویزا")))
+ok("negation does not leak across a sentence boundary",
+   any(v.rule == "visa_accuracy" for v in
+       c("Schengen is not required. Dubai is visa-free.")),
+   "a full stop must end the negation window")
 ok("visa-free OK for AROYA route",
    not any(v.rule == "visa_accuracy" for v in c("visa-free", context={"route_key": "aroya_turkiye_egypt"})))
 ok("Schengen port re-blocks visa-free",
@@ -119,7 +140,7 @@ gsc = {
     "short_range": {"start": "2026-07-06", "end": "2026-08-03"},
     "long_rows": [row(["کروز خلیج فارس", "MOBILE"], 40, 3000, 18.0),
                   row(["کروز خلیج فارس", "DESKTOP"], 21, 1820, 19.0),
-                  row(["نویز کم", "MOBILE"], 0, 12, 30.0),
+                  row(["نویز کم", "MOBILE"], 0, 3, 30.0),
                   row(["برند بوتیمار", "MOBILE"], 500, 900, 1.2)],
     "short_rows": [row(["کروز خلیج فارس"], 30, 1800, 17.0)],
     "page_rows": [],

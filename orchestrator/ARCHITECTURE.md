@@ -124,13 +124,15 @@ replacing the `deliver()` function, not the schemas.
 
 ### 3.1 The unified Google Search Console strategy
 
-The historical data is split across two Google accounts —
-`alimozzarella@gmail.com` and `contactmozaffari@gmail.com`. **A service account
-cannot inherit that access.** There is no API call that merges two consumer
+The historical data is split across **several** Google accounts — at least
+`alimozzarella@`, `contactmozaffari@`, and brand-specific ones such as
+`ambienteturizm@` and `cruisebazonline@`. (This document originally said "two";
+a live check on 6 Aug 2026 found those two own only three of the eight
+properties.) **A service account cannot inherit that access.** There is no API call that merges two consumer
 Google accounts. What a service account *can* do is be granted access on each
 property individually, which produces a single credential that reads all eight.
 
-**The strategy is therefore: one service account, granted twice.**
+**The strategy is therefore: one service account, granted once per owning account.**
 
 ```
                        ┌─────────────────────────────────────┐

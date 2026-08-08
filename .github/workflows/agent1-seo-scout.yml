@@ -58,14 +58,23 @@ jobs:
       - name: Verify Search Console access
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-        # Fails the run if the service account cannot read a property declared
-        # in sites.yml — the usual cause is that only one of the two Google
-        # accounts granted it access (ARCHITECTURE.md §3.1).
+        # Fails ONLY when the service account can read nothing at all — a broken
+        # key or a grant process that never happened. Properties still pending
+        # are listed as a warning and the run proceeds with what IS granted;
+        # blocking three working sites on five ungranted ones helps nobody.
         run: python agent1_seo_scout.py --list-properties
 
       - name: Run the scout
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          # The gap analysis runs on Anthropic (GAP_ANALYSIS_PROVIDER default).
+          # Without this the step still "succeeds" — it just silently drops to
+          # the deterministic fallback, which does not deduplicate or rank, so
+          # the failure looks like poor output rather than a missing secret.
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-5' }}
+          GAP_ANALYSIS_PROVIDER: ${{ vars.GAP_ANALYSIS_PROVIDER || 'anthropic' }}
+          # Kept so GAP_ANALYSIS_PROVIDER=openai still works if you switch back.
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1' }}
           WEBHOOK_SIGNING_SECRET: ${{ secrets.WEBHOOK_SIGNING_SECRET }}

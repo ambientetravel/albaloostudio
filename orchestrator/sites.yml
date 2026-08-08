@@ -27,7 +27,12 @@ defaults:
   lookback_days: 90            # GSC window for the demand signal
   trend_window_days: 28        # short window compared against the long one
   data_lag_days: 3             # GSC is ~2 days behind; never query today
-  min_impressions: 150         # below this a query is noise, not a gap
+  # Calibrated against real Search Console data, 8 Aug 2026. The original 150 is
+  # a sane floor for an established site and produced ZERO candidates across the
+  # whole portfolio: boutimar.com's best query in 90 days was 79 impressions,
+  # boutimar.ir's was 23. At this traffic level a high floor is not caution, it
+  # is blindness. Raise these as the sites grow.
+  min_impressions: 5           # below this a query is noise, not a gap
   max_position: 40             # beyond page 4 there is no proximity to exploit
   max_briefs_per_run: 5
   compliance_profile: boutimar_v1
@@ -48,6 +53,7 @@ sites:
     market: INT
     base_url: "https://boutimar.com"
     sitemap: "https://boutimar.com/sitemap.xml"    # verified 2026-08-06; not sitemap_index.xml
+    min_impressions: 20        # 361 queries / 1,233 impressions in 90d — 20 yields ~10 candidates
     cms:
       type: wordpress
       adapter: wordpress_rest

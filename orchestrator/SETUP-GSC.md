@@ -3,33 +3,40 @@
 Architecture credit: **Albaloo Studio** — [albaloostudio.com](https://albaloostudio.com)
 Owner: Alireza Mozaffari
 
-Everything else in this pipeline runs without you. This does not: the historical
-Search Console data sits under two Google accounts, and no API merges them. The
-whole of Agent 1 is blocked until this is done once.
+Everything else in this pipeline runs without you. This does not: the Search
+Console properties sit under several Google accounts, and no API merges them.
+Agent 1 reads only the properties that have been granted.
 
-**Time: about 15 minutes.** You need to be signed in as
-`alimozzarella@gmail.com` for one part and `contactmozaffari@gmail.com` for the
-other — a second browser profile or an incognito window makes this much less
-annoying than signing in and out.
+**Time: ~5 minutes per owning account.** A second browser profile makes this far
+less annoying than signing in and out repeatedly.
 
 ---
 
-## Why it has to be done twice
+## Why it has to be done once per owning account
+
+**Verified 6 Aug 2026: the properties are spread across more than two accounts.**
+`alimozzarella@` and `contactmozaffari@` between them own only three of the
+eight. The rest sit under brand-specific accounts — `ambienteturizm@gmail.com`,
+`cruisebazonline@gmail.com` and others visible in the Google account chooser.
+
+Nothing about the approach changes. It is still one service account granted
+separately on each property; there are simply more sign-ins than two.
 
 A service account is a robot user. It inherits nothing from you. There is no
-"link my two Google accounts" call, no delegation shortcut (that is Workspace
-only, and both of these are consumer Gmail), and no way to export one account's
-history into the other.
+"link my Google accounts" call, no delegation shortcut (that is Workspace only,
+and these are all consumer Gmail), and no way to export one account's history
+into another.
 
 What *does* work: one robot, added as a user on every property, by whichever
-human owns that property. Then one JSON key reads all eight.
+human owns that property. Then one JSON key reads all of them.
 
 ```
 alimozzarella@       ─┐
-                      ├─→ both add the SAME service account as a Restricted user
-contactmozaffari@    ─┘                    │
-                                           ▼
-                        one JSON key  →  GH secret  →  reads all 8 properties
+contactmozaffari@     │
+ambienteturizm@       ├─→ each adds the SAME service account as a Restricted user
+cruisebazonline@      │                    │
+…                    ─┘                    ▼
+                        one JSON key  →  GH secret  →  reads every granted property
 ```
 
 ---
@@ -53,10 +60,20 @@ and Google will not show you the key again.
 
 ---
 
-## Step 2 — Grant it, as account one (5 min)
+## Step 2 — Grant it, account by account
+
+Work through the account chooser. As of 6 Aug 2026:
+
+| Property | Owning account |
+|---|---|
+| `boutimar.com`, `boutimar.ir` | `alimozzarella@gmail.com` ✓ granted |
+| `exploreorient.com` | `contactmozaffari@gmail.com` ✓ granted |
+| `ambientetravel.com` | likely `ambienteturizm@gmail.com` — unverified |
+| `cruisebaz.com` | likely `cruisebazonline@gmail.com` — unverified |
+| `cruise24.ir`, `cruiseshop.ir`, `dmciran.ir` | unknown — check the chooser |
 
 Sign in to [search.google.com/search-console](https://search.google.com/search-console)
-as **alimozzarella@gmail.com**.
+as each account in turn.
 
 For **each** property that account owns:
 
@@ -71,30 +88,27 @@ For **each** property that account owns:
 it submit sitemaps and request URL removals. A daily cron job has no business
 holding the ability to deindex your pages.
 
----
-
-## Step 3 — Grant it again, as account two (5 min)
-
-Sign out. Sign in as **contactmozaffari@gmail.com**. Same five clicks, for every
-remaining property.
-
-This is the step that gets half-done. If Agent 1 later reports six properties
-instead of eight, this is why.
+Repeat for every account that owns a property. This is the step that gets
+half-done — if Agent 1 later reports three properties instead of eight, this is
+why, and `--list-properties` names exactly which are missing.
 
 ---
 
 ## Step 4 — Verify (1 min)
 
-```bash
-export GOOGLE_SERVICE_ACCOUNT_JSON="$(cat ~/Downloads/albaloo-orchestrator-*.json)"
-```
+Point the loader at the file — no need to paste the key anywhere:
 
 ```bash
-cd orchestrator && python agent1_seo_scout.py --list-properties
+cd orchestrator && GOOGLE_APPLICATION_CREDENTIALS=~/Downloads/albaloo-orchestrator-*.json \
+  python agent1_seo_scout.py --list-properties
 ```
 
-Eight rows, all `siteRestrictedUser`, and no "NOT readable" list at the bottom.
-Anything missing is named explicitly — go back to step 2 or 3 for exactly those.
+Every row should read `siteRestrictedUser`, with no "NOT readable" list at the
+bottom. Anything missing is named explicitly — go back to step 2 for exactly
+those.
+
+**Status 6 Aug 2026: 3 of 8 granted** — boutimar.com, boutimar.ir,
+exploreorient.com. The other five await the accounts that own them.
 
 The CI workflow runs this same command as a separate step before the scout, so a
 half-granted service account fails the run loudly instead of silently scouting

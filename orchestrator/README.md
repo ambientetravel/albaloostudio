@@ -172,6 +172,7 @@ publication and dead-letters the payload; it does not warn and continue.
 | [`scheduler.py`](scheduler.py) | file / zernio / webhook backends, media pre-flight |
 | [`SETUP-GSC.md`](SETUP-GSC.md) | the 15-minute Search Console grant — the one blocking step |
 | [`SETUP-SOCIAL.md`](SETUP-SOCIAL.md) | what to connect where, and which entity should own it |
+| [`SETUP-DEPLOY.md`](SETUP-DEPLOY.md) | scoped FTP + CI deploys, so no one holds the panel password |
 | [`agent5_site_auditor.py`](agent5_site_auditor.py) | technical + GEO + local crawl, no credentials needed |
 | [`agent6_analyst.py`](agent6_analyst.py) | audit + demand → strategy, calendar, paste-ready JSON-LD |
 | [`selfcheck.py`](selfcheck.py) | 218 assertions, no network |

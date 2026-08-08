@@ -7,7 +7,7 @@ Owner: Alireza Mozaffari
 
 Crawls the eight Search Console properties of the travel portfolio with ONE
 service account (ARCHITECTURE.md §3.1), diffs demand (GSC) against supply
-(sitemap), asks OpenAI to classify and rank the gaps, and POSTs a signed
+(sitemap), asks an LLM to classify and rank the gaps, and POSTs a signed
 `content.brief.v1` payload to Agent 2 for each opportunity worth writing.
 
 Runs on a GitHub Actions cron. Reads only — it never mutates a site.
@@ -57,7 +57,7 @@ TARGET_ID = "agent2.writer"
 
 GSC_ROW_LIMIT = 25_000          # the API maximum per request
 GSC_PAGE_SLEEP_S = 0.25         # 200 queries/min/site — stay well under it
-MAX_CANDIDATES_TO_LLM = 40      # one batched OpenAI call per domain, not per keyword
+MAX_CANDIDATES_TO_LLM = 40      # one batched LLM call per domain, not per keyword
 
 # Rough organic CTR by position. Used only to spot a page that ranks well and
 # still under-earns its clicks — i.e. a title/intent problem, not a volume one.
@@ -450,7 +450,10 @@ GAP_ANALYSIS_SCHEMA: dict[str, Any] = {
                         "type": "string",
                         "enum": ["informational", "commercial", "transactional", "navigational"],
                     },
-                    "priority_score": {"type": "integer", "minimum": 0, "maximum": 100},
+                    # No minimum/maximum here: neither OpenAI strict mode nor
+                    # Anthropic structured outputs support numeric constraints.
+                    # Clamped in code instead — see _clamp_analysis.
+                    "priority_score": {"type": "integer"},
                     "priority_inputs": {
                         "type": "object",
                         "additionalProperties": False,
@@ -480,7 +483,7 @@ GAP_ANALYSIS_SCHEMA: dict[str, Any] = {
                             "additionalProperties": False,
                             "required": ["h", "heading", "must_cover"],
                             "properties": {
-                                "h": {"type": "integer", "minimum": 2, "maximum": 3},
+                                "h": {"type": "integer"},
                                 "heading": {"type": "string"},
                                 "must_cover": {"type": "array", "items": {"type": "string"}},
                             },
@@ -498,66 +501,107 @@ GAP_ANALYSIS_SCHEMA: dict[str, Any] = {
 }
 
 
-def analyse_gaps_with_openai(
-    site: Site, candidates: list[dict[str, Any]], limit: int
-) -> list[dict[str, Any]]:
-    """
-    One call per domain, batched over its candidates. Returns at most `limit`
-    briefs. On any provider failure we fall back to the deterministic builder —
-    a degraded run beats a dead one.
-    """
-    if not candidates:
-        return []
+def _analysis_system_prompt(site: Site) -> str:
+    """Shared by both providers — the instruction is about the task, not the vendor."""
+    return "\n".join([
+        "You are the SEO analyst of a luxury travel group. You convert Search "
+        "Console gap data into content briefs. You are analytical, not "
+        "promotional: you do not write the article, you specify it.",
+        "",
+        f"Brand: {site.brand}. Domain: {site.domain}. Locale: {site.locale}.",
+        f"Write every brief field in the site's language ({site.locale}); keep "
+        "keywords exactly as they appear in the Search Console data.",
+        "",
+        "target_url_path must be a lowercase ASCII slug beginning with '/' even "
+        "for Farsi pages — the sites do not use percent-encoded URLs. Transliterate "
+        "rather than leaving a placeholder.",
+        "Never propose a path that already exists in the supplied sitemap sample.",
+        "",
+        compliance.prompt_constraints(site.compliance_profile),
+        "",
+        "Put the Persian Gulf and visa rules into every brief's must_avoid list "
+        "so the writing agent inherits them.",
+    ])
 
-    from openai import OpenAI  # imported here so --dry-run needs no API key
 
-    client = OpenAI(api_key=config.require_env("OPENAI_API_KEY"))
-
-    system = "\n".join(
-        [
-            "You are the SEO analyst of a luxury travel group. You convert Search "
-            "Console gap data into content briefs. You are analytical, not "
-            "promotional: you do not write the article, you specify it.",
-            "",
-            f"Brand: {site.brand}. Domain: {site.domain}. Locale: {site.locale}.",
-            f"Write every brief field in the site's language ({site.locale}); keep "
-            "keywords exactly as they appear in the Search Console data.",
-            "",
-            "target_url_path must be a lowercase ASCII slug beginning with '/' even "
-            "for Farsi pages — the sites do not use percent-encoded URLs.",
-            "Never propose a path that already exists in the supplied sitemap sample.",
-            "",
-            compliance.prompt_constraints(site.compliance_profile),
-            "",
-            "Put the Persian Gulf and visa rules into every brief's must_avoid list "
-            "so the writing agent inherits them.",
-        ]
-    )
-
-    user = json.dumps(
+def _analysis_user_prompt(site: Site, candidates: list[dict[str, Any]], limit: int) -> str:
+    return json.dumps(
         {
             "site": {
                 "domain": site.domain, "brand": site.brand, "locale": site.locale,
                 "market": site.market, "base_url": site.base_url,
             },
             "instruction": (
-                f"Select the {limit} highest-value opportunities from the candidates "
-                "and produce one brief for each. Score priority 0-100 using volume, "
-                "position proximity, commercial value and effort. Reject candidates "
-                "that are brand-navigational or that duplicate each other's intent."
+                f"Select AT MOST {limit} opportunities from the candidates and "
+                "produce one brief for each. Fewer is correct when the candidates "
+                "do not justify more. Score priority 0-100 using volume, position "
+                "proximity, commercial value and effort. Reject candidates that are "
+                "brand-navigational, and MERGE any that share an intent — two "
+                "spellings of one query are one page, not two."
             ),
             "candidates": candidates,
         },
         ensure_ascii=False,
     )
 
+
+def _clamp_analysis(a: dict[str, Any]) -> dict[str, Any]:
+    """
+    Bounds that used to live in the JSON schema. Neither OpenAI strict mode nor
+    Anthropic structured outputs accept numeric constraints, so they are applied
+    here rather than silently trusted.
+    """
+    a["priority_score"] = max(0, min(100, int(a.get("priority_score", 50))))
+    for section in a.get("outline", []):
+        section["h"] = max(2, min(3, int(section.get("h", 2))))
+    lo = max(100, int(a.get("word_count_min", 1200)))
+    hi = max(lo, int(a.get("word_count_max", 1800)))
+    a["word_count_min"], a["word_count_max"] = lo, hi
+    return a
+
+
+def analyse_gaps(
+    site: Site, candidates: list[dict[str, Any]], limit: int
+) -> list[dict[str, Any]]:
+    """
+    One call per domain, batched over its candidates. Returns at most `limit`
+    briefs. On any provider failure we fall back to the deterministic builder —
+    a degraded run beats a dead one.
+
+    Provider is config.GAP_ANALYSIS_PROVIDER: `anthropic` (default) or `openai`.
+    The step is analytical — classify, deduplicate, rank, outline — and both
+    models do it well. Anthropic is the default because the rest of the pipeline
+    already runs on it; one vendor is one key, one bill, one thing to rotate.
+    """
+    if not candidates:
+        return []
+
+    if config.GAP_ANALYSIS_PROVIDER == "anthropic":
+        return _analyse_with_anthropic(site, candidates, limit)
+
+    # Import and client construction sit inside the guarded path on purpose. A
+    # missing `openai` package or an unset key is precisely the "provider
+    # unavailable" case the fallback exists for — letting either crash the run
+    # would lose every other domain's work too.
+    try:
+        from openai import OpenAI
+
+        client = OpenAI(api_key=config.require_env("OPENAI_API_KEY"))
+    except (ImportError, ConfigError) as exc:
+        log.error(
+            "%s — OpenAI unavailable (%s); using the deterministic fallback. "
+            "Candidates will not be deduplicated or ranked.",
+            site.domain, exc,
+        )
+        return [_fallback_brief(site, c) for c in candidates[:limit]]
+
     try:
         resp = client.chat.completions.create(
             model=config.OPENAI_MODEL,
             temperature=0.2,
             messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
+                {"role": "system", "content": _analysis_system_prompt(site)},
+                {"role": "user", "content": _analysis_user_prompt(site, candidates, limit)},
             ],
             response_format={
                 "type": "json_schema",
@@ -577,9 +621,77 @@ def analyse_gaps_with_openai(
                 site.domain, config.OPENAI_MODEL,
                 getattr(usage, "prompt_tokens", "?"), getattr(usage, "completion_tokens", "?"),
             )
-        return briefs[:limit]
+        return [_clamp_analysis(b) for b in briefs[:limit]]
     except Exception as exc:  # provider outage, quota, schema refusal
         log.error("%s — OpenAI step failed (%s); using deterministic fallback", site.domain, exc)
+        return [_fallback_brief(site, c) for c in candidates[:limit]]
+
+
+def _analyse_with_anthropic(
+    site: Site, candidates: list[dict[str, Any]], limit: int
+) -> list[dict[str, Any]]:
+    """
+    Same contract as the OpenAI path, same schema, same fallback on failure.
+
+    Request-shape notes for this model family: no temperature/top_p/top_k (a
+    400), thinking is on by default and `budget_tokens` is a 400 — depth is
+    `output_config.effort`. Structured output replaces the assistant prefill
+    that older code would have used to force JSON.
+    """
+    try:
+        from anthropic import Anthropic
+
+        client = Anthropic(api_key=config.require_env("ANTHROPIC_API_KEY"))
+    except (ImportError, ConfigError) as exc:
+        log.error(
+            "%s — Anthropic unavailable (%s); using the deterministic fallback. "
+            "Candidates will not be deduplicated or ranked.", site.domain, exc,
+        )
+        return [_fallback_brief(site, c) for c in candidates[:limit]]
+
+    kwargs: dict[str, Any] = {
+        "model": config.ANTHROPIC_MODEL,
+        "max_tokens": 16000,
+        "system": _analysis_system_prompt(site),
+        "messages": [{"role": "user", "content": _analysis_user_prompt(site, candidates, limit)}],
+        "output_config": {
+            "effort": config.ANTHROPIC_EFFORT,
+            "format": {"type": "json_schema", "schema": GAP_ANALYSIS_SCHEMA},
+        },
+    }
+    if config.ANTHROPIC_FALLBACKS.lower() not in {"", "off", "false", "0"}:
+        kwargs["betas"] = [config.ANTHROPIC_FALLBACK_BETA]
+        kwargs["fallbacks"] = config.ANTHROPIC_FALLBACKS
+        create = client.beta.messages.create
+    else:
+        create = client.messages.create
+
+    try:
+        resp = create(**kwargs)
+        # Check stop_reason before touching content — a refusal leaves it empty.
+        if getattr(resp, "stop_reason", None) == "refusal":
+            detail = getattr(resp, "stop_details", None)
+            raise RuntimeError(
+                f"declined by safety classifiers (category="
+                f"{getattr(detail, 'category', None)!r})"
+            )
+        text = "".join(
+            b.text for b in resp.content if getattr(b, "type", "") == "text"
+        ).strip()
+        briefs = json.loads(text).get("briefs", [])
+        usage = getattr(resp, "usage", None)
+        if usage:
+            log.info(
+                "%s — Claude %s: %s in / %s out", site.domain,
+                getattr(resp, "model", config.ANTHROPIC_MODEL),
+                getattr(usage, "input_tokens", "?"), getattr(usage, "output_tokens", "?"),
+            )
+        if not briefs:
+            raise ValueError("model returned no briefs")
+        return [_clamp_analysis(b) for b in briefs[:limit]]
+    except Exception as exc:
+        log.error("%s — Claude step failed (%s); using deterministic fallback",
+                  site.domain, exc)
         return [_fallback_brief(site, c) for c in candidates[:limit]]
 
 
@@ -898,7 +1010,7 @@ def process_site(
 
         by_query = {c["query"]: c for c in candidates}
         analyses = (
-            analyse_gaps_with_openai(site, candidates, limit)
+            analyse_gaps(site, candidates, limit)
             if use_llm
             else [_fallback_brief(site, c) for c in candidates[:limit]]
         )
@@ -963,7 +1075,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--domain", action="append", help="restrict to a domain (repeatable)")
     parser.add_argument("--limit", type=int, default=None, help="max briefs per domain")
     parser.add_argument("--dry-run", action="store_true", help="build briefs, deliver nothing")
-    parser.add_argument("--no-openai", action="store_true", help="skip the LLM step")
+    parser.add_argument("--no-llm", "--no-openai", dest="no_llm", action="store_true",
+                        help="skip the LLM step and use the deterministic fallback")
     parser.add_argument("--list-properties", action="store_true",
                         help="print every property this service account can read, then exit")
     parser.add_argument("--verbose", action="store_true")
@@ -993,7 +1106,16 @@ def main(argv: list[str] | None = None) -> int:
             print("\nDeclared in sites.yml but NOT readable:")
             for m in missing:
                 print(f"  ✗ {m}")
+        # Exit 1 only when NOTHING is readable — that means the credential or the
+        # grant process is broken and scouting would be pointless. Some properties
+        # pending is the normal state while grants are worked through account by
+        # account, and it must not block work on the ones that ARE granted.
+        if not props:
+            print("\nNo readable properties at all — check the key and the grants.")
             return 1
+        if missing:
+            print(f"\n{len(props)} of {len(props) + len(missing)} granted — "
+                  "proceeding with those. See SETUP-GSC.md for the rest.")
         return 0
 
     audit_access(service, sites)
@@ -1016,7 +1138,7 @@ def main(argv: list[str] | None = None) -> int:
                 service, site, session, run_id, run_dir,
                 limit=args.limit or site.max_briefs_per_run,
                 dry_run=args.dry_run,
-                use_llm=not args.no_openai,
+                use_llm=not args.no_llm,
                 webhook_url=webhook_url,
                 callback_url=callback_url,
                 secret=secret,
@@ -1031,7 +1153,7 @@ def main(argv: list[str] | None = None) -> int:
         "owner": config.OWNER,
         "environment": config.ENVIRONMENT,
         "dry_run": args.dry_run,
-        "openai_model": None if args.no_openai else config.OPENAI_MODEL,
+        "analysis_provider": None if args.no_llm else config.GAP_ANALYSIS_PROVIDER,
         "domains": stats,
         "totals": {
             key: sum(s.get(key, 0) for s in stats)

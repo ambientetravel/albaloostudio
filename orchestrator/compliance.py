@@ -83,6 +83,30 @@ _NO_VISA_CLAIM = re.compile(
 
 _SCHENGEN_MISLABEL = re.compile(r"(?i)\bschengen[-\s]?free\b|بدون\s*شنگن")
 
+# Negation guard. `visa_accuracy` bans a CLAIM, not a term: "Dubai is not
+# visa-free" is the correct sentence, and "state that Iran stays are not
+# visa-free" is the instruction that enforces the rule. A context-blind match
+# blocked both — it blocked the fix as readily as the error.
+#
+# `persian_gulf_only` deliberately gets NO such guard: that rule bans a term
+# outright, and "Arabian Gulf" is wrong in any framing.
+_NEG_BEFORE = re.compile(
+    r"(?i)\b(not|isn'?t|aren'?t|never|non|no)\b[^.!?؟\n]{0,24}$"
+    r"|(نه|نمی|بدون\s+اینکه)[^.!?؟\n]{0,24}$"
+)
+_NEG_AFTER = re.compile(
+    r"(?i)^[^.!?؟\n]{0,24}\b(is|are)\s+(not|never)\b"
+    r"|^[^.!?؟\n]{0,24}(نیست|نیستند|نمی[‌\s]*باشد|ندارد)"
+)
+
+
+def _is_negated(text: str, match: re.Match[str]) -> bool:
+    """True when the surrounding clause denies the claim rather than making it."""
+    return bool(
+        _NEG_BEFORE.search(text[max(0, match.start() - 60):match.start()])
+        or _NEG_AFTER.search(text[match.end():match.end() + 60])
+    )
+
 # ── §7.3 Never invent ────────────────────────────────────────────────────────
 
 # Digits: ASCII, Persian (۰-۹) and Arabic-Indic (٠-٩). A Farsi price written
@@ -171,6 +195,8 @@ def check(
         for m in _NO_VISA_CLAIM.finditer(text):
             if route_ok and not schengen:
                 continue
+            if _is_negated(text, m):
+                continue  # "not visa-free" states the rule, it does not break it
             reason = (
                 "One Schengen port makes the whole itinerary Schengen — even sailing "
                 "from Istanbul."
