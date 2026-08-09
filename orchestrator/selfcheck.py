@@ -8,7 +8,7 @@ Mocks Search Console and Gemini. Exercises config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry and the
 Agent 2 HTTP surface end to end.
 """
-import json, os, sys
+import json, os, sys, pathlib
 
 os.environ.setdefault("WEBHOOK_SIGNING_SECRET", "test-secret-123")
 os.environ.setdefault("PIPELINE_ENVIRONMENT", "staging")
@@ -43,6 +43,27 @@ ok("audit sample size is pinned uniformly",
    {s.audit_sample_pages for s in config.load_sites(include_hold=True)})
 ok("defaults merged into each site", all(s.min_impressions == 5 for s in sites
                                          if s.domain != "boutimar.com"))
+
+# ── The scheduled-run blind spot ─────────────────────────────────────────────
+# Every manual run passed --dry-run. The 04:15 cron never does, so it was a LIVE
+# run demanding a delivery endpoint that Agent 2 does not yet provide, and it
+# died on the missing secret every night. Testing only the convenient branch is
+# exactly how the `?e=` bug shipped in August.
+_wf = (pathlib.Path(__file__).resolve().parents[1]
+       / ".github" / "workflows" / "agent1-seo-scout.yml").read_text(encoding="utf-8")
+ok("the cron degrades to brief-only when Agent 2 has no endpoint",
+   'if [ -z "$AGENT2_WEBHOOK_URL" ]' in _wf,
+   "a scheduled run with no delivery target must still scout, not fail")
+ok("the guard does not override an explicit dry-run request",
+   'inputs.dry_run }}" != "true"' in _wf)
+ok("AGENT2_WEBHOOK_URL is passed to the scout step",
+   "AGENT2_WEBHOOK_URL: ${{ secrets.AGENT2_WEBHOOK_URL }}" in _wf,
+   "the guard tests an env var that must actually be populated")
+_scout_src = pathlib.Path(__file__).with_name("agent1_seo_scout.py").read_text(encoding="utf-8")
+_tail = _scout_src.split('require_env("AGENT2_WEBHOOK_URL")', 1)[1][:600]
+ok("a missing delivery endpoint is exit 2, not a traceback",
+   "except ConfigError" in _tail and "return 2" in _tail,
+   "exit 1 reads as 'a brief was dead-lettered' and misdirects the search")
 ok("boutimar.com overrides the impression floor",
    next(s.min_impressions for s in sites if s.domain == "boutimar.com") == 20)
 ok("domain filter works", len(config.load_sites(only=["boutimar.ir"])) == 1)

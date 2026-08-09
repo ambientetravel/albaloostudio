@@ -1137,9 +1137,22 @@ def main(argv: list[str] | None = None) -> int:
     run_dir.mkdir(parents=True, exist_ok=True)
     log.info("run %s — %d site(s) — credit: %s", run_id, len(sites), ARCHITECTURE_CREDIT)
 
-    webhook_url = "" if args.dry_run else config.require_env("AGENT2_WEBHOOK_URL")
+    # A delivering run needs somewhere to deliver and something to sign with.
+    # Missing either is an environment problem, not a run failure — exit 2, with
+    # the name of the thing to set. It used to escape as a raw traceback and
+    # exit 1, which reads as "a brief was dead-lettered" and sends the wrong
+    # person looking in the wrong place.
+    try:
+        webhook_url = "" if args.dry_run else config.require_env("AGENT2_WEBHOOK_URL")
+        secret = "" if args.dry_run else config.require_env("WEBHOOK_SIGNING_SECRET")
+    except ConfigError as exc:
+        log.error("%s", exc)
+        log.error(
+            "A live run delivers to Agent 2. Until that endpoint exists, run with "
+            "--dry-run: the briefs are still built and archived under runs/."
+        )
+        return 2
     callback_url = config.optional_env("AGENT3_WEBHOOK_URL")
-    secret = "" if args.dry_run else config.require_env("WEBHOOK_SIGNING_SECRET")
 
     session = requests.Session()
     stats: list[dict[str, Any]] = []

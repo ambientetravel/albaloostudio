@@ -85,6 +85,18 @@ jobs:
           ARGS="--limit ${{ inputs.limit || '5' }}"
           if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
           if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+
+          # Agent 2 is not built yet, so a scheduled run — which never passes
+          # dry_run — had nowhere to deliver and died on the missing secret every
+          # night at 04:15. Scouting is still worth doing without a consumer: the
+          # briefs are the artifact. This is self-healing, not a permanent
+          # opt-out — the night AGENT2_WEBHOOK_URL exists, delivery starts on its
+          # own with no edit here.
+          if [ -z "$AGENT2_WEBHOOK_URL" ] && [ "${{ inputs.dry_run }}" != "true" ]; then
+            echo "::notice title=No delivery endpoint::AGENT2_WEBHOOK_URL is not set — Agent 2 has no endpoint yet. Building briefs and archiving them as the run artifact; delivering nothing."
+            ARGS="$ARGS --dry-run"
+          fi
+
           python agent1_seo_scout.py $ARGS
 
       - name: Upload run artifact
