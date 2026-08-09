@@ -11,15 +11,42 @@
       "Bash(git diff *)",
       "Bash(python3 *)",
       "Bash(node *)",
-      "Edit"
+      "Edit",
+
+      "Bash(git push *)",
+
+      "Bash(git fetch *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git ls-remote *)",
+      "Bash(git ls-files *)",
+      "Bash(git rev-parse *)",
+      "Bash(git branch *)",
+      "Bash(git check-ignore *)",
+      "Bash(git remote *)",
+
+      "Bash(curl *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(wc *)",
+      "Bash(diff *)",
+      "Bash(cmp *)",
+      "Bash(zip *)",
+      "Bash(unzip *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(bash *)"
     ],
     "deny": [
       "Read(**/.env*)",
       "Read(**/credentials*.json)",
       "Read(**/*service-account*.json)",
       "Edit(**/.env*)",
-      "Bash(git push *)",
-      "Bash(rm -rf *)"
+      "Bash(rm -rf *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)"
     ]
   }
 }
