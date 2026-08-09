@@ -69,3 +69,7 @@ orchestrator/bundles/
 
 # Staged deploy tree for albaloostudio.com — built by scripts/stage-site.py
 _site/
+
+# Python bytecode from running the orchestrator locally
+__pycache__/
+*.pyc
