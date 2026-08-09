@@ -1,0 +1,10 @@
+# alBaloo Studio — albaloostudio.com
+#
+# Deliberately permissive. This site exists to be found and cited, including by
+# answer engines, so the AI crawlers are allowed rather than blocked. Nothing
+# here is private and nothing is behind a paywall.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://albaloostudio.com/sitemap.xml

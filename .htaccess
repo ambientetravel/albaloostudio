@@ -1,0 +1,44 @@
+# alBaloo Studio — albaloostudio.com
+# Apache config for GoDaddy shared hosting.
+#
+# Added 2026-08-09 after the first site audit scored this domain 51/100.
+# The single worst finding: albaloostudio.com and www.albaloostudio.com both
+# returned 200 with no redirect, so every ranking signal the site earns was
+# being split between two hosts Google treats as separate sites.
+#
+# This same rule is live and verified on boutimar.com, which sits on a
+# different host (Netafraz/nginx-in-front-of-Apache) — www.boutimar.com
+# returns 301 to the apex. The pattern is proven, not assumed.
+
+RewriteEngine On
+
+# ---- Canonical host: force www -> apex ----
+RewriteCond %{HTTP_HOST} ^www\.albaloostudio\.com$ [NC]
+RewriteRule ^(.*)$ https://albaloostudio.com/$1 [R=301,L]
+
+# ---- Long-lived caching for the media, which is most of this site's weight ----
+# The hero videos and portraits are several MB each and their filenames change
+# when the work changes, so they can be cached hard.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType video/mp4 "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(jpg|jpeg|png|webp|svg|ico|woff2|mp4)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# ---- Compression ----
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

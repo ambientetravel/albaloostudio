@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  alBaloo Studio — albaloostudio.com
+
+  One URL, deliberately. This is a single-page site: /about, /releases,
+  /whatwedo, /davan, /roxana, /podcast and /contact are anchor sections of
+  index.html, not separate documents. Listing them as #fragments would be
+  invalid in a sitemap, and inventing /about.html for pages that do not exist
+  would put 404s in front of a crawler.
+
+  Add a <url> here the day a real second page ships, not before.
+
+  lastmod is the last commit that touched index.html, not the date this file
+  was written — a lastmod that moves without the page changing is a lie the
+  crawler learns to ignore.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://albaloostudio.com/</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
