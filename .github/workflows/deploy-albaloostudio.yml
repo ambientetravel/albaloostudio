@@ -1,0 +1,182 @@
+# Deploy albaloostudio.com
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Shape follows orchestrator/SETUP-DEPLOY.md: a scoped FTP account that can see
+# one directory, held in GitHub's secret store, revocable by deleting the FTP
+# account and nothing else. Nobody holds the hosting panel password in CI.
+#
+# THE ONE THING THAT MAKES THIS DIFFERENT from the boutimar.com deploy: this
+# repository root is both the albaloostudio.com document root AND the working
+# directory for the entire portfolio. orchestrator/, CLAUDE.md, docs/ and a
+# dozen sibling project folders sit beside index.html. A mirror of the repo
+# root would publish all of it. So we mirror `_site/`, which is built from an
+# explicit allowlist by scripts/stage-site.py, and never the repo itself.
+
+name: Deploy albaloostudio.com
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "styles.css"
+      - "script.js"
+      - ".htaccess"
+      - "sitemap.xml"
+      - "robots.txt"
+      - "*.png"
+      - "*.mp4"
+      - "*.jpg"
+      - "scripts/stage-site.py"
+      - ".github/workflows/deploy-albaloostudio.yml"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Connect and list what WOULD upload, upload nothing"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-albaloostudio
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      # Refuses to stage if the site references an asset that is not in the
+      # allowlist, if the allowlist names a file that does not exist, or if
+      # anything internal has been added to it. Runs before we touch the network.
+      - name: Stage the published surface
+        run: python3 scripts/stage-site.py --out _site
+
+      - name: Check the staged tree
+        run: |
+          set -euo pipefail
+
+          test -s _site/index.html   || { echo "::error::_site/index.html missing or empty"; exit 1; }
+          test -s _site/sitemap.xml  || { echo "::error::_site/sitemap.xml missing or empty"; exit 1; }
+          test -s _site/robots.txt   || { echo "::error::_site/robots.txt missing or empty"; exit 1; }
+          test -s _site/.htaccess    || { echo "::error::_site/.htaccess missing or empty"; exit 1; }
+
+          python3 -c "import xml.dom.minidom,sys; xml.dom.minidom.parse('_site/sitemap.xml')" \
+            || { echo "::error::sitemap.xml is not valid XML"; exit 1; }
+
+          # A sitemap must never list a page that tells crawlers not to index it.
+          # boutimar.com shipped exactly that contradiction and it cost a CRITICAL
+          # audit finding; this is the guard that stops it recurring here.
+          python3 - <<'PY'
+          import re, sys, xml.dom.minidom as x
+          from pathlib import Path
+          locs = [n.firstChild.data.strip()
+                  for n in x.parse('_site/sitemap.xml').getElementsByTagName('loc')]
+          bad = []
+          for loc in locs:
+              rel = loc.replace('https://albaloostudio.com/', '') or 'index.html'
+              p = Path('_site') / rel
+              if p.exists() and re.search(
+                      r'<meta[^>]+name=["\']robots["\'][^>]*content=["\'][^"\']*noindex',
+                      p.read_text(encoding='utf-8', errors='replace'), re.I):
+                  bad.append(loc)
+          if bad:
+              print("::error::sitemap lists noindexed page(s): " + ", ".join(bad))
+              sys.exit(1)
+          print(f"sitemap: {len(locs)} URL(s), none noindexed")
+          PY
+
+          # Nothing internal may exist in the staged tree, whatever else changed.
+          for bad in CLAUDE.md AGENTS.md README.md .env .gitignore orchestrator docs scripts .github .claude; do
+            if [ -e "_site/$bad" ]; then echo "::error::_site contains $bad — refusing to publish"; exit 1; fi
+          done
+
+          echo "staged $(find _site -type f | wc -l) files, $(du -sh _site | cut -f1)"
+
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Deploy
+        env:
+          FTP_HOST: ${{ secrets.ALBALOO_FTP_HOST }}
+          FTP_USER: ${{ secrets.ALBALOO_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.ALBALOO_FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ vars.ALBALOO_FTP_REMOTE_DIR || '.' }}
+          # A push deploys for real; a manual dispatch defaults to a dry run.
+          DRY: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${FTP_HOST:-}" ] || [ -z "${FTP_USER:-}" ] || [ -z "${FTP_PASSWORD:-}" ]; then
+            echo "::error title=No FTP credentials::Set ALBALOO_FTP_HOST, ALBALOO_FTP_USER and ALBALOO_FTP_PASSWORD (Settings → Secrets and variables → Actions). See orchestrator/SETUP-DEPLOY.md for creating a scoped, single-directory FTP account."
+            exit 1
+          fi
+
+          # --delete is deliberately absent. The live docroot holds files that
+          # are not in this repo, and a delete-enabled mirror would remove them
+          # on its first run. If something genuinely has to go, delete it by
+          # hand, once.
+          MIRROR_FLAGS="-R --verbose --parallel=4 --exclude-glob .DS_Store"
+          if [ "$DRY" = "true" ]; then
+            echo "::notice title=Dry run::Listing what would upload. Nothing is written."
+            MIRROR_FLAGS="$MIRROR_FLAGS --dry-run"
+          fi
+
+          lftp -c "
+            set ftp:ssl-allow true;
+            set ftp:ssl-force false;
+            set ssl:verify-certificate no;
+            set net:max-retries 3;
+            set net:timeout 20;
+            open -u '$FTP_USER','$FTP_PASSWORD' '$FTP_HOST';
+            mirror $MIRROR_FLAGS _site/ '$FTP_REMOTE_DIR';
+            bye
+          "
+
+      # Verify against the LIVE URL, never against the artifact we just built.
+      # An edited file that never made it into a deploy has shipped on this
+      # project before; this is the check that catches it.
+      - name: Verify live
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run == false }}
+        run: |
+          set -euo pipefail
+          sleep 10
+          fail=0
+
+          live=$(mktemp)
+          curl -sS -L --max-time 30 https://albaloostudio.com/ -o "$live"
+          if cmp -s "$live" _site/index.html; then
+            echo "index.html      live matches the deployed build ✓"
+          else
+            echo "::error::index.html on the server differs from what was just built"
+            fail=1
+          fi
+
+          for path in sitemap.xml robots.txt; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 20 "https://albaloostudio.com/$path")
+            [ "$code" = "200" ] && echo "$path       $code ✓" \
+              || { echo "::error::$path returned $code"; fail=1; }
+          done
+
+          # The whole reason .htaccess is deployed. If this is not 301, the
+          # rewrite is not reaching Apache and the fix belongs in the GoDaddy
+          # panel, not in the file.
+          www=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 https://www.albaloostudio.com/)
+          if [ "$www" = "301" ]; then
+            echo "www redirect    301 ✓"
+          else
+            echo "::warning title=www not redirecting::www.albaloostudio.com returned $www, expected 301. .htaccess may not be read on this host — check GoDaddy's domain settings."
+          fi
+
+          exit $fail

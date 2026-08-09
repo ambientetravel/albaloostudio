@@ -10,7 +10,7 @@ Owner: Alireza Mozaffari.
 GitHub Actions cron
       │
       ▼
-Agent 1  SEO Scout      GSC (8 properties, 1 service account) → OpenAI → content.brief.v1
+Agent 1  SEO Scout      GSC (10 properties, 1 service account) → OpenAI → content.brief.v1
       │
       ▼
 Agent 2  Writer         base44 Super Agent — contract in BASE44-AGENT2.md
@@ -37,7 +37,7 @@ Verify the whole thing without a single API key or network call:
 python selfcheck.py
 ```
 
-252 assertions across all six agents — config, the compliance gate, gap
+257 assertions across all six agents — config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry, the
 autopost gates, PII redaction, escalation rules, and every HTTP surface. Exit 0
 means the pipeline is wired correctly.
@@ -47,7 +47,7 @@ means the pipeline is wired correctly.
 **First run? Do [SETUP-GSC.md](SETUP-GSC.md) first** — ~15 minutes, and nothing
 in Agent 1 works until it is done.
 
-Confirm the one service account can read all eight Search Console properties.
+Confirm the one service account can read all ten Search Console properties.
 This is the step that catches "only one of the two Google accounts granted
 access":
 
@@ -194,7 +194,7 @@ Gulf" is wrong in any framing — question, negation or quotation.
 | | |
 |---|---|
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | the spec, incl. all three JSON handoff schemas |
-| [`sites.yml`](sites.yml) | the 8 properties — the only place a domain is declared |
+| [`sites.yml`](sites.yml) | the 10 properties — the only place a domain is declared |
 | [`config.py`](config.py) | env, model IDs, envelope + HMAC signing |
 | [`compliance.py`](compliance.py) | the gate |
 | [`agent1_seo_scout.py`](agent1_seo_scout.py) | GSC → OpenAI → webhook |
@@ -206,9 +206,10 @@ Gulf" is wrong in any framing — question, negation or quotation.
 | [`SETUP-GSC.md`](SETUP-GSC.md) | the 15-minute Search Console grant — the one blocking step |
 | [`SETUP-SOCIAL.md`](SETUP-SOCIAL.md) | what to connect where, and which entity should own it |
 | [`SETUP-DEPLOY.md`](SETUP-DEPLOY.md) | scoped FTP + CI deploys, so no one holds the panel password |
+| [`SETUP-DEPLOY-ALBALOO.md`](SETUP-DEPLOY-ALBALOO.md) | albaloostudio.com deploy — publishes an allowlist, never a repo mirror |
 | [`agent5_site_auditor.py`](agent5_site_auditor.py) | technical + GEO + local crawl, no credentials needed |
 | [`agent6_analyst.py`](agent6_analyst.py) | audit + demand → strategy, calendar, paste-ready JSON-LD |
-| [`selfcheck.py`](selfcheck.py) | 252 assertions, no network |
+| [`selfcheck.py`](selfcheck.py) | 257 assertions, no network |
 | [`schemas/`](schemas) | JSON Schema for the three payloads |
 | `../.github/workflows/agent1-seo-scout.yml` | daily scout, 04:15 UTC |
 | `../.github/workflows/agent5-site-audit.yml` | weekly audit + strategy, Mondays 05:00 UTC |

@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       domain:
-        description: "Restrict to one domain (blank = all eight)"
+        description: "Restrict to one domain (blank = all ten)"
         required: false
         type: string
       limit:
