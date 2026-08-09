@@ -158,17 +158,81 @@ sites:
   - domain: cruise24.ir
     property_uri: "sc-domain:cruise24.ir"
     brand: Cruise24
-    locale: fa-IR
+    # OFF HOLD 2026-08-09. It was a 375-byte coming-soon page on 6 Aug; it now
+    # serves a real 31KB storefront — "Search 2,200+ sailings from MSC, Explora
+    # Journeys, Celestyal and AROYA".
+    #
+    # locale is `en` because that is what the site ACTUALLY declares and serves
+    # today, and the audit's lang check compares against this field. The Farsi
+    # build for the Iranian audience lands around mid-August 2026; when it does,
+    # THIS LINE MUST BECOME fa-IR. Declaring fa-IR early would flag every page
+    # as a language mismatch for a week and train everyone to ignore the rule.
+    locale: en                 # → fa-IR when the Farsi build ships
     market: IR
-    status: hold               # not launched — 375-byte coming-soon page as of 2026-08-06
+    status: active
     base_url: "https://cruise24.ir"
-    sitemap: "https://cruise24.ir/sitemap.xml"
+    sitemap: "https://cruise24.ir/sitemap.xml"   # 404 as of 2026-08-09 — see below
     cms:
       type: static
-      adapter: static_bundle     # Agent 2 emits a deploy bundle, not an API push
+      adapter: static_bundle     # Netafraz/nginx; Agent 2 emits a deploy bundle
+      content_root: "/"
+      publish_mode: draft
+    channels:
+      - name: telegram
+        audience: d2c
+        autopost: false
+        account_ref: null          # text-only, no Meta review — fastest channel for IR
+    notes:
+      - "No sitemap.xml and no robots.txt (both 404 on 2026-08-09)."
+      - "Zero JSON-LD blocks."
+
+  - domain: cruise24.me
+    property_uri: "sc-domain:cruise24.me"
+    brand: Cruise24
+    locale: en
+    market: INT                # the world-audience twin of cruise24.ir
+    base_url: "https://cruise24.me"
+    sitemap: "https://cruise24.me/sitemap.xml"   # a sitemap INDEX, not a urlset
+    cms:
+      type: godaddy_builder
+      # GoDaddy Website Builder is a closed platform: no REST API, no file
+      # access, no repo. `unimplemented` is deliberate and load-bearing — it
+      # routes Agent 2 down the stage-the-draft path. Any other adapter name
+      # falls through to the generic branch, which returns a live_url for a page
+      # it never created, and an adapter must never report a URL it did not make.
+      adapter: unimplemented
+      content_root: "/"
+      publish_mode: draft
+    channels:
+      - name: linkedin
+        audience: b2b
+        autopost: false
+        account_ref: null
+    notes:
+      - "Declares lang=\"tr-TR\" while serving English to a world audience."
+      - "Sitemap index resolves to 2 URLs total across both child sitemaps."
+
+  - domain: albaloostudio.com
+    property_uri: "sc-domain:albaloostudio.com"
+    brand: Albaloo Studio
+    locale: en
+    market: INT
+    base_url: "https://albaloostudio.com"
+    sitemap: "https://albaloostudio.com/sitemap.xml"   # 404 as of 2026-08-09
+    # The studio this whole pipeline is credited to, now watched by it. A few
+    # static pages on GoDaddy/Apache: music, AI video, and the sites it builds.
+    # Small surface, so it is here for oversight rather than for a content
+    # programme — expect few briefs and a short audit.
+    compliance_profile: boutimar_v1   # the travel rules are inert here; the
+                                      # invented-facts and price rules are not
+    cms:
+      type: static
+      adapter: unimplemented     # hand-built; no push target
       content_root: "/"
       publish_mode: draft
     channels: []
+    notes:
+      - "No meta description on the homepage, no sitemap.xml, no robots.txt."
 
   - domain: cruiseshop.ir
     property_uri: "sc-domain:cruiseshop.ir"

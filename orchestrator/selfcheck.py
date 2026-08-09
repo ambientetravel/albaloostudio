@@ -25,17 +25,37 @@ def ok(label, cond, extra=""):
 
 print("\n=== config ===")
 sites = config.load_sites()
-ok("active sites load", len(sites) == 7, len(sites))
-ok("held sites excluded by default",
-   all(s.domain != "cruise24.ir" for s in sites))
-ok("include_hold returns the full portfolio",
-   len(config.load_sites(include_hold=True)) == 8)
-ok("naming a held site explicitly overrides the hold",
-   [s.domain for s in config.load_sites(only=["cruise24.ir"])] == ["cruise24.ir"])
-ok("on_hold flag reads from sites.yml",
-   next(s.on_hold for s in config.load_sites(include_hold=True)
-        if s.domain == "cruise24.ir") is True)
+ok("the portfolio loads", len(sites) == 10, len(sites))
+ok("every registered domain is unique",
+   len({s.domain for s in config.load_sites(include_hold=True)})
+   == len(config.load_sites(include_hold=True)))
 ok("active sites are not on hold", all(not s.on_hold for s in sites))
+
+# The hold mechanism is tested against a FIXTURE, not against whichever real
+# site happens to be paused today. cruise24.ir used to be the test subject; it
+# came off hold on 9 Aug 2026 when it went live, and took five assertions with
+# it. A feature test must not depend on the state of production data.
+_hold_yaml = """
+defaults: {min_impressions: 5, status: active}
+sites:
+  - {domain: live.example, property_uri: "sc-domain:live.example"}
+  - {domain: paused.example, property_uri: "sc-domain:paused.example", status: hold}
+"""
+_tmp = pathlib.Path(__file__).with_name(".selfcheck-hold.yml")
+_tmp.write_text(_hold_yaml, encoding="utf-8")
+try:
+    ok("held sites excluded by default",
+       [s.domain for s in config.load_sites(_tmp)] == ["live.example"])
+    ok("include_hold returns the full portfolio",
+       len(config.load_sites(_tmp, include_hold=True)) == 2)
+    ok("naming a held site explicitly overrides the hold",
+       [s.domain for s in config.load_sites(_tmp, only=["paused.example"])]
+       == ["paused.example"])
+    ok("on_hold flag reads from the registry",
+       next(s.on_hold for s in config.load_sites(_tmp, include_hold=True)
+            if s.domain == "paused.example") is True)
+finally:
+    _tmp.unlink(missing_ok=True)
 # The audit score counts findings, so it scales with sample size. The cron never
 # passes --sample; it takes this. Uniformity is what makes the trend line real.
 ok("audit sample size is pinned uniformly",
