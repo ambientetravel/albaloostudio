@@ -48,6 +48,7 @@ defaults:
 sites:
   - domain: boutimar.com
     property_uri: "sc-domain:boutimar.com"
+    gsc_account: "alimozzarella@gmail.com"
     brand: Boutimar
     locale: en
     market: INT
@@ -72,6 +73,7 @@ sites:
 
   - domain: boutimar.ir
     property_uri: "sc-domain:boutimar.ir"
+    gsc_account: "alimozzarella@gmail.com"
     brand: Boutimar
     locale: fa-IR
     market: IR
@@ -98,6 +100,7 @@ sites:
 
   - domain: exploreorient.com
     property_uri: "sc-domain:exploreorient.com"
+    gsc_account: "contactmozaffari@gmail.com"
     brand: Explore Orient
     locale: en
     market: INT
@@ -124,6 +127,7 @@ sites:
     # one. It needs a TXT record at WIX (ns12.wixdns.net serves this zone) —
     # adding it at GoDaddy, where the domain is registered, has no effect.
     property_uri: "sc-domain:ambientetravel.com"
+    gsc_account: "contactmozaffari@gmail.com"
     brand: Ambiente Travel
     locale: en
     market: DACH
@@ -149,6 +153,7 @@ sites:
     # A domain property would still be tidier one day; it is not worth a DNS
     # round-trip when this one already has full coverage.
     property_uri: "https://cruisebaz.com/"
+    gsc_account: "UNCONFIRMED"
     brand: CruiseBaz
     locale: fa-IR
     market: IR
@@ -172,6 +177,7 @@ sites:
 
   - domain: cruise24.ir
     property_uri: "sc-domain:cruise24.ir"
+    gsc_account: "alimozzarella@gmail.com"
     brand: Cruise24
     # OFF HOLD 2026-08-09. It was a 375-byte coming-soon page on 6 Aug; it now
     # serves a real 31KB storefront — "Search 2,200+ sailings from MSC, Explora
@@ -203,6 +209,7 @@ sites:
 
   - domain: cruise24.me
     property_uri: "sc-domain:cruise24.me"
+    gsc_account: "contactmozaffari@gmail.com"
     brand: Cruise24
     locale: en
     market: INT                # the world-audience twin of cruise24.ir
@@ -229,6 +236,7 @@ sites:
 
   - domain: albaloostudio.com
     property_uri: "sc-domain:albaloostudio.com"
+    gsc_account: "contactmozaffari@gmail.com"
     brand: Albaloo Studio
     locale: en
     market: INT
@@ -251,6 +259,7 @@ sites:
 
   - domain: cruiseshop.ir
     property_uri: "sc-domain:cruiseshop.ir"
+    gsc_account: "alimozzarella@gmail.com"
     brand: CruiseShop
     locale: fa-IR
     market: IR
@@ -265,6 +274,7 @@ sites:
 
   - domain: dmciran.ir
     property_uri: "sc-domain:dmciran.ir"
+    gsc_account: "alimozzarella@gmail.com"
     brand: DMC Iran
     locale: fa-IR
     market: IR
