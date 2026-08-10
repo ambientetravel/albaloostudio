@@ -115,6 +115,14 @@ sites:
         account_ref: null          # not connected to the scheduler yet
 
   - domain: ambientetravel.com
+    # Kept as sc-domain: DELIBERATELY, even though a property already exists.
+    # The existing one is https://www.ambientetravel.com/ — the www host, which
+    # 301s to the apex. A URL-prefix property only reports URLs under its own
+    # prefix, so a property on a hostname that serves nothing but a redirect
+    # reports almost nothing. That is not a property worth pointing an agent at.
+    # The fix is a Domain property, which rolls up apex, www, http and https in
+    # one. It needs a TXT record at WIX (ns12.wixdns.net serves this zone) —
+    # adding it at GoDaddy, where the domain is registered, has no effect.
     property_uri: "sc-domain:ambientetravel.com"
     brand: Ambiente Travel
     locale: en
@@ -133,7 +141,14 @@ sites:
         account_ref: null          # not connected to the scheduler yet
 
   - domain: cruisebaz.com
-    property_uri: "sc-domain:cruisebaz.com"
+    # URL-prefix, not sc-domain, because this is the property that ACTUALLY
+    # EXISTS (confirmed 9 Aug 2026) and it happens to be on the right host:
+    # www.cruisebaz.com 301s to the apex, so the apex prefix sees everything
+    # Google indexes. Asking for sc-domain: was requesting a property nobody
+    # ever created, which is the whole reason this domain returned 403.
+    # A domain property would still be tidier one day; it is not worth a DNS
+    # round-trip when this one already has full coverage.
+    property_uri: "https://cruisebaz.com/"
     brand: CruiseBaz
     locale: fa-IR
     market: IR
