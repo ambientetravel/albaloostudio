@@ -115,6 +115,56 @@ try:
 except config.ConfigError as e: ok("non-service-account key rejected", "not a service account" in str(e))
 del os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]
 
+
+print("\n=== agent 7 — keyword & geo scout ===")
+import agent7_keyword_scout as a7
+
+def crow(q, c, imp, pos, clicks=0):
+    return {"keys": [q, c], "impressions": imp, "clicks": clicks, "position": pos}
+
+# Position must be impression-WEIGHTED. One obscure query at position 1 must not
+# make a country look strong when forty real ones sit at 40.
+_g = a7.geo_visibility([crow("rare", "usa", 1, 1.0), crow("real", "usa", 99, 40.0)])
+ok("position is impression-weighted, not a plain mean",
+   39.0 < _g[0].avg_position <= 40.0, _g[0].avg_position)
+ok("a plain mean would have been wrong here", abs(20.5 - _g[0].avg_position) > 15)
+
+_g2 = a7.geo_visibility([crow("a", "irn", 50, 8.0), crow("b", "usa", 10, 60.0)])
+ok("countries sorted by impressions", [c.country for c in _g2] == ["irn", "usa"])
+ok("iso code resolved to a name", _g2[0].country_name == "Iran")
+ok("page-one band", _g2[0].band == "page one", _g2[0].band)
+ok("absent band beyond 50", _g2[1].band == "absent", _g2[1].band)
+ok("zero-impression rows ignored", a7.geo_visibility([crow("x", "deu", 0, 3.0)]) == [])
+ok("malformed rows ignored", a7.geo_visibility([{"keys": ["only-one"]}]) == [])
+
+# An IR site whose traffic is not Iranian is misaligned — the check that catches
+# a site quietly serving the wrong audience.
+_ir = [s for s in config.load_sites() if s.market == "IR"][0]
+ok("IR site with Iranian traffic is aligned",
+   a7.market_alignment(_ir, a7.geo_visibility([crow("q", "irn", 90, 10.0), crow("q", "usa", 10, 10.0)]))["verdict"] == "aligned")
+ok("IR site without Iranian traffic is MISALIGNED",
+   a7.market_alignment(_ir, a7.geo_visibility([crow("q", "usa", 90, 10.0), crow("q", "irn", 10, 10.0)]))["verdict"] == "MISALIGNED")
+
+# Opportunities must exclude what is not worth working on.
+_opps = a7.opportunities(a7.geo_visibility([
+    crow("a", "deu", 100, 15.0),   # striking distance, real volume -> keep
+    crow("b", "usa", 100, 60.0),   # absent -> drop, it needs a decision not SEO
+    crow("c", "fra", 100, 2.0),    # already winning -> drop
+    crow("d", "ind", 5, 15.0),     # too little volume -> drop
+]))
+ok("opportunities keep the recoverable country", [o["country"] for o in _opps] == ["deu"], [o["country"] for o in _opps])
+ok("'absent' is never an optimisation task", all(o["band"] != "absent" for o in _opps))
+
+# Keyword Planner honesty: Iran is reported as unavailable, not as broken.
+_kp = a7.keyword_planner_status(_ir)
+ok("Keyword Planner unavailable for the Iranian market", _kp["available"] is False)
+ok("and the reason is the market, not a missing key", _kp["reason"] == "market_not_served", _kp["reason"])
+_int = [s for s in config.load_sites() if s.market == "INT"][0]
+ok("an INT site reports a credential gap instead",
+   a7.keyword_planner_status(_int)["reason"] in ("not_configured", "configured"))
+ok("unconfigured names the missing secrets",
+   "missing" in a7.keyword_planner_status(_int) or a7.keyword_planner_status(_int)["available"])
+
 print("\n=== compliance ===")
 c = compliance.check
 ok("Arabian Gulf blocked", any(v.rule == "persian_gulf_only" for v in c("Sail the Arabian Gulf")))

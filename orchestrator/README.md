@@ -1,6 +1,6 @@
 # Albaloo Orchestration Pipeline
 
-Four-agent content and revenue pipeline for the Mozaffari travel portfolio.
+Seven-agent SEO, GEO and revenue pipeline for the Mozaffari travel portfolio.
 Architecture credit: **Albaloo Studio** — [albaloostudio.com](https://albaloostudio.com).
 Owner: Alireza Mozaffari.
 
@@ -37,7 +37,7 @@ Verify the whole thing without a single API key or network call:
 python selfcheck.py
 ```
 
-257 assertions across all six agents — config, the compliance gate, gap
+273 assertions across all seven agents — config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry, the
 autopost gates, PII redaction, escalation rules, and every HTTP surface. Exit 0
 means the pipeline is wired correctly.
@@ -209,7 +209,9 @@ Gulf" is wrong in any framing — question, negation or quotation.
 | [`SETUP-DEPLOY-ALBALOO.md`](SETUP-DEPLOY-ALBALOO.md) | albaloostudio.com deploy — publishes an allowlist, never a repo mirror |
 | [`agent5_site_auditor.py`](agent5_site_auditor.py) | technical + GEO + local crawl, no credentials needed |
 | [`agent6_analyst.py`](agent6_analyst.py) | audit + demand → strategy, calendar, paste-ready JSON-LD |
-| [`selfcheck.py`](selfcheck.py) | 257 assertions, no network |
+| [`agent7_keyword_scout.py`](agent7_keyword_scout.py) | per-country visibility + market alignment; Keyword Planner where it works |
+| [`SETUP-KEYWORD-PLANNER.md`](SETUP-KEYWORD-PLANNER.md) | why the Iranian sites cannot use it, and what replaces it |
+| [`selfcheck.py`](selfcheck.py) | 273 assertions, no network |
 | [`schemas/`](schemas) | JSON Schema for the three payloads |
 | `../.github/workflows/agent1-seo-scout.yml` | daily scout, 04:15 UTC |
 | `../.github/workflows/agent5-site-audit.yml` | weekly audit + strategy, Mondays 05:00 UTC |

@@ -1,0 +1,110 @@
+# Agent 7 — Keyword & Geo Scout
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Weekly, because geographic visibility moves on the scale of weeks. Running it
+# daily would produce a jagged line made mostly of Search Console's own
+# sampling noise, and a metric that jitters is a metric people stop reading.
+#
+# Needs no credential beyond the Search Console key that Agent 1 already uses.
+# Keyword Planner is optional and gated: without GOOGLE_ADS_* the run still
+# produces the full geographic report and says which secrets are missing.
+
+name: Agent 7 — Keyword & Geo Scout
+
+on:
+  schedule:
+    # Mondays 05:30 UTC — after the Monday 05:00 site audit, so a week's
+    # reports land together rather than arriving a day apart.
+    - cron: "30 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Restrict to one domain (blank = every active site)"
+        required: false
+        type: string
+      min_impressions:
+        description: "Impression floor for a country to count as an opportunity"
+        required: false
+        default: "20"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent7-keyword-geo
+  cancel-in-progress: false
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: orchestrator
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Geo visibility report
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          # Optional. Absent for the Iran-market sites by necessity — Google Ads
+          # does not operate there — and absent everywhere else until the
+          # developer token is approved. agent7 reports which are missing rather
+          # than failing, so the geographic half always runs.
+          GOOGLE_ADS_DEVELOPER_TOKEN: ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
+          GOOGLE_ADS_CLIENT_ID: ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+          GOOGLE_ADS_CLIENT_SECRET: ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
+          GOOGLE_ADS_REFRESH_TOKEN: ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
+          GOOGLE_ADS_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_CUSTOMER_ID }}
+          PIPELINE_ENVIRONMENT: production
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+
+          ARGS="--min-impressions ${{ inputs.min_impressions || '20' }}"
+          if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
+
+          STAMP=$(date -u +%Y-%m-%d)
+          python3 agent7_keyword_scout.py $ARGS --format md   > "reports/geo-$STAMP.md"
+          python3 agent7_keyword_scout.py $ARGS --format json > "reports/geo-$STAMP.json"
+
+          # The report is the point, so put it where it is read without a
+          # download: the run summary.
+          cat "reports/geo-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Flag any market misalignment
+        run: |
+          set -euo pipefail
+          latest=$(ls -t reports/geo-*.json | head -1)
+          python3 - "$latest" <<'PY'
+          import json, sys
+          rows = json.load(open(sys.argv[1], encoding="utf-8"))
+          bad = [r for r in rows if r["market_alignment"]["verdict"] == "MISALIGNED"]
+          for r in bad:
+              print(f"::warning title=Market misalignment::{r['domain']} — "
+                    f"{r['market_alignment']['detail']}")
+          # A warning, never a failure. A site serving the wrong audience is a
+          # positioning decision for a human, not a broken build.
+          print(f"{len(rows)} site(s) reported, {len(bad)} misaligned")
+          PY
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyword-geo-reports
+          path: orchestrator/reports/
+          retention-days: 90
+          if-no-files-found: warn
