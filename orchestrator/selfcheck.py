@@ -116,6 +116,37 @@ except config.ConfigError as e: ok("non-service-account key rejected", "not a se
 del os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]
 
 
+
+print("\n=== 403 diagnosis ===")
+import agent1_seo_scout as _a1
+
+# A 403 means two opposite things and the fix differs. Telling someone to click
+# "Add user" on a property that was never created sends them hunting for a
+# screen that is not there — which this pipeline did for three days.
+_orig = _a1._has_verification_txt
+try:
+    _a1._has_verification_txt = lambda d: False
+    _m = _a1.diagnose_403("sc-domain:nope.example")
+    ok("unverified domain -> 'does not exist yet', not 'grant access'",
+       "does not exist yet" in _m and "Users and permissions" not in _m.split("then add")[0])
+    ok("and it names the real fix", "Add property" in _m)
+
+    _a1._has_verification_txt = lambda d: True
+    _m = _a1.diagnose_403("sc-domain:real.example")
+    ok("verified domain -> grant access", "Users and permissions" in _m)
+    ok("and does not claim it is missing", "does not exist" not in _m)
+
+    _a1._has_verification_txt = lambda d: None
+    _m = _a1.diagnose_403("sc-domain:unknown.example")
+    ok("a failed DNS lookup admits it does not know", "could not resolve" in _m)
+    ok("an unknown answer is never reported as a confident no",
+       "does not exist yet" not in _m)
+
+    _m = _a1.diagnose_403("https://prefix.example/")
+    ok("URL-prefix properties keep the original message", "Users and permissions" in _m)
+finally:
+    _a1._has_verification_txt = _orig
+
 print("\n=== agent 7 — keyword & geo scout ===")
 import agent7_keyword_scout as a7
 

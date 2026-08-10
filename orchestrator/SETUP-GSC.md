@@ -12,15 +12,57 @@ less annoying than signing in and out repeatedly.
 
 ---
 
-## Why it has to be done once per owning account
+## Read this first — the earlier version of this file was wrong
 
-**Verified 6 Aug 2026: the properties are spread across more than two accounts.**
-`alimozzarella@` and `contactmozaffari@` between them own only three of the
-eight. The rest sit under brand-specific accounts — `ambienteturizm@gmail.com`,
-`cruisebazonline@gmail.com` and others visible in the Google account chooser.
+For three days this document, and the pipeline's own error messages, said the
+seven failing properties needed the service account **granted** access, and sent
+you to *Settings → Users and permissions*.
 
-Nothing about the approach changes. It is still one service account granted
-separately on each property; there are simply more sign-ins than two.
+That screen does not exist for those properties, because **the properties
+themselves do not exist.**
+
+Checked 9 Aug 2026 by DNS lookup, which is decisive: a `sc-domain:` property
+cannot be created without a `google-site-verification` TXT record on the domain.
+
+| Domain | Verification TXT | Reality |
+|---|---|---|
+| `boutimar.com` | ✅ present | property exists, granted |
+| `boutimar.ir` | ✅ present | property exists, granted |
+| `exploreorient.com` | ✅ present | property exists, granted |
+| `ambientetravel.com` | ❌ none | **property never created** |
+| `cruisebaz.com` | ❌ none | **property never created** |
+| `cruise24.ir` | ❌ none | **property never created** |
+| `cruise24.me` | ❌ none | **property never created** |
+| `cruiseshop.ir` | ❌ none | **property never created** |
+| `dmciran.ir` | ❌ none | **property never created** |
+| `albaloostudio.com` | ❌ none | **property never created** |
+
+So this is not a permissions job spread across several Google accounts. It is a
+DNS job, and it can all be done from **one** account — whichever you want to own
+Search Console. There is no need to hunt for `ambienteturizm@` or
+`cruisebazonline@`; those accounts own base44 apps, not Search Console
+properties.
+
+`agent1_seo_scout.py` now tells the two cases apart on its own: it resolves the
+domain's TXT record when it hits a 403 and says either "this property does not
+exist yet, create it" or "it exists, grant access".
+
+## Where each TXT record goes
+
+Every domain is on a panel you already use, and each panel is proven — the three
+working properties span both of them.
+
+| Domain | DNS host | Same panel as |
+|---|---|---|
+| `cruise24.ir`, `cruiseshop.ir`, `dmciran.ir` | Netafraz (`ns.netafraz.com`) | boutimar.com ✅, boutimar.ir ✅ |
+| `cruisebaz.com`, `cruise24.me`, `albaloostudio.com` | GoDaddy (`domaincontrol.com`) | exploreorient.com ✅ |
+| `ambientetravel.com` | **Wix** (`ns12.wixdns.net`) | — edit at Wix, not GoDaddy |
+
+`ambientetravel.com` is the one trap: the domain is registered at GoDaddy but
+its DNS zone is served by Wix nameservers, so a TXT record added at GoDaddy will
+have no effect at all.
+
+## The old guidance, kept because it still applies once a property exists
 
 A service account is a robot user. It inherits nothing from you. There is no
 "link my Google accounts" call, no delegation shortcut (that is Workspace only,

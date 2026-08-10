@@ -122,6 +122,69 @@ def audit_access(service, sites: list[Site]) -> list[str]:
     return missing
 
 
+def _has_verification_txt(domain: str) -> bool | None:
+    """
+    Does this domain publish a google-site-verification TXT record?
+
+    Resolved over DNS-over-HTTPS so it needs no resolver library and works from
+    a CI runner. Returns None when the lookup itself fails — an unknown answer
+    must not be reported as a confident "no".
+    """
+    try:
+        r = requests.get(
+            "https://dns.google/resolve",
+            params={"name": domain, "type": "TXT"},
+            timeout=8,
+        )
+        r.raise_for_status()
+        answers = r.json().get("Answer") or []
+        return any("google-site-verification=" in a.get("data", "") for a in answers)
+    except Exception:  # network, DNS, malformed JSON — all mean "do not guess"
+        return None
+
+
+def diagnose_403(property_uri: str) -> str:
+    """
+    Turn a bare 403 into the instruction that will actually fix it.
+
+    Search Console returns 403 both for "you are not a user on this property"
+    and for "no such property", and the two need opposite responses. Telling
+    someone to click *Add user* on a property that was never created sends them
+    hunting through Settings for a screen that is not there — which is exactly
+    what this pipeline told its owner for three days.
+
+    A `sc-domain:` property cannot exist without a google-site-verification TXT
+    record on the domain, so the DNS answer separates the two cases cleanly.
+    """
+    tail = property_uri.split(":", 1)[1] if property_uri.startswith("sc-domain:") else None
+    if not tail:
+        return (f"403 on {property_uri}: the service account is not a user on this "
+                "property. Add it in Search Console → Settings → Users and "
+                "permissions → Restricted.")
+
+    verified = _has_verification_txt(tail)
+    if verified is False:
+        return (
+            f"403 on {property_uri}: {tail} publishes NO google-site-verification "
+            "TXT record, so this domain property does not exist yet. Granting "
+            "access is not the fix and there is no Users-and-permissions screen "
+            "to visit. Create the property first — Search Console → Add property "
+            f"→ Domain → {tail} → copy the TXT record into the domain's DNS — "
+            "then add the service account as a Restricted user. See SETUP-GSC.md."
+        )
+    if verified is None:
+        return (
+            f"403 on {property_uri}: could not resolve DNS to tell whether this "
+            "property exists. Either it was never created, or it exists and the "
+            "service account is not a user on it. See SETUP-GSC.md."
+        )
+    return (
+        f"403 on {property_uri}: {tail} IS verified, so the property exists and "
+        "the service account simply has no access to it. Search Console → "
+        "Settings → Users and permissions → Add user → Restricted."
+    )
+
+
 def _search_analytics(
     service,
     property_uri: str,
@@ -151,11 +214,7 @@ def _search_analytics(
         except HttpError as exc:
             status = getattr(exc.resp, "status", None)
             if status == 403:
-                raise PermissionError(
-                    f"403 on {property_uri}: the service account is not a user on this "
-                    "property. Add it in Search Console → Settings → Users and "
-                    "permissions → Restricted."
-                ) from exc
+                raise PermissionError(diagnose_403(property_uri)) from exc
             if status == 429:
                 log.warning("429 on %s — backing off 30s", property_uri)
                 time.sleep(30)
