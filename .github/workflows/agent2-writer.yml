@@ -133,7 +133,11 @@ jobs:
         if: steps.locate.outputs.found != ''
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-pro' }}
+          # Flash, not Pro. Pro is absent from the free tier and answers every
+          # request with 429 "limit: 0", which reads as rate-limiting and is
+          # not. Set the GEMINI_MODEL repository variable to override once
+          # billing is enabled on the key's project.
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
           PIPELINE_ENVIRONMENT: production
         run: |
           set -euo pipefail

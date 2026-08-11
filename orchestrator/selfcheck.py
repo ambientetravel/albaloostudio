@@ -161,6 +161,16 @@ _src2b = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text
 ok("a zero-quota model fails fast instead of retrying three times",
    '"limit: 0" in msg' in _src2b,
    "429 with limit:0 means the model is not in the plan, not a rate limit")
+# A default that lives in two places will disagree, and the one that wins is
+# whichever the runtime reads last. config.py said flash while the workflow
+# still said pro, so the fix shipped and changed nothing.
+_wf2b = (pathlib.Path(__file__).resolve().parents[1]
+         / ".github" / "workflows" / "agent2-writer.yml").read_text(encoding="utf-8")
+ok("the workflow's model default agrees with config.py",
+   "gemini-2.5-pro" not in _wf2b,
+   "the workflow fallback overrides config.py, so both must say flash")
+_envx = pathlib.Path(__file__).with_name(".env.example").read_text(encoding="utf-8")
+ok(".env.example agrees too", "GEMINI_MODEL=gemini-2.5-flash" in _envx)
 ok("and the error says which two things would fix it",
    "GEMINI_MODEL to a model your plan includes" in _src2b
    and "enable billing" in _src2b)
