@@ -277,6 +277,9 @@ sites:
     base_url: "https://cruiseshop.ir"
     sitemap: "https://cruiseshop.ir/sitemap.xml"
     cms:
+      # Also being rebuilt as JSON-driven static (11 Aug 2026). static_bundle
+      # is already the right adapter; switch to astro_pr if the rebuild lands
+      # in a git repo, as boutimar.com did.
       type: static
       adapter: static_bundle
       content_root: "/"
@@ -292,12 +295,20 @@ sites:
     base_url: "https://dmciran.ir"
     sitemap: "https://dmciran.ir/sitemap.xml"
     cms:
-      # Verified WordPress 11 Aug 2026: /wp-admin, /wp-json/wp/v2 and
-      # /wp-login.php all answer 200. This — not boutimar.com — is where the
-      # wordpress_rest adapter belongs. It needs WORDPRESS_USER and
-      # WORDPRESS_APP_PASSWORD for THIS host before it can write anything.
-      type: wordpress
-      adapter: wordpress_rest
+      # WordPress TODAY (/wp-admin and /wp-json/wp/v2 both answer 200), but
+      # being rebuilt as a JSON-driven static site like boutimar.com. So
+      # wordpress_rest is deliberately NOT used: wiring an adapter to a stack
+      # that is on its way out means writing drafts into an admin nobody will
+      # open again, and re-doing the work after the migration.
+      #
+      # static_bundle writes a deploy bundle instead, which is what the rebuilt
+      # site will want anyway. Switch to astro_pr once it has a repo.
+      #
+      # As of 11 Aug 2026 NO property in this portfolio uses wordpress_rest.
+      # The adapter is kept because it is written and tested, not because
+      # anything needs it.
+      type: static
+      adapter: static_bundle
       content_root: "/"
       publish_mode: draft
     channels:

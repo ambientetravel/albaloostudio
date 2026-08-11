@@ -11,58 +11,25 @@ and merged.
 |---|---|---|---|
 | **1. Telegram via Make** | Agent 3 posts instead of queueing | a Make webhook URL | ~15 min |
 | **2. A lead source** | Agent 4 stops being idle | an endpoint or a file | ~20 min |
-| **3. WordPress** | Agent 2's articles reach **dmciran.ir** | an Application Password | ~5 min |
+| ~~3. WordPress~~ | **withdrawn** — no property runs WordPress any more | — | — |
 
-Do **3 first**. It is the shortest, and it is the one where five articles a
-night are already being written and thrown away.
-
----
-
-## 3. WordPress — five minutes, for dmciran.ir
-
-**Corrected 11 Aug 2026.** This section originally named boutimar.com, which
-has not been WordPress for some time — it is a static Astro build now, driven
-by JSON in `src/data/`, and `/wp-admin` returns 404. The adapter was built
-against a site that no longer exists in that form.
-
-The site it genuinely belongs to is **dmciran.ir**, where `/wp-admin`,
-`/wp-json/wp/v2` and `/wp-login.php` all answer 200. That is also the site
-scoring 75/100 with 48 audit findings and zero impressions in 480 days, so it
-is the one with the most to gain from new content.
-
-boutimar.com now uses `astro_pr`, like exploreorient: Agent 2 writes a content
-file and opens a pull request. Nothing reaches the live site without a human
-merging it — the right shape for a site with no CMS to hold a draft.
-
-**Create an Application Password**, not your account password:
-
-1. `dmciran.ir/wp-admin` → **Users → Profile**
-2. Scroll to **Application Passwords**
-3. Name it `albaloo-agent2` → **Add New Application Password**
-4. Copy the value it shows once. **Keep the spaces** — WordPress generates it
-   in `xxxx xxxx xxxx xxxx` form and stripping them is the most common reason
-   for a 401.
-
-**Then two repository secrets:**
-
-| Secret | Value |
-|---|---|
-| `WORDPRESS_USER` | your wp-admin username |
-| `WORDPRESS_APP_PASSWORD` | the value from step 4, spaces and all |
-
-That is the whole setup. The adapter is wired to `wordpress_rest` in
-`sites.yml` for dmciran.ir.
-
-**It always writes `status: draft`.** Even if `publish_mode` says `publish`.
-Five unattended articles a night reaching a live commercial site is not a
-setting anyone should be able to flip by accident — changing it is a deliberate
-code edit, and the reason is in the docstring.
-
-If it fails it stages the draft and records why, rather than reporting a URL it
-did not create. A 401 is almost always the stripped spaces, or an account
-without author rights.
+Two remain. The WordPress item is gone: see below.
 
 ---
+
+## 3. WordPress — WITHDRAWN
+
+Named boutimar.com first, then dmciran.ir, and now neither. boutimar.com was
+already a JSON-driven Astro build; dmciran.ir and cruiseshop.ir are being
+rebuilt the same way. **No property in this portfolio runs WordPress any
+more**, so there is nothing to connect and no Application Password to create.
+
+The adapter stays in the codebase — written, tested, unused. Both sites now use
+`static_bundle`, which is what a JSON-driven static site wants anyway, and they
+move to `astro_pr` if the rebuilds land in git repos as boutimar.com did.
+
+Wiring `wordpress_rest` to a stack on its way out would have meant writing
+drafts into an admin nobody opens again, then redoing the work after migration.
 
 ## 1. Telegram via Make — fifteen minutes
 
