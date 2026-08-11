@@ -321,6 +321,31 @@ ok("a held post is not a failure",
    "held and blocked-on-media are the design working")
 
 
+
+print("\n=== the three edges ===")
+import inspect
+import agent4_sales_closer_batch as a4b   # this section runs before the agent-4 one
+import agent2_writer_listener as _a2w
+_wp = inspect.getsource(_a2w._push_wordpress)
+ok("the WordPress adapter always writes status=draft",
+   _wp.count('"status": "draft"') >= 3 and '"status": "publish"' not in _wp,
+   "five unattended articles a night must not be able to reach a live site")
+ok("an unconfigured WordPress stages rather than pretends",
+   "wordpress_rest not configured" in _wp)
+ok("a WordPress failure never reports a URL it did not create",
+   _wp.count('"record_id": None') >= 3)
+_wf2w = (pathlib.Path(__file__).resolve().parents[1]
+         / ".github" / "workflows" / "agent2-writer.yml").read_text(encoding="utf-8")
+ok("the writer workflow passes the WordPress secrets",
+   "WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}" in _wf2w)
+
+_fl = inspect.getsource(a4b._fetch_leads)
+ok("the lead pull is HMAC-signed", "signed_headers" in _fl)
+ok("and warns loudly when it cannot sign",
+   "cannot tell this request from anyone" in _fl,
+   "an open endpoint returning customer messages is a leak")
+ok("it accepts a bare array or a wrapped one", '"leads"' in _fl and '"data"' in _fl)
+
 print("\n=== agent 4 — batch closer ===")
 import agent4_sales_closer_batch as a4b
 from agent4_sales_closer import redact as _redact

@@ -37,7 +37,7 @@ Verify the whole thing without a single API key or network call:
 python selfcheck.py
 ```
 
-331 assertions across all seven agents — config, the compliance gate, gap
+338 assertions across all seven agents — config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry, the
 autopost gates, PII redaction, escalation rules, and every HTTP surface. Exit 0
 means the pipeline is wired correctly.
@@ -208,11 +208,12 @@ Gulf" is wrong in any framing — question, negation or quotation.
 | [`SETUP-SOCIAL.md`](SETUP-SOCIAL.md) | what to connect where, and which entity should own it |
 | [`SETUP-DEPLOY.md`](SETUP-DEPLOY.md) | scoped FTP + CI deploys, so no one holds the panel password |
 | [`SETUP-DEPLOY-ALBALOO.md`](SETUP-DEPLOY-ALBALOO.md) | albaloostudio.com deploy — publishes an allowlist, never a repo mirror |
+| [`SETUP-PLUG-THE-ENDS-IN.md`](SETUP-PLUG-THE-ENDS-IN.md) | **the three remaining edges** — WordPress, Telegram via Make, a lead source |
 | [`agent5_site_auditor.py`](agent5_site_auditor.py) | technical + GEO + local crawl, no credentials needed |
 | [`agent6_analyst.py`](agent6_analyst.py) | audit + demand → strategy, calendar, paste-ready JSON-LD |
 | [`agent7_keyword_scout.py`](agent7_keyword_scout.py) | per-country visibility + market alignment; Keyword Planner where it works |
 | [`SETUP-KEYWORD-PLANNER.md`](SETUP-KEYWORD-PLANNER.md) | why the Iranian sites cannot use it, and what replaces it |
-| [`selfcheck.py`](selfcheck.py) | 331 assertions, no network |
+| [`selfcheck.py`](selfcheck.py) | 338 assertions, no network |
 | [`schemas/`](schemas) | JSON Schema for the three payloads |
 | `../.github/workflows/agent1-seo-scout.yml` | daily scout, 04:15 UTC |
 | `../.github/workflows/agent5-site-audit.yml` | weekly audit + strategy, Mondays 05:00 UTC |

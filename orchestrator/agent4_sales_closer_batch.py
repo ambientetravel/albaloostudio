@@ -198,6 +198,38 @@ def close_one(raw: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Outcome:
         return oc
 
 
+def _fetch_leads(url: str) -> list[dict[str, Any]]:
+    """
+    Pull leads from an endpoint — the portal at res.boutimar.ir, a Make
+    scenario draining an inbox, whatever holds them.
+
+    Signed with the same HMAC every other hop uses, so the source can verify
+    this is the pipeline asking and not anyone who found the URL. Leads are
+    customer messages; an unauthenticated endpoint that returns them is a data
+    leak wearing an integration costume.
+    """
+    import requests
+
+    secret = config.optional_env("WEBHOOK_SIGNING_SECRET")
+    body = b""
+    headers = (config.signed_headers(secret, body, "agent4-lead-pull")
+               if secret else {"User-Agent": config.USER_AGENT})
+    if not secret:
+        log.warning("WEBHOOK_SIGNING_SECRET not set — pulling leads unsigned. "
+                    "The source cannot tell this request from anyone else's.")
+
+    resp = requests.get(url, headers=headers, timeout=config.WEBHOOK_TIMEOUT_S)
+    resp.raise_for_status()
+    data = resp.json()
+    # Accept a bare array or {"leads": [...]}, because both are what real
+    # endpoints return and arguing about it helps nobody.
+    if isinstance(data, dict):
+        data = data.get("leads") or data.get("data") or []
+    if not isinstance(data, list):
+        raise ValueError(f"expected a list of leads, got {type(data).__name__}")
+    return data
+
+
 def _read_leads(path: Path) -> list[dict[str, Any]]:
     """JSONL (one lead per line) or a JSON array. Both are common exports."""
     text = path.read_text(encoding="utf-8").strip()
@@ -220,7 +252,11 @@ def _read_leads(path: Path) -> list[dict[str, Any]]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--campaigns", help="directory of campaign.log.v1 files from Agent 3")
-    ap.add_argument("--leads", required=True, help="JSONL or JSON array of inbound leads")
+    src = ap.add_mutually_exclusive_group(required=True)
+    src.add_argument("--leads", help="JSONL or JSON array of inbound leads")
+    src.add_argument("--leads-url", help="endpoint returning leads as JSON; the "
+                                         "request is HMAC-signed like every "
+                                         "other hop in the pipeline")
     ap.add_argument("--out", default="closed")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--no-llm", action="store_true",
@@ -232,10 +268,11 @@ def main(argv: list[str] | None = None) -> int:
                         format="%(asctime)s %(levelname)-7s %(name)s | %(message)s",
                         datefmt="%H:%M:%S")
 
-    leads_path = Path(args.leads)
-    if not leads_path.is_file():
-        log.error("no such leads file: %s", leads_path)
-        return 2
+    if args.leads:
+        leads_path = Path(args.leads)
+        if not leads_path.is_file():
+            log.error("no such leads file: %s", leads_path)
+            return 2
 
     registered = 0
     if args.campaigns:
@@ -255,9 +292,13 @@ def main(argv: list[str] | None = None) -> int:
                       "--no-llm to exercise everything except the model call.")
             return 2
 
-    leads = _read_leads(leads_path)
+    try:
+        leads = _read_leads(leads_path) if args.leads else _fetch_leads(args.leads_url)
+    except Exception as exc:
+        log.error("could not load leads: %s", config.redact(str(exc))[:300])
+        return 2
     if not leads:
-        log.warning("no leads in %s — nothing to qualify", leads_path)
+        log.info("no leads waiting — nothing to qualify")
         return 0
 
     out_dir = Path(args.out)

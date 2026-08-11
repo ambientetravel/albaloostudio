@@ -691,6 +691,9 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
             "note": f"no adapter for cms.type={site.cms.type!r}",
         }
 
+    if adapter == "wordpress_rest":
+        return _push_wordpress(brief, draft, url)
+
     if adapter == "static_bundle":
         # cruise24.ir / cruiseshop.ir / dmciran.ir are hand-built static sites:
         # there is no API to push to, so the deliverable is a deploy bundle a
@@ -712,6 +715,97 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
         "record_id": brief.brief.target_url_path.strip("/").replace("/", "-"),
         "published_at": rfc3339() if site.cms.publish_mode == "publish" else None,
         "scheduled_for": None,
+    }
+
+
+def _push_wordpress(
+    brief: ContentBrief, draft: dict[str, Any], url: str
+) -> dict[str, Any]:
+    """
+    Create a WordPress post via the REST API, always as a DRAFT.
+
+    publish_mode is honoured only as far as `draft`. Even when sites.yml says
+    `publish`, this writes status=draft — the pipeline generates five articles a
+    night unattended and a bad one going straight to a live commercial site
+    cannot be recalled. Flipping that is a deliberate edit, not a config value.
+
+    Auth is a WordPress Application Password (Users -> Profile -> Application
+    Passwords), never the account password. It is revocable on its own, scoped
+    to the REST API, and does not unlock wp-admin.
+
+    Returns status `draft` with the real post ID and edit link when it works.
+    On any failure it returns `draft` with the intended URL and a note — an
+    adapter must never report a URL it did not create.
+    """
+    base = brief.site.base_url.rstrip("/")
+    user = config.optional_env("WORDPRESS_USER")
+    app_pw = config.optional_env("WORDPRESS_APP_PASSWORD")
+
+    if not user or not app_pw:
+        log.warning(
+            "%s — WORDPRESS_USER/WORDPRESS_APP_PASSWORD not set; staging the draft",
+            brief.site.domain,
+        )
+        return {
+            "status": "draft", "live_url": url, "record_id": None,
+            "published_at": None, "scheduled_for": None,
+            "note": "wordpress_rest not configured — set WORDPRESS_USER and "
+                    "WORDPRESS_APP_PASSWORD (an Application Password, not the "
+                    "account password)",
+        }
+
+    slug = brief.brief.target_url_path.strip("/").split("/")[-1] or "post"
+    body = {
+        "title": draft.get("title") or brief.brief.working_title,
+        "slug": slug,
+        "content": draft.get("body_markdown", ""),
+        "excerpt": draft.get("meta_description", ""),
+        # Never anything else. See the docstring.
+        "status": "draft",
+    }
+
+    try:
+        resp = requests.post(
+            f"{base}/wp-json/wp/v2/posts",
+            json=body,
+            auth=(user, app_pw),
+            timeout=config.WEBHOOK_TIMEOUT_S,
+            headers={"User-Agent": config.USER_AGENT},
+        )
+    except requests.RequestException as exc:
+        log.error("%s — WordPress unreachable: %s", brief.site.domain, exc)
+        return {
+            "status": "draft", "live_url": url, "record_id": None,
+            "published_at": None, "scheduled_for": None,
+            "note": f"wordpress transport error: {exc}",
+        }
+
+    if resp.status_code not in (200, 201):
+        # 401 is the common one and it is almost always the Application
+        # Password being pasted with its spaces stripped, or the account
+        # lacking author rights.
+        log.error("%s — WordPress returned %s: %s",
+                  brief.site.domain, resp.status_code, resp.text[:300])
+        return {
+            "status": "draft", "live_url": url, "record_id": None,
+            "published_at": None, "scheduled_for": None,
+            "note": f"wordpress HTTP {resp.status_code}: {resp.text[:200]}",
+        }
+
+    data = resp.json()
+    post_id = data.get("id")
+    log.info("%s — WordPress draft %s created: %s",
+             brief.site.domain, post_id, data.get("link") or url)
+    return {
+        "status": "draft",
+        # The link WordPress reports for a draft is the eventual permalink, not
+        # a live page. Report it, but it is not published and says so.
+        "live_url": data.get("link") or url,
+        "record_id": str(post_id) if post_id else None,
+        "published_at": None,
+        "scheduled_for": None,
+        "edit_url": f"{base}/wp-admin/post.php?post={post_id}&action=edit" if post_id else None,
+        "note": "created as a WordPress draft — review and publish by hand",
     }
 
 

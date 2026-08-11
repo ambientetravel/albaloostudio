@@ -138,6 +138,12 @@ jobs:
           # not. Set the GEMINI_MODEL repository variable to override once
           # billing is enabled on the key's project.
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          # WordPress. Absent until set, in which case the adapter stages the
+          # draft and says so rather than pretending to publish. An Application
+          # Password, never the account password — revocable on its own and
+          # scoped to the REST API.
+          WORDPRESS_USER: ${{ secrets.WORDPRESS_USER }}
+          WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
           PIPELINE_ENVIRONMENT: production
         run: |
           set -euo pipefail
