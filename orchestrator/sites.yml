@@ -56,9 +56,20 @@ sites:
     sitemap: "https://boutimar.com/sitemap.xml"    # verified 2026-08-06; not sitemap_index.xml
     min_impressions: 20        # 361 queries / 1,233 impressions in 90d — 20 yields ~10 candidates
     cms:
-      type: wordpress
-      adapter: wordpress_rest
-      content_root: "/"
+      # NOT WordPress. Corrected 11 Aug 2026 after the WordPress adapter was
+      # built and pointed here: /wp-admin, /wp-json and /wp-login.php all
+      # return 404, the generator meta says astro, and package.json depends on
+      # astro + @astrojs/sitemap. The site was rebuilt as a static Astro build
+      # driven by JSON in src/data/ — experiences, itineraries, iran-visa,
+      # hotel-rates, cities. The old WordPress+Elementor+Woo install is gone.
+      #
+      # astro_pr, same as exploreorient: Agent 2 writes a content file and
+      # opens a pull request against ambientetravel/boutimar. Nothing reaches
+      # the live site without a human merging it, which is the right shape for
+      # a site with no CMS to hold a draft.
+      type: astro
+      adapter: astro_pr
+      content_root: "src/content/"
       publish_mode: draft
     channels:
       - name: linkedin
@@ -281,8 +292,12 @@ sites:
     base_url: "https://dmciran.ir"
     sitemap: "https://dmciran.ir/sitemap.xml"
     cms:
-      type: static
-      adapter: static_bundle
+      # Verified WordPress 11 Aug 2026: /wp-admin, /wp-json/wp/v2 and
+      # /wp-login.php all answer 200. This — not boutimar.com — is where the
+      # wordpress_rest adapter belongs. It needs WORDPRESS_USER and
+      # WORDPRESS_APP_PASSWORD for THIS host before it can write anything.
+      type: wordpress
+      adapter: wordpress_rest
       content_root: "/"
       publish_mode: draft
     channels:
