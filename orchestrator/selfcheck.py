@@ -138,6 +138,19 @@ ok("actions:read is granted for the cross-workflow artifact",
 # A manual dispatch has no upstream workflow_run, so both ID sources are empty
 # and download-artifact fails with "unable to find artifact" rather than "you
 # did not say which run". Resolve the latest successful scout instead.
+# workflow_run carries no inputs, so the SHELL fallback governs the nightly run,
+# not the input default. If the two disagree, the number in the UI is not the
+# number that runs — the same trap as the model default that read flash in
+# config.py and pro in the workflow.
+import re as _re
+_lim_input = _re.search(r'limit:\n\s+description:[^\n]*\n\s+required: false\n\s+default: "(\d+)"', _wf2)
+_lim_shell = set(_re.findall(r"inputs\.limit \|\| '(\d+)'", _wf2))
+ok("the brief limit is 5", _lim_input and _lim_input.group(1) == "5",
+   _lim_input.group(1) if _lim_input else "not found")
+ok("the input default and the shell fallback agree",
+   _lim_input and {_lim_input.group(1)} == _lim_shell,
+   f"input={_lim_input.group(1) if _lim_input else '?'} shell={_lim_shell}")
+
 ok("a manual dispatch resolves the latest scout run instead of failing",
    "gh run list --workflow agent1-seo-scout.yml --status success" in _wf2)
 ok("and it says so plainly when there is no scout run to read",

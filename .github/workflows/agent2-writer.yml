@@ -37,7 +37,7 @@ on:
       limit:
         description: "Max briefs to write (0 = all)"
         required: false
-        default: "3"
+        default: "5"
         type: string
       no_llm:
         description: "Skip Gemini — exercise parsing, gate and adapters only"
@@ -143,7 +143,11 @@ jobs:
           set -euo pipefail
           ARGS="--briefs ${{ steps.locate.outputs.found }} --out written"
           if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
-          if [ "${{ inputs.limit || '3' }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit || '3' }}"; fi
+          # This fallback, not the input default, is what governs the nightly
+          # run — workflow_run carries no inputs. Both say 5; a limit that
+          # lives in two places and disagrees is the same bug as the model
+          # default that shipped as flash in config.py and pro in this file.
+          if [ "${{ inputs.limit || '5' }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit || '5' }}"; fi
 
           # Without a key, run the structural path instead of failing. Same
           # reasoning as the scout's missing-endpoint guard: a cron that is red
