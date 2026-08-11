@@ -135,9 +135,14 @@ _EASY_VISA_MARKER = re.compile(
 _CLAUSE_BOUNDARY = re.compile(r"[.!?؟\n؛;•|]")
 
 # A question asserts nothing. "Is the UAE visa-free?" is a heading; the answer
-# ("no — easy visa") is the next list item and is judged on its own. Blocking
-# the question blocks the FAQ/question-heading shape the GEO work exists to
-# produce, on every brief, forever.
+# ("no — easy visa") is the next list item and is judged on its own.
+#
+# The original note here said this shape was "what the GEO work exists to
+# produce". That overstated it: a 100-query AI Overview study found
+# question-format titles had NO positive correlation with citation. The
+# interrogative guard stays, because blocking a question that asserts nothing is
+# simply wrong — but the justification is correctness, not a citation benefit
+# that did not survive measurement.
 _INTERROGATIVE = re.compile(
     r"(?i)^\s*(is|are|was|were|do|does|did|can|could|will|would|should|has|have"
     r"|which|what|when|where|how|why)\b"

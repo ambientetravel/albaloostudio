@@ -322,6 +322,48 @@ ok("a held post is not a failure",
 
 
 
+
+print("\n=== measured GEO rules (heytony.ca, 100 AI Overviews) ===")
+import agent6_analyst as _a6
+import agent1_seo_scout as _a1sp
+
+# Finding 4: >7 of 10 major brands on page one and the query is walled off.
+# This pipeline has no SERP source, so the verdict must be honest about that
+# rather than inventing one from Search Console rows.
+ok("an unmeasured page one returns 'unknown'",
+   _a6.competition_verdict(None)["verdict"] == "unknown")
+ok("and an unknown verdict NEVER filters a brief out",
+   _a6.competition_verdict(None)["acts_as_filter"] is False,
+   "dropping work on a guess is worse than doing work that might be crowded")
+ok("9 of 10 brands is walled off, and does filter",
+   _a6.competition_verdict(9)["verdict"] == "walled_off"
+   and _a6.competition_verdict(9)["acts_as_filter"] is True)
+ok("3 of 10 brands is open", _a6.competition_verdict(3)["verdict"] == "open")
+ok("the threshold is the tested one, not a round number",
+   _a6.WALLED_OFF_BRAND_THRESHOLD == 7)
+
+# Finding 3: agreeing with the consensus number was worth ~12 points, and the
+# proprietary fact is the part a bigger competitor cannot copy.
+_sp = _a1sp._analysis_system_prompt([x for x in config.load_sites()
+                                     if x.domain == "boutimar.ir"][0])
+ok("every brief must state the consensus range", "CONSENSUS range" in _sp)
+ok("and must carry a fact nobody else has", "NOBODY ELSE" in _sp)
+ok("a missing proprietary fact is declared, never invented",
+   "rather than inventing one" in _sp,
+   "the never-invent rule already forbids the alternative")
+
+# Finding 6: question-format titles did NOT correlate with citation.
+ok("Agent 1 no longer requires question-shaped headings",
+   "Do NOT require question-shaped headings" in _sp)
+ok("Agent 6 no longer sells them as a citation lever",
+   "tested AI-citation benefit is nil" in _a6._IMPACT["geo.no_question_structure"])
+ok("but the finding survives for readers and valid schema",
+   "help a reader scan" in _a6._IMPACT["geo.no_question_structure"],
+   "still worth doing, just not for the reason originally given")
+_comp = pathlib.Path(__file__).with_name("compliance.py").read_text(encoding="utf-8")
+ok("the compliance comment no longer overstates the GEO benefit",
+   "did not survive measurement" in _comp)
+
 print("\n=== the three edges ===")
 import inspect
 import agent4_sales_closer_batch as a4b   # this section runs before the agent-4 one

@@ -161,7 +161,17 @@ _IMPACT = {
     "content.noindex": "The page is excluded from the index. Not advertised in the sitemap, so probably deliberate — worth confirming.",
     "sitemap.noindex_conflict": "The sitemap says crawl it, the page says ignore it. Contradictory signals waste crawl budget, and whichever of the two is wrong is a real defect.",
     "geo.no_structured_data": "Answer engines lift entities, prices and FAQs from structured data far more reliably than from prose. Without it the brand is invisible to the surface you are trying to win.",
-    "geo.no_question_structure": "Answer engines quote passages already shaped like an answer. Nothing on the page is quotable.",
+    # DOWNGRADED 11 Aug 2026. The original claim — that answer engines quote
+    # passages shaped like an answer — did not survive testing. In a 100-query
+    # AI Overview study (heytony.ca), question-format titles matching the query
+    # showed NO positive correlation with citation, alongside heavy formatting
+    # and fact density. What DID correlate was agreeing with the consensus
+    # number (+12 points) and matching the answer's geographic scope (+14).
+    #
+    # Kept as a finding because question headings still help a reader scan, and
+    # FAQPage schema is still valid structured data. It is no longer sold as a
+    # citation lever, and it no longer ranks above the things that measured.
+    "geo.no_question_structure": "Question headings help a reader scan and FAQ schema is valid structured data — but tested AI-citation benefit is nil. Do this for people, not for engines.",
     "geo.js_dependent": "Googlebot renders eventually; most AI fetchers do not. A JS-only page is invisible to exactly the surface this lane targets.",
     "geo.no_local_signals": "'DMC in Iran', 'travel agency Tehran' are geographic queries. Nothing on the page answers the geographic part.",
     "content.lang_mismatch": "The wrong language is declared for the primary market, which affects both ranking and how assistive tech reads the page.",
@@ -192,7 +202,7 @@ _EFFORT = {
     "host.duplicate": "minutes", "content.noindex": "minutes",
     "content.no_lang": "minutes", "content.lang_mismatch": "minutes",
     "content.no_viewport": "minutes", "geo.no_llms_txt": "hours",
-    "geo.no_structured_data": "hours", "geo.no_question_structure": "hours",
+    "geo.no_structured_data": "hours", "geo.no_question_structure": "minutes",
     "geo.js_dependent": "days", "sitemap.missing": "hours",
 }
 
@@ -374,6 +384,61 @@ def build_matrix(gaps: list[dict[str, Any]]) -> list[Opportunity]:
     ]
     opps.sort(key=lambda o: o.score, reverse=True)
     return opps
+
+
+# heytony.ca's 100-AI-Overview study, Finding 4: when page one is dominated by
+# major brands (more than 7 of 10), those brands took 76% of stable citations.
+# Where page one was mostly smaller sites, small and mid-size businesses took
+# 77%. The query is either open or it is walled off, and writing into a walled
+# query is a wasted brief.
+#
+# Counting brands on page one needs SERP data, and this pipeline has none — it
+# infers everything from Search Console, which reports only our own rows. So
+# this returns "unknown" unless a SERP source is supplied, and an unknown
+# verdict NEVER filters a brief out. Dropping work on a guess is worse than
+# doing work that might be crowded.
+WALLED_OFF_BRAND_THRESHOLD = 7      # of 10 page-one results
+
+
+def competition_verdict(page_one_brands: int | None) -> dict[str, Any]:
+    """
+    Is this query worth entering?
+
+    page_one_brands is the count of major-brand results in the top ten, or None
+    when nobody has measured it. None is the honest default here: a verdict
+    invented from Search Console data would look like evidence and be a guess.
+    """
+    if page_one_brands is None:
+        return {
+            "verdict": "unknown",
+            "acts_as_filter": False,
+            "detail": (
+                "No SERP source is configured, so page-one composition has not "
+                "been measured. Briefs are not filtered on an unmeasured signal."
+            ),
+        }
+    if page_one_brands > WALLED_OFF_BRAND_THRESHOLD:
+        return {
+            "verdict": "walled_off",
+            "acts_as_filter": True,
+            "page_one_brands": page_one_brands,
+            "detail": (
+                f"{page_one_brands} of 10 page-one results are major brands. In "
+                "testing, brands took 76% of stable AI citations in queries like "
+                "this. A new page here is unlikely to be cited or to rank; spend "
+                "the brief somewhere open."
+            ),
+        }
+    return {
+        "verdict": "open",
+        "acts_as_filter": False,
+        "page_one_brands": page_one_brands,
+        "detail": (
+            f"Only {page_one_brands} of 10 page-one results are major brands. "
+            "Small and mid-size sites took 77% of stable citations in queries "
+            "with this shape — worth entering."
+        ),
+    }
 
 
 def topic_map(opps: list[Opportunity]) -> dict[str, dict[str, Any]]:

@@ -580,6 +580,30 @@ def _analysis_system_prompt(site: Site) -> str:
         "",
         "Put the Persian Gulf and visa rules into every brief's must_avoid list "
         "so the writing agent inherits them.",
+        "",
+        # From heytony.ca's 100-AI-Overview study (Aug 2026): pages whose figures
+        # AGREED with the consensus number in the answer were ~12 points more
+        # likely to be cited, and the effect was stronger among citations that
+        # persisted across checks. "You're not being judged on quality. You're
+        # being matched on agreement." Agreement is the entry ticket; the real
+        # number is the differentiation.
+        "EVERY brief's must_include list MUST contain two entries, in this order:",
+        "  1. A statement of the CONSENSUS range for the topic — the figure, "
+        "duration or price band a reader would meet everywhere else. State it "
+        "plainly and early, in the first section.",
+        "  2. At least one fact that is TRUE OF THIS BUSINESS AND NOBODY ELSE — "
+        "a real fare from the live feed, a real port fee, a real sailing date, a "
+        "real cabin category. Frame it as our own experience, placed after the "
+        "consensus.",
+        "If no proprietary fact is available for a topic, say so in must_include "
+        "rather than inventing one. A brief with no distinctive fact is a brief "
+        "for a page a larger competitor can copy in an afternoon.",
+        "",
+        # Same study, Finding 6: question-format titles matching the query
+        # structure showed NO positive correlation with citation.
+        "Do NOT require question-shaped headings. Testing found no citation "
+        "benefit from question-format titles. Use them where they genuinely read "
+        "better for a person, never as an optimisation.",
     ])
 
 
