@@ -154,6 +154,17 @@ ok("and its generation_meta flags itself as non-model output",
        "agent2_writer_batch.py").read_text(encoding="utf-8"))
 
 print("\n=== agent 2 — retry semantics ===")
+ok("the default Gemini model is one the free tier actually allows",
+   config.GEMINI_MODEL.endswith("flash") or "GEMINI_MODEL" in os.environ,
+   config.GEMINI_MODEL)
+_src2b = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("a zero-quota model fails fast instead of retrying three times",
+   '"limit: 0" in msg' in _src2b,
+   "429 with limit:0 means the model is not in the plan, not a rate limit")
+ok("and the error says which two things would fix it",
+   "GEMINI_MODEL to a model your plan includes" in _src2b
+   and "enable billing" in _src2b)
+
 _src2 = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
 _seg = _src2.split("for attempt in range(1, 4):", 1)[1][:900]
 ok("a missing credential is not retried three times",

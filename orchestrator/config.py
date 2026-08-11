@@ -52,7 +52,13 @@ RUNS_DIR = Path(os.getenv("RUNS_DIR", BASE_DIR / "runs"))
 # so one vendor means one key, one bill, one thing to rotate.
 GAP_ANALYSIS_PROVIDER = os.getenv("GAP_ANALYSIS_PROVIDER", "anthropic").lower()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-pro")
+# Flash, not Pro, and the reason is not preference. Gemini 2.5 Pro is not on
+# the free tier at all: the API answers a request for it with 429 and
+# "limit: 0", which reads like rate-limiting but means "this model is not in
+# your plan". Flash is available without billing, and for drafting from a brief
+# that already fixes the outline, headings and must-cover points, the gap
+# between the two is small. Override with GEMINI_MODEL once billing is on.
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 # Claude Opus 5 is the default for Agents 3 and 4. Notes that matter for the
 # request shape on this model family:

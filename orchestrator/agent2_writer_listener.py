@@ -508,6 +508,19 @@ def _call_gemini(
             last_error = exc
             log.warning("gemini attempt %d returned unusable output: %s", attempt, exc)
         except Exception as exc:  # transport / quota / safety block
+            # "limit: 0" is not rate-limiting, it is the model being absent from
+            # the plan — most often Pro on a free-tier key. Zero permitted
+            # requests will still be zero on the third attempt, so retrying only
+            # buries the cause under three identical 429s.
+            msg = str(exc)
+            if "RESOURCE_EXHAUSTED" in msg and "limit: 0" in msg:
+                raise RuntimeError(
+                    f"{config.GEMINI_MODEL} is not available on this API key's plan "
+                    "(quota limit: 0, not a temporary rate limit). Either set "
+                    "GEMINI_MODEL to a model your plan includes — gemini-2.5-flash "
+                    "is on the free tier — or enable billing on the Google Cloud "
+                    "project behind the key."
+                ) from exc
             last_error = exc
             log.warning("gemini attempt %d failed: %s", attempt, exc)
         time.sleep((2 ** (attempt - 1)) + random.uniform(0, 0.4))
