@@ -177,6 +177,7 @@ ok(".env.example agrees too", "GEMINI_MODEL=gemini-2.5-flash" in _envx)
 # 2.5-flash returns 404 "no longer available to new users". Both are invisible
 # until a live call. So the model is discovered, not assumed.
 import agent2_writer_listener as _a2
+_src2c = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
 _orig_list = _a2.resolve_model
 _a2._RESOLVED_MODEL = None
 ok("resolve_model exists and is used by both SDK paths",
@@ -213,6 +214,22 @@ ok("non-generative families cannot win the alphabetical fallback",
 ok("the model listing is logged so a silent empty result is visible",
    "Gemini lists %d model(s)" in _src2b or "usable for generation" in
    pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8"))
+
+# ListModels advertised gemini-2.5-flash and the API then refused it with 404.
+# Presence in the listing is not proof of access; a rejected call is the only
+# reliable signal, so a refused model retires itself and the loop moves on.
+_a2._UNUSABLE_MODELS.clear(); _a2._RESOLVED_MODEL = "x"
+_a2.mark_model_unusable("gemini-2.5-flash")
+ok("a refused model is retired for the process",
+   "gemini-2.5-flash" in _a2._UNUSABLE_MODELS)
+ok("and retiring it clears the cache so the next call re-resolves",
+   _a2._RESOLVED_MODEL is None)
+ok("a withdrawn model retries with the next candidate rather than failing",
+   "retrying with %s" in _src2c,
+   "presence in ListModels is not proof the key may call it")
+ok("it only gives up when no alternative remains",
+   "no alternative" in _src2c)
+_a2._UNUSABLE_MODELS.clear(); _a2._RESOLVED_MODEL = None
 
 ok("resolve_model caches so a batch does not re-list per brief",
    "_RESOLVED_MODEL" in _src2b and "global _RESOLVED_MODEL" in _src2b)

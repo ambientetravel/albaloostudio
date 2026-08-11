@@ -438,6 +438,19 @@ GENERATION_CONFIG = {
 
 _RESOLVED_MODEL: str | None = None
 
+# Models ListModels advertises but the API then refuses with 404 "no longer
+# available to new users". Presence in the listing is NOT proof of access, so
+# the only reliable signal is a rejected call. Remembering them lets the retry
+# loop move on instead of asking for the same withdrawn model three times.
+_UNUSABLE_MODELS: set[str] = set()
+
+
+def mark_model_unusable(name: str) -> None:
+    """Retire a model for this process and force the next call to re-resolve."""
+    global _RESOLVED_MODEL
+    _UNUSABLE_MODELS.add(name)
+    _RESOLVED_MODEL = None
+
 # Preference order when the configured model is not usable. Newest generation
 # first, and flash tiers ahead of pro within a generation because pro is the one
 # routinely gated behind billing. Any name absent from the account's own list is
@@ -495,6 +508,7 @@ def resolve_model() -> str:
         # otherwise win the alphabetical fallback.
         available = [n for n in available
                      if not any(x in n for x in ("embedding", "aqa", "imagen", "veo", "tts"))]
+        available = [n for n in available if n not in _UNUSABLE_MODELS]
         log.info("Gemini lists %d model(s), %d usable for generation",
                  len(listed), len(available))
     except config.ConfigError:
@@ -511,12 +525,12 @@ def resolve_model() -> str:
         _RESOLVED_MODEL = configured
         return configured
 
-    if configured in available:
+    if configured in available and configured not in _UNUSABLE_MODELS:
         _RESOLVED_MODEL = configured
         return configured
 
     for candidate in _MODEL_PREFERENCE:
-        if candidate in available:
+        if candidate in available and candidate not in _UNUSABLE_MODELS:
             log.warning(
                 "GEMINI_MODEL=%s is not available to this API key. Using %s instead. "
                 "This key offers: %s",
@@ -613,12 +627,17 @@ def _call_gemini(
             # buries the cause under three identical 429s.
             msg = str(exc)
             if "NOT_FOUND" in msg and "no longer available" in msg:
-                raise RuntimeError(
-                    f"{resolve_model()} has been withdrawn for new API keys. "
-                    "Model discovery should have caught this — if you are seeing "
-                    "it, ListModels failed and the configured name was honoured. "
-                    "Set GEMINI_MODEL to a name this key offers."
-                ) from exc
+                dead = resolve_model()
+                mark_model_unusable(dead)
+                nxt = resolve_model()
+                if nxt == dead:
+                    raise RuntimeError(
+                        f"{dead} is withdrawn for this API key and no alternative "
+                        "remains. Set GEMINI_MODEL to a model the key can call."
+                    ) from exc
+                log.warning("%s is withdrawn for this key — retrying with %s", dead, nxt)
+                last_error = exc
+                continue
             if "RESOURCE_EXHAUSTED" in msg and "limit: 0" in msg:
                 raise RuntimeError(
                     f"{config.GEMINI_MODEL} is not available on this API key's plan "
