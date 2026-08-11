@@ -320,6 +320,53 @@ ok("a held post is not a failure",
    "return 1 if manifest[\"failed\"] else 0" in _src3,
    "held and blocked-on-media are the design working")
 
+
+print("\n=== agent 4 — batch closer ===")
+import agent4_sales_closer_batch as a4b
+from agent4_sales_closer import redact as _redact
+
+# The claim that matters most: a Luhn-valid card is redacted, and a booking
+# reference that merely looks like one is left alone. A guard that mangles
+# customer data to catch a card is worse than no guard.
+_c, _r = _redact("Please charge my card 4111111111111111 cvv 123")
+ok("a Luhn-valid card is redacted", "4111111111111111" not in _c and "card_number" in _r)
+ok("the CVV goes with it", "cvv" in _r)
+_c2, _r2 = _redact("My booking reference is 1234567890123456 — confirm the cabin?")
+ok("a 16-digit booking reference that fails Luhn is NOT mangled",
+   "1234567890123456" in _c2 and _r2 == [],
+   "redacting it would corrupt the one field the agent needs to look the booking up")
+_c3, _r3 = _redact("Transfer to IBAN DE89370400440532013000")
+ok("an IBAN is redacted", "DE89370400440532013000" not in _c3 and "iban" in _r3)
+_c4, _r4 = _redact("Passport number X1234567 attached")
+ok("a passport number is redacted", "X1234567" not in _c4 and "passport_number" in _r4)
+
+_wf4 = (pathlib.Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "agent4-sales-closer.yml").read_text(encoding="utf-8")
+# Parse it, do not grep it: the file explains in a comment WHY there is no
+# schedule, and a text match flags that comment. Same mistake as the
+# AGENT2_WEBHOOK_URL assertion that failed on a comment describing its removal.
+import yaml as _yaml
+_wf4y = _yaml.safe_load(_wf4)
+_on4 = _wf4y.get("on") or _wf4y.get(True)
+ok("Agent 4 has NO cron trigger",
+   "schedule" not in _on4,
+   "no lead source is wired; a nightly green no-op teaches people to ignore green")
+ok("it is dispatch-only", list(_on4) == ["workflow_dispatch"])
+ok("its artifact retention is short, not the 90-day default",
+   "retention-days: 7" in _wf4,
+   "these records hold real customers' words, redacted but still theirs")
+
+_src4 = pathlib.Path(__file__).with_name("agent4_sales_closer_batch.py").read_text(encoding="utf-8")
+ok("the batch runner has no delivery path at all",
+   not _re.search(r"requests\.(post|put)|smtplib|sendmail", _src4),
+   "Agent 4 drafts; a human sends")
+ok("the manifest states sent=0 as a design fact",
+   '"sent": 0' in _src4 and "always 0 by design" in _src4)
+ok("every record is marked draft-only", "DRAFT ONLY" in _src4)
+ok("the stub deliberately drafts no reply",
+   "Deliberately drafts NO reply" in (a4b._stub_qualify.__doc__ or ""),
+   "a stub reply is the one thing here someone could send by mistake")
+
 print("\n=== agent 7 — keyword & geo scout ===")
 import agent7_keyword_scout as a7
 

@@ -1,0 +1,168 @@
+# Agent 4 — Sales Closer
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# workflow_dispatch ONLY — deliberately no cron.
+#
+# Agents 1, 2 and 3 chain nightly because each has real input waiting: Search
+# Console data, then briefs, then publishing events. Agent 4 has no lead source
+# wired. A nightly run would register campaigns, find zero leads and report a
+# green no-op every morning, which is how a green tick stops meaning anything.
+#
+# Add `schedule:` the day leads actually arrive — from res.boutimar.ir/ingest,
+# a Make scenario polling an inbox, or a WhatsApp bridge. Until then this runs
+# when someone has leads to qualify.
+#
+# NOTHING IS SENT. Agent 4 has no delivery path at all: no SMTP, no webhook to
+# a customer, nothing. Replies land in the artifact for a human to read, edit
+# and send. A wrong price or a wrong visa claim cannot be recalled once it
+# reaches a real person.
+
+name: Agent 4 — Sales Closer
+
+on:
+  workflow_dispatch:
+    inputs:
+      leads_path:
+        description: "Path in the repo to a JSONL/JSON array of inbound leads"
+        required: true
+        type: string
+      campaigns_run_id:
+        description: "Agent 3 run ID for attribution (blank = latest successful)"
+        required: false
+        type: string
+      limit:
+        description: "Max leads to qualify (0 = all)"
+        required: false
+        default: "0"
+        type: string
+      no_llm:
+        description: "Skip Claude — exercise redaction, attribution and gate only"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: agent4-sales-closer
+  cancel-in-progress: false
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: orchestrator
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check the leads file exists
+        id: leads
+        run: |
+          set -euo pipefail
+          P="../${{ inputs.leads_path }}"
+          if [ ! -f "$P" ]; then
+            echo "::error title=No leads file::${{ inputs.leads_path }} does not exist in the repository."
+            exit 1
+          fi
+          echo "path=$P" >> "$GITHUB_OUTPUT"
+          echo "$(wc -l < "$P") line(s) in ${{ inputs.leads_path }}"
+
+      - name: Resolve the broadcaster run for attribution
+        id: b
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true      # attribution is useful, not required
+        run: |
+          set -euo pipefail
+          RUN="${{ inputs.campaigns_run_id }}"
+          if [ -z "$RUN" ]; then
+            RUN=$(gh run list --workflow agent3-broadcaster.yml --status success \
+                    --limit 1 --json databaseId --jq '.[0].databaseId' \
+                    --repo "${{ github.repository }}" || true)
+          fi
+          [ -n "$RUN" ] && [ "$RUN" != "null" ] && echo "run_id=$RUN" >> "$GITHUB_OUTPUT" || \
+            echo "::notice title=No campaigns::No Agent 3 run found — leads will be qualified without attribution."
+
+      - name: Fetch campaign logs
+        if: steps.b.outputs.run_id != ''
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: agent3-broadcast
+          path: orchestrator/inbox
+          run-id: ${{ steps.b.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Qualify
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-5' }}
+          PIPELINE_ENVIRONMENT: production
+        run: |
+          set -euo pipefail
+          ARGS="--leads ${{ steps.leads.outputs.path }} --out closed"
+          CDIR=$(find inbox -type d -name campaigns 2>/dev/null | head -1 || true)
+          if [ -n "$CDIR" ]; then ARGS="$ARGS --campaigns $CDIR"; fi
+          if [ "${{ inputs.limit || '0' }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit || '0' }}"; fi
+
+          if [ "${{ inputs.no_llm }}" = "true" ] || [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+              echo "::notice title=No Anthropic key::Running --no-llm: redaction, attribution, the compliance gate and escalation are exercised, but no reply is drafted."
+            fi
+            ARGS="$ARGS --no-llm"
+          fi
+
+          python3 agent4_sales_closer_batch.py $ARGS
+
+      - name: Summarise
+        if: always()
+        run: |
+          set -euo pipefail
+          [ -f closed/manifest.json ] || exit 0
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          m = json.load(open("closed/manifest.json", encoding="utf-8"))
+          print("## Agent 4 — Sales Closer\n")
+          if m.get("no_llm"):
+              print("> **Structural run — no model was called.** No replies were drafted.\n")
+          print(f"{m['qualified']} qualified · {m['blocked_replies']} replies blocked · "
+                f"{m['failed']} failed (of {m['leads_seen']} leads)\n")
+          print(f"**{m['escalated']} escalated to a human** · {m['with_draft']} drafts · "
+                f"{m['leads_containing_pii']} contained PII (redacted before the model) · "
+                f"{m['attributed']} attributed to a campaign\n")
+          print(f"> **{m['sent']} sent.** {m['sent_note']}\n")
+          print("| Lead | Channel | Status | Intent | Score | Escalated | Redacted |")
+          print("|---|---|---|---|---:|---|---|")
+          for o in m["outcomes"]:
+              print(f"| `{o['lead_id'] or o['lead_ref']}` | {o['channel']} | {o['status']} | "
+                    f"{o['intent'] or '—'} | {o['score']} | "
+                    f"{'yes' if o['escalated'] else ''} | {', '.join(o['redactions']) or ''} |")
+          print("\n*Architecture credit: Albaloo Studio*")
+          PY
+
+      # Retention is short on purpose. These records hold redacted customer
+      # messages — real people's words, even with the card numbers stripped.
+      # 90 days is right for a build artifact and wrong for correspondence.
+      - name: Upload drafts and escalations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent4-closed
+          path: orchestrator/closed/
+          retention-days: 7
+          if-no-files-found: warn

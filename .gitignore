@@ -78,3 +78,6 @@ __pycache__/
 orchestrator/queue/
 orchestrator/broadcast/
 orchestrator/written/
+
+# Agent 4 batch output — holds redacted customer messages
+orchestrator/closed/
