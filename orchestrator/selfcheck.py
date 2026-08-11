@@ -287,6 +287,39 @@ try:
 finally:
     _a1._has_verification_txt = _orig
 
+
+print("\n=== agent 3 — batch broadcaster ===")
+import agent3_broadcaster_batch as a3b
+
+_wf3 = (pathlib.Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "agent3-broadcaster.yml").read_text(encoding="utf-8")
+ok("Agent 3 is chained off Agent 2",
+   'workflows: ["Agent 2 — Writer"]' in _wf3)
+ok("it does not run when the writer failed",
+   "workflow_run.conclusion == 'success'" in _wf3)
+ok("ALLOW_AUTOPOST is NOT set in the workflow environment",
+   not _re.search(r"^\s{10}ALLOW_AUTOPOST:", _wf3, _re.M),
+   "the outer of the two locks stays open until a brand account exists")
+ok("it degrades to --no-llm rather than failing without a key",
+   '[ -z "${ANTHROPIC_API_KEY:-}" ]' in _wf3)
+_l3i = _re.search(r'limit:\n\s+description:[^\n]*\n\s+required: false\n\s+default: "(\d+)"', _wf3)
+ok("its limit default and shell fallback agree",
+   _l3i and {_l3i.group(1)} == set(_re.findall(r"inputs\.limit \|\| '(\d+)'", _wf3)))
+
+# campaign.log.v1 requires copy.hash — the dedupe guard that stops identical
+# copy reaching one channel twice on a redelivery. The batch runner omitted it
+# and only schema validation caught it, which is why the schema is validated
+# rather than trusted.
+_src3 = pathlib.Path(__file__).with_name("agent3_broadcaster_batch.py").read_text(encoding="utf-8")
+ok("the batch runner emits copy.hash", '"hash": "sha256:"' in _src3)
+ok("and the hash covers channel AND body, so one post per channel is distinct",
+   "f\"{d['channel']}|{d['body']}\"" in _src3)
+ok("the stub copy is documented as never publishable",
+   "Never publishable" in (a3b._stub_copy.__doc__ or ""))
+ok("a held post is not a failure",
+   "return 1 if manifest[\"failed\"] else 0" in _src3,
+   "held and blocked-on-media are the design working")
+
 print("\n=== agent 7 — keyword & geo scout ===")
 import agent7_keyword_scout as a7
 
