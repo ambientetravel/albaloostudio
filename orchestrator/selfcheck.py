@@ -135,6 +135,13 @@ ok("AGENT2_WEBHOOK_URL is no longer a secret this workflow consumes",
    "the secret whose absence killed the nightly cron is not part of the new path")
 ok("actions:read is granted for the cross-workflow artifact",
    "actions: read" in _wf2)
+# A manual dispatch has no upstream workflow_run, so both ID sources are empty
+# and download-artifact fails with "unable to find artifact" rather than "you
+# did not say which run". Resolve the latest successful scout instead.
+ok("a manual dispatch resolves the latest scout run instead of failing",
+   "gh run list --workflow agent1-seo-scout.yml --status success" in _wf2)
+ok("and it says so plainly when there is no scout run to read",
+   "No successful Agent 1 run to take briefs from" in _wf2)
 
 # The stub must never look like publishable output.
 # Normalised: the docstring wraps, so a raw substring match is brittle.

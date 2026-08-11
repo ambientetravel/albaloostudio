@@ -81,12 +81,36 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # On workflow_run this comes free. On a manual dispatch with no run_id
+      # BOTH sources are empty, and download-artifact fails with a confusing
+      # "unable to find artifact" rather than "you did not say which run" — so
+      # resolve the latest successful scout instead of making someone paste an
+      # ID they have to go and look up.
+      - name: Resolve which scout run to read
+        id: scout
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          RUN="${{ inputs.run_id || github.event.workflow_run.id }}"
+          if [ -z "$RUN" ]; then
+            RUN=$(gh run list --workflow agent1-seo-scout.yml --status success \
+                    --limit 1 --json databaseId --jq '.[0].databaseId' \
+                    --repo "${{ github.repository }}")
+            if [ -z "$RUN" ] || [ "$RUN" = "null" ]; then
+              echo "::error title=No scout run::No successful Agent 1 run to take briefs from. Run the scout first."
+              exit 1
+            fi
+            echo "::notice title=Using latest scout run::$RUN"
+          fi
+          echo "run_id=$RUN" >> "$GITHUB_OUTPUT"
+
       - name: Fetch the briefs Agent 1 produced
         uses: actions/download-artifact@v4
         with:
           name: seo-scout-run
           path: orchestrator/inbox
-          run-id: ${{ inputs.run_id || github.event.workflow_run.id }}
+          run-id: ${{ steps.scout.outputs.run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Locate the briefs
