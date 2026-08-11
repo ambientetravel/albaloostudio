@@ -700,6 +700,9 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
         # human uploads. Status stays `draft` — nothing is live until it is.
         return _write_static_bundle(site, brief, draft, url)
 
+    if adapter == "astro_pr":
+        return _push_astro_pr(brief, draft, url)
+
     # A missing_page brief whose path already exists is a hard error, never an
     # overwrite (ARCHITECTURE.md §5, Agent 2).
     if brief.opportunity.gap_type == "missing_page" and _url_exists(url):
@@ -708,13 +711,24 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
             "overwrite. Re-run the scout; the sitemap signal was stale."
         )
 
-    log.info("adapter %s → %s (%s)", adapter, url, site.cms.publish_mode)
+    # Anything still here has no implementation. It used to return `url` as
+    # live_url and stamp published_at when publish_mode said publish — a URL for
+    # a page nothing had created, and a publication timestamp for a publication
+    # that never happened. Five of ten sites were routed through it.
+    #
+    # The rule at the top of this function is not decorative: an adapter must
+    # never report a URL it did not create. So it reports the INTENDED path and
+    # says plainly that nothing was written.
+    log.warning("%s — adapter %r is not implemented; staging only, nothing written",
+                site.domain, adapter)
     return {
-        "status": "draft" if site.cms.publish_mode == "draft" else site.cms.publish_mode,
-        "live_url": url,
-        "record_id": brief.brief.target_url_path.strip("/").replace("/", "-"),
-        "published_at": rfc3339() if site.cms.publish_mode == "publish" else None,
+        "status": "draft",
+        "live_url": None,
+        "intended_url": url,
+        "record_id": None,
+        "published_at": None,
         "scheduled_for": None,
+        "note": f"adapter {adapter!r} is not implemented — draft staged, not published",
     }
 
 
@@ -747,7 +761,7 @@ def _push_wordpress(
             brief.site.domain,
         )
         return {
-            "status": "draft", "live_url": url, "record_id": None,
+            "status": "draft", "live_url": None, "intended_url": url, "record_id": None,
             "published_at": None, "scheduled_for": None,
             "note": "wordpress_rest not configured — set WORDPRESS_USER and "
                     "WORDPRESS_APP_PASSWORD (an Application Password, not the "
@@ -775,7 +789,7 @@ def _push_wordpress(
     except requests.RequestException as exc:
         log.error("%s — WordPress unreachable: %s", brief.site.domain, exc)
         return {
-            "status": "draft", "live_url": url, "record_id": None,
+            "status": "draft", "live_url": None, "intended_url": url, "record_id": None,
             "published_at": None, "scheduled_for": None,
             "note": f"wordpress transport error: {exc}",
         }
@@ -787,7 +801,7 @@ def _push_wordpress(
         log.error("%s — WordPress returned %s: %s",
                   brief.site.domain, resp.status_code, resp.text[:300])
         return {
-            "status": "draft", "live_url": url, "record_id": None,
+            "status": "draft", "live_url": None, "intended_url": url, "record_id": None,
             "published_at": None, "scheduled_for": None,
             "note": f"wordpress HTTP {resp.status_code}: {resp.text[:200]}",
         }
@@ -807,6 +821,123 @@ def _push_wordpress(
         "edit_url": f"{base}/wp-admin/post.php?post={post_id}&action=edit" if post_id else None,
         "note": "created as a WordPress draft — review and publish by hand",
     }
+
+
+def _push_astro_pr(
+    brief: ContentBrief, draft: dict[str, Any], url: str
+) -> dict[str, Any]:
+    """
+    Write the article into an Astro content collection and open a pull request.
+
+    Used by boutimar.com and exploreorient.com — both static Astro builds with
+    no CMS able to hold a draft. A pull request IS the draft: it is reviewable,
+    diffable, revertible, and nothing reaches the live site until a human
+    merges it. For a site generated from files, that is a better review surface
+    than a CMS admin.
+
+    Needs a token with `contents: write` and `pull_requests: write` on the
+    TARGET repository — the default GITHUB_TOKEN is scoped to the repo the
+    workflow runs in, which is not the one being written to. Without it the
+    file is staged to disk and the adapter says so rather than pretending.
+    """
+    from pathlib import Path as _Path
+
+    site = brief.site
+    repo = config.optional_env(f"ASTRO_REPO_{site.domain.replace('.', '_').upper()}") \
+        or config.optional_env("ASTRO_REPO")
+    token = config.optional_env("ASTRO_GITHUB_TOKEN")
+
+    slug = brief.brief.target_url_path.strip("/").replace("/", "-") or "post"
+    collection = (brief.brief.content_type or "journal").strip("/")
+    rel_path = f"{site.cms.content_root.strip('/')}/{collection}/{slug}.md"
+
+    front = {
+        "title": draft.get("title") or brief.brief.working_title,
+        "description": draft.get("meta_description", ""),
+        "draft": True,          # Astro content collections honour this
+        "pubDate": rfc3339(),
+        "lang": brief.brief.language,
+    }
+    fm = "\n".join(f'{k}: {json.dumps(v, ensure_ascii=False)}' for k, v in front.items())
+    file_body = f"---\n{fm}\n---\n\n{draft.get('body_markdown', '')}"
+
+    if not repo or not token:
+        out = _Path(config.optional_env("BUNDLE_DIR", str(config.BASE_DIR / "bundles")))
+        out = out / site.domain / slug
+        out.mkdir(parents=True, exist_ok=True)
+        (out / _Path(rel_path).name).write_text(file_body, encoding="utf-8")
+        log.warning("%s — ASTRO_REPO/ASTRO_GITHUB_TOKEN not set; wrote %s instead of a PR",
+                    site.domain, out)
+        return {
+            "status": "draft", "live_url": None, "intended_url": url,
+            "record_id": slug, "published_at": None, "scheduled_for": None,
+            "staged_path": str(out / _Path(rel_path).name),
+            "note": "astro_pr not configured — set ASTRO_REPO and ASTRO_GITHUB_TOKEN "
+                    "to open a pull request. File written to bundles/ meanwhile.",
+        }
+
+    api = "https://api.github.com"
+    hdr = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
+           "User-Agent": config.USER_AGENT}
+    branch = f"agent2/{slug}"
+
+    try:
+        r = requests.get(f"{api}/repos/{repo}", headers=hdr, timeout=config.WEBHOOK_TIMEOUT_S)
+        r.raise_for_status()
+        base = r.json()["default_branch"]
+
+        r = requests.get(f"{api}/repos/{repo}/git/ref/heads/{base}", headers=hdr,
+                         timeout=config.WEBHOOK_TIMEOUT_S)
+        r.raise_for_status()
+        sha = r.json()["object"]["sha"]
+
+        # 422 here means the branch already exists — a redelivery of the same
+        # brief. That is idempotency working, not an error.
+        rb = requests.post(f"{api}/repos/{repo}/git/refs", headers=hdr,
+                           json={"ref": f"refs/heads/{branch}", "sha": sha},
+                           timeout=config.WEBHOOK_TIMEOUT_S)
+        if rb.status_code not in (201, 422):
+            rb.raise_for_status()
+
+        import base64 as _b64
+        r = requests.put(
+            f"{api}/repos/{repo}/contents/{rel_path}", headers=hdr,
+            json={"message": f"Agent 2: draft \u2014 {front['title']}"[:72],
+                  "content": _b64.b64encode(file_body.encode("utf-8")).decode("ascii"),
+                  "branch": branch},
+            timeout=config.WEBHOOK_TIMEOUT_S)
+        r.raise_for_status()
+
+        rp = requests.post(
+            f"{api}/repos/{repo}/pulls", headers=hdr,
+            json={"title": f"Agent 2 draft: {front['title']}"[:72],
+                  "head": branch, "base": base,
+                  "body": (f"Drafted by Agent 2 from the Search Console gap "
+                           f"`{brief.opportunity.primary_keyword}`.\n\n"
+                           f"Intended path: `{brief.brief.target_url_path}`\n\n"
+                           f"`draft: true` in the front matter — merging does not "
+                           f"publish it, it only puts the file in the repo.\n\n"
+                           f"_Pipeline architecture by {config.ARCHITECTURE_CREDIT}_")},
+            timeout=config.WEBHOOK_TIMEOUT_S)
+        if rp.status_code == 422:      # a PR for this branch already exists
+            log.info("%s — PR already open for %s", site.domain, branch)
+            return {"status": "draft", "live_url": None, "intended_url": url,
+                    "record_id": slug, "published_at": None, "scheduled_for": None,
+                    "note": f"pull request already open for {branch}"}
+        rp.raise_for_status()
+        pr = rp.json()
+        log.info("%s — opened PR #%s: %s", site.domain, pr.get("number"), pr.get("html_url"))
+        return {
+            "status": "draft", "live_url": None, "intended_url": url,
+            "record_id": slug, "published_at": None, "scheduled_for": None,
+            "pr_url": pr.get("html_url"), "pr_number": pr.get("number"),
+            "note": "pull request opened — review and merge to add the file",
+        }
+    except requests.RequestException as exc:
+        log.error("%s — astro_pr failed: %s", site.domain, config.redact(str(exc))[:200])
+        return {"status": "draft", "live_url": None, "intended_url": url,
+                "record_id": None, "published_at": None, "scheduled_for": None,
+                "note": f"astro_pr error: {config.redact(str(exc))[:200]}"}
 
 
 def _write_static_bundle(

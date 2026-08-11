@@ -364,6 +364,48 @@ _comp = pathlib.Path(__file__).with_name("compliance.py").read_text(encoding="ut
 ok("the compliance comment no longer overstates the GEO benefit",
    "did not survive measurement" in _comp)
 
+
+print("\n=== adapters never report a URL they did not create ===")
+import inspect as _insp
+import agent2_writer_listener as _a2c
+_pc = _insp.getsource(_a2c.push_to_cms)
+ok("astro_pr is routed, not left to the generic branch",
+   'adapter == "astro_pr"' in _pc,
+   "boutimar.com and exploreorient.com both depend on it")
+ok("the generic branch returns live_url None",
+   '"live_url": None' in _pc,
+   "it used to return the intended URL and stamp published_at — a page that "
+   "never existed, reported as published")
+ok("and it never stamps published_at",
+   "published_at" in _pc and "rfc3339() if site.cms.publish_mode" not in _pc)
+_wp2 = _insp.getsource(_a2c._push_wordpress)
+ok("every WordPress failure path also reports None",
+   '"live_url": url' not in _wp2)
+_ap = _insp.getsource(_a2c._push_astro_pr)
+ok("astro_pr stages a file when unconfigured rather than claiming a PR",
+   "not configured" in _ap and '"live_url": None' in _ap)
+ok("an existing branch or PR is treated as idempotency, not failure",
+   "422" in _ap)
+
+# The schema itself required a live_url string, which FORCED the fabrication.
+_ev = json.load(open(os.path.join(SCHEMA_DIR, "publishing.event.v1.json"), encoding="utf-8"))
+_pubp = _ev["properties"]["publication"]["properties"]
+ok("publishing.event.v1 allows a null live_url",
+   _pubp["live_url"]["type"] == ["string", "null"],
+   "requiring a string is what made honesty impossible")
+ok("live_url is not in the required list",
+   "live_url" not in _ev["properties"]["publication"].get("required", []))
+ok("canonical_url is nullable too", _pubp["canonical_url"]["type"] == ["string", "null"])
+
+print("\n=== you cannot broadcast a page that does not exist ===")
+_src3b = pathlib.Path(__file__).with_name("agent3_broadcaster_batch.py").read_text(encoding="utf-8")
+ok("Agent 3 skips an event with no live_url",
+   "if not event.publication.live_url:" in _src3b,
+   "posting a link to an unpublished draft sends readers to a 404")
+ok("and says why, naming the intended path",
+   "nothing was published" in _src3b and "intended" in _src3b)
+ok("skipped is not failed", 'oc.status = "skipped"' in _src3b)
+
 print("\n=== the three edges ===")
 import inspect
 import agent4_sales_closer_batch as a4b   # this section runs before the agent-4 one

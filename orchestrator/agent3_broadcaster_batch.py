@@ -120,6 +120,17 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Ou
         profile = "boutimar_v1"
 
     try:
+        # You cannot broadcast a page that does not exist. When Agent 2 staged a
+        # draft rather than publishing — no adapter configured, a PR awaiting
+        # review, a failed push — live_url is null, and posting a link to it
+        # would send readers to a 404 and burn the one impression you get.
+        if not event.publication.live_url:
+            oc.status = "skipped"
+            oc.error = ("nothing was published — Agent 2 staged a draft "
+                        f"(intended: {getattr(event.publication, 'intended_url', None) or 'unknown'}). "
+                        "Broadcast when the page is live.")
+            return oc
+
         channel_cfgs = _resolve_channels(event)
         if not channel_cfgs:
             oc.status = "skipped"

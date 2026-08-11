@@ -96,7 +96,10 @@ class SourceBrief(_Loose):
 
 class Publication(_Loose):
     status: Literal["published", "scheduled", "draft", "failed"]
-    live_url: str
+    # Nullable: an adapter that staged a draft has no live URL, and the schema
+    # used to force one, which is how phantom URLs entered the pipeline.
+    live_url: str | None = None
+    intended_url: str | None = None
     canonical_url: str | None = None
     cms: dict[str, Any] = Field(default_factory=dict)
     published_at: str | None = None
@@ -132,7 +135,7 @@ class DistributionHints(_Loose):
     channels: list[str] = Field(default_factory=list)
     b2b_angle: str | None = None
     d2c_angle: str | None = None
-    cta_url: str = ""
+    cta_url: str | None = None
     utm: dict[str, Any] = Field(default_factory=dict)
     hashtags_allowed: bool = True
     embargo_until: str | None = None
