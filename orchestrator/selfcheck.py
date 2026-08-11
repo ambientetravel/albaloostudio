@@ -187,6 +187,33 @@ ok("the preference order puts flash tiers ahead of pro",
    _a2._MODEL_PREFERENCE.index("gemini-flash-latest")
    < _a2._MODEL_PREFERENCE.index("gemini-pro-latest"),
    "pro is the tier routinely gated behind billing")
+# supported_actions is populated on Vertex and empty on the Gemini Developer
+# API. Filtering on it excluded EVERY model, so discovery returned nothing and
+# the configured name was honoured straight into the 404 it existed to prevent.
+class _FakeModel:
+    def __init__(self, name, acts): self.name, self.supported_actions = name, acts
+def _filter(models):
+    avail = [m.name.removeprefix("models/") for m in models
+             if (a := getattr(m, "supported_actions", None)) is None or not a
+             or "generateContent" in a]
+    return [n for n in avail
+            if not any(x in n for x in ("embedding", "aqa", "imagen", "veo", "tts"))]
+ok("a model with an EMPTY supported_actions is kept (Developer API shape)",
+   _filter([_FakeModel("models/gemini-flash-latest", [])]) == ["gemini-flash-latest"],
+   "this is the shape that silently broke discovery")
+ok("a model with None supported_actions is kept",
+   _filter([_FakeModel("models/gemini-flash-latest", None)]) == ["gemini-flash-latest"])
+ok("a populated Vertex-style list still filters correctly",
+   _filter([_FakeModel("models/gemini-flash-latest", ["generateContent"]),
+            _FakeModel("models/text-embedding-004", ["embedContent"])])
+   == ["gemini-flash-latest"])
+ok("non-generative families cannot win the alphabetical fallback",
+   _filter([_FakeModel("models/imagen-4", None), _FakeModel("models/veo-3", None),
+            _FakeModel("models/text-embedding-004", None)]) == [])
+ok("the model listing is logged so a silent empty result is visible",
+   "Gemini lists %d model(s)" in _src2b or "usable for generation" in
+   pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8"))
+
 ok("resolve_model caches so a batch does not re-list per brief",
    "_RESOLVED_MODEL" in _src2b and "global _RESOLVED_MODEL" in _src2b)
 _a2._RESOLVED_MODEL = None

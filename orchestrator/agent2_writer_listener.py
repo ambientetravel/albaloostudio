@@ -478,11 +478,25 @@ def resolve_model() -> str:
         from google import genai as new_genai
 
         client = new_genai.Client(api_key=config.require_env("GEMINI_API_KEY"))
+        listed = list(client.models.list())
+        # supported_actions is populated on Vertex and usually EMPTY on the
+        # Gemini Developer API. Filtering on it excluded every model, discovery
+        # returned nothing, and the configured name was honoured straight into
+        # the 404 it was meant to prevent. So exclude only what we positively
+        # know cannot generate — an unknown capability is included, not dropped.
         available = [
             m.name.removeprefix("models/")
-            for m in client.models.list()
-            if "generateContent" in (getattr(m, "supported_actions", None) or [])
+            for m in listed
+            if (acts := getattr(m, "supported_actions", None)) is None
+            or not acts
+            or "generateContent" in acts
         ]
+        # Embedding and similar models advertise nothing useful here and would
+        # otherwise win the alphabetical fallback.
+        available = [n for n in available
+                     if not any(x in n for x in ("embedding", "aqa", "imagen", "veo", "tts"))]
+        log.info("Gemini lists %d model(s), %d usable for generation",
+                 len(listed), len(available))
     except config.ConfigError:
         raise
     except Exception as exc:
