@@ -171,6 +171,25 @@ ok("the workflow's model default agrees with config.py",
    "the workflow fallback overrides config.py, so both must say flash")
 _envx = pathlib.Path(__file__).with_name(".env.example").read_text(encoding="utf-8")
 ok(".env.example agrees too", "GEMINI_MODEL=gemini-2.5-flash" in _envx)
+
+# Hardcoding a model name failed twice in one evening for two different
+# reasons: 2.5-pro returns 429 "limit: 0" (absent from the free tier) and
+# 2.5-flash returns 404 "no longer available to new users". Both are invisible
+# until a live call. So the model is discovered, not assumed.
+import agent2_writer_listener as _a2
+_orig_list = _a2.resolve_model
+_a2._RESOLVED_MODEL = None
+ok("resolve_model exists and is used by both SDK paths",
+   _src2b.count("resolve_model()") >= 2)
+ok("a withdrawn model is not retried three times",
+   '"no longer available" in msg' in _src2b)
+ok("the preference order puts flash tiers ahead of pro",
+   _a2._MODEL_PREFERENCE.index("gemini-flash-latest")
+   < _a2._MODEL_PREFERENCE.index("gemini-pro-latest"),
+   "pro is the tier routinely gated behind billing")
+ok("resolve_model caches so a batch does not re-list per brief",
+   "_RESOLVED_MODEL" in _src2b and "global _RESOLVED_MODEL" in _src2b)
+_a2._RESOLVED_MODEL = None
 ok("and the error says which two things would fix it",
    "GEMINI_MODEL to a model your plan includes" in _src2b
    and "enable billing" in _src2b)

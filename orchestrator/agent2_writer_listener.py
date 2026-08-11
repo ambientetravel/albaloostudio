@@ -436,6 +436,91 @@ GENERATION_CONFIG = {
 }
 
 
+_RESOLVED_MODEL: str | None = None
+
+# Preference order when the configured model is not usable. Newest generation
+# first, and flash tiers ahead of pro within a generation because pro is the one
+# routinely gated behind billing. Any name absent from the account's own list is
+# skipped, so entries that do not exist cost nothing.
+_MODEL_PREFERENCE = (
+    "gemini-flash-latest",
+    "gemini-pro-latest",
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    "gemini-2.0-flash",
+)
+
+
+def resolve_model() -> str:
+    """
+    The model this API key can actually call, asked rather than assumed.
+
+    Hardcoding a model name has now failed twice in one evening for two
+    different reasons: gemini-2.5-pro answers 429 "limit: 0" because it is not
+    on the free tier, and gemini-2.5-flash answers 404 "no longer available to
+    new users" because a key minted today cannot reach that generation at all.
+    Both are invisible until a live call, and both look like ordinary errors.
+
+    Model names churn faster than this pipeline will be edited, so it asks the
+    account what it has: ListModels, filtered to those supporting
+    generateContent. The configured name wins when it is present. Otherwise the
+    first preference the account actually offers is used, loudly.
+
+    Cached per process — the answer cannot change mid-run, and a batch of ten
+    briefs should not make ten identical calls.
+    """
+    global _RESOLVED_MODEL
+    if _RESOLVED_MODEL:
+        return _RESOLVED_MODEL
+
+    configured = config.GEMINI_MODEL
+    try:
+        from google import genai as new_genai
+
+        client = new_genai.Client(api_key=config.require_env("GEMINI_API_KEY"))
+        available = [
+            m.name.removeprefix("models/")
+            for m in client.models.list()
+            if "generateContent" in (getattr(m, "supported_actions", None) or [])
+        ]
+    except config.ConfigError:
+        raise
+    except Exception as exc:
+        # If the listing itself fails, honour the configured name rather than
+        # second-guessing it — the caller's error will be the real one.
+        log.warning("could not list Gemini models (%s); using %s as configured", exc, configured)
+        _RESOLVED_MODEL = configured
+        return configured
+
+    if not available:
+        log.warning("Gemini returned no generateContent models; using %s as configured", configured)
+        _RESOLVED_MODEL = configured
+        return configured
+
+    if configured in available:
+        _RESOLVED_MODEL = configured
+        return configured
+
+    for candidate in _MODEL_PREFERENCE:
+        if candidate in available:
+            log.warning(
+                "GEMINI_MODEL=%s is not available to this API key. Using %s instead. "
+                "This key offers: %s",
+                configured, candidate, ", ".join(sorted(available)[:12]),
+            )
+            _RESOLVED_MODEL = candidate
+            return candidate
+
+    fallback = sorted(available)[0]
+    log.warning(
+        "neither GEMINI_MODEL=%s nor any preferred model is available. Falling back to %s. "
+        "This key offers: %s",
+        configured, fallback, ", ".join(sorted(available)[:12]),
+    )
+    _RESOLVED_MODEL = fallback
+    return fallback
+
+
 def _gemini_once(system: str, prompt: str) -> tuple[str, Any]:
     """
     One Gemini generation. Returns (text, usage_metadata).
@@ -452,7 +537,7 @@ def _gemini_once(system: str, prompt: str) -> tuple[str, Any]:
 
         client = new_genai.Client(api_key=config.require_env("GEMINI_API_KEY"))
         resp = client.models.generate_content(
-            model=config.GEMINI_MODEL,
+            model=resolve_model(),
             contents=prompt,
             config=genai_types.GenerateContentConfig(
                 system_instruction=system, **GENERATION_CONFIG
@@ -466,7 +551,7 @@ def _gemini_once(system: str, prompt: str) -> tuple[str, Any]:
 
     genai.configure(api_key=config.require_env("GEMINI_API_KEY"))
     model = genai.GenerativeModel(
-        model_name=config.GEMINI_MODEL,
+        model_name=resolve_model(),
         system_instruction=system,
         generation_config=GENERATION_CONFIG,
     )
@@ -513,6 +598,13 @@ def _call_gemini(
             # requests will still be zero on the third attempt, so retrying only
             # buries the cause under three identical 429s.
             msg = str(exc)
+            if "NOT_FOUND" in msg and "no longer available" in msg:
+                raise RuntimeError(
+                    f"{resolve_model()} has been withdrawn for new API keys. "
+                    "Model discovery should have caught this — if you are seeing "
+                    "it, ListModels failed and the configured name was honoured. "
+                    "Set GEMINI_MODEL to a name this key offers."
+                ) from exc
             if "RESOURCE_EXHAUSTED" in msg and "limit: 0" in msg:
                 raise RuntimeError(
                     f"{config.GEMINI_MODEL} is not available on this API key's plan "
