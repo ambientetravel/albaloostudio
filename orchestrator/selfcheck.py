@@ -117,6 +117,42 @@ del os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]
 
 
 
+
+print("\n=== agent 2 — batch writer ===")
+import agent2_writer_batch as a2b
+
+_wf2 = (pathlib.Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "agent2-writer.yml").read_text(encoding="utf-8")
+ok("Agent 2 is chained off Agent 1, not woken by a webhook",
+   "workflow_run" in _wf2 and 'workflows: ["Agent 1 — SEO Scout"]' in _wf2)
+ok("it does not run when the scout failed",
+   "workflow_run.conclusion == 'success'" in _wf2,
+   "a failed scout emits no briefs; running anyway reports an empty success")
+ok("it degrades to --no-llm instead of failing on a missing key",
+   'if [ "${{ inputs.no_llm }}" = "true" ] || [ -z "${GEMINI_API_KEY:-}" ]' in _wf2)
+ok("AGENT2_WEBHOOK_URL is no longer a secret this workflow consumes",
+   "secrets.AGENT2_WEBHOOK_URL" not in _wf2,
+   "the secret whose absence killed the nightly cron is not part of the new path")
+ok("actions:read is granted for the cross-workflow artifact",
+   "actions: read" in _wf2)
+
+# The stub must never look like publishable output.
+# Normalised: the docstring wraps, so a raw substring match is brittle.
+_meta = " ".join((a2b._stub_draft.__doc__ or "").split())
+ok("the stub draft documents that it is not model output",
+   "must never be published" in _meta)
+_stub_meta = a2b._stub_draft.__wrapped__ if hasattr(a2b._stub_draft, "__wrapped__") else None
+ok("and its generation_meta flags itself as non-model output",
+   "NOT MODEL OUTPUT" in pathlib.Path(__file__).with_name(
+       "agent2_writer_batch.py").read_text(encoding="utf-8"))
+
+print("\n=== agent 2 — retry semantics ===")
+_src2 = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
+_seg = _src2.split("for attempt in range(1, 4):", 1)[1][:900]
+ok("a missing credential is not retried three times",
+   "except config.ConfigError" in _seg and "raise" in _seg,
+   "retrying a ConfigError wastes 7s per brief and buries the cause")
+
 print("\n=== 403 diagnosis ===")
 import agent1_seo_scout as _a1
 

@@ -37,7 +37,7 @@ Verify the whole thing without a single API key or network call:
 python selfcheck.py
 ```
 
-280 assertions across all seven agents — config, the compliance gate, gap
+288 assertions across all seven agents — config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry, the
 autopost gates, PII redaction, escalation rules, and every HTTP surface. Exit 0
 means the pipeline is wired correctly.
@@ -198,7 +198,8 @@ Gulf" is wrong in any framing — question, negation or quotation.
 | [`config.py`](config.py) | env, model IDs, envelope + HMAC signing |
 | [`compliance.py`](compliance.py) | the gate |
 | [`agent1_seo_scout.py`](agent1_seo_scout.py) | GSC → OpenAI → webhook |
-| [`agent2_writer_listener.py`](agent2_writer_listener.py) | FastAPI → Gemini → CMS → webhook (reference impl) |
+| [`agent2_writer_batch.py`](agent2_writer_batch.py) | **Agent 2 in production** — reads Agent 1's briefs, drafts, gates, publishes |
+| [`agent2_writer_listener.py`](agent2_writer_listener.py) | the FastAPI variant — reference impl, kept for the HTTP surface tests |
 | [`BASE44-AGENT2.md`](BASE44-AGENT2.md) | what the base44 Super Agent must implement |
 | [`agent3_broadcaster.py`](agent3_broadcaster.py) | FastAPI → Claude → scheduler → webhook |
 | [`agent4_sales_closer.py`](agent4_sales_closer.py) | FastAPI → Claude → qualify → escalate |
@@ -211,7 +212,7 @@ Gulf" is wrong in any framing — question, negation or quotation.
 | [`agent6_analyst.py`](agent6_analyst.py) | audit + demand → strategy, calendar, paste-ready JSON-LD |
 | [`agent7_keyword_scout.py`](agent7_keyword_scout.py) | per-country visibility + market alignment; Keyword Planner where it works |
 | [`SETUP-KEYWORD-PLANNER.md`](SETUP-KEYWORD-PLANNER.md) | why the Iranian sites cannot use it, and what replaces it |
-| [`selfcheck.py`](selfcheck.py) | 280 assertions, no network |
+| [`selfcheck.py`](selfcheck.py) | 288 assertions, no network |
 | [`schemas/`](schemas) | JSON Schema for the three payloads |
 | `../.github/workflows/agent1-seo-scout.yml` | daily scout, 04:15 UTC |
 | `../.github/workflows/agent5-site-audit.yml` | weekly audit + strategy, Mondays 05:00 UTC |

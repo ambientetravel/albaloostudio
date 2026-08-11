@@ -1,0 +1,296 @@
+#!/usr/bin/env python3
+"""
+Agent 2 — Writer, batch runner.
+
+Architecture credit: Albaloo Studio — albaloostudio.com
+Owner: Alireza Mozaffari
+
+Reads the briefs Agent 1 produced, drafts each one with Gemini, runs the
+compliance gate on the OUTPUT, pushes to the site's CMS adapter, and writes a
+publishing.event.v1 per success.
+
+Why this exists instead of the base44 service in BASE44-AGENT2.md
+-----------------------------------------------------------------
+That contract assumed Agent 2 would be an external HTTP service, so Agent 1
+signed a webhook and POSTed to it. Checked properly on 9 Aug 2026, base44
+cannot do the job:
+
+  * Six of the ten registered sites need git or filesystem writes it does not
+    have — astro_pr opens a pull request, boutimar_ir_static and static_bundle
+    write files. Only the two base44-hosted sites are native to it.
+  * The contract requires verifying an HMAC over the RAW request bytes before
+    parsing. Hosted app builders typically hand you a parsed object; re-
+    serialising changes key order and separators and the MAC never matches.
+  * It must answer 202 in about two seconds and then draft for 30–90s. That is
+    real background work, not a request handler.
+
+Running here instead makes three problems disappear rather than solving them:
+git and file writes are native, the secrets already exist, and the six-hour job
+limit removes all timeout pressure.
+
+And it deletes a moving part. The signed webhook between Agent 1 and Agent 2
+existed only because Agent 2 was going to live somewhere else. Both now run in
+the same place, so Agent 2 reads the briefs directly — one less credential, one
+less network hop, and AGENT2_WEBHOOK_URL, whose absence killed the nightly cron
+on 9 Aug, is no longer part of the design.
+
+The rest of BASE44-AGENT2.md still stands: the payload shape, the compliance
+rules, the idempotency requirement and the publishing.event contract are
+unchanged. Only the transport is superseded.
+
+    python3 agent2_writer_batch.py --briefs runs/<run_id>/briefs
+    python3 agent2_writer_batch.py --briefs briefs/ --dry-run
+    python3 agent2_writer_batch.py --briefs briefs/ --limit 2
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+import compliance
+import config
+from agent2_writer_listener import (
+    ContentBrief,
+    _call_gemini,
+    _resolve_data_dependencies,
+    build_publishing_event,
+    push_to_cms,
+)
+
+log = logging.getLogger("agent2.writer_batch")
+
+ARCHITECTURE_CREDIT = config.ARCHITECTURE_CREDIT
+
+
+@dataclass
+class Outcome:
+    brief_file: str
+    domain: str = ""
+    keyword: str = ""
+    status: str = "pending"      # drafted | blocked | failed | skipped
+    target_url: str = ""
+    words: int = 0
+    error: str = ""
+    violations: list[dict[str, Any]] = field(default_factory=list)
+    warnings: int = 0
+
+
+def _draft_surface(draft: dict[str, Any]) -> str:
+    """
+    The text the compliance gate judges.
+
+    One clause per line, and prohibition fields excluded — the same rule the
+    scout learned the hard way when `must_avoid` entries got read as claims and
+    dead-lettered three correct briefs. assertive_surface() owns that logic so
+    every agent inherits the fix.
+    """
+    return compliance.assertive_surface(
+        [
+            draft.get("title", ""),
+            draft.get("meta_description", ""),
+            draft.get("body_markdown", ""),
+            draft.get("key_points", []),
+            draft.get("quotable_lines", []),
+            [f"{f.get('q','')} {f.get('a','')}" for f in draft.get("faq", [])],
+        ]
+    )
+
+
+def _stub_draft(brief: ContentBrief) -> tuple[dict[str, Any], dict[str, Any]]:
+    """
+    A draft assembled from the brief itself, with no model involved.
+
+    This is not a preview of what Gemini would write and must never be
+    published — it exists so the rest of the machine can be exercised without a
+    credential: payload parsing, the compliance gate, the CMS adapters, event
+    assembly. Every one of those has broken before for reasons that had nothing
+    to do with the model, and each cost a full API round-trip to discover.
+    """
+    b = brief.brief
+    body = [f"# {b.working_title}", ""]
+    for s in b.outline:
+        body.append(f"{'#' * max(2, s.h)} {s.heading}")
+        body.extend(f"- {c}" for c in (s.must_cover or []))
+        body.append("")
+    return (
+        {
+            "title": b.working_title,
+            "meta_description": b.meta.description if b.meta else "",
+            "body_markdown": "\n".join(body),
+            "key_points": list(b.must_include or []),
+            "quotable_lines": [],
+            "faq": [],
+        },
+        {"provider": "stub", "model": "none", "attempts": 0, "duration_ms": 0,
+         "note": "NOT MODEL OUTPUT — structural test only"},
+    )
+
+
+def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
+              no_llm: bool = False) -> Outcome:
+    """Draft, gate, publish and record one brief. Never raises."""
+    name = payload.get("envelope", {}).get("message_id", "unknown")
+    oc = Outcome(brief_file=name)
+
+    try:
+        brief = ContentBrief.model_validate(payload)
+    except Exception as exc:
+        oc.status, oc.error = "failed", f"payload does not match content.brief.v1: {exc}"
+        return oc
+
+    oc.domain = brief.site.domain
+    oc.keyword = brief.opportunity.primary_keyword
+    oc.target_url = brief.brief.target_url_path
+
+    try:
+        # Resolved ONCE and reused. The gate must judge against the same data
+        # snapshot the model saw, or it is checking a different article.
+        data = _resolve_data_dependencies(brief)
+        draft, gen_meta = _stub_draft(brief) if no_llm else _call_gemini(brief, data)
+        oc.words = len(draft.get("body_markdown", "").split())
+
+        ctx = {
+            "priced_facts": data["has_priced_facts"],
+            "price_asof": data["fetched_at"] if data["has_priced_facts"] else None,
+            "itinerary_ports": brief.brief.must_include,
+        }
+        warnings = compliance.enforce(_draft_surface(draft), brief.compliance.profile, context=ctx)
+        oc.warnings = len(warnings)
+
+        if dry_run:
+            oc.status = "drafted"
+            (out_dir / "drafts").mkdir(parents=True, exist_ok=True)
+            (out_dir / "drafts" / f"{name}.json").write_text(
+                json.dumps({"brief": payload, "draft": draft}, ensure_ascii=False, indent=2),
+                encoding="utf-8")
+            return oc
+
+        result = push_to_cms(brief, draft)
+        event = build_publishing_event(brief, payload, draft, result, gen_meta, warnings, data)
+
+        (out_dir / "events").mkdir(parents=True, exist_ok=True)
+        (out_dir / "events" / f"{name}.json").write_text(
+            json.dumps(event, ensure_ascii=False, indent=2), encoding="utf-8")
+        (out_dir / "drafts").mkdir(parents=True, exist_ok=True)
+        (out_dir / "drafts" / f"{name}.json").write_text(
+            json.dumps({"brief": payload, "draft": draft, "cms": result},
+                       ensure_ascii=False, indent=2), encoding="utf-8")
+
+        oc.status = "drafted"
+        return oc
+
+    except compliance.ComplianceError as exc:
+        oc.status = "blocked"
+        oc.error = str(exc)[:400]
+        oc.violations = [v.as_dict() for v in exc.violations if v.severity == compliance.BLOCK]
+        (out_dir / "blocked").mkdir(parents=True, exist_ok=True)
+        (out_dir / "blocked" / f"{name}.json").write_text(
+            json.dumps({"brief": payload, "violations": oc.violations},
+                       ensure_ascii=False, indent=2), encoding="utf-8")
+        return oc
+    except Exception as exc:  # one bad brief must not end the batch
+        oc.status = "failed"
+        oc.error = config.redact(str(exc))[:400]
+        return oc
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--briefs", required=True, help="directory of content.brief.v1 JSON files")
+    ap.add_argument("--out", default="written", help="where drafts, events and blocks are written")
+    ap.add_argument("--limit", type=int, default=0, help="stop after N briefs (0 = all)")
+    ap.add_argument("--domain", action="append", help="restrict to a domain (repeatable)")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="draft and gate, but do not touch any CMS")
+    ap.add_argument("--no-llm", action="store_true",
+                    help="assemble the draft from the brief instead of calling "
+                         "Gemini. Exercises parsing, the gate, the adapters and "
+                         "event assembly with no credential and no cost. Never "
+                         "publishable output.")
+    args = ap.parse_args(argv)
+
+    logging.basicConfig(level=logging.INFO,
+                        format="%(asctime)s %(levelname)-7s %(name)s | %(message)s",
+                        datefmt="%H:%M:%S")
+
+    briefs_dir = Path(args.briefs)
+    if not briefs_dir.is_dir():
+        log.error("no such directory: %s", briefs_dir)
+        return 2
+
+    files = sorted(p for p in briefs_dir.glob("*.json") if p.name != "manifest.json")
+    if not files:
+        log.warning("no briefs in %s — nothing to write", briefs_dir)
+        return 0
+
+    if not args.no_llm:
+        try:
+            config.require_env("GEMINI_API_KEY")
+        except config.ConfigError as exc:
+            log.error("%s", exc)
+            log.error("Agent 2 drafts with Gemini. Set GEMINI_API_KEY, or run "
+                      "--no-llm to exercise everything except the model call.")
+            return 2
+
+    out_dir = Path(args.out)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    wanted = {d.lower() for d in (args.domain or [])}
+    outcomes: list[Outcome] = []
+
+    for path in files:
+        if args.limit and len(outcomes) >= args.limit:
+            break
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            outcomes.append(Outcome(brief_file=path.name, status="failed",
+                                    error=f"unreadable: {exc}"))
+            continue
+
+        dom = str(payload.get("site", {}).get("domain", "")).lower()
+        if wanted and dom not in wanted:
+            continue
+
+        oc = write_one(payload, out_dir, dry_run=args.dry_run, no_llm=args.no_llm)
+        outcomes.append(oc)
+        log.info("%s — %s — %r → %s%s",
+                 oc.domain or "?", oc.status, oc.keyword, oc.target_url or "-",
+                 f"  ({oc.words} words)" if oc.words else "")
+        if oc.status == "blocked":
+            for v in oc.violations[:3]:
+                log.error("    BLOCKED %s: %s", v.get("rule"), str(v.get("excerpt"))[:100])
+        elif oc.status == "failed":
+            log.error("    %s", oc.error)
+
+    manifest = {
+        "architecture_credit": ARCHITECTURE_CREDIT,
+        "owner": config.OWNER,
+        "dry_run": args.dry_run,
+        "no_llm": args.no_llm,
+        "briefs_seen": len(files),
+        "processed": len(outcomes),
+        "drafted": sum(o.status == "drafted" for o in outcomes),
+        "blocked": sum(o.status == "blocked" for o in outcomes),
+        "failed": sum(o.status == "failed" for o in outcomes),
+        "outcomes": [o.__dict__ for o in outcomes],
+    }
+    (out_dir / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    log.info("Agent 2 finished — %d drafted, %d blocked, %d failed (of %d briefs)",
+             manifest["drafted"], manifest["blocked"], manifest["failed"], len(files))
+
+    # A blocked brief is the gate working, not the run failing. Only a genuine
+    # error — an unreadable payload, a model or adapter fault — is exit 1.
+    return 1 if manifest["failed"] else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

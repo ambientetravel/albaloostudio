@@ -1,0 +1,168 @@
+# Agent 2 — Writer
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Chained off Agent 1 with workflow_run rather than woken by a webhook.
+#
+# BASE44-AGENT2.md specified an external HTTP service, so Agent 1 signed an
+# HMAC and POSTed to it. base44 turned out not to be able to do the job — six
+# of the ten sites need git or filesystem writes it does not have, the raw-body
+# HMAC is hostile to platforms that pre-parse JSON, and drafting takes 30–90s
+# which is not a request handler's work.
+#
+# Running here removes the transport entirely. Agent 2 reads Agent 1's artifact
+# directly: no webhook, no signature to verify, no AGENT2_WEBHOOK_URL — the
+# secret whose absence killed the nightly cron on 9 Aug. Fewer moving parts,
+# not more.
+#
+# The signed-webhook design still stands for Agent 3, which genuinely is
+# external.
+
+name: Agent 2 — Writer
+
+on:
+  workflow_run:
+    workflows: ["Agent 1 — SEO Scout"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Agent 1 run ID to take briefs from (blank = latest successful)"
+        required: false
+        type: string
+      domain:
+        description: "Restrict to one domain"
+        required: false
+        type: string
+      limit:
+        description: "Max briefs to write (0 = all)"
+        required: false
+        default: "3"
+        type: string
+      no_llm:
+        description: "Skip Gemini — exercise parsing, gate and adapters only"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read      # needed to download the upstream run's artifact
+
+concurrency:
+  # Two writers on the same briefs would draft the same article twice. The
+  # idempotency key guards the payload, not the compute.
+  group: agent2-writer
+  cancel-in-progress: false
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # A failed scout produces no briefs worth writing. Skip rather than run and
+    # report an empty success, which reads as "nothing to do" when it means
+    # "the upstream broke".
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    defaults:
+      run:
+        working-directory: orchestrator
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch the briefs Agent 1 produced
+        uses: actions/download-artifact@v4
+        with:
+          name: seo-scout-run
+          path: orchestrator/inbox
+          run-id: ${{ inputs.run_id || github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Locate the briefs
+        id: locate
+        run: |
+          set -euo pipefail
+          # The artifact preserves runs/<run_id>/briefs/. Find the one that has
+          # briefs in it rather than assuming a path — a run with zero
+          # candidates produces a manifest and no briefs directory at all.
+          DIR=$(find inbox -type d -name briefs | head -1 || true)
+          if [ -z "$DIR" ] || [ -z "$(ls -A "$DIR" 2>/dev/null)" ]; then
+            echo "::notice title=Nothing to write::Agent 1 emitted no briefs in that run."
+            echo "found=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "found=$DIR" >> "$GITHUB_OUTPUT"
+          echo "$(ls "$DIR" | wc -l) brief(s) in $DIR"
+
+      - name: Draft, gate and stage
+        if: steps.locate.outputs.found != ''
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-pro' }}
+          PIPELINE_ENVIRONMENT: production
+        run: |
+          set -euo pipefail
+          ARGS="--briefs ${{ steps.locate.outputs.found }} --out written"
+          if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
+          if [ "${{ inputs.limit || '3' }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit || '3' }}"; fi
+
+          # Without a key, run the structural path instead of failing. Same
+          # reasoning as the scout's missing-endpoint guard: a cron that is red
+          # for a known, documented gap is a cron nobody reads. Self-healing —
+          # the day GEMINI_API_KEY exists, real drafting starts with no edit.
+          if [ "${{ inputs.no_llm }}" = "true" ] || [ -z "${GEMINI_API_KEY:-}" ]; then
+            if [ -z "${GEMINI_API_KEY:-}" ]; then
+              echo "::notice title=No Gemini key::GEMINI_API_KEY is not set. Running --no-llm: parsing, the compliance gate, the CMS adapters and event assembly are all exercised, but the drafts are assembled from the briefs and are NOT publishable."
+            fi
+            ARGS="$ARGS --no-llm"
+          fi
+
+          python3 agent2_writer_batch.py $ARGS
+
+      - name: Summarise
+        if: always() && steps.locate.outputs.found != ''
+        run: |
+          set -euo pipefail
+          [ -f written/manifest.json ] || exit 0
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          m = json.load(open("written/manifest.json", encoding="utf-8"))
+          print("## Agent 2 — Writer\n")
+          if m.get("no_llm"):
+              print("> **Structural run — no model was called.** The drafts below are "
+                    "assembled from the briefs and are not publishable.\n")
+          print(f"{m['drafted']} drafted · {m['blocked']} blocked · {m['failed']} failed "
+                f"(of {m['briefs_seen']} briefs)\n")
+          print("| Site | Keyword | Status | Target | Words |")
+          print("|---|---|---|---|---:|")
+          for o in m["outcomes"]:
+              print(f"| {o['domain']} | {o['keyword']} | {o['status']} | "
+                    f"`{o['target_url']}` | {o['words']} |")
+          blocked = [o for o in m["outcomes"] if o["status"] == "blocked"]
+          if blocked:
+              print("\n### Blocked by the compliance gate\n")
+              for o in blocked:
+                  for v in o["violations"][:2]:
+                      print(f"- **{o['domain']}** — `{v.get('rule')}`: {str(v.get('excerpt'))[:160]}")
+          print("\n*Architecture credit: Albaloo Studio*")
+          PY
+
+      - name: Upload drafts and events
+        if: always() && steps.locate.outputs.found != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent2-written
+          path: orchestrator/written/
+          retention-days: 90
+          if-no-files-found: warn

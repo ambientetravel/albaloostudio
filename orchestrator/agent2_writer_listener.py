@@ -499,6 +499,11 @@ def _call_gemini(
                 "duration_ms": int((time.time() - started) * 1000),
             }
             return draft, meta
+        except config.ConfigError:
+            # A missing or malformed credential will be just as missing on the
+            # third try. Retrying it wastes ~7s per brief and buries the real
+            # cause under three identical warnings.
+            raise
         except (json.JSONDecodeError, ValueError) as exc:
             last_error = exc
             log.warning("gemini attempt %d returned unusable output: %s", attempt, exc)
