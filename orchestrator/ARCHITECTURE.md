@@ -21,20 +21,31 @@
 
 ## 1. The portfolio
 
-Nine brands, ten Search Console properties (boutimar runs a `.com` and a
-`.ir` property against one brand — they are separate sites with separate
-languages and separate sitemaps, so they are separate rows everywhere below).
+Eight brands, ten Search Console properties. Boutimar runs a `.com` and a `.ir`,
+and Cruise24 a `.ir` and a `.me`; each pair is one brand and two sites, with
+separate languages, markets and sitemaps, so they are separate rows everywhere
+below.
 
-| # | Domain | Brand | Locale | Market | CMS / stack | Property type |
-|---|--------|-------|--------|--------|-------------|---------------|
-| 1 | `boutimar.com` | Boutimar | `en` | International B2C/B2B | WordPress + Elementor + Woo | `sc-domain:boutimar.com` |
-| 2 | `boutimar.ir` | Boutimar (Farsi) | `fa-IR` | Iran domestic | Static build + PHP API (Netafraz) | `sc-domain:boutimar.ir` |
-| 3 | `exploreorient.com` | Explore Orient | `en` | Inbound Orient portal | Astro 5 (static) | `sc-domain:exploreorient.com` |
-| 4 | `ambientetravel.com` | Ambiente Travel | `en` / `de` | DMC / MICE | base44 | `sc-domain:ambientetravel.com` |
-| 5 | `cruisebaz.com` | CruiseBaz | `fa-IR` | Iran cruise D2C | base44 | `sc-domain:cruisebaz.com` |
-| 6 | `cruise24.ir` | Cruise24 | `fa-IR` | Iran cruise D2C | Static (hand-built) | `sc-domain:cruise24.ir` |
-| 7 | `cruiseshop.ir` | CruiseShop | `fa-IR` | Iran cruise retail | Static (hand-built) | `sc-domain:cruiseshop.ir` |
-| 8 | `dmciran.ir` | DMC Iran | `fa-IR` / `en` | Inbound DMC | Static (hand-built) | `sc-domain:dmciran.ir` |
+| # | Domain | Brand | Locale | Market | Adapter | Property | Google account |
+|---|--------|-------|--------|--------|---------|----------|----------------|
+| 1 | `boutimar.com` | Boutimar | `en` | INT | `astro_pr` | `sc-domain:boutimar.com` | alimozzarella@ |
+| 2 | `boutimar.ir` | Boutimar | `fa-IR` | IR | `boutimar_ir_static` | `sc-domain:boutimar.ir` | alimozzarella@ |
+| 3 | `exploreorient.com` | Explore Orient | `en` | INT | `astro_pr` | `sc-domain:exploreorient.com` | contactmozaffari@ |
+| 4 | `ambientetravel.com` | Ambiente Travel | `en` | DACH | `base44_entity` | `sc-domain:ambientetravel.com` | contactmozaffari@ |
+| 5 | `cruisebaz.com` | CruiseBaz | `fa-IR` | IR | `base44_entity` | `https://cruisebaz.com/` | UNCONFIRMED |
+| 6 | `cruise24.ir` | Cruise24 | `en` | IR | `static_bundle` | `sc-domain:cruise24.ir` | alimozzarella@ |
+| 7 | `cruise24.me` | Cruise24 | `en` | INT | `unimplemented` | `sc-domain:cruise24.me` | contactmozaffari@ |
+| 8 | `albaloostudio.com` | Albaloo Studio | `en` | INT | `unimplemented` | `sc-domain:albaloostudio.com` | contactmozaffari@ |
+| 9 | `cruiseshop.ir` | CruiseShop | `fa-IR` | IR | `static_bundle` | `sc-domain:cruiseshop.ir` | alimozzarella@ |
+| 10 | `dmciran.ir` | DMC Iran | `fa-IR` | IR | `static_bundle` | `sc-domain:dmciran.ir` | alimozzarella@ |
+
+The table above is generated from `sites.yml`, not maintained beside it. It
+listed eight rows and called boutimar.com WordPress until 12 Aug 2026 — two
+properties missing and one stack wrong, in the document that is supposed to be
+the specification. **No property runs WordPress.** The Iranian domains sit under
+`alimozzarella@` and the world-facing ones under `contactmozaffari@`; that split
+is deliberate (§3.1) and the service account is granted on both sides.
+`cruise24.ir` still declares locale `en` while its Farsi build is pending.
 
 The authoritative machine-readable copy of this table lives in
 [`sites.yml`](sites.yml). Agent 1 reads it at boot; nothing else in the pipeline
@@ -641,6 +652,22 @@ Field rules that apply everywhere:
   `publishing.event.v1` originally *required* `live_url` to be a string, which
   made honesty impossible and produced phantom URLs for five of ten sites; it
   is nullable as of 11 Aug 2026.
+* **How the per-run limit is spent:** one brief per site in rotation, never down
+  a sorted list. `--limit` cut the filename-sorted briefs until 12 Aug 2026, and
+  Agent 1 names brief files by domain, so run #8 wrote five articles and all
+  five were boutimar.com — seven other properties were scouted, cost a GSC call
+  each, and would never have been written no matter how often the cron ran. The
+  limit is a cost ceiling, not a priority order. Briefs it cannot fit are
+  counted as `deferred_by_limit` and named in the job summary.
+* **A busy provider is not a failure.** Gemini answering `503 UNAVAILABLE`
+  raises `TransientUpstreamError`, the brief is recorded `deferred` and drafts
+  untouched on the next run, and the run still exits 0. Overload gets its own
+  backoff — 15 s then 45 s — because the generic 1 s/2 s schedule spent all
+  three attempts of run #9 inside 31 seconds against an error whose own text
+  says the spike is temporary. Same reasoning as an ungranted Search Console
+  property in Agent 1: a cron that is red for something nobody can act on is a
+  cron nobody opens. `deferred_upstream` is counted separately from
+  `deferred_by_limit` — a cost ceiling and a busy model are different facts.
 * **Concurrency:** one draft per `idempotency_key` at a time; a second delivery
   of the same key while the first is in flight returns `200` with the existing
   `job_id`.
@@ -772,6 +799,24 @@ No rate, no departure date, no inclusion, no photo credit that is not present in
 `brief.data_dependencies` / `publication.hero_image`. If the data is absent, the
 copy says it is absent. A price with no `price_asof` is not a price.
 
+**This rule collided with the consensus-figure rule and won.** The GEO work
+(§5, Agent 1) requires every brief to state the consensus figure for its topic,
+because agreeing with the number an AI answer already holds is what gets a page
+cited. Written as "state the price band a reader would meet everywhere else",
+that instruction asks the writer for a number nobody measured — and in run #9
+it duly produced *"$50 to $150 USD per room"*, which the gate blocked as an
+invented rate. The pipeline blocked its own output, correctly, because two
+rules built from the same source contradicted each other.
+
+The consensus rule now carries its own sourcing requirement: the figure must be
+**observed** — from supplied data, the live feed, or a named public source — and
+stated with that source attached. A price may never serve as the consensus
+figure unless it carries a `price_asof`. Where no sourced price exists the brief
+must reach for a non-price figure (duration, distance, season length, room
+count, sailing frequency) or state plainly that no sourced consensus is
+available. Agreement is worth ~12 points of citation probability; it is not
+worth a fabricated number.
+
 ### 7.4 Brand & scope
 
 * The partner **embed widget stays brand-neutral** — no «بوتیمار», no links to
@@ -853,7 +898,7 @@ orchestrator/
 ├── SETUP-SOCIAL.md            ← what to connect where
 ├── BASE44-AGENT2.md           ← what the base44 Super Agent must implement
 ├── selfcheck.py               ← assertions, no network, no API keys
-├── sites.yml                  ← the 8 properties, machine-readable
+├── sites.yml                  ← the 10 properties, machine-readable
 ├── .env.example
 ├── schemas/
 │   ├── content.brief.v1.json
@@ -885,7 +930,9 @@ than reading them.
 | Agent 3 | broadcast anything it received | **skips events with no `live_url`** — posting a link to a staged draft sends readers to a 404 |
 | boutimar.com | WordPress | **Astro, JSON-driven.** So was the WordPress adapter's second home. No property runs WordPress |
 | Question headings | a GEO win | **no measured citation benefit.** Kept for readers and valid schema, not sold as a lever |
-| Briefs | keyword + outline | **consensus range first, then a fact nobody else has** — the two things that did measure |
+| Briefs | keyword + outline | **consensus figure first, then a fact nobody else has** — the two things that did measure. The figure must be sourced: asking for one without asking where it came from made the writer invent a price band, and the gate blocked it |
+| Per-run limit | first N briefs | **one per site in rotation.** Sorted-and-truncated wrote five articles for one domain and none for the other seven |
+| A 503 from Gemini | a failed run | **a deferred brief.** The provider being busy is not a defect in this pipeline |
 
 The one thing that did not change is the compliance gate's remit. It got
 sharper — a claim is judged in its clause, not as a term anywhere — but «خلیج

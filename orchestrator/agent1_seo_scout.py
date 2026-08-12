@@ -792,9 +792,26 @@ def _analyse_with_anthropic(
 
 
 def _fallback_brief(site: Site, c: dict[str, Any]) -> dict[str, Any]:
-    """No-LLM brief. Coarser, but every field the schema needs is present."""
+    """
+    No-LLM brief. Coarser, but every field the schema needs is present.
+
+    "Every field the schema needs" is a lower bar than "a brief worth writing",
+    and run #10 showed the gap. The LLM step failed for every site, this builder
+    produced all 14 briefs, and Agent 1 reported Success — because a degraded
+    run is designed to beat a dead one. What nobody saw was that the briefs
+    carried `must_include: []`, so the consensus figure and the proprietary
+    fact — the only two things measured to affect AI citation — were silently
+    absent from every one of them, and the target paths were raw slugs
+    (`/iranoilshow`, and `/opportunity` for a Farsi keyword that strips to
+    nothing in ASCII). Four of them then spent a Gemini call each.
+
+    So the marker below is not decoration. `_degraded` is counted into the run
+    manifest, annotated on the workflow, and read by Agent 2, which will not
+    spend a model call on a brief that cannot satisfy the pipeline's own rules.
+    """
     slug = re.sub(r"[^a-z0-9]+", "-", c["query"].lower()).strip("-") or "opportunity"
     return {
+        "_degraded": True,
         "primary_keyword": c["query"],
         "gap_type": c["gap_type"],
         "search_intent": "commercial",
@@ -926,6 +943,10 @@ def build_brief_payload(
                 "credit_required": True,
             },
             "data_dependencies": site.data_dependencies,
+            # Carried onto the wire so a downstream agent can tell a ranked,
+            # outlined brief from a slug and an impression count. Agent 2 reads
+            # this; without it the two are indistinguishable in the payload.
+            "degraded_no_llm": bool(analysis.get("_degraded")),
         },
         "compliance": {
             "profile": site.compliance_profile,
@@ -1072,7 +1093,11 @@ def process_site(
     started = time.time()
     stat: dict[str, Any] = {
         "domain": site.domain, "status": "ok", "gsc_rows": 0, "candidates": 0,
-        "briefs_emitted": 0, "delivered": 0, "dlq": 0, "blocked": 0, "error": None,
+        "briefs_emitted": 0, "delivered": 0, "dlq": 0, "blocked": 0,
+        # Briefs this site produced without the LLM step. Green-but-degraded is
+        # the run state that hides best, so it gets its own counter rather than
+        # living only in a log line nobody scrolls to.
+        "degraded_briefs": 0, "error": None,
     }
     try:
         gsc = collect_gsc(service, site)
@@ -1134,6 +1159,8 @@ def process_site(
                 violations, payload["compliance"]["profile"]
             )
             stat["briefs_emitted"] += 1
+            if analysis.get("_degraded"):
+                stat["degraded_briefs"] += 1
 
             briefs_dir = run_dir / "briefs"
             briefs_dir.mkdir(parents=True, exist_ok=True)
@@ -1278,7 +1305,8 @@ def main(argv: list[str] | None = None) -> int:
         "domains": stats,
         "totals": {
             key: sum(s.get(key, 0) for s in stats)
-            for key in ("gsc_rows", "candidates", "briefs_emitted", "delivered", "dlq", "blocked")
+            for key in ("gsc_rows", "candidates", "briefs_emitted", "delivered",
+                        "dlq", "blocked", "degraded_briefs")
         },
     }
     (run_dir / "manifest.json").write_text(
@@ -1288,6 +1316,8 @@ def main(argv: list[str] | None = None) -> int:
     t = manifest["totals"]
     ungranted = [s["domain"] for s in stats if s["status"] == "not_granted"]
     manifest["not_granted"] = ungranted
+    manifest["degraded_domains"] = [s["domain"] for s in stats
+                                    if s.get("degraded_briefs")]
     (run_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
     )
@@ -1297,6 +1327,19 @@ def main(argv: list[str] | None = None) -> int:
         run_id, t["briefs_emitted"], t["delivered"], t["dlq"], t["blocked"],
         f", {len(ungranted)} not granted ({', '.join(ungranted)})" if ungranted else "",
     )
+    # Loud, because this is the state that looks fine. Run #10 produced 14
+    # briefs with no consensus figure, no proprietary fact and raw-slug URLs,
+    # and reported Success in 47 seconds — a sixth of run #9's time, which was
+    # the only visible sign anything had gone wrong.
+    if t["degraded_briefs"]:
+        doms = ", ".join(manifest["degraded_domains"])
+        log.error(
+            "DEGRADED: %d of %d briefs were built WITHOUT the LLM step (%s). They "
+            "carry no consensus figure, no proprietary fact and an unranked slug "
+            "for a URL. The run is green because a degraded run beats a dead one, "
+            "but these briefs are not worth publishing.",
+            t["degraded_briefs"], t["briefs_emitted"], doms,
+        )
     if any(s["status"] == "failed" for s in stats):
         return 1
     return 1 if t["dlq"] else 0

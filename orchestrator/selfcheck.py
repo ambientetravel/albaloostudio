@@ -194,8 +194,45 @@ ok("a single-site portfolio still fills the limit",
    len(a2b.select_round_robin(
        [{"site": {"domain": "boutimar.com"}, "n": i} for i in range(9)], 5)[0]) == 5)
 
-print("\n=== agent 2 — a busy model is not a broken pipeline ===")
+print("\n=== a degraded scout does not look like a healthy one ===")
+# Run #10 finished in 47s where run #9 took 6m22s, emitted 14 briefs built
+# entirely by the fallback, and reported Success. The only visible difference on
+# the run page was the duration.
+import agent1_seo_scout as _a1sp
 import agent2_writer_listener as _a2l
+_a2bsrc = pathlib.Path(__file__).with_name("agent2_writer_batch.py").read_text(encoding="utf-8")
+_fb = _a1sp._fallback_brief(
+    [x for x in config.load_sites() if x.domain == "boutimar.ir"][0],
+    {"query": "لانزاروته", "gap_type": "missing_page", "impressions": 120,
+     "position": 41.0, "local_score": 60},
+)
+ok("a fallback brief marks itself as degraded", _fb.get("_degraded") is True)
+ok("and it genuinely has none of what the GEO rules require",
+   _fb["must_include"] == [], "no consensus figure, no proprietary fact")
+ok("a Farsi keyword with no ASCII strips to a placeholder path, not a real one",
+   _fb["target_url_path"] == "/opportunity",
+   "which is why publishing one is worse than deferring it")
+_a1src = pathlib.Path(__file__).with_name("agent1_seo_scout.py").read_text(encoding="utf-8")
+ok("degraded briefs are counted into the run manifest",
+   '"degraded_briefs"' in _a1src and '"degraded_domains"' in _a1src)
+ok("the flag travels on the wire, not just in the log",
+   '"degraded_no_llm": bool(analysis.get("_degraded"))' in _a1src)
+ok("Agent 2's model accepts the flag and defaults it False for older briefs",
+   _a2l.BriefBlock(working_title="t", target_url_path="/x",
+                   language="en").degraded_no_llm is False)
+ok("and Agent 2 skips a degraded brief instead of paying for a draft",
+   'getattr(brief.brief, "degraded_no_llm", False)' in _a2bsrc
+   and 'oc.status = "skipped"' in _a2bsrc)
+_wf1 = (pathlib.Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "agent1-seo-scout.yml").read_text(encoding="utf-8")
+ok("a degraded run raises a workflow annotation, not a line of summary text",
+   "::warning title=Degraded run::" in _wf1)
+ok("and the annotation goes to stdout, where GitHub actually reads it",
+   'GITHUB_STEP_SUMMARY"] , "a"' not in _wf1
+   and 'fh.write("\\n".join(out))' in _wf1,
+   "a ::warning piped into the summary file is grey text, not an annotation")
+
+print("\n=== agent 2 — a busy model is not a broken pipeline ===")
 ok("a 503 is recognised as the provider being busy",
    _a2l.is_overloaded("503 UNAVAILABLE. This model is currently experiencing high demand."))
 ok("so is an explicit overload message",
@@ -709,6 +746,23 @@ ok("summarise reflects profile",
 try:
     c("x", "no_such_profile"); ok("unknown profile raises", False)
 except ValueError: ok("unknown profile raises", True)
+
+print("\n=== the spec describes the registry it claims to specify ===")
+# ARCHITECTURE.md's portfolio table listed eight rows for ten properties and
+# called boutimar.com WordPress — a stack the user had already corrected twice.
+# A hand-maintained copy of sites.yml drifts silently; this makes it noisy.
+_arch = pathlib.Path(__file__).with_name("ARCHITECTURE.md").read_text(encoding="utf-8")
+_sites_all = config.load_sites()
+_missing = [s.domain for s in _sites_all if f"`{s.domain}`" not in _arch]
+ok("every site in sites.yml appears in ARCHITECTURE.md", not _missing, _missing)
+ok("and the spec does not claim a WordPress property",
+   "WordPress + Elementor" not in _arch,
+   "no property has run WordPress since 11 Aug 2026")
+_WORDS = {8: "eight", 9: "nine", 10: "ten", 11: "eleven", 12: "twelve"}
+ok("the portfolio count in prose matches the registry",
+   any(f"{n} Search Console properties" in _arch
+       for n in (len(_sites_all), _WORDS.get(len(_sites_all), "\0"))),
+   f"{len(_sites_all)} sites in sites.yml")
 
 print("\n=== agent 1 ===")
 import agent1_seo_scout as a1

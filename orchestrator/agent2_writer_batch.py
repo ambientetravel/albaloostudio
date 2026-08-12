@@ -150,6 +150,21 @@ def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
     oc.target_url = brief.brief.target_url_path
 
     try:
+        # A brief Agent 1 built without its LLM is not a brief, it is a keyword
+        # and an impression count. It carries no consensus figure, no
+        # proprietary fact and an unranked slug for a URL — the three things
+        # that make a page worth publishing at all — so drafting it produces an
+        # article that fails the pipeline's own content rules at full model
+        # cost. Run #10 spent four Gemini calls this way before anyone noticed
+        # the scout had degraded. The brief is not lost: Agent 1 re-scouts the
+        # same gap on the next run, with its model back.
+        if getattr(brief.brief, "degraded_no_llm", False):
+            oc.status = "skipped"
+            oc.error = ("Agent 1 built this brief without its LLM step — no "
+                        "consensus figure, no proprietary fact, raw-slug URL. "
+                        "Re-scouted next run rather than drafted from it.")
+            return oc
+
         # Resolved ONCE and reused. The gate must judge against the same data
         # snapshot the model saw, or it is checking a different article.
         data = _resolve_data_dependencies(brief)

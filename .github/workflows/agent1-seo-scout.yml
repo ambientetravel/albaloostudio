@@ -99,6 +99,48 @@ jobs:
 
           python agent1_seo_scout.py $ARGS
 
+      # Agent 1 is green whether or not its LLM answered, on purpose — losing
+      # every domain's GSC work to one provider outage is worse. But run #10
+      # finished in 47 seconds instead of six minutes, emitted 14 briefs with no
+      # consensus figure and no proprietary fact, and looked identical to a good
+      # run on this page. The only tell was the duration.
+      - name: Say so if the run was degraded
+        if: always()
+        run: |
+          set -euo pipefail
+          M=$(find runs -name manifest.json -maxdepth 3 2>/dev/null | head -1 || true)
+          [ -n "$M" ] || exit 0
+          # The summary is written to its file directly so stdout stays free for
+          # workflow commands — a ::warning piped into the summary is a line of
+          # grey text, not an annotation, and this is precisely the run state
+          # that must not be quiet.
+          python3 - "$M" <<'PY'
+          import json, os, sys
+          m = json.load(open(sys.argv[1], encoding="utf-8"))
+          t = m.get("totals", {})
+          deg, tot = t.get("degraded_briefs", 0), t.get("briefs_emitted", 0)
+          doms = ", ".join(m.get("degraded_domains", []))
+          out = ["## Agent 1 — SEO Scout\n",
+                 f"{tot} brief(s) from {len(m.get('domains', []))} propert(ies) · "
+                 f"provider: `{m.get('analysis_provider') or 'none'}`\n"]
+          if deg:
+              out.append(
+                  f"> ### {deg} of {tot} briefs are DEGRADED\n>\n"
+                  f"> The gap-analysis model was unavailable for: **{doms}**. Those "
+                  f"briefs carry no consensus figure, no proprietary fact and an "
+                  f"unranked slug for a URL. Agent 2 skips them rather than paying "
+                  f"for a draft that cannot pass the content rules; Agent 1 "
+                  f"re-scouts the same gaps on the next run.\n")
+          if m.get("not_granted"):
+              out.append(f"> Not granted: {', '.join(m['not_granted'])}\n")
+          out.append("\n*Architecture credit: Albaloo Studio*\n")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
+              fh.write("\n".join(out))
+          if deg:
+              print(f"::warning title=Degraded run::{deg} of {tot} briefs were built "
+                    f"without the LLM step ({doms}). They are not worth publishing.")
+          PY
+
       - name: Upload run artifact
         if: always()
         uses: actions/upload-artifact@v4

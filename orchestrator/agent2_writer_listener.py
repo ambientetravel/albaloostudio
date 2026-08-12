@@ -139,6 +139,10 @@ class BriefBlock(_Loose):
     meta: MetaBlock = Field(default_factory=MetaBlock)
     media: MediaBlock = Field(default_factory=MediaBlock)
     data_dependencies: list[dict[str, Any]] = Field(default_factory=list)
+    # True when Agent 1's LLM step was unavailable and this brief came from the
+    # deterministic fallback. Defaults False so briefs written before the flag
+    # existed are treated as full briefs, which they were.
+    degraded_no_llm: bool = False
 
 
 class OpportunityBlock(_Loose):
