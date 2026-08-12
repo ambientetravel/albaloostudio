@@ -77,7 +77,10 @@ AGENT_ID = "agent8.competitor_scout"
 # more than the data was worth.
 CRAWL_DELAY_S = 1.5
 MAX_SITEMAP_CHILDREN = 12
-MAX_PAGES_SAMPLED = 12
+# A median needs enough pages to mean anything. The first run sampled three and
+# reported 289 words for one rival and 2,035 for another — a spread that sample
+# size alone could produce. Every median is published with the n beside it.
+MAX_PAGES_SAMPLED = 10
 
 _WORD = re.compile(r"[^\W\d_]+", re.UNICODE)
 _TAG = re.compile(r"<[^>]+>")
@@ -225,7 +228,16 @@ def topic_of(url: str) -> str:
 
 
 def _text_stats(html: str) -> tuple[int, str, list[str], list[str]]:
-    """Word count, title, h1/h2 headings, and schema.org @type values."""
+    """
+    Word count, title, h1/h2 headings, and schema.org @type values.
+
+    The count is every word in the served HTML after scripts and styles are
+    stripped — so it includes navigation, footer and boilerplate, and it counts
+    only what the SERVER sent. A client-rendered page whose body arrives as an
+    empty div scores near zero however much a reader eventually sees. Compare
+    like with like, and treat a very low number as "check whether this renders
+    server-side" before treating it as "this page is thin".
+    """
     body = _SCRIPT_STYLE.sub(" ", html)
     title_m = re.search(r"(?is)<title[^>]*>(.*?)</title>", body)
     title = _TAG.sub("", title_m.group(1)).strip()[:200] if title_m else ""
@@ -392,18 +404,35 @@ def main(argv: list[str] | None = None) -> int:
             results.append({"domain": site.domain, "competitors": rivals, "dry_run": True})
             continue
 
-        ours = _sitemap_urls(session, site.base_url, None)
+        # Measure our own site through the SAME function, not a cheaper path.
+        # The first version only read our sitemap for URLs and never fetched a
+        # page, so every competitor had a median word count and we had none —
+        # which makes the one comparison that matters impossible to draw.
+        us = scout_competitor(session, site.base_url, sample=args.sample)
+        ours = [smp["url"] for smp in us.samples] or []
+        our_urls = us.urls_listed
+        log.info("  %s (us) — %s — %d listed, %d sampled, median %d words",
+                 site.domain, us.status, us.urls_listed, us.pages_sampled, us.median_words)
         reports = [scout_competitor(session, r, sample=args.sample) for r in rivals]
         for r in reports:
             log.info("  %s — %s — %d listed, %d sampled%s", r.domain, r.status,
                      r.urls_listed, r.pages_sampled,
                      f" — {r.note}" if r.note else "")
 
+        all_our_urls = _sitemap_urls(session, site.base_url, None)
+        cmp = compare(site, all_our_urls, reports)
+        cmp["our_median_words"] = us.median_words
+        cmp["our_pages_sampled"] = us.pages_sampled
+        cmp["depth_gap"] = (
+            None if not (us.median_words and cmp["their_median_words"])
+            else cmp["their_median_words"] - us.median_words
+        )
         results.append({
             "domain": site.domain,
-            "our_urls_listed": len(ours),
+            "our_urls_listed": our_urls,
+            "us": us.__dict__,
             "competitors": [r.__dict__ for r in reports],
-            "comparison": compare(site, ours, reports),
+            "comparison": cmp,
         })
 
     manifest = {

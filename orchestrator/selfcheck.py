@@ -373,6 +373,7 @@ ok("and the annotation goes to stdout, where GitHub actually reads it",
 
 print("\n=== agent 8 — reading someone else's site ===")
 import agent8_competitor_scout as _a8
+_a8src = pathlib.Path(__file__).with_name("agent8_competitor_scout.py").read_text(encoding="utf-8")
 from urllib.robotparser import RobotFileParser as _RFP
 _rp = _RFP(); _rp.parse(["User-agent: *", "Disallow: /private/", "Disallow: /admin"])
 ok("a competitor's robots.txt is obeyed, not merely audited",
@@ -403,6 +404,18 @@ ok("and the report says the section diff does not apply rather than showing none
    and _flat["sections_they_cover_that_we_do_not"] == []
    and _flat["note"],
    "an empty list would read as 'no gaps found'")
+# The first version measured every rival's page depth and none of our own —
+# the one comparison the agent exists to make.
+ok("our own site is measured through the same code path as theirs",
+   "us = scout_competitor(session, site.base_url" in _a8src)
+ok("and the depth gap is reported as a number, not left to arithmetic",
+   '"depth_gap"' in _a8src and '"our_median_words"' in _a8src)
+ok("every median carries the sample size beside it",
+   '"our_pages_sampled"' in _a8src and _a8.MAX_PAGES_SAMPLED >= 10,
+   "a median of three pages is not a measurement")
+ok("the word count documents that it sees only server-rendered HTML",
+   "client-rendered page" in (_a8._text_stats.__doc__ or ""),
+   "boutimar.ir's article.html returns 336 words of template for every article")
 ok("competitors declared in sites.yml reach the Site object",
    len([x for x in config.load_sites() if x.competitors]) >= 1,
    "the field existed on the dataclass but load_sites never passed it through")
