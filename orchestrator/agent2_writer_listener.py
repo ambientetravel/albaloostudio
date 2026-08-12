@@ -678,7 +678,7 @@ def _call_gemini(
                 ) from exc
             last_error = exc
             log.warning("gemini attempt %d failed: %s", attempt, exc)
-            if is_overloaded(msg):
+            if is_overloaded(msg) or config.rate_limited(msg):
                 # Google says a 503 spike is "usually temporary". The general
                 # backoff answers that with 1s and 2s, which is not a wait —
                 # run #9 burned all three attempts inside 31 seconds and lost
@@ -689,9 +689,12 @@ def _call_gemini(
                 continue
         time.sleep((2 ** (attempt - 1)) + random.uniform(0, 0.4))
 
-    if last_error is not None and is_overloaded(str(last_error)):
+    if last_error is not None and (is_overloaded(str(last_error))
+                                   or config.rate_limited(str(last_error))):
+        # Overloaded or rate-limited: both mean "not now", neither means the
+        # brief is bad. Deferring keeps the run green and re-drafts next time.
         raise TransientUpstreamError(
-            f"Gemini was overloaded on all 3 attempts: {last_error}"
+            f"Gemini was unavailable on all 3 attempts: {last_error}"
         ) from last_error
     raise RuntimeError(f"Gemini failed after 3 attempts: {last_error}")
 

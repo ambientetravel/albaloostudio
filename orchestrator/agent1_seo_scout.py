@@ -832,7 +832,7 @@ def _analyse_with_gemini(
                                 model_name, nxt)
                     model_name = nxt
                     continue
-            if (is_overloaded(msg) or _rate_limited(msg)) and attempt < 3:
+            if (is_overloaded(msg) or config.rate_limited(msg)) and attempt < 3:
                 wait = _OVERLOAD_BACKOFF[min(attempt - 1, len(_OVERLOAD_BACKOFF) - 1)]
                 log.warning("%s — Gemini %s (attempt %d); waiting %ds", site.domain,
                             "overloaded" if is_overloaded(msg) else "rate-limited",
@@ -849,25 +849,6 @@ def _analyse_with_gemini(
         log.error("This is an account-level failure — skipping the model for "
                   "every remaining site rather than repeating the same call.")
     return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
-
-
-def _rate_limited(msg: str) -> bool:
-    """
-    A 429 that waiting will fix, as opposed to one that never will.
-
-    The free tier limits requests per minute, and run #14 spent them: four
-    properties in quick succession, two answered, two got 429
-    RESOURCE_EXHAUSTED. That is a queue problem, not a plan problem, and the
-    fix is to wait rather than to fall back.
-
-    "limit: 0" is the one 429 that is NOT this — it means the model is absent
-    from the plan entirely, so every retry returns the same zero. Agent 2
-    learned that distinction the expensive way; it is worth keeping here.
-    """
-    m = msg.upper()
-    if "LIMIT: 0" in m:
-        return False
-    return "429" in m or "RESOURCE_EXHAUSTED" in m or "RATE LIMIT" in m
 
 
 def _briefs_from(text: str) -> list[dict[str, Any]]:

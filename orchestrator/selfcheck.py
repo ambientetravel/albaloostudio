@@ -276,18 +276,32 @@ ok("the Gemini prompt states the envelope the other two get from a schema",
    'The top level is an OBJECT with the key' in _a1src,
    "Gemini takes no response-schema parameter here")
 ok("an overloaded Gemini waits instead of falling straight back",
-   "is_overloaded(msg) or _rate_limited(msg)" in _a1src and "attempt < 3" in _a1src,
+   "is_overloaded(msg) or config.rate_limited(msg)" in _a1src
+   and "attempt < 3" in _a1src,
    "run #13 also hit a 503 on this path with no backoff")
 # Run #14: four properties in quick succession, two answered, two got 429
 # RESOURCE_EXHAUSTED. The free tier limits requests per minute.
 ok("a Gemini rate-limit 429 is recognised as worth waiting out",
-   _a1sp._rate_limited("429 RESOURCE_EXHAUSTED: You exceeded your current quota"))
+   config.rate_limited("429 RESOURCE_EXHAUSTED: You exceeded your current quota"))
 ok("but 'limit: 0' is NOT — no wait fixes a model absent from the plan",
-   not _a1sp._rate_limited("429 RESOURCE_EXHAUSTED quota limit: 0"))
+   not config.rate_limited("429 RESOURCE_EXHAUSTED quota limit: 0"))
 ok("a 503 is not mistaken for a rate limit",
-   not _a1sp._rate_limited("503 UNAVAILABLE high demand"))
+   not config.rate_limited("503 UNAVAILABLE high demand"))
 ok("rate limits are retried on the same backoff as overload",
-   "is_overloaded(msg) or _rate_limited(msg)" in _a1src)
+   "is_overloaded(msg) or config.rate_limited(msg)" in _a1src)
+# Agent 1 got rate-limit handling on 12 Aug and Agent 2 did not, so the same
+# free-tier ceiling deferred a brief in one agent and failed the run in the
+# other. One definition, both agents.
+_a2lsrc = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("Agent 2 defers on a rate limit too, not just an overload",
+   "is_overloaded(msg) or config.rate_limited(msg)" in _a2lsrc)
+ok("and raises the transient type so the run stays green",
+   "or config.rate_limited(str(last_error))" in _a2lsrc)
+_wf2 = (pathlib.Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "agent2-writer.yml").read_text(encoding="utf-8")
+ok("a brief that was not drafted says why on the run page",
+   "### Not drafted" in _wf2,
+   "a row of zeros meant expanding a collapsed log step by hand")
 ok("and per-property calls are paced so the ceiling is not hit at all",
    config.GEMINI_MIN_INTERVAL_S > 0 and "_GEMINI_LAST_CALL" in _a1src,
    f"{config.GEMINI_MIN_INTERVAL_S}s between properties")

@@ -57,6 +57,25 @@ _TERMINAL_PROVIDER_ERRORS = (
 )
 
 
+def rate_limited(msg: str) -> bool:
+    """
+    A 429 that waiting will fix, as opposed to one that never will.
+
+    Free tiers meter requests per minute and per day. Hitting that ceiling is a
+    queue problem, not a plan problem, and the fix is to wait — so it must not
+    be reported as a failed run.
+
+    "limit: 0" is the one 429 that is NOT this: it means the model is absent
+    from the plan entirely, so every retry returns the same zero. Agent 2
+    learned that distinction the expensive way in August; keeping both agents on
+    one definition is how it stays learned.
+    """
+    m = msg.upper()
+    if "LIMIT: 0" in m:
+        return False
+    return "429" in m or "RESOURCE_EXHAUSTED" in m or "RATE LIMIT" in m
+
+
 def terminal_provider_error(msg: str) -> str:
     """The reason this will fail for every other site too, or '' if it will not."""
     low = msg.lower()

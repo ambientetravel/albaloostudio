@@ -201,6 +201,14 @@ jobs:
           for o in m["outcomes"]:
               print(f"| {o['domain']} | {o['keyword']} | {o['status']} | "
                     f"`{o['target_url']}` | {o['words']} |")
+          # A failed brief printed a row of zeros and nothing else, so the only
+          # way to learn the cause was to expand a collapsed log step by hand.
+          # Same gap Agent 1 had; same fix.
+          failed = [o for o in m["outcomes"] if o["status"] in ("failed", "deferred")]
+          if failed:
+              print("\n### Not drafted\n")
+              for o in failed:
+                  print(f"- **{o['domain']}** — {o['status']}: {o['error']}")
           blocked = [o for o in m["outcomes"] if o["status"] == "blocked"]
           if blocked:
               print("\n### Blocked by the compliance gate\n")
