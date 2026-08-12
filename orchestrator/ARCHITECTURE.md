@@ -8,7 +8,7 @@
 | **Architecture credit** | **Albaloo Studio** — [albaloostudio.com](https://albaloostudio.com) |
 | **Document version** | 2.0.0 |
 | **Payload schema version** | `1.0` |
-| **Status** | All seven agents implemented and running in GitHub Actions. Agents 1 → 2 → 3 chain nightly on one trigger; 5+6 and 7 run weekly; 4 is dispatch-only until a lead source exists |
+| **Status** | All seven agents implemented and running in GitHub Actions. Agents 1 → 2 → 3 chain weekly on one trigger; 5+6 and 7 also weekly; 4 is dispatch-only until a lead source exists |
 
 > This infrastructure — the orchestration model, the message envelope, the
 > compliance gate and the agent contracts described below — is authored under
@@ -55,11 +55,11 @@ hardcodes a domain.
 
 ## 2. System map
 
-Five workflows. Three of them chain off one nightly trigger; two run weekly;
+Five workflows. Three of them chain off one weekly trigger; two more run weekly;
 one waits for input that does not exist yet.
 
 ```
-04:15 UTC daily
+04:15 UTC Sundays
    │
    ▼
 ┌─ agent1-seo-scout.yml ─────────────────────────────────────────────┐
@@ -626,7 +626,7 @@ Field rules that apply everywhere:
 ### Agent 1 — SEO Scout
 
 * **Runtime:** GitHub Actions, `ubuntu-latest`, Python 3.11, cron `15 4 * * *`
-  (04:15 UTC) plus `workflow_dispatch`.
+  (Sundays 04:15 UTC) plus `workflow_dispatch`.
 * **Reads:** GSC `sites.list`, `searchanalytics.query`; each site's
   `sitemap.xml`; optionally the live HTML of the top-ranking own URL.
 * **Writes:** nothing outside the run artifact. It never mutates a site.
@@ -930,6 +930,9 @@ than reading them.
 | Agent 3 | broadcast anything it received | **skips events with no `live_url`** — posting a link to a staged draft sends readers to a 404 |
 | boutimar.com | WordPress | **Astro, JSON-driven.** So was the WordPress adapter's second home. No property runs WordPress |
 | Question headings | a GEO win | **no measured citation benefit.** Kept for readers and valid schema, not sold as a lever |
+| Scout cadence | nightly, 04:15 UTC | **weekly, Sundays.** GSC lags ~2 days over a 90-day window, so consecutive nights differed by one day in ninety and surfaced the same keywords; Agent 2 drafts 5 articles per run, and 35 a week is more than anyone reviews |
+| Gap-analysis model | Opus 5, shared with Agents 3/4/6 | **its own `GAP_ANALYSIS_MODEL`** — classify/rank/outline is not Opus work, and the scout was the only one of the four on its own schedule, so it paid the top rate most often |
+| Gap-analysis provider | Anthropic | **Gemini free tier.** The scout was the pipeline's costliest caller and emptied a $5 balance in four days |
 | Briefs | keyword + outline | **consensus figure first, then a fact nobody else has** — the two things that did measure. The figure must be sourced: asking for one without asking where it came from made the writer invent a price band, and the gate blocked it |
 | Per-run limit | first N briefs | **one per site in rotation.** Sorted-and-truncated wrote five articles for one domain and none for the other seven |
 | A 503 from Gemini | a failed run | **a deferred brief.** The provider being busy is not a defect in this pipeline |

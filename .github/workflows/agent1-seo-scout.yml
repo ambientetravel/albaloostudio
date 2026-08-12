@@ -6,9 +6,24 @@ name: Agent 1 — SEO Scout
 
 on:
   schedule:
-    # 04:15 UTC daily. Search Console data lags ~2 days, so the script queries
-    # back from today-3d; the exact hour only needs to be off-peak.
-    - cron: "15 4 * * *"
+    # 04:15 UTC on SUNDAYS — weekly, not nightly (changed 12 Aug 2026).
+    #
+    # Nightly was wrong on three counts, only one of them cost.
+    #
+    # 1. It re-read the same data. Search Console lags ~2 days and the script
+    #    queries back from today-3d over a 90-day window, so consecutive nights
+    #    differ by one day in ninety. Runs #8, #9 and #10 surfaced the same
+    #    keywords — toranj marine hotel, tehran boutique hotel, alamut castle —
+    #    because the gap set genuinely had not changed.
+    # 2. It outran the humans. Agent 2 drafts 5 articles per scout run. Nightly
+    #    is 35 a week to review, edit and publish; nobody was ever going to.
+    #    The bottleneck in this pipeline is review, not scouting.
+    # 3. It cost the most on the model that costs the most — one Opus 5 call
+    #    per property per night emptied a $5 balance in four days.
+    #
+    # Sunday so the briefs and drafts are waiting on Monday morning, and clear
+    # of the Monday 05:00/05:30 audit jobs. Dispatch any time for a fresh look.
+    - cron: "15 4 * * 0"
   workflow_dispatch:
     inputs:
       domain:
@@ -81,7 +96,12 @@ jobs:
           # Kept so GAP_ANALYSIS_PROVIDER=anthropic works the moment the balance
           # is topped up — no edit here, just the repository variable.
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-5' }}
+          # Sonnet, not Opus. Classify / deduplicate / rank / outline against a
+          # fixed schema is not Opus work, and this is the only agent that runs
+          # on a schedule of its own — it paid the top rate most often. Set the
+          # GAP_ANALYSIS_MODEL variable to claude-haiku-4-5 to go cheaper still.
+          # Agents 3, 4 and 6 keep ANTHROPIC_MODEL for prose and strategy.
+          GAP_ANALYSIS_MODEL: ${{ vars.GAP_ANALYSIS_MODEL || 'claude-sonnet-5' }}
           GAP_ANALYSIS_PROVIDER: ${{ vars.GAP_ANALYSIS_PROVIDER || 'gemini' }}
           # Kept so GAP_ANALYSIS_PROVIDER=openai still works if you switch back.
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

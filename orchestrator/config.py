@@ -101,6 +101,25 @@ GEMINI_MIN_INTERVAL_S = float(os.getenv("GEMINI_MIN_INTERVAL_S", "20"))
 #   * thinking is ON by default; `budget_tokens` is a 400. Depth is `effort`.
 #   * assistant-turn prefills are a 400 — structured output replaces them.
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-5")
+
+# Agent 1's gap analysis when GAP_ANALYSIS_PROVIDER=anthropic — deliberately NOT
+# ANTHROPIC_MODEL. The scout ran on Opus 5 until 12 Aug 2026 because it shared
+# that one setting with Agents 3, 4 and 6, and it is the wrong tier for the job:
+# classify, deduplicate, rank, outline against a fixed JSON schema is not the
+# work Opus exists for. It is also the only one of the four that ran every
+# night, so it paid the top rate most often.
+#
+# Sonnet 5 rather than Haiku 4.5 because the brief is not pure classification —
+# working_title, meta_title, meta_description and the outline headings are
+# Farsi prose that seeds the article, and that copy is worth a mid tier. Haiku
+# is the further step down if the bill still matters: set GAP_ANALYSIS_MODEL.
+#
+# Per run, eight properties, ~64k in / 40k out:
+#     Opus 5     $5/$25 per MTok  →  ~$1.32
+#     Sonnet 5   $3/$15           →  ~$0.79
+#     Haiku 4.5  $1/$5            →  ~$0.26
+#     Gemini flash (free tier)    →   $0.00   ← the current default
+GAP_ANALYSIS_MODEL = os.getenv("GAP_ANALYSIS_MODEL", "claude-sonnet-5")
 ANTHROPIC_EFFORT = os.getenv("ANTHROPIC_EFFORT", "medium")
 # Safety classifiers can decline a request (HTTP 200 + stop_reason "refusal").
 # Server-side fallbacks re-run it on Anthropic's recommended model instead of

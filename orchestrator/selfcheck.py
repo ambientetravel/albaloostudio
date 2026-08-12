@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 SCHEMA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "schemas")
 
 import jsonschema
+import yaml
 import config, compliance
 
 FAIL = []
@@ -290,6 +291,29 @@ ok("rate limits are retried on the same backoff as overload",
 ok("and per-property calls are paced so the ceiling is not hit at all",
    config.GEMINI_MIN_INTERVAL_S > 0 and "_GEMINI_LAST_CALL" in _a1src,
    f"{config.GEMINI_MIN_INTERVAL_S}s between properties")
+# The scout shared ANTHROPIC_MODEL with Agents 3, 4 and 6, so it ran on Opus 5
+# — the wrong tier for classify/rank/outline, and the only one of the four on a
+# schedule of its own, so it paid the top rate most often.
+ok("gap analysis has its own model setting, separate from the prose agents",
+   config.GAP_ANALYSIS_MODEL != config.ANTHROPIC_MODEL
+   or "GAP_ANALYSIS_MODEL" in os.environ,
+   f"{config.GAP_ANALYSIS_MODEL} vs {config.ANTHROPIC_MODEL}")
+ok("and it is not the top tier",
+   "opus" not in config.GAP_ANALYSIS_MODEL.lower() or "GAP_ANALYSIS_MODEL" in os.environ,
+   config.GAP_ANALYSIS_MODEL)
+ok("the Anthropic path actually reads it",
+   "config.GAP_ANALYSIS_MODEL" in _a1src and
+   '"model": config.ANTHROPIC_MODEL' not in _a1src)
+ok("Agents 3, 4 and 6 keep the prose model",
+   config.ANTHROPIC_MODEL.startswith("claude-opus")
+   or "ANTHROPIC_MODEL" in os.environ, config.ANTHROPIC_MODEL)
+# Search Console lags ~2 days over a 90-day window: consecutive nights differ
+# by one day in ninety, and Agent 2 drafts 5 articles per scout run.
+_cron = [e["cron"] for e in yaml.safe_load(_wf1)[True]["schedule"]]
+ok("the scout runs weekly, not nightly",
+   all(not c.endswith("* * *") for c in _cron), _cron)
+ok("and its day is clear of the Monday audit jobs",
+   all(c.strip().split()[-1] not in {"1", "MON"} for c in _cron), _cron)
 ok("the workflow passes the key the default provider needs",
    "GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}" in _wf1)
 

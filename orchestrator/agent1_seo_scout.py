@@ -956,7 +956,7 @@ def _analyse_with_anthropic(
                 for c in candidates[:limit]]
 
     kwargs: dict[str, Any] = {
-        "model": config.ANTHROPIC_MODEL,
+        "model": config.GAP_ANALYSIS_MODEL,
         "max_tokens": 16000,
         "system": _analysis_system_prompt(site),
         "messages": [{"role": "user", "content": _analysis_user_prompt(site, candidates, limit)}],
@@ -989,7 +989,7 @@ def _analyse_with_anthropic(
         if usage:
             log.info(
                 "%s — Claude %s: %s in / %s out", site.domain,
-                getattr(resp, "model", config.ANTHROPIC_MODEL),
+                getattr(resp, "model", config.GAP_ANALYSIS_MODEL),
                 getattr(usage, "input_tokens", "?"), getattr(usage, "output_tokens", "?"),
             )
         if not briefs:
