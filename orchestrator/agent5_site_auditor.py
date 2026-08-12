@@ -479,10 +479,14 @@ def audit_nonascii_slugs(site: Site, probe: list[tuple[str, int]],
     are *both* the only non-ASCII slugs on the site are a permalink layer that
     cannot resolve Persian.
 
-    That matters far beyond the two URLs. Six of the ten properties publish in
-    Farsi. A site that 404s its own Persian slugs will 404 every Farsi article
-    written for it, and the failure only becomes visible once real content is
-    published on top of it.
+    The observation is worth raising on any of the six Farsi properties. The
+    CAUSE, though, is not inferable from the outside, and the first version of
+    this docstring asserted the wrong one. Two faults look identical here:
+    stored slugs that were saved already-percent-encoded (bad data on those
+    rows; new content is unaffected), or a server that mangles percent-encoded
+    UTF-8 paths (everything is affected). cruiseshop.ir turned out to be the
+    first. The fix text tells the reader how to tell them apart rather than
+    guessing for them.
     """
     from urllib.parse import unquote
 
@@ -506,10 +510,15 @@ def audit_nonascii_slugs(site: Site, probe: list[tuple[str, int]],
                else f"{len(bad)} non-ASCII URL(s) return 404"),
         evidence=(f"{len(bad)} non-ASCII URL(s) 404 while {len(good_ascii)} ASCII "
                   f"URL(s) return 200: " + "; ".join(u[:70] for u in bad[:3])),
-        fix="Check the permalink structure and the server's handling of "
-            "percent-encoded UTF-8 paths. Until this resolves, every Farsi slug "
-            "published on this site will 404 — the fault is in the URL layer, "
-            "not in any one page.",
+        fix="Two causes look identical from outside and need opposite fixes. "
+            "Check the stored slug first — fetch the object over the REST API "
+            "and test whether its `slug` is pure ASCII: cruiseshop.ir's category "
+            "held the 82-character literal '%d8%af%d8%b3...' where the real "
+            "Persian slug is 14 characters, so the request decoded to Persian "
+            "and matched nothing. That is bad data on those rows, fixed by "
+            "re-saving each slug, and it does NOT affect new content. Only if "
+            "the stored slugs are correct Persian is it the server's handling "
+            "of percent-encoded UTF-8 paths, which would affect everything.",
     )
     return bad
 
