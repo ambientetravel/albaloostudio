@@ -416,10 +416,12 @@ _a5.audit_nonascii_slugs(_st, [], _au4,
 ok("but one broken Farsi URL among working ones is only high",
    _au4.findings[0].severity == _a5.HIGH,
    "one 404 is a page; all of them is the URL layer")
-ok("the fix distinguishes bad stored data from a broken server",
-   "test whether its `slug` is pure ASCII" in _a5src_txt
-   and "does NOT affect new content" in _a5src_txt,
-   "cruiseshop.ir stored an 82-char literal where the Persian slug is 14")
+ok("the fix says to locate the failure before naming its cause",
+   "Check WHERE it fails before assuming what it is" in _a5src_txt
+   and "taxonomy rewrite" in _a5src_txt,
+   "measured: Farsi pages 200, ASCII terms 200, Farsi term archives 404")
+ok("and the docstring records that two earlier readings were wrong",
+   "two earlier readings of it here" in _a5src_txt)
 ok("an all-ASCII site raises nothing",
    _a5.audit_nonascii_slugs(_st, [], _fresh_audit(), {"https://c.ir/a": 200}) == [])
 

@@ -479,14 +479,24 @@ def audit_nonascii_slugs(site: Site, probe: list[tuple[str, int]],
     are *both* the only non-ASCII slugs on the site are a permalink layer that
     cannot resolve Persian.
 
-    The observation is worth raising on any of the six Farsi properties. The
-    CAUSE, though, is not inferable from the outside, and the first version of
-    this docstring asserted the wrong one. Two faults look identical here:
-    stored slugs that were saved already-percent-encoded (bad data on those
-    rows; new content is unaffected), or a server that mangles percent-encoded
-    UTF-8 paths (everything is affected). cruiseshop.ir turned out to be the
-    first. The fix text tells the reader how to tell them apart rather than
-    guessing for them.
+    Measured on cruiseshop.ir and dmciran.ir, 13 Aug 2026, and it is narrower
+    than it first looks — narrow enough that two earlier readings of it here
+    were both wrong:
+
+        Farsi PAGE slug      /%d8%ae%d8%a7%d9%86%d9%87/        200
+        ASCII CATEGORY       /archives/category/hiking/        200   (7 of 7)
+        Farsi CATEGORY       /archives/category/%d8%af%d8%...  404   (both sites)
+
+    So it is not "Persian URLs do not work" — Persian pages resolve. And it is
+    not bad stored data: WordPress stores non-ASCII slugs percent-encoded BY
+    DESIGN, and that stored form is what resolves. It is taxonomy archives
+    specifically: the category rewrite fails to match a percent-encoded term,
+    while the page lookup handles it.
+
+    Practical scope: a Farsi CATEGORY or TAG archive 404s; the pages and posts
+    inside it are reachable. Renaming the term's slug to ASCII fixes it, and on
+    these two sites the only affected term is WordPress's own default
+    «دسته‌بندی نشده», which is junk and duplicates an ASCII `uncategorized`.
     """
     from urllib.parse import unquote
 
@@ -510,15 +520,12 @@ def audit_nonascii_slugs(site: Site, probe: list[tuple[str, int]],
                else f"{len(bad)} non-ASCII URL(s) return 404"),
         evidence=(f"{len(bad)} non-ASCII URL(s) 404 while {len(good_ascii)} ASCII "
                   f"URL(s) return 200: " + "; ".join(u[:70] for u in bad[:3])),
-        fix="Two causes look identical from outside and need opposite fixes. "
-            "Check the stored slug first — fetch the object over the REST API "
-            "and test whether its `slug` is pure ASCII: cruiseshop.ir's category "
-            "held the 82-character literal '%d8%af%d8%b3...' where the real "
-            "Persian slug is 14 characters, so the request decoded to Persian "
-            "and matched nothing. That is bad data on those rows, fixed by "
-            "re-saving each slug, and it does NOT affect new content. Only if "
-            "the stored slugs are correct Persian is it the server's handling "
-            "of percent-encoded UTF-8 paths, which would affect everything.",
+        fix="Check WHERE it fails before assuming what it is. Test an ASCII "
+            "term archive, a non-ASCII term archive and a non-ASCII page on the "
+            "same site: on cruiseshop.ir and dmciran.ir the pages and the ASCII "
+            "terms returned 200 and only the non-ASCII TERM archives 404d, which "
+            "makes it the taxonomy rewrite and not the URL layer, the encoding, "
+            "or the stored slug. Renaming that term's slug to ASCII resolves it.",
     )
     return bad
 
