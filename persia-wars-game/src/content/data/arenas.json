@@ -1,0 +1,281 @@
+[
+  {
+    "id": 1,
+    "name": "Anshan",
+    "where": "Tal-e Malyan, Fars",
+    "subtitle": "Heart of Elam, cradle of kings",
+    "year": "559 BCE",
+    "yearNumeric": -559,
+    "trophies": 0,
+    "blurb": "An Elamite highland capital long before it was Persian. Cyrus inherited it as a small kingdom answering to the Medes — and did not stay small.",
+    "artNote": "Mud-brick city on a broad plain ringed by dry Zagros ridges, irrigation channels, a stepped temple platform. Elamite rather than Persian: heavier, older, pre-column architecture. Dawn light.",
+    "disputed": [
+      "Anshan's identification with the mound at Tal-e Malyan was only established in the 1970s, from inscribed bricks found there. Older books place Anshan somewhere else entirely."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/anshan-elamite-region/",
+      "https://www.iranicaonline.org/articles/malian/",
+      "https://www.iranicaonline.org/articles/elam-i/"
+    ],
+    "slug": "anshan",
+    "figures": {
+      "left": {
+        "name": "Elamite King",
+        "title": "King of Anshan and Susa"
+      },
+      "right": {
+        "name": "Sumerian Governor",
+        "title": "Envoy from the lowlands"
+      }
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": 2,
+    "name": "Ecbatana",
+    "where": "Hamadan",
+    "subtitle": "The Median capital falls",
+    "year": "550 BCE",
+    "yearNumeric": -550,
+    "trophies": 100,
+    "blurb": "Astyages marched out to punish a rebellious vassal and his own army handed him over. Cyrus took the city and its treasury, and an empire started.",
+    "artNote": "Fortified hill city on the eastern slope of Alvand, snow on the peaks behind. Concentric walls — Herodotus describes seven, in different colours. Cold high-altitude light.",
+    "disputed": [
+      "Herodotus' seven concentric coloured walls are famous and unconfirmed by excavation. Treat them as a story about Ecbatana, not a plan of it."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/ecbatana/",
+      "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-7-nabonidus-chronicle/"
+    ],
+    "slug": "ecbatana",
+    "confidence": "probable"
+  },
+  {
+    "id": 3,
+    "name": "Sardis",
+    "where": "Sart, western Türkiye",
+    "subtitle": "Lydia and the western frontier",
+    "year": "547/546 BCE",
+    "yearNumeric": -547,
+    "trophies": 250,
+    "blurb": "Croesus was the richest king in the world and it did not save him. Sardis became the empire's window onto the Greek sea, and the far end of the Royal Road.",
+    "artNote": "Acropolis on a steep spur above a river valley, Greek-influenced stonework mixed with Anatolian. Gold-washing streams below — Lydia minted the first coins. Warm western light.",
+    "disputed": [
+      "The date is given as 547 or 546 BCE depending on how the Nabonidus Chronicle's damaged line is restored."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/capital-cities/",
+      "https://www.britannica.com/event/Siege-of-Sardis-546-BCE",
+      "https://www.livius.org/articles/place/sardes/"
+    ],
+    "slug": "sardis",
+    "confidence": "probable"
+  },
+  {
+    "id": 4,
+    "name": "Bactra",
+    "where": "Balkh, northern Afghanistan",
+    "subtitle": "The eastern marches",
+    "year": "c. 545 BCE",
+    "yearNumeric": -545,
+    "trophies": 450,
+    "blurb": "The rich north-east came in without a war — Iranica reads it as a union of crowns rather than a conquest. It stayed the empire's most independent-minded province.",
+    "artNote": "Oasis city in irrigated green against grey desert, Central Asian mud-brick with high walls. Horses and Bactrian camels. Big empty sky, dust on the horizon.",
+    "disputed": [
+      "There is no firm date. Bactria is annexed under Cyrus somewhere in the 540s, and Iranica notes the annexation looks like a personal union of crowns rather than a conquest."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/bactria/bactria-i-pre-islamic-period/",
+      "https://www.iranicaonline.org/articles/achaemenid-satrapies/"
+    ],
+    "slug": "bactra",
+    "confidence": "probable"
+  },
+  {
+    "id": 5,
+    "name": "Babylon",
+    "where": "Hillah, Iraq",
+    "subtitle": "Taken without a siege",
+    "year": "October 539 BCE",
+    "yearNumeric": -539,
+    "trophies": 700,
+    "blurb": "The greatest city on earth opened its gates. The Cyrus Cylinder, written afterwards, describes the temples he restored — in the voice of a Babylonian king.",
+    "artNote": "Blue-glazed brick, processional way, the Ishtar Gate's animals in relief. Flat river country, palms, the Euphrates. This is the one place that is already grander than Persia.",
+    "disputed": [
+      "The Cyrus Cylinder is often called the first charter of human rights. Specialists reject that: it follows a long Babylonian tradition of temple-restoration texts and is addressed to the gods, not to humanity."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/cyrus-iii/",
+      "https://www.livius.org/articles/person/cyrus-the-great/",
+      "https://peabody.yale.edu/news/finkel_talk"
+    ],
+    "slug": "babylon",
+    "confidence": "probable"
+  },
+  {
+    "id": 6,
+    "name": "Pasargadae",
+    "where": "Dasht-e Morghab, Fars",
+    "subtitle": "Cyrus builds, and is buried",
+    "year": "c. 546–530 BCE",
+    "yearNumeric": -530,
+    "trophies": 1000,
+    "blurb": "A capital of gardens and scattered pavilions rather than one fortress, laid out where Cyrus had beaten the Medes. His tomb still stands on the plain.",
+    "artNote": "Open watered garden-plain 1,900 m up, isolated stone pavilions rather than a dense city, long straight water channels. The plain gabled tomb on its stepped plinth. Green against pale stone.",
+    "disputed": [
+      "That Pasargadae marks the site of the victory over Astyages comes from Strabo, writing five centuries later.",
+      "This rung shows the finished capital, begun after the victory over Astyages. An arena is the ground you compete on, not where the battle you are playing happened."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/pasargadae/",
+      "https://www.iranicaonline.org/articles/cyrus-v-tomb/",
+      "https://whc.unesco.org/en/list/1106/"
+    ],
+    "slug": "pasargadae",
+    "confidence": "probable"
+  },
+  {
+    "id": 7,
+    "name": "Memphis",
+    "where": "Mit Rahina, Egypt",
+    "subtitle": "The Great King becomes pharaoh",
+    "year": "525 BCE",
+    "yearNumeric": -525,
+    "trophies": 1350,
+    "blurb": "Cambyses beat the Egyptians at Pelusium in spring and had the whole country by summer. That August he was installed as king of Upper and Lower Egypt.",
+    "artNote": "Nile-side temple precinct, colossi, palms, Egyptian colour and column forms — deliberately not Persian. Persian guards small against Egyptian scale. Hard midday sun.",
+    "disputed": [
+      "Herodotus' portrait of Cambyses as a madman who mocked Egyptian religion is contradicted by Egyptian sources such as the Udjahorresnet inscription, which shows him observing local protocol."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/cambyses-opers/",
+      "https://www.iranicaonline.org/articles/herodotus-v/"
+    ],
+    "slug": "memphis",
+    "confidence": "probable"
+  },
+  {
+    "id": 8,
+    "name": "Bisotun",
+    "where": "Kermanshah",
+    "subtitle": "Darius carves his account",
+    "year": "522–520 BCE",
+    "yearNumeric": -522,
+    "trophies": 1750,
+    "blurb": "Darius took the throne in a year of rebellion and then cut his version of it into a cliff, in three languages, sixty metres up where nobody could reach it to argue.",
+    "artNote": "Sheer limestone cliff over the Baghdad–Ecbatana road, relief of the king with bound rebels, trilingual text panels. The scale gag is the point: enormous, unreachable, unavoidable. Late afternoon shadow.",
+    "disputed": [
+      "The inscription is Darius's own account of a contested succession, written to justify it. It is a primary source for what he wanted believed, not a neutral record."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/bisotun-iii/",
+      "https://whc.unesco.org/en/list/1222",
+      "https://www.livius.org/articles/place/behistun/"
+    ],
+    "slug": "bisotun",
+    "confidence": "probable"
+  },
+  {
+    "id": 9,
+    "name": "Susa",
+    "where": "Shush, Khuzestan",
+    "subtitle": "Where the empire was actually run",
+    "year": "from 521 BCE",
+    "yearNumeric": -521,
+    "trophies": 2200,
+    "blurb": "An Elamite city older than Persia itself, which Darius rebuilt into the administrative capital. The paperwork of an empire ran through here, not through Persepolis.",
+    "artNote": "Mounded old city on the Khuzestan plain, Darius's palace and apadana, glazed-brick guard friezes in yellow and green. Hot, low, riverine — the opposite of the highland capitals.",
+    "disputed": [
+      "Susa entered the empire under Cyrus around 539 BCE; it becomes a Persian royal city only with Darius's building programme, which is the date used here."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/susa-iii-the-achaemenid-period/",
+      "https://www.iranicaonline.org/articles/susa-parent/",
+      "https://whc.unesco.org/en/list/1455/"
+    ],
+    "slug": "susa",
+    "confidence": "probable"
+  },
+  {
+    "id": 10,
+    "name": "Gandara",
+    "where": "Peshawar valley, Pakistan",
+    "subtitle": "The road to the Indus",
+    "year": "c. 518 BCE",
+    "yearNumeric": -518,
+    "trophies": 2700,
+    "blurb": "The empire's eastern limit and, by Herodotus' reckoning, its richest tribute district. Its people appear on the Persepolis stairs carrying gifts.",
+    "artNote": "Green river valley under high mountains, monsoon-side vegetation unlike anywhere else in the empire. Cotton, cane, elephants. Cooler, wetter light than the plateau.",
+    "disputed": [
+      "The date of Darius's Indus campaign is inferred rather than recorded, and the extent of Achaemenid control east of the Indus is debated."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/india-iii-relations-achaemenid-period/",
+      "https://www.iranicaonline.org/articles/achaemenid-satrapies/"
+    ],
+    "slug": "gandara",
+    "confidence": "probable"
+  },
+  {
+    "id": 11,
+    "name": "Persepolis",
+    "where": "Marvdasht, Fars",
+    "subtitle": "The empire performs itself",
+    "year": "from c. 518 BCE",
+    "yearNumeric": -517,
+    "trophies": 3250,
+    "blurb": "Built for ceremony, not defence. Its stairways show every people of the empire bringing gifts — the only surviving picture of what the Persians thought their empire was.",
+    "artNote": "Vast terrace against the Mountain of Mercy, columned halls with double-bull capitals, the tribute-bearer stairway. Gold and lapis paint on the stone — it was not bare. Ceremonial dawn.",
+    "disputed": [
+      "The tribute reliefs are an official self-portrait of the empire. What they show is what the court wanted shown, not a census of who actually paid what."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/persepolis/",
+      "https://www.iranicaonline.org/articles/apadana/",
+      "https://whc.unesco.org/en/list/114/"
+    ],
+    "slug": "persepolis",
+    "confidence": "probable"
+  },
+  {
+    "id": 12,
+    "name": "The Royal Road",
+    "where": "Sardis to Susa, ~2,400 km",
+    "subtitle": "The arteries of the empire",
+    "year": "Darius, from c. 500 BCE",
+    "yearNumeric": -500,
+    "trophies": 3850,
+    "blurb": "A relay of riding stations every 25 to 30 km, with fresh horses waiting. Herodotus says nothing on earth travelled faster than the king's messengers.",
+    "artNote": "Not a city — a landscape. A stone-marked road crossing empty country, a waystation with stabled horses, a courier changing mounts. Distance and dust; the empire as logistics.",
+    "disputed": [
+      "The road's exact route is reconstructed from Herodotus' station counts and archaeology, and stretches of it are still argued over."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/commerce-ii/",
+      "https://www.livius.org/articles/concept/royal-road/"
+    ],
+    "slug": "royal-road",
+    "confidence": "probable"
+  },
+  {
+    "id": 13,
+    "name": "The Persian Gates",
+    "where": "Tang-e Meyran, near Yasuj",
+    "subtitle": "The last stand",
+    "year": "January 330 BCE",
+    "yearNumeric": -330,
+    "trophies": 4500,
+    "blurb": "Two centuries after Anshan, a satrap held a Zagros gorge against Alexander with a fraction of his numbers — until someone showed the Macedonians a path over the mountain.",
+    "artNote": "Narrow snow-dusted defile, sheer rock either side, a river below, winter. Claustrophobic after twelve open landscapes — the empire's world closing to the width of one pass.",
+    "disputed": [
+      "Arrian's 40,000 defenders are regarded as grossly inflated; Iranica suggests as few as 700. The shepherd who reveals the mountain path mirrors Herodotus' Ephialtes at Thermopylae closely enough to be doubted."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/articles/battle/persian-gate-330-bce/",
+      "https://en.wikipedia.org/wiki/Battle_of_the_Persian_Gate",
+      "https://en.wikipedia.org/wiki/Ariobarzanes,_Satrap_of_Persis"
+    ],
+    "slug": "persian-gates",
+    "confidence": "probable"
+  }
+]

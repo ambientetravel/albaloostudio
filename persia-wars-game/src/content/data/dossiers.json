@@ -1,0 +1,400 @@
+{
+  "book": {
+    "id": "rise-of-cyrus",
+    "title": "Book One — Rise of Cyrus",
+    "framework": "Four things about this war are on the record. A Persian king called Cyrus, styled king of Anshan, ruled in Fars as a subordinate of Media. Astyages of Media mobilised against him. The Median army mutinied, bound its own king and handed him to Cyrus. Cyrus then took Ecbatana and its treasury. Everything else in this book — the councils, the marches, the border actions, the retreats — is scene-setting built on that frame.",
+    "dateRange": {
+      "text": "550 BCE by the Nabonidus Chronicle; 553 BCE is defensible from the Sippar Cylinder. One reconciliation is a revolt beginning around 553 and a decisive campaign in 550.",
+      "confidence": "probable"
+    },
+    "contemporaryEvidence": [
+      "Nabonidus Chronicle (ABC 7), Babylonian, written within living memory: Astyages mobilised, his army rebelled and handed him over, Cyrus took Ecbatana and its silver and gold.",
+      "Nabonidus Cylinder from Sippar: refers to Cyrus and to the Median king; read by some to place events around 553 BCE.",
+      "The Cyrus Cylinder (539 BCE, Babylon) for Cyrus' own royal titulature, including the line of 'kings of Anshan'."
+    ],
+    "laterSources": [
+      "Herodotus I.95–130 — the fullest narrative and the most novelised. Written roughly a century later by a Greek, using Persian informants at unknown remove, and structured as a moral tale.",
+      "Ctesias, Persica (fragments) — a different and incompatible account.",
+      "Nicolaus of Damascus — a third version, again incompatible.",
+      "Xenophon, Cyropaedia — a didactic romance about the ideal ruler. Not evidence for events.",
+      "Strabo XV.3.8 — the only source placing Cyrus' victory 'among the Pasargadae'."
+    ],
+    "material": [
+      "Tal-e Malyan (Anshan), excavated: an Elamite centre in Fars, in decline by the mid-first millennium.",
+      "Pasargadae (UNESCO 1106): gardens, water channels, isolated pavilions and the tomb. Construction begins AFTER the victory, not before.",
+      "Ecbatana (Hamadan) — very little of the Median city is excavated; the site is under a modern one."
+    ],
+    "mustNotClaim": [
+      "That the Cyrus Cylinder is a charter of human rights. It is a Babylonian foundation deposit in a long Mesopotamian royal tradition, and reading it as a modern rights document is a twentieth-century framing that the text does not support. This claim circulates widely and must not appear anywhere in this product.",
+      "That Cyrus was young at the revolt, or any specific age. His birth date is unknown.",
+      "That Herodotus' exposure-and-shepherd story is biography. It is a folk pattern attached to many founders.",
+      "That Medes and Persians were foreign to one another. Both are Iranian peoples with closely related languages; this was a dynastic war, not a clash of civilisations.",
+      "That a single pitched battle decided the war. The near-contemporary evidence describes a mutiny."
+    ],
+    "sensitivities": [
+      "Medes must not be written or drawn as villains. The Median court is the losing side of an Iranian dynastic quarrel, and its soldiers are the ones who ended the war.",
+      "No triumphalism about Cyrus, and no framing of the Achaemenids as a precursor to any modern state or ideology.",
+      "Persian Gulf, never 'Arabian Gulf', in every map, label and codex entry.",
+      "No modern political reading of any of this, in either direction."
+    ],
+    "reviewStatus": "drafted"
+  },
+  "missions": {
+    "small-court": {
+      "whatWeKnow": "Almost nothing. Cyrus appears in the record already ruling in Fars and already subordinate to Media. What his court looked like, who was in it, and how he governed before the revolt are simply not described anywhere.",
+      "location": {
+        "text": "Anshan — Tal-e Malyan in Fars, an old Elamite centre.",
+        "confidence": "attested"
+      },
+      "combatants": "None. This is a court, not a battle.",
+      "specificEvidence": [
+        "The title 'king of Anshan' is Cyrus' own, in the Cyrus Cylinder genealogy.",
+        "Anshan's identification with Tal-e Malyan is settled by excavation and by inscribed material from the site."
+      ],
+      "unitArchetypes": [
+        "Spearmen and archers of a small Persian household following. Inferred from region and period, not described."
+      ],
+      "mustNotClaim": [
+        "That any named person other than Cyrus was present. No court list survives."
+      ],
+      "abstractions": [
+        {
+          "what": "A battle at all",
+          "why": "The mission needs to teach the Ledger, and the game's only verb is a fight. The scene is invention; the lesson is the mechanic."
+        }
+      ],
+      "reviewStatus": "drafted"
+    },
+    "rally-households": {
+      "whatWeKnow": "That early Persian forces were household and tribal levies rather than a standing army is an inference from the region, the period and the later Achaemenid pattern. No muster is described.",
+      "location": {
+        "text": "Fars, unspecified.",
+        "confidence": "reconstructed-for-gameplay"
+      },
+      "combatants": "Persian levies against a notional Median force.",
+      "specificEvidence": [],
+      "unitArchetypes": [
+        "Tribal infantry",
+        "Light cavalry from the herding tribes"
+      ],
+      "mustNotClaim": [
+        "That Herodotus' tribal list is a reliable census.",
+        "That the Persians had any formal military organisation at this date."
+      ],
+      "abstractions": [
+        {
+          "what": "The Sagartian Lassoer as an early Persian reward",
+          "why": "Sagartians appear in Herodotus' Persian contingent and are an Iranian people. Their presence this early is plausible rather than attested."
+        }
+      ],
+      "reviewStatus": "drafted",
+      "laterSources": [
+        "Herodotus I.125 lists Persian tribes — Pasargadae, Maraphii, Maspii and others — but he is writing much later and the list may be schematic."
+      ]
+    },
+    "roads-of-fars": {
+      "whatWeKnow": "Nothing specific. No supply action from this campaign is recorded. Supply and roads mattered enormously in ancient warfare, which is why the mission exists, but this particular episode is invented.",
+      "location": {
+        "text": "Highland routes in Fars.",
+        "confidence": "reconstructed-for-gameplay"
+      },
+      "combatants": "Persian troops against a raiding force.",
+      "specificEvidence": [],
+      "unitArchetypes": [
+        "Infantry screening a column",
+        "Skirmishers"
+      ],
+      "mustNotClaim": [
+        "That the Royal Road existed. It is a Darius-era construction, roughly thirty years later."
+      ],
+      "abstractions": [
+        {
+          "what": "Terrain as a stat modifier",
+          "why": "Real terrain effects are continuous and situational. The game reduces them to two named grounds so the player can reason about them."
+        }
+      ],
+      "reviewStatus": "drafted"
+    },
+    "tribal-council": {
+      "whatWeKnow": "Herodotus I.125–126 has Cyrus assemble the Persians, work them brutally for a day, feast them the next, and ask which life they prefer. It is a good story, it is a hundred years later, and it has the shape of a folk tale rather than a report.",
+      "location": {
+        "text": "Unspecified, in Fars.",
+        "confidence": "traditional-account"
+      },
+      "combatants": "None.",
+      "specificEvidence": [],
+      "unitArchetypes": [],
+      "mustNotClaim": [
+        "That the labour-and-feast episode happened.",
+        "That the three branches offered here correspond to anything any source describes. They are game design."
+      ],
+      "abstractions": [
+        {
+          "what": "A branching decision",
+          "why": "The concept asks for one non-battle mission. A persuasion scene is the right shape for it, and Herodotus supplies the setting even though he does not supply the facts."
+        }
+      ],
+      "reviewStatus": "drafted",
+      "laterSources": [
+        "Herodotus I.125–126."
+      ]
+    },
+    "border-warning": {
+      "whatWeKnow": "Nothing. No preliminary border action is recorded. The Nabonidus Chronicle jumps straight from mobilisation to mutiny.",
+      "location": {
+        "text": "The passes between Media and Fars.",
+        "confidence": "reconstructed-for-gameplay"
+      },
+      "combatants": "A Median column against Persian defenders.",
+      "specificEvidence": [],
+      "unitArchetypes": [
+        "Median infantry",
+        "Median cavalry"
+      ],
+      "mustNotClaim": [
+        "That Median arms and dress can be reconstructed in detail. They largely cannot; most images used for 'Medes' come from later Persian reliefs."
+      ],
+      "abstractions": [
+        {
+          "what": "Median units drawn from the Achaemenid roster",
+          "why": "There is no separate attested Median army list. The game uses the shared roster and says so rather than inventing one."
+        }
+      ],
+      "reviewStatus": "drafted"
+    },
+    "kingdom-divided": {
+      "whatWeKnow": "That some Persians would have preferred to keep paying tribute is likely and unrecorded. Revolts usually have internal opponents; this one's are not named anywhere.",
+      "location": {
+        "text": "Fars.",
+        "confidence": "reconstructed-for-gameplay"
+      },
+      "combatants": "Persians on both sides.",
+      "specificEvidence": [],
+      "unitArchetypes": [
+        "Persian infantry",
+        "Persian archers"
+      ],
+      "mustNotClaim": [
+        "That any named individual opposed Cyrus. Nobody is named."
+      ],
+      "abstractions": [
+        {
+          "what": "Internal opposition as a battle",
+          "why": "A civil dispute is being represented by a fight because that is the game's vocabulary."
+        }
+      ],
+      "reviewStatus": "drafted"
+    },
+    "the-refusal": {
+      "whatWeKnow": "That the war began with withheld tribute is the Greek tradition. The Babylonian record says only that Astyages mobilised against Cyrus — it gives no cause at all.",
+      "location": {
+        "text": "Anshan.",
+        "confidence": "reconstructed-for-gameplay"
+      },
+      "combatants": "Persians against a Median punitive force.",
+      "specificEvidence": [
+        "Nabonidus Chronicle: Astyages mobilised against Cyrus, king of Anshan."
+      ],
+      "unitArchetypes": [
+        "Persian infantry",
+        "Median infantry"
+      ],
+      "mustNotClaim": [
+        "That tribute was the cause. It is one plausible cause among several and the contemporary source is silent.",
+        "That Cyrus made any recorded speech. No words of his from this period survive."
+      ],
+      "abstractions": [
+        {
+          "what": "A single dramatic refusal",
+          "why": "Wars rarely begin on one day. The mission compresses a process into a moment because a campaign needs a turning point."
+        }
+      ],
+      "reviewStatus": "drafted",
+      "laterSources": [
+        "Herodotus I.127 for the tribute-and-revolt framing."
+      ]
+    },
+    "first-advance": {
+      "whatWeKnow": "That Astyages took the field in person is in the Nabonidus Chronicle. Nothing about the course of his advance is.",
+      "location": {
+        "text": "Between Media and Fars, unspecified.",
+        "confidence": "reconstructed-for-gameplay"
+      },
+      "combatants": "Astyages of Media against Cyrus of Anshan.",
+      "specificEvidence": [
+        "Nabonidus Chronicle (ABC 7)."
+      ],
+      "unitArchetypes": [
+        "Median royal infantry",
+        "Median cavalry",
+        "Persian levies"
+      ],
+      "mustNotClaim": [
+        "Any figure for the size of either army. No numbers survive, and the numbers in Greek sources for Persian armies are unreliable throughout.",
+        "That the Immortals existed in 550 BCE. The corps is described for a later period; the card is a game convenience."
+      ],
+      "abstractions": [
+        {
+          "what": "The Immortal as a Chapter Two reward",
+          "why": "It is the recognisable Achaemenid heavy infantryman and the game needs one. Its attestation is later than this book, and the codex entry says so."
+        }
+      ],
+      "reviewStatus": "drafted"
+    },
+    "broken-ground": {
+      "whatWeKnow": "Nothing about terrain in this campaign is recorded. The gorge here is borrowed scenery — the Persian Gates action it resembles belongs to a different war two centuries later.",
+      "location": {
+        "text": "A mountain defile. Not a real location for this campaign.",
+        "confidence": "reconstructed-for-gameplay"
+      },
+      "combatants": "Persians against a larger Median force.",
+      "specificEvidence": [],
+      "unitArchetypes": [
+        "Infantry in close country"
+      ],
+      "mustNotClaim": [
+        "That Cyrus fought a defile action against Astyages.",
+        "That this is the Persian Gates. It is not, and the Persian Gates is a separate playable scenario for the right reason."
+      ],
+      "abstractions": [
+        {
+          "what": "Reusing the gorge scenario",
+          "why": "The game has two battlefields. Using the gorge here teaches terrain, and the dossier is the place that admits the borrowing."
+        }
+      ],
+      "reviewStatus": "drafted"
+    },
+    "retreat-to-persis": {
+      "whatWeKnow": "No withdrawal is recorded. This mission exists for a reason that is about honesty rather than about evidence: most campaigns in history contain retreats, and a game that only rewards destroying the enemy teaches that they do not.",
+      "location": {
+        "text": "Fars.",
+        "confidence": "reconstructed-for-gameplay"
+      },
+      "combatants": "Persians withdrawing before a Median advance.",
+      "specificEvidence": [],
+      "unitArchetypes": [
+        "Rearguard infantry",
+        "Horse-archers screening a withdrawal"
+      ],
+      "mustNotClaim": [
+        "That Cyrus suffered any recorded defeat. He may have; no source says so."
+      ],
+      "abstractions": [
+        {
+          "what": "Winning by taking one round",
+          "why": "The only way to express 'the army got away' in a first-to-N format. The mission brief states the objective before the player commits."
+        }
+      ],
+      "reviewStatus": "drafted"
+    },
+    "camp-holds": {
+      "whatWeKnow": "Nothing specific. Baggage trains, standards and camp followers are standard features of ancient armies and their loss was routinely decisive, but no camp action from this campaign is described.",
+      "location": {
+        "text": "A Persian camp in Fars.",
+        "confidence": "reconstructed-for-gameplay"
+      },
+      "combatants": "Persians defending a camp.",
+      "specificEvidence": [],
+      "unitArchetypes": [
+        "Shield-bearers in a static line",
+        "Archers shooting over them"
+      ],
+      "mustNotClaim": [
+        "That the spara shield wall is attested for 550 BCE. It is known from later Achaemenid contexts."
+      ],
+      "abstractions": [
+        {
+          "what": "Locked Shields as the reward's neighbour",
+          "why": "The mission is where the shield-wall trait makes the most sense, so the two are placed together."
+        }
+      ],
+      "reviewStatus": "drafted"
+    },
+    "divided-loyalties": {
+      "whatWeKnow": "This is the one mission whose central event is near-contemporary. The Nabonidus Chronicle records that Astyages' army rebelled against him, bound him, and handed him to Cyrus. What it does not give is any motive, and it does not mention Harpagus at all.",
+      "location": {
+        "text": "With the Median army in the field.",
+        "confidence": "probable"
+      },
+      "combatants": "The Median army against its own king.",
+      "specificEvidence": [
+        "Nabonidus Chronicle (ABC 7) — the mutiny and the handover."
+      ],
+      "laterSources": [
+        "Herodotus I.108–129 for Harpagus, his son, and his revenge. A revenge tragedy in structure, and a hundred years later."
+      ],
+      "unitArchetypes": [
+        "Median infantry and cavalry, changing sides"
+      ],
+      "mustNotClaim": [
+        "Harpagus' motive. The Chronicle gives none and Herodotus gives a literary one.",
+        "That Harpagus was present at all. He is absent from the contemporary record.",
+        "That the mutiny was arranged in advance by Cyrus. Nothing supports it."
+      ],
+      "abstractions": [
+        {
+          "what": "Defection as a normal battle",
+          "why": "The mechanic for changing sides does not exist yet. The mission teaches the idea through its framing and its reward rather than through a system. Flagged for a future defection mechanic."
+        }
+      ],
+      "reviewStatus": "drafted"
+    },
+    "plain-before-pasargadae": {
+      "whatWeKnow": "That the decisive fighting happened at Pasargadae comes from Strabo, about five centuries later. Nothing was built on that plain yet — Cyrus laid out the capital after he won, and construction is generally placed after the Lydian campaign of the later 540s.",
+      "location": {
+        "text": "Dasht-e Morghab, Fars. The site of the later capital.",
+        "confidence": "traditional-account"
+      },
+      "combatants": "Persians against Medes.",
+      "specificEvidence": [
+        "Pasargadae excavation and the UNESCO record for the construction sequence."
+      ],
+      "unitArchetypes": [
+        "Both armies at full strength"
+      ],
+      "mustNotClaim": [
+        "That the palaces, gardens or tomb existed at the time of the battle. They did not, and showing them would be the exact error the concept brief singles out.",
+        "That Strabo's location is secure. It is a single late source."
+      ],
+      "abstractions": [
+        {
+          "what": "Naming the mission for a place that is not yet there",
+          "why": "'The Plain before Pasargadae' says the thing precisely: the ground, before the city."
+        }
+      ],
+      "reviewStatus": "drafted",
+      "laterSources": [
+        "Strabo XV.3.8 for the location claim."
+      ]
+    },
+    "last-stand": {
+      "whatWeKnow": "The outcome is as secure as anything in this book. Astyages was defeated, his own army handed him over, and Cyrus took Ecbatana and its treasury. What is NOT secure is that it happened as a pitched battle — the near-contemporary account describes a mutiny, and the battle is the Greek version of the same events.",
+      "location": {
+        "text": "Unspecified; Ecbatana follows.",
+        "confidence": "probable"
+      },
+      "combatants": "Cyrus of Anshan against Astyages of Media.",
+      "specificEvidence": [
+        "Nabonidus Chronicle (ABC 7) — the defeat, the handover, and the taking of Ecbatana's silver and gold."
+      ],
+      "laterSources": [
+        "Herodotus I.127–130 for a battle narrative."
+      ],
+      "unitArchetypes": [
+        "Both armies at full strength"
+      ],
+      "mustNotClaim": [
+        "That Astyages was killed. He was not; the sources have him spared.",
+        "That this founded an empire in a day. Cyrus' empire is built over the following two decades — Lydia, then Babylon.",
+        "Any casualty figure."
+      ],
+      "abstractions": [
+        {
+          "what": "A climactic first-to-4 battle",
+          "why": "The book needs a finale and the game's verb is a fight. The result screen states what the contemporary evidence actually says, whichever way the match goes."
+        }
+      ],
+      "reviewStatus": "drafted"
+    }
+  }
+}

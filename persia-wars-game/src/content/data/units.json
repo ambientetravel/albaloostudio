@@ -1,0 +1,914 @@
+[
+  {
+    "id": "persian-archer",
+    "era": "achaemenid",
+    "class": "archer",
+    "name": "Persian Archer",
+    "arena": 1,
+    "atk": 6,
+    "def": 2,
+    "hp": 38,
+    "range": 26,
+    "speed": 0.35,
+    "attackInterval": 18,
+    "kite": false,
+    "counters": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "counteredBy": [
+      "cavalry",
+      "horse-archer"
+    ],
+    "blurb": "The empire's real weapon. Massed archers darkened the sky before the two lines ever met — which is why the Persians put shields in front of them, not swords.",
+    "blurbOlder": "Archery was the centre of Achaemenid tactics, not a supporting arm. The royal coinage — the gold daric — shows the king himself as an archer, and the Persepolis reliefs make the bow and quiver the mark of a Persian soldier. Herodotus equips the Persians with long bows and arrows of reed.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/army-i",
+      "https://www.livius.org/articles/concept/persian-army/"
+    ],
+    "art": {
+      "silhouette": "bow"
+    },
+    "confidence": "attested"
+  },
+  {
+    "id": "spara-bearer",
+    "era": "achaemenid",
+    "class": "infantry",
+    "name": "Shield-bearer",
+    "arena": 1,
+    "atk": 4,
+    "def": 9,
+    "hp": 72,
+    "range": 1.5,
+    "speed": 0.45,
+    "attackInterval": 16,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "The front rank. Each man plants a tall wicker shield in the ground to build a wall, and the archers behind him shoot over the top of it.",
+    "blurbOlder": "Herodotus gives the Persians wicker bucklers, short spears and scale corselets 'like in appearance to the scales of fish'. Ranks of archers stood behind the shield wall and shot over it — excellent against missiles and against cavalry forced to charge a hedge of spears, fragile once the wall broke at close quarters.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "The modern name is a reconstruction. Scholars build 'sparabara' from Old Persian spara, 'shield', but no surviving Persian text uses it as the name of a unit. The shields, the spears and the formation are attested; the label is ours."
+    ],
+    "sourceRefs": [
+      "https://en.wikipedia.org/wiki/Sparabara",
+      "https://www.iranicaonline.org/articles/army-i"
+    ],
+    "art": {
+      "silhouette": "shield"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "median-spearman",
+    "era": "achaemenid",
+    "class": "infantry",
+    "name": "Median Spearman",
+    "arena": 1,
+    "atk": 5,
+    "def": 8,
+    "hp": 66,
+    "range": 1.5,
+    "speed": 0.5,
+    "attackInterval": 15,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Yesterday's rulers, fighting for today's. You can tell them from the Persians by the turban instead of the soft cap — the armour underneath is the same.",
+    "blurbOlder": "Herodotus equips the Medes exactly as the Persians, and then adds a detail worth keeping: 'that fashion of armour is Median, not Persian.' The conquered people's kit became the conqueror's. Medes held high command throughout the empire and were never treated as a subject nation in the ordinary sense.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.iranicaonline.org/articles/army-i"
+    ],
+    "art": {
+      "silhouette": "spear"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "persian-cavalry",
+    "era": "achaemenid",
+    "class": "cavalry",
+    "name": "Persian Cavalry",
+    "arena": 1,
+    "atk": 7,
+    "def": 4,
+    "hp": 52,
+    "range": 1.5,
+    "speed": 1.05,
+    "attackInterval": 13,
+    "kite": false,
+    "counters": [
+      "archer",
+      "horse-archer"
+    ],
+    "counteredBy": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "blurb": "Fast riders from the noble families, sent around the edge of the enemy line to get at the archers behind it.",
+    "blurbOlder": "Horsemanship was a mark of the Persian nobility, and cavalry decided flanks. Herodotus equips the horse as the foot, with some riders in beaten bronze and iron headgear. Against a standing shield wall a frontal charge was suicide; the value of cavalry was going around a line rather than into it — exactly what Alexander later did to the Persians.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/army-i",
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII"
+    ],
+    "art": {
+      "silhouette": "horse"
+    },
+    "confidence": "attested"
+  },
+  {
+    "id": "kissian-levy",
+    "era": "achaemenid",
+    "class": "infantry",
+    "name": "Kissian Levy",
+    "arena": 2,
+    "atk": 4,
+    "def": 7,
+    "hp": 64,
+    "range": 1.5,
+    "speed": 0.5,
+    "attackInterval": 16,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Men from the country around Susa, kitted out like Persians but wearing turbans. They fought in the second wave at Thermopylae.",
+    "blurbOlder": "The Kissians came from Elam, the old kingdom around Susa that the Persians absorbed. Herodotus arms them as the Persians and marks them out only by headgear — turbans in place of caps. It is a small line that says something large: the empire ran on local levies wearing an imperial standard kit.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.iranicaonline.org/articles/elam-i"
+    ],
+    "art": {
+      "silhouette": "shield"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "immortal",
+    "era": "achaemenid",
+    "class": "heavy-infantry",
+    "name": "Immortal",
+    "arena": 2,
+    "atk": 7,
+    "def": 6,
+    "hp": 60,
+    "range": 1.5,
+    "speed": 0.55,
+    "attackInterval": 14,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "The king's own guard, ten thousand strong. Herodotus says that whenever one fell, another stepped straight into his place, so the number never changed.",
+    "blurbOlder": "Herodotus describes a standing corps of 10,000 kept permanently at full strength, and the Greeks called them athanatoi, 'the immortals'. What the Persians themselves called the unit is not known — no Persian source names it. They carried wicker shields, short spears, and the large bow of the Persepolis reliefs.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "The name is disputed. 'Immortals' reaches us only through Herodotus and writers who follow him. One widely discussed suggestion is that the Greek athanatoi mistranslates an Old Persian word closer to anūšiya, 'companions'. It is a proposal, not a settled fact."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/immortals/",
+      "https://en.wikipedia.org/wiki/Immortals_(Achaemenid_Empire)"
+    ],
+    "art": {
+      "silhouette": "spear"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "bactrian-archer",
+    "era": "achaemenid",
+    "class": "archer",
+    "name": "Bactrian Archer",
+    "arena": 3,
+    "atk": 6,
+    "def": 3,
+    "hp": 40,
+    "range": 24,
+    "speed": 0.4,
+    "attackInterval": 18,
+    "kite": false,
+    "counters": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "counteredBy": [
+      "cavalry",
+      "horse-archer"
+    ],
+    "blurb": "Bowmen from the far north-east, carrying reed bows and a short spear for when the arrows run out.",
+    "blurbOlder": "Herodotus gives the Bactrians headgear 'most like to the Median', native bows of reed, and short spears. Bactria was one of the empire's richest and most independent-minded satrapies — the place a Persian noble was sent to be powerful, and the place from which Bessus would later claim the throne after Darius III's death.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.livius.org/articles/place/bactra-balkh/"
+    ],
+    "art": {
+      "silhouette": "bow"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "saka-horse-archer",
+    "era": "achaemenid",
+    "class": "horse-archer",
+    "name": "Saka Horse-archer",
+    "arena": 3,
+    "atk": 5,
+    "def": 3,
+    "hp": 44,
+    "range": 18,
+    "speed": 0.95,
+    "attackInterval": 16,
+    "kite": true,
+    "counters": [
+      "archer",
+      "infantry"
+    ],
+    "counteredBy": [
+      "heavy-infantry",
+      "cavalry"
+    ],
+    "blurb": "Steppe riders who fought for the Persian king. They never stand still: they shoot, ride back out of reach, and shoot again.",
+    "blurbOlder": "Herodotus marks the Sacae by their tall stiff pointed caps, and arms them with native bows, daggers and the axe they call the sagaris. Saka cavalry stood in Darius III's line at Gaugamela. Their habit of shooting while withdrawing is the idea the Parthians would later make famous as the 'Parthian shot'.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.livius.org/articles/people/sacae/",
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII"
+    ],
+    "art": {
+      "silhouette": "horse-bow"
+    },
+    "confidence": "attested"
+  },
+  {
+    "id": "caspian-skirmisher",
+    "era": "achaemenid",
+    "class": "archer",
+    "name": "Caspian Skirmisher",
+    "arena": 4,
+    "atk": 5,
+    "def": 2,
+    "hp": 36,
+    "range": 22,
+    "speed": 0.45,
+    "attackInterval": 17,
+    "kite": false,
+    "counters": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "counteredBy": [
+      "cavalry",
+      "horse-archer"
+    ],
+    "blurb": "Light troops from the shore of the Caspian, in goat-skin cloaks with reed bows and a short sword.",
+    "blurbOlder": "Herodotus dresses the Caspians in cloaks and gives them 'the reed bows of their country and short swords'. They are a good corrective to the picture of a uniformed imperial army: much of Xerxes' host was regional levies fighting in exactly the kit they used at home.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.iranicaonline.org/articles/army-i"
+    ],
+    "art": {
+      "silhouette": "bow"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "assyrian-clubman",
+    "era": "achaemenid",
+    "class": "heavy-infantry",
+    "name": "Assyrian Clubman",
+    "arena": 4,
+    "atk": 8,
+    "def": 5,
+    "hp": 62,
+    "range": 1.5,
+    "speed": 0.5,
+    "attackInterval": 15,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Linen armour, a bronze helmet, and a wooden club studded with iron. Not elegant — very hard to stop.",
+    "blurbOlder": "Herodotus puts the Assyrians in 'helmets of twisted bronze made in an outlandish fashion', linen breastplates, and gives them shields, spears and daggers of Egyptian pattern plus 'wooden clubs withal studded with iron'. Assyria had been the great power that sacked Susa a century before Cyrus; by Xerxes' day it was a satrapy sending levies.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.iranicaonline.org/articles/assyria-i"
+    ],
+    "art": {
+      "silhouette": "club"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "paphlagonian-javelineer",
+    "era": "achaemenid",
+    "class": "infantry",
+    "name": "Paphlagonian Javelineer",
+    "arena": 5,
+    "atk": 6,
+    "def": 6,
+    "hp": 56,
+    "range": 3,
+    "speed": 0.6,
+    "attackInterval": 15,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Plaited helmets, small shields, and a fistful of javelins to throw before the lines close.",
+    "blurbOlder": "Herodotus gives the Paphlagonians 'plaited helmets on their heads, and small shields and short spears, and javelins and daggers withal', plus knee-high boots of their own country. They sat on the Black Sea coast of Anatolia, one of the many peoples the empire counted without ever fully assimilating.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII"
+    ],
+    "art": {
+      "silhouette": "spear"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "sagartian-lassoer",
+    "era": "achaemenid",
+    "class": "cavalry",
+    "name": "Sagartian Lassoer",
+    "arena": 5,
+    "atk": 6,
+    "def": 2,
+    "hp": 46,
+    "range": 4,
+    "speed": 1.1,
+    "attackInterval": 14,
+    "kite": false,
+    "counters": [
+      "archer",
+      "horse-archer"
+    ],
+    "counteredBy": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "blurb": "They carry no armour and almost no weapons — just a dagger and a rope with a noose. They ride up, catch a man, and drag him away.",
+    "blurbOlder": "Herodotus says the Sagartians were nomads, Persian in speech, and that their custom was 'to carry no armour of bronze or iron, save daggers only, and to use ropes of twisted leather'. At close quarters they threw the rope and hauled in whatever it caught, man or horse. He counts eight thousand of them among the cavalry.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.iranicaonline.org/articles/asagarta/"
+    ],
+    "art": {
+      "silhouette": "lasso"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "indian-cane-archer",
+    "era": "achaemenid",
+    "class": "archer",
+    "name": "Indian Cane-bow Archer",
+    "arena": 6,
+    "atk": 7,
+    "def": 2,
+    "hp": 36,
+    "range": 25,
+    "speed": 0.38,
+    "attackInterval": 18,
+    "kite": false,
+    "counters": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "counteredBy": [
+      "cavalry",
+      "horse-archer"
+    ],
+    "blurb": "Cotton clothes, a bow of cane, and arrows of cane tipped with iron.",
+    "blurbOlder": "Herodotus dresses the Indians in 'garments of tree-wool' — cotton, which struck a Greek audience as remarkable — and arms them with reed bows and iron-tipped reed arrows. Gandara and the Indus lands were the empire's eastern edge and, by Herodotus' reckoning, its richest tribute district.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.iranicaonline.org/articles/gandhara"
+    ],
+    "art": {
+      "silhouette": "bow"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "arabian-camel-rider",
+    "era": "achaemenid",
+    "class": "cavalry",
+    "name": "Arabian Camel Rider",
+    "arena": 6,
+    "atk": 6,
+    "def": 4,
+    "hp": 58,
+    "range": 16,
+    "speed": 0.85,
+    "attackInterval": 17,
+    "kite": false,
+    "counters": [
+      "archer",
+      "horse-archer"
+    ],
+    "counteredBy": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "blurb": "Long bows that curve backwards, shot from the back of a camel. Horses hate the smell of them, which is half the point.",
+    "blurbOlder": "Herodotus gives the Arabians girded mantles and 'long bows curving backwards' worn at the right side, and puts them in the cavalry on camels 'no less swift as horses'. Camels unsettle horses that have not been trained around them — Cyrus is said to have used exactly that against the Lydian cavalry at Thymbra.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII"
+    ],
+    "art": {
+      "silhouette": "camel"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "thracian-peltast",
+    "era": "achaemenid",
+    "class": "infantry",
+    "name": "Thracian Peltast",
+    "arena": 7,
+    "atk": 6,
+    "def": 5,
+    "hp": 52,
+    "range": 3,
+    "speed": 0.7,
+    "attackInterval": 14,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Fox-skin caps, fawnskin boots, a little shield and a handful of javelins. Fast, loose, and hard to pin down.",
+    "blurbOlder": "Herodotus puts the Thracians in fox-skin caps and fawnskin footwear with mantles of many colours, carrying 'javelins and little shields and daggers'. Thrace was the empire's European foothold, taken under Darius and held until the Greek wars went wrong.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII"
+    ],
+    "art": {
+      "silhouette": "spear"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "lydian-hoplite",
+    "era": "achaemenid",
+    "class": "heavy-infantry",
+    "name": "Lydian Hoplite",
+    "arena": 7,
+    "atk": 7,
+    "def": 8,
+    "hp": 66,
+    "range": 1.5,
+    "speed": 0.48,
+    "attackInterval": 15,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Persians from Sardis who fight in Greek armour, because Sardis is where the Persian world touches the Greek one.",
+    "blurbOlder": "Herodotus disposes of the Lydians in one line: their 'armour was most like to the Greek'. Lydia had been Croesus' kingdom until Cyrus took it, and as a Persian satrapy it became the empire's window onto the Aegean — which is why its levies looked like the enemy the Persians would spend a century fighting.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.livius.org/articles/place/sardes/"
+    ],
+    "art": {
+      "silhouette": "shield"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "colchian-shieldman",
+    "era": "achaemenid",
+    "class": "infantry",
+    "name": "Colchian Shieldman",
+    "arena": 8,
+    "atk": 5,
+    "def": 7,
+    "hp": 60,
+    "range": 1.5,
+    "speed": 0.52,
+    "attackInterval": 16,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Wooden helmets and small shields of raw ox-hide, from the eastern shore of the Black Sea.",
+    "blurbOlder": "Herodotus gives the Colchians 'wooden helmets and small shields of raw oxhide and short spears, and swords withal'. Colchis is the land the Greeks put the Golden Fleece in — a reminder that for a Greek audience the edges of the Persian empire and the edges of myth were the same map.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII"
+    ],
+    "art": {
+      "silhouette": "shield"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "armenian-lancer",
+    "era": "achaemenid",
+    "class": "cavalry",
+    "name": "Armenian Lancer",
+    "arena": 8,
+    "atk": 8,
+    "def": 5,
+    "hp": 54,
+    "range": 1.5,
+    "speed": 1,
+    "attackInterval": 13,
+    "kite": false,
+    "counters": [
+      "archer",
+      "horse-archer"
+    ],
+    "counteredBy": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "blurb": "Riders from the highlands, kitted out like their Phrygian neighbours. Armenia bred the horses the empire's cavalry rode.",
+    "blurbOlder": "Herodotus deals with the Armenians in four words — 'armed like the Phrygians' — but the satrapy mattered for a reason he mentions elsewhere: its tribute was paid in horses. Highland Armenia was one of the empire's studs, and Persian cavalry depended on it.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.iranicaonline.org/articles/armenia-ii"
+    ],
+    "art": {
+      "silhouette": "horse"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "egyptian-marine",
+    "era": "achaemenid",
+    "class": "heavy-infantry",
+    "name": "Egyptian Marine",
+    "arena": 9,
+    "atk": 8,
+    "def": 7,
+    "hp": 64,
+    "range": 1.5,
+    "speed": 0.46,
+    "attackInterval": 15,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Ship-fighters with a great axe and a long knife, and a shield with a broad rim for boarding.",
+    "blurbOlder": "Herodotus equips the Egyptian marines with plaited helmets, concave shields with broad rims, boarding spears and great battle-axes, most of them in corselets and carrying long knives. Cambyses took Egypt in 525 BCE and for most of two centuries the Great King was also a pharaoh — Egypt rebelled repeatedly and was repeatedly retaken.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.livius.org/articles/person/cambyses-ii/"
+    ],
+    "art": {
+      "silhouette": "club"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "ethiopian-bowman",
+    "era": "achaemenid",
+    "class": "archer",
+    "name": "Ethiopian Bowman",
+    "arena": 9,
+    "atk": 8,
+    "def": 3,
+    "hp": 42,
+    "range": 28,
+    "speed": 0.36,
+    "attackInterval": 19,
+    "kite": false,
+    "counters": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "counteredBy": [
+      "cavalry",
+      "horse-archer"
+    ],
+    "blurb": "Bows of palm-wood taller than a man, shooting short arrows tipped with sharpened stone instead of iron.",
+    "blurbOlder": "Herodotus wraps the Ethiopians in leopard and lion skins and gives them 'bows made of palm-wood strips, full four cubits long, and short arrows therewith, pointed not with iron but with a sharpened stone', plus spears tipped with sharpened gazelle horn and studded clubs. The stone points are the detail scholars weigh most carefully — it is either careful reporting or a Greek marker for 'the edge of the world'.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and its account of distant peoples leans on Greek convention as much as on report."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII"
+    ],
+    "art": {
+      "silhouette": "bow"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "greek-mercenary-hoplite",
+    "era": "achaemenid",
+    "class": "heavy-infantry",
+    "name": "Greek Mercenary Hoplite",
+    "arena": 10,
+    "atk": 9,
+    "def": 8,
+    "hp": 70,
+    "range": 1.5,
+    "speed": 0.45,
+    "attackInterval": 14,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Greeks fighting for Persian pay. The empire hired them for a century — including the Ten Thousand who marched for a Persian prince.",
+    "blurbOlder": "Greek heavy infantry served Persian employers throughout the fourth century BCE. Xenophon's Ten Thousand were hired by Cyrus the Younger and won their part of the field at Cunaxa in 401 BCE while their employer got himself killed; Greek mercenaries formed the toughest part of Darius III's line at the Granicus and at Issus. The neat story of Greeks versus Persians does not survive contact with the payroll.",
+    "earliestAttested": -401,
+    "attestationNote": "Locked before 401 BCE. Large Greek mercenary contingents in Persian service are firmly attested from the march of Cyrus the Younger and the Ten Thousand in 401 BCE onward.",
+    "disputed": [
+      "Numbers for mercenary contingents come from Greek authors writing about their own countrymen and should be read with that in mind."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/articles/battle/cunaxa-401-bce/",
+      "https://www.livius.org/articles/person/cyrus-the-younger/"
+    ],
+    "art": {
+      "silhouette": "shield"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "scythed-chariot",
+    "era": "achaemenid",
+    "class": "chariot",
+    "name": "Scythed Chariot",
+    "arena": 11,
+    "atk": 10,
+    "def": 3,
+    "hp": 45,
+    "range": 2,
+    "speed": 1.3,
+    "attackInterval": 22,
+    "kite": false,
+    "counters": [
+      "infantry",
+      "archer"
+    ],
+    "counteredBy": [
+      "heavy-infantry",
+      "elephant"
+    ],
+    "blurb": "A war-cart with blades bolted to its wheels, driven straight at a line of men to open a gap in it. Terrifying — and easy to stop if the line simply steps aside.",
+    "blurbOlder": "Scythed chariots appear in Achaemenid armies late, and they rarely worked. At Gaugamela in 331 BCE the Macedonians opened lanes in their ranks and let the chariots run harmlessly through, then killed the drivers from behind. The weapon's reputation always outran its record.",
+    "earliestAttested": -401,
+    "attestationNote": "Locked before 401 BCE. The first firm evidence of scythed chariots in a Persian army is the battle of Cunaxa in 401 BCE. Xenophon's Cyropaedia credits Cyrus the Great with inventing them, but that book is a moral romance rather than a history, and the chariots are missing from the Persian invasions of Greece under Darius and Xerxes.",
+    "disputed": [
+      "Whether the early Achaemenids used scythed chariots at all is contested. Xenophon is the only writer who attributes them to Cyrus the Great, and he is not a reliable witness for the sixth century BCE."
+    ],
+    "sourceRefs": [
+      "https://en.wikipedia.org/wiki/Scythed_chariot",
+      "https://www.bookandsword.com/2016/12/10/scythed-chariots/"
+    ],
+    "art": {
+      "silhouette": "chariot"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "chorasmian-rider",
+    "era": "achaemenid",
+    "class": "cavalry",
+    "name": "Chorasmian Rider",
+    "arena": 10,
+    "atk": 7,
+    "def": 4,
+    "hp": 50,
+    "range": 1.5,
+    "speed": 1.08,
+    "attackInterval": 13,
+    "kite": false,
+    "counters": [
+      "archer",
+      "horse-archer"
+    ],
+    "counteredBy": [
+      "heavy-infantry",
+      "infantry",
+      "elephant"
+    ],
+    "blurb": "Horsemen from the oasis lands beyond Bactria, riding in the same kit their infantry wear.",
+    "blurbOlder": "Herodotus arms the Chorasmians as the Bactrians and, in the cavalry chapters, notes simply that they were 'equipped as were their foot'. Chorasmia — Khwarazm, on the lower Oxus — was the empire's north-eastern limit, irrigated desert that produced both cavalry and one of antiquity's great irrigation systems.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Herodotus' catalogue of Xerxes' army is a literary set-piece as much as a muster roll. Its equipment is treated as more reliable than its troop numbers, which are wildly inflated, and some of its ethnography is second-hand."
+    ],
+    "sourceRefs": [
+      "https://en.wikisource.org/wiki/Herodotus_The_Persian_Wars_(Godley)/Book_VII",
+      "https://www.iranicaonline.org/articles/chorasmia-i"
+    ],
+    "art": {
+      "silhouette": "horse"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "war-elephant",
+    "era": "achaemenid",
+    "class": "elephant",
+    "name": "War Elephant",
+    "arena": 12,
+    "atk": 9,
+    "def": 8,
+    "hp": 95,
+    "range": 2,
+    "speed": 0.5,
+    "attackInterval": 20,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "infantry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "Horses will not go near them. Fifteen were brought from India and stood in the Persian line at Gaugamela — though nobody wrote down what they actually did there.",
+    "blurbOlder": "Arrian records fifteen Indian elephants in Darius III's order of battle at Gaugamela in 331 BCE, and they are mentioned again among the spoils taken in the Persian camp. What they did during the fighting is not described in any surviving account — an honest gap, and a reminder that a unit appearing on a battle list is not the same as a unit that decided anything.",
+    "earliestAttested": -331,
+    "attestationNote": "Locked before 331 BCE. Elephants first appear in an Achaemenid battle line at Gaugamela, brought by the Indian contingent. Before that date the Persian army has no attested elephants.",
+    "disputed": [
+      "Their effect is unknown. The sources place elephants at Gaugamela but say nothing about them fighting, so the strength given to this unit in-game is a design choice, not a historical measurement."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/articles/battle/gaugamela/",
+      "https://en.wikipedia.org/wiki/Battle_of_Gaugamela"
+    ],
+    "art": {
+      "silhouette": "elephant"
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "melophoros",
+    "era": "achaemenid",
+    "class": "heavy-infantry",
+    "name": "Apple-bearer",
+    "arena": 13,
+    "atk": 9,
+    "def": 9,
+    "hp": 78,
+    "range": 1.5,
+    "speed": 0.5,
+    "attackInterval": 13,
+    "kite": false,
+    "counters": [
+      "cavalry",
+      "chariot"
+    ],
+    "counteredBy": [
+      "archer"
+    ],
+    "blurb": "The thousand closest to the king. The butt of each spear is a golden apple — which is how you tell them from the other nine thousand, whose apples are silver.",
+    "blurbOlder": "Herodotus describes a thousand spearmen 'of the best and noblest blood of Persia' around the king. The Greeks called them melophoroi, apple-bearers, after the fruit-shaped counterweight on the spear butt — probably a pomegranate rather than an apple. Heraclides of Cyme says the thousand were drawn from the ten thousand, with gold counterweights marking them out from the silver of the rest.",
+    "earliestAttested": null,
+    "attestationNote": null,
+    "disputed": [
+      "Like the Immortals, this unit reaches us only through Greek writers. The gold-versus-silver distinction comes from Heraclides of Cyme, quoted at second hand, and no Persian source describes the corps."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/articles/concept/immortals/",
+      "https://en.wikipedia.org/wiki/Immortals_(Achaemenid_Empire)"
+    ],
+    "art": {
+      "silhouette": "spear"
+    },
+    "confidence": "probable"
+  }
+]

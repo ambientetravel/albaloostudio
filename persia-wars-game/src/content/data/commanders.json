@@ -1,0 +1,64 @@
+[
+  {
+    "id": "cyrus",
+    "name": "Cyrus",
+    "epithet": "Coalition",
+    "arena": 1,
+    "affinity": "wide",
+    "passive": {
+      "id": "many-peoples",
+      "name": "Many Peoples",
+      "reads": "Every different kind of squad in your army makes the whole line hold together longer. Four of the same kind does nothing."
+    },
+    "order": {
+      "id": "the-line-reforms",
+      "name": "The Line Reforms",
+      "reads": "The first squad you lose gets back up once, at half strength.",
+      "trigger": "the first time one of your squads falls"
+    },
+    "blurb": "He did not win by having the biggest army. He won by being the king that other peoples were willing to fight alongside — and then by not punishing them afterwards.",
+    "blurbOlder": "The Cyrus Cylinder presents a ruler who restores local sanctuaries and returns displaced peoples, and the Babylonian material shows a takeover managed by accommodation rather than by sack. Whether that was principle or policy is argued, but the pattern is on the record.",
+    "confidence": "attested",
+    "disputed": [
+      "The passive, the order and the drafting affinity are game design. No source describes Cyrus using a battlefield doctrine of any kind — the kit is built from what his reign is recorded as valuing, not from a recorded tactic.",
+      "His birth, upbringing and early biography are uncertain, and the fullest accounts of them are Greek and much later."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/cyrus-iii",
+      "https://www.britishmuseum.org/collection/object/W_1880-0617-1941",
+      "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-7-nabonidus-chronicle/"
+    ],
+    "art": { "silhouette": "spear" }
+  },
+  {
+    "id": "astyages",
+    "name": "Astyages",
+    "epithet": "Royal Muster",
+    "arena": 1,
+    "affinity": "deep",
+    "passive": {
+      "id": "kings-levy",
+      "name": "The King's Levy",
+      "reads": "In the first two rounds one card on offer arrives already Trained. You start ahead of them."
+    },
+    "order": {
+      "id": "muster-again",
+      "name": "Muster Again",
+      "reads": "When you are two squads down, one of your squads is reinforced on the spot.",
+      "trigger": "falling two squads behind"
+    },
+    "blurb": "The king with the bigger army, the older kingdom and the better start — who lost anyway, because the men he mustered decided they would rather have somebody else.",
+    "blurbOlder": "The Nabonidus Chronicle records that Astyages mobilised against Cyrus and that his own army mutinied, bound him and handed him over. It is one of the clearest cases in ancient history of a war decided by an army refusing to fight it.",
+    "confidence": "attested",
+    "disputed": [
+      "The passive, the order and the drafting affinity are game design. Median military practice is barely recorded and what is written about it is mostly inferred backwards from later Persian evidence.",
+      "The Greek accounts of Astyages' character and reign are hostile and much later, and should not be read as description."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/astyages",
+      "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-7-nabonidus-chronicle/",
+      "https://www.iranicaonline.org/articles/media"
+    ],
+    "art": { "silhouette": "shield" }
+  }
+]

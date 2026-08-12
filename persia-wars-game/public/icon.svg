@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#35609f"/>
+      <stop offset="1" stop-color="#142a4f"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eec95f"/>
+      <stop offset="1" stop-color="#d4a22b"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- Placeholder crest: crossed spears behind a shield, Achaemenid palette. -->
+  <path d="M150 142 L362 400 M362 142 L150 400" stroke="#0d1a33" stroke-width="30" stroke-linecap="round"/>
+  <path d="M150 142 L362 400 M362 142 L150 400" stroke="url(#gold)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M256 150 c-66 0 -92 20 -92 20 v96 c0 72 48 116 92 134 44 -18 92 -62 92 -134 v-96 s-26 -20 -92 -20 z"
+        fill="#b8412a" stroke="#0d1a33" stroke-width="16"/>
+  <path d="M198 246 h116 M198 302 h116" stroke="#eec95f" stroke-width="14" stroke-linecap="round"/>
+</svg>

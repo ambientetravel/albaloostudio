@@ -1,0 +1,386 @@
+[
+  {
+    "id": "small-court",
+    "chapter": 1,
+    "number": 1,
+    "name": "The Small Court",
+    "setup": "You are king of Anshan. It is not a large thing to be. A few valleys, a few households who answer when you call, and a much larger king in the north who expects his share.",
+    "objective": "defeat",
+    "winsNeeded": 2,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "A card you take stays with you for the whole match"
+    ],
+    "reward": {
+      "kind": "card",
+      "id": "kissian-levy"
+    },
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": [
+      "Cyrus' court before the revolt is not described in any source. This mission is a scene, not a record."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/cyrus-iii",
+      "https://www.iranicaonline.org/articles/anshan-elamite-region"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "rally-households",
+    "chapter": 1,
+    "number": 2,
+    "name": "Rally the Households",
+    "setup": "Nobody in Fars keeps a standing army. You keep men who farm, and who come when they are called — if they think you are worth coming for.",
+    "objective": "defeat",
+    "winsNeeded": 2,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "Taking the same card twice makes it stronger",
+      "An army of one kind loses to its counter"
+    ],
+    "reward": {
+      "kind": "card",
+      "id": "sagartian-lassoer"
+    },
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": [
+      "That early Persian forces were household levies is inferred from the region and the period, not stated in a source."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/army-i"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "roads-of-fars",
+    "chapter": 1,
+    "number": 3,
+    "name": "Roads of Fars",
+    "setup": "Grain moves slower than men do. Hold the road and you hold everything on it.",
+    "objective": "defeat",
+    "winsNeeded": 2,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "The ground you fight on changes what your army is worth"
+    ],
+    "reward": {
+      "kind": "upgrade",
+      "id": "locked-shields"
+    },
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": [
+      "No supply action from this campaign is recorded. The mission teaches terrain using a plausible setting."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/fars-i"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "tribal-council",
+    "chapter": 1,
+    "number": 4,
+    "name": "The Tribal Council",
+    "setup": "The heads of the Persian tribes have come to hear what you intend. What you say to them decides who rides with you — and who does not.",
+    "objective": "choice",
+    "winsNeeded": 0,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "Not every decision in a war is made on a battlefield"
+    ],
+    "choices": [
+      {
+        "id": "promise-plunder",
+        "label": "Promise them the spoils",
+        "reads": "The riders come, and they come for what they can carry.",
+        "reward": {
+          "kind": "card",
+          "id": "caspian-skirmisher"
+        }
+      },
+      {
+        "id": "promise-standing",
+        "label": "Promise them standing",
+        "reads": "Fewer men, but the ones who come stay when it turns hard.",
+        "reward": {
+          "kind": "upgrade",
+          "id": "long-reach"
+        }
+      },
+      {
+        "id": "promise-nothing",
+        "label": "Promise nothing you cannot give",
+        "reads": "They respect it. They are also slower to arrive.",
+        "reward": {
+          "kind": "doctrine",
+          "id": "the-centre-holds"
+        }
+      }
+    ],
+    "reward": null,
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": [
+      "Herodotus has Cyrus assemble the Persians and win them over with a day of labour and a day of feasting. It is a good story and a late one; the council here is invention built on it."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/cyrus-iii"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "border-warning",
+    "chapter": 1,
+    "number": 5,
+    "name": "Border Warning",
+    "setup": "A Median column has come as far as the passes. Not to conquer — to remind you what is above you.",
+    "objective": "defeat",
+    "winsNeeded": 3,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "The counter triangle decides more than raw numbers"
+    ],
+    "reward": {
+      "kind": "upgrade",
+      "id": "ready-volley"
+    },
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": [
+      "No border action is recorded before the main campaign."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/media"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "kingdom-divided",
+    "chapter": 1,
+    "number": 6,
+    "name": "A Kingdom Divided",
+    "setup": "Not everyone in Fars wants this fight. Some of your own would rather pay the tribute and keep the harvest.",
+    "objective": "defeat",
+    "winsNeeded": 3,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "A wide army holds together longer than a deep one"
+    ],
+    "reward": {
+      "kind": "doctrine",
+      "id": "shoot-the-horses"
+    },
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": [
+      "Persian opposition to the revolt is not attested. It is likely rather than known."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/cyrus-iii"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "the-refusal",
+    "chapter": 1,
+    "number": 7,
+    "name": "The Refusal",
+    "setup": "The tribute is due. You are not sending it. Everything after this happens because of a thing you did not do.",
+    "objective": "defeat",
+    "winsNeeded": 3,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "A war can begin with a refusal rather than an attack"
+    ],
+    "reward": {
+      "kind": "commander",
+      "id": "cyrus"
+    },
+    "confidence": "traditional-account",
+    "disputed": [
+      "That the revolt began with withheld tribute is the Greek tradition. The Babylonian evidence records only that Astyages mobilised against Cyrus."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-7-nabonidus-chronicle/",
+      "https://www.iranicaonline.org/articles/cyrus-iii"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "first-advance",
+    "chapter": 2,
+    "number": 8,
+    "name": "The First Advance",
+    "setup": "Astyages has taken the field himself. His army is larger than yours, better equipped than yours, and has done this before.",
+    "objective": "defeat",
+    "winsNeeded": 3,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "Being outnumbered is a problem you draft your way out of"
+    ],
+    "reward": {
+      "kind": "card",
+      "id": "immortal"
+    },
+    "confidence": "probable",
+    "disputed": [
+      "That Astyages campaigned in person is in the Nabonidus Chronicle. The course of the advance is not."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-7-nabonidus-chronicle/"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "broken-ground",
+    "chapter": 2,
+    "number": 9,
+    "name": "Broken Ground",
+    "setup": "You cannot beat this army on open ground. So do not fight it on open ground.",
+    "objective": "defeat",
+    "winsNeeded": 3,
+    "scenario": "persian-gates-330",
+    "teaches": [
+      "Choosing where to fight is choosing half the result"
+    ],
+    "reward": {
+      "kind": "doctrine",
+      "id": "broken-ground"
+    },
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": [
+      "The gorge here stands in for terrain the sources do not describe. The Persian Gates itself belongs to a different war two centuries later."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/army-i"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "retreat-to-persis",
+    "chapter": 2,
+    "number": 10,
+    "name": "Retreat to Persis",
+    "setup": "You are not going to win today. Today you are going to still have an army tomorrow.",
+    "objective": "survive",
+    "winsNeeded": 2,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "Winning is not always the same as destroying the enemy",
+      "An army that survives a bad day can fight a better one"
+    ],
+    "reward": {
+      "kind": "upgrade",
+      "id": "loosed-rein"
+    },
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": [
+      "No withdrawal is recorded. The mission exists to teach that a loss can be survived, which is the honest lesson of most campaigns."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/cyrus-iii"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "camp-holds",
+    "chapter": 2,
+    "number": 11,
+    "name": "The Camp Holds",
+    "setup": "Standards, grain, and the families who followed the army. Lose the camp and the army stops being an army.",
+    "objective": "survive",
+    "winsNeeded": 2,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "A shield wall holds ground it cannot chase"
+    ],
+    "reward": {
+      "kind": "upgrade",
+      "id": "wheeling-line"
+    },
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": [
+      "Camp defence is a standard feature of ancient warfare, not a recorded episode of this campaign."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/army-i"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "divided-loyalties",
+    "chapter": 2,
+    "number": 12,
+    "name": "Divided Loyalties",
+    "setup": "Word comes that not all of the Median army wants to be here. Harpagus commands its centre, and Harpagus has reasons of his own.",
+    "objective": "defeat",
+    "winsNeeded": 3,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "Armies are made of people who can decide things"
+    ],
+    "reward": {
+      "kind": "commander",
+      "id": "astyages"
+    },
+    "confidence": "traditional-account",
+    "disputed": [
+      "Harpagus' grievance and his role are Herodotus, heavily novelised, and centuries later. That the Median army changed sides IS in the near-contemporary Babylonian record — the motive is not."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-7-nabonidus-chronicle/",
+      "https://www.iranicaonline.org/articles/harpagus"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "plain-before-pasargadae",
+    "chapter": 2,
+    "number": 13,
+    "name": "The Plain before Pasargadae",
+    "setup": "Open ground on the Murghab plain. Nothing is built here yet. Everything that will be built here depends on tomorrow.",
+    "objective": "defeat",
+    "winsNeeded": 3,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "Where a capital stands is decided before it is built"
+    ],
+    "reward": {
+      "kind": "capital",
+      "id": "camp"
+    },
+    "confidence": "traditional-account",
+    "disputed": [
+      "That the decisive fighting happened at Pasargadae comes from Strabo, about five centuries later."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/pasargadae",
+      "https://whc.unesco.org/en/list/1106/"
+    ],
+    "dossier": true
+  },
+  {
+    "id": "last-stand",
+    "chapter": 2,
+    "number": 14,
+    "name": "The Last Stand",
+    "setup": "Astyages is in the field with everything he has left. So are you.",
+    "objective": "defeat",
+    "winsNeeded": 4,
+    "scenario": "pasargadae-550",
+    "teaches": [
+      "How the Achaemenid Empire was founded",
+      "An army can decide a war by refusing to fight it"
+    ],
+    "reward": {
+      "kind": "capital",
+      "id": "gardens"
+    },
+    "confidence": "probable",
+    "disputed": [
+      "The Nabonidus Chronicle — near-contemporary — records that Astyages' own army mutinied, bound him and handed him to Cyrus. The pitched battle is the Greek version of the same events."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-7-nabonidus-chronicle/",
+      "https://www.iranicaonline.org/articles/cyrus-iii"
+    ],
+    "dossier": true
+  }
+]

@@ -1,0 +1,18 @@
+# Render — Docker web service. Its free tier sleeps after inactivity, which
+# drops sockets and ends matches; the starter tier does not.
+services:
+  - type: web
+    name: persia-at-war-test
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /healthz
+    envVars:
+      - key: WS_PORT
+        value: 8080
+      - key: SERVE_DIST
+        value: "1"
+      - key: ACCESS_USER
+        value: team
+      - key: ACCESS_PASS
+        sync: false   # set this in the dashboard, never in the repo

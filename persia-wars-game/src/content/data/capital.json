@@ -1,0 +1,47 @@
+[
+  {
+    "id": "camp",
+    "name": "The Camp",
+    "order": 1,
+    "reads": "Tents, a picket line and a standard planted in the ground. Everything you have is portable, because until now everything has had to be.",
+    "confidence": "reconstructed-for-gameplay",
+    "disputed": ["A generic pre-royal camp. Nothing about Cyrus' encampments is recorded."],
+    "sourceRefs": ["https://www.iranicaonline.org/articles/army-i"]
+  },
+  {
+    "id": "gardens",
+    "name": "The Watered Garden",
+    "order": 2,
+    "reads": "Straight stone channels carrying water across a dry plain, and planting laid out along them. The Greeks borrowed a Persian word for this and we still use it: paradise.",
+    "confidence": "attested",
+    "disputed": [],
+    "sourceRefs": ["https://www.iranicaonline.org/articles/pasargadae", "https://whc.unesco.org/en/list/1106/"]
+  },
+  {
+    "id": "audience-hall",
+    "name": "The Audience Hall",
+    "order": 3,
+    "reads": "A columned hall standing on its own in the garden rather than inside a fortress wall. A king who builds without walls is saying something about how safe he feels.",
+    "confidence": "attested",
+    "disputed": [],
+    "sourceRefs": ["https://www.iranicaonline.org/articles/pasargadae"]
+  },
+  {
+    "id": "gate-house",
+    "name": "The Gatehouse",
+    "order": 4,
+    "reads": "A doorway with a winged figure carved beside it, wearing an Egyptian crown, Elamite dress and Assyrian wings. Whoever it is, it is not one thing.",
+    "confidence": "attested",
+    "disputed": ["Who the winged figure represents — Cyrus, a guardian spirit, or something else — has been argued for two centuries and is not settled."],
+    "sourceRefs": ["https://www.iranicaonline.org/articles/pasargadae", "https://www.iranicaonline.org/articles/cyrus-iv-winged-figure"]
+  },
+  {
+    "id": "tomb",
+    "name": "The Tomb",
+    "order": 5,
+    "reads": "A plain gabled chamber on a stepped plinth, standing by itself on the plain. It is still there.",
+    "confidence": "attested",
+    "disputed": ["The inscription Greek writers report on it is not preserved, and its wording comes to us only through them."],
+    "sourceRefs": ["https://www.iranicaonline.org/articles/cyrus-v-tomb", "https://whc.unesco.org/en/list/1106/"]
+  }
+]

@@ -1,0 +1,282 @@
+[
+  {
+    "id": "farr",
+    "name": "Farr",
+    "source": "Avesta",
+    "arena": 2,
+    "kind": "legend",
+    "blurb": "The glory that settles on a rightful king — and leaves him the moment he stops deserving it.",
+    "blurbOlder": "Khvarenah, later farr, is the divine radiance of legitimate rule in Zoroastrian tradition. In the Shahnameh it abandons Jamshid when pride takes him, which is the whole moral engine of the poem: kingship is conditional.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/farrah"
+    ],
+    "art": {
+      "silhouette": "shield"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "simorgh-feather",
+    "name": "Simorgh's Feather",
+    "source": "Shahnameh",
+    "arena": 3,
+    "kind": "legend",
+    "blurb": "Burn it and the great bird comes. She raised an abandoned child on a mountain, and she does not forget her own.",
+    "blurbOlder": "The Simorgh rears the outcast infant Zal and gives him a feather to burn in extremity. She returns to deliver Rostam and to heal his wounds — one of the oldest helper-figures in Iranian storytelling.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/simorg"
+    ],
+    "art": {
+      "silhouette": "bow"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "derafsh-kaviani",
+    "name": "Derafsh Kaviani",
+    "source": "Shahnameh",
+    "arena": 4,
+    "kind": "legend",
+    "blurb": "A blacksmith's leather apron raised on a spear as a flag of revolt — and it became the banner of Iran.",
+    "blurbOlder": "Kaveh the blacksmith, having lost his sons to Zahhak, hoists his apron as a standard and starts the rising that puts Fereydun on the throne. Later tradition has the banner jewelled and carried by Sasanian armies until it was lost at Nahavand.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/derafs-e-kaviani"
+    ],
+    "art": {
+      "silhouette": "spear"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "jam-e-jam",
+    "name": "Jamshid's Cup",
+    "source": "Shahnameh",
+    "arena": 4,
+    "kind": "legend",
+    "blurb": "Look into the wine and you see the whole world in it — every place at once, and what is about to happen there.",
+    "blurbOlder": "The Jam-e Jam shows the seven climes of the world reflected in its liquid. It became the standard Persian metaphor for total knowledge, and Hafez uses it constantly to mean the opposite: the thing you search for that was inside you all along.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/jam-e-jam"
+    ],
+    "art": {
+      "silhouette": "shield"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "arash-arrow",
+    "name": "Arash's Arrow",
+    "source": "Avesta / Shahnameh tradition",
+    "arena": 5,
+    "kind": "legend",
+    "blurb": "He put his whole life into one shot to set a border, and the arrow flew from dawn until noon.",
+    "blurbOlder": "Arash Kamangir shoots an arrow to fix the frontier between Iran and Turan, pouring his entire strength into the draw and dying as it leaves the string. The arrow lands at the Oxus. It is the founding story of a border drawn by sacrifice rather than by conquest.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/aras-kamangir"
+    ],
+    "art": {
+      "silhouette": "bow"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "rakhsh",
+    "name": "Rakhsh",
+    "source": "Shahnameh",
+    "arena": 5,
+    "kind": "legend",
+    "blurb": "Rostam's horse. He chose his own rider, killed a lion while his rider slept, and no other horse could carry the weight.",
+    "blurbOlder": "Rakhsh is the only horse that does not buckle under Rostam's hand pressed on its spine. Through the Haft Khan he fights beside his rider rather than under him, and his death — in a pit of spears — is the beginning of Rostam's own.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/raks"
+    ],
+    "art": {
+      "silhouette": "horse"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "gorz-e-gavsar",
+    "name": "Ox-headed Mace",
+    "source": "Shahnameh",
+    "arena": 6,
+    "kind": "legend",
+    "blurb": "Fereydun had it forged with the head of an ox, and carried it against the serpent-king.",
+    "blurbOlder": "The gorz-e gavsar is Fereydun's weapon against Zahhak, and it passes down the heroic line to Rostam. In the miniature tradition it is the visual shorthand for legitimate force — a weapon used to end a tyranny rather than to build one.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/fereydun"
+    ],
+    "art": {
+      "silhouette": "club"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "div-e-sepid",
+    "name": "The White Div",
+    "source": "Shahnameh",
+    "arena": 6,
+    "kind": "legend",
+    "blurb": "The demon of Mazandaran, who blinded an army with a fog and had to be fought in his own cave.",
+    "blurbOlder": "The Div-e Sepid strikes Kay Kavus and his army blind, and the seventh of Rostam's labours is to enter the cave and kill him. His liver restores the sight of the blinded. Persian divs are not devils in the Christian sense — they are older, stranger, and often bound to a particular place.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/div"
+    ],
+    "art": {
+      "silhouette": "club"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "zahhak-serpents",
+    "name": "Zahhak's Serpents",
+    "source": "Shahnameh",
+    "arena": 7,
+    "kind": "legend",
+    "blurb": "Two snakes grew from a king's shoulders where the devil kissed him, and they had to be fed every day.",
+    "blurbOlder": "Ahriman kisses Zahhak's shoulders and serpents sprout there, demanding human brains daily. The thousand-year tyranny that follows is the Shahnameh's portrait of what a ruler becomes when he takes power by killing his father. Kaveh's revolt ends it.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/azdaha-i"
+    ],
+    "art": {
+      "silhouette": "lasso"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "homa",
+    "name": "Homa",
+    "source": "Iranian tradition",
+    "arena": 7,
+    "kind": "legend",
+    "blurb": "A bird that never lands. Its shadow falling on you is said to make you a king.",
+    "blurbOlder": "The homa lives its whole life in the air and touches ground only at death. Whoever its shadow crosses is destined to rule. The twinned-bird capitals of Persepolis are popularly identified with it, though that identification is modern rather than ancient.",
+    "disputed": [
+      "The identification of the Persepolis column capitals as homa birds is a modern popular reading, not an ancient label."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/homa-bird"
+    ],
+    "art": {
+      "silhouette": "bow"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "atar",
+    "name": "Atar",
+    "source": "Avesta",
+    "arena": 8,
+    "kind": "legend",
+    "blurb": "The sacred fire. Not a god to be worshipped, but the thing you face while you pray.",
+    "blurbOlder": "Atar is fire as the son of Ahura Mazda and the medium of purity in Zoroastrian practice. The persistent outside description of Zoroastrians as 'fire-worshippers' is a misreading: the fire is a direction to pray toward, not the object of prayer.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/atas"
+    ],
+    "art": {
+      "silhouette": "spear"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "haoma",
+    "name": "Haoma",
+    "source": "Avesta",
+    "arena": 8,
+    "kind": "legend",
+    "blurb": "A plant pressed into a drink that gives strength and long memory. Nobody now knows for certain which plant it was.",
+    "blurbOlder": "Haoma is both a plant, a pressed drink, and a divinity in the Avesta, cognate with the Indian soma. Its botanical identity has been argued over for two centuries — ephedra is the leading candidate — and remains unsettled.",
+    "disputed": [
+      "The botanical identity of haoma is genuinely unresolved; ephedra is the leading candidate but not a settled one."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/haoma-i"
+    ],
+    "art": {
+      "silhouette": "shield"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "anahita-waters",
+    "name": "Anahita's Waters",
+    "source": "Avesta",
+    "arena": 9,
+    "kind": "legend",
+    "blurb": "The lady of the waters, who is asked for strong horses, fast chariots, and children who survive.",
+    "blurbOlder": "Aredvi Sura Anahita is the Avestan divinity of the waters, invoked in the Aban Yasht by heroes asking for victory. Artaxerxes II names her in royal inscriptions alongside Ahura Mazda and Mithra — the first Achaemenid king to name any divinity but Ahura Mazda.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/anahid"
+    ],
+    "art": {
+      "silhouette": "shield"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "mithra-light",
+    "name": "Mithra's Light",
+    "source": "Avesta",
+    "arena": 10,
+    "kind": "legend",
+    "blurb": "The keeper of oaths, who sees a broken promise from a thousand plains away.",
+    "blurbOlder": "Mithra is the divinity of covenant and the sworn word, with ten thousand eyes and ten thousand ears in the Mihr Yasht. He is named in Artaxerxes II's inscriptions, and a much-transformed version of him travelled west into the Roman mysteries of Mithras — how much survived that journey is heavily debated.",
+    "disputed": [
+      "The relationship between Iranian Mithra and Roman Mithras is contested; continuity of the name is not continuity of the cult."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/mithra-i"
+    ],
+    "art": {
+      "silhouette": "spear"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "haft-khan",
+    "name": "The Seven Labours",
+    "source": "Shahnameh",
+    "arena": 11,
+    "kind": "legend",
+    "blurb": "Seven trials on the road to Mazandaran — a lion, a desert, a dragon, a sorceress, and worse waiting at the end.",
+    "blurbOlder": "The Haft Khan is Rostam's sequence of seven ordeals on the way to rescue Kay Kavus. Esfandiyar later performs his own seven. The doubling is deliberate: the poem is testing two kinds of hero against the same road, and only one of them comes out of it well.",
+    "disputed": [],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/haft-kan"
+    ],
+    "art": {
+      "silhouette": "club"
+    },
+    "confidence": "traditional-account"
+  },
+  {
+    "id": "peri-veil",
+    "name": "Peri's Veil",
+    "source": "Iranian tradition",
+    "arena": 12,
+    "kind": "legend",
+    "blurb": "Beautiful, winged, and not on anyone's side. A peri helps or ruins you depending on how you behave.",
+    "blurbOlder": "The pari of Iranian folklore is neither angel nor demon. In the older Avestan layer the pairika is hostile; in later Persian literature the peri becomes the type of unearthly beauty. That inversion — a hostile spirit turning into a romantic ideal over a thousand years — is one of the clearest examples of how the tradition rewrote itself.",
+    "disputed": [
+      "The peri's character reverses between the Avestan and the later Persian material; treating them as one figure flattens that history."
+    ],
+    "sourceRefs": [
+      "https://www.iranicaonline.org/articles/pari"
+    ],
+    "art": {
+      "silhouette": "horse-bow"
+    },
+    "confidence": "traditional-account"
+  }
+]

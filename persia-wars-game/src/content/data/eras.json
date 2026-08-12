@@ -1,0 +1,19 @@
+[
+  {
+    "id": "achaemenid",
+    "name": "Achaemenid",
+    "span": "550–330 BCE",
+    "startYear": -550,
+    "endYear": -330,
+    "capital": "Pasargadae · Susa · Persepolis",
+    "color": "#ff5a4d",
+    "accent": "#ffd45e",
+    "unlockAfter": null,
+    "signatureUnits": ["immortal", "spara-bearer", "persian-archer", "persian-cavalry"],
+    "blurb": "The first Persian empire. It began when Cyrus overthrew his Median overlord, and ended when Alexander of Macedon burned Persepolis. Its armies fought behind walls of wicker shields, with archers massed at the back.",
+    "sourceRefs": [
+      "https://www.livius.org/articles/person/cyrus-the-great/",
+      "https://www.iranicaonline.org/articles/achaemenid-dynasty"
+    ]
+  }
+]

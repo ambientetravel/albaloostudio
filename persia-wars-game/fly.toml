@@ -1,0 +1,30 @@
+# fly.io — WebSockets work on the free-ish shared tier and it keeps a process
+# alive, which this game needs.
+app = "persia-at-war-test"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  WS_PORT = "8080"
+  SERVE_DIST = "1"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Do NOT set min_machines_running = 0. A cold start drops every open socket,
+  # which ends any match in progress.
+  auto_stop_machines = false
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "4s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

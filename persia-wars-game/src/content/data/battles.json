@@ -1,0 +1,85 @@
+[
+  {
+    "id": "pasargadae-550",
+    "era": "achaemenid",
+    "year": "550 BCE",
+    "yearNumeric": -550,
+    "name": "The Plain before Pasargadae",
+    "opponents": {
+      "a": "Persians under Cyrus",
+      "b": "Medes under Astyages"
+    },
+    "victor": "Persian victory — the empire begins",
+    "victorSide": "a",
+    "onIranianSoil": true,
+    "site": "Murghab plain, Fars, southern Iran",
+    "summary": "Cyrus was a small king who answered to a bigger one. When he refused to keep obeying, Astyages of Media marched out to punish him — and the Median soldiers changed sides in the middle of the campaign. They tied up their own king and handed him to Cyrus. That is how the Persian Empire started.",
+    "summaryOlder": "The contemporary Babylonian record is blunt. The Nabonidus Chronicle, under the sixth year of Nabonidus, says Astyages mobilised his army against Cyrus, king of Anshan; that his troops revolted, bound him, and delivered him up; and that Cyrus then plundered and occupied Ecbatana, the Median capital. A pitched battle at Pasargadae belongs to a later Greek tradition — Strabo, writing more than five centuries afterwards, places Cyrus's victory 'among the Pasargadae'. So the empire was founded less by a stroke of battlefield genius than by a mutiny, which is the less flattering and better-evidenced version.",
+    "teaches": [
+      "How the Achaemenid Empire was founded",
+      "Medes and Persians were two different peoples",
+      "Armies can decide a war by refusing to fight it"
+    ],
+    "kings": [
+      "cyrus",
+      "astyages"
+    ],
+    "disputed": [
+      "The date. The Nabonidus Chronicle points to 550 BCE; the Nabonidus Cylinder of Sippar points to 553 BCE. One reconciliation is that the revolt started in 553 and the decisive campaign came in 550.",
+      "Whether a real battle was fought here at all. The Babylonian evidence describes a mutiny, not a battle. Herodotus, Ctesias and Nicolaus of Damascus give fuller battle narratives, but they are Greek, they are much later, and they disagree with each other.",
+      "That the fighting happened at Pasargadae at all. That comes from Strabo, writing about five centuries later. Nothing was built there yet — Cyrus laid out the capital after he won."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-7-nabonidus-chronicle/",
+      "https://www.livius.org/articles/person/cyrus-the-great/",
+      "https://www.iranicaonline.org/articles/cyrus-iii/"
+    ],
+    "field": {
+      "terrain": "plain",
+      "note": "Open ground on the Murghab plain, years before any capital stood on it. Room to ride, so cavalry and chariots have space to work."
+    },
+    "confidence": "probable"
+  },
+  {
+    "id": "persian-gates-330",
+    "era": "achaemenid",
+    "year": "January 330 BCE",
+    "yearNumeric": -330,
+    "name": "The Persian Gates",
+    "opponents": {
+      "a": "Persians under Ariobarzanes",
+      "b": "Macedonians under Alexander"
+    },
+    "victor": "Macedonian victory — the road to Persepolis opens",
+    "victorSide": "b",
+    "onIranianSoil": true,
+    "site": "Tang-e Meyran gorge, Zagros mountains, near Yasuj",
+    "summary": "The empire had already lost two great battles. Ariobarzanes took a small force into a narrow mountain gorge, the only road to Persepolis, and stopped Alexander's army cold. He held it until someone showed the Macedonians a goat-track over the mountain, and they came down behind him in the dark.",
+    "summaryOlder": "After Gaugamela the Achaemenid field army was gone, but the geography was still Persian. The gorge narrows to a defile where numbers stop mattering, and Ariobarzanes used it exactly as it should be used. Alexander eventually turned the position by a night march up a parallel valley — the standard account says a captured prisoner or a local shepherd showed him the way, which is worth noticing because it repeats Herodotus's story of Ephialtes at Thermopylae almost detail for detail. The pass fell, Persepolis fell with it, and the palace was burned later that year.",
+    "teaches": [
+      "Terrain can beat numbers — for a while",
+      "How the Achaemenid Empire ended",
+      "A famous story is not the same as a proven one"
+    ],
+    "kings": [
+      "darius-iii",
+      "ariobarzanes"
+    ],
+    "disputed": [
+      "The numbers. Arrian gives Ariobarzanes 40,000 infantry and 700 cavalry, which specialists regard as grossly exaggerated and implausible; Encyclopædia Iranica suggests a real strength as low as 700 and no more than 2,000. The game does not use either figure — it is a squad game, not a reconstruction.",
+      "The thirty days. That the pass was held for a month is widely repeated but thinly sourced.",
+      "The guide. The story of the prisoner or shepherd who revealed the mountain path mirrors Herodotus's Ephialtes at Thermopylae so closely that its reliability is questioned.",
+      "Ariobarzanes' death. Killed in a last charge, escaped north and surrendered later, or shut out of Persepolis and killed at its gate — the sources give all three."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/articles/battle/persian-gate-330-bce/",
+      "https://en.wikipedia.org/wiki/Battle_of_the_Persian_Gate",
+      "https://en.wikipedia.org/wiki/Ariobarzanes,_Satrap_of_Persis"
+    ],
+    "field": {
+      "terrain": "gorge",
+      "note": "A narrow defile. Cavalry and chariots lose their advantage where there is no room to turn."
+    },
+    "confidence": "probable"
+  }
+]

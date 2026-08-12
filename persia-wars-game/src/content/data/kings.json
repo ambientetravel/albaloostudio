@@ -1,0 +1,72 @@
+[
+  {
+    "id": "cyrus",
+    "era": "achaemenid",
+    "name": "Cyrus the Great",
+    "title": "King of Anshan, then King of Persia",
+    "reign": "559–530 BCE",
+    "bio": "He began as king of Anshan, a small kingdom that answered to the Medes. He ended as ruler of the largest empire the world had yet seen, stretching from the Aegean to the edge of India. He died on campaign in the north-east in December 530 BCE.",
+    "achievement": "Founded the Achaemenid Empire, took Babylon in October 539 BCE, and left behind the Cyrus Cylinder — a clay text describing his entry into the city and his restoration of its temples.",
+    "disputed": [
+      "The Cyrus Cylinder is often called the first charter of human rights. Most specialists reject that description. It follows a long Babylonian tradition of texts a new king wrote when restoring a temple, and it is addressed to the gods and to the city, not to humanity. Amélie Kuhrt has called the 'first bill of human rights' framing an exaggeration, and Irving Finkel of the British Museum puts it plainly: there were no human rights in antiquity. The Cylinder is a genuinely remarkable object; the modern label is a modern invention.",
+      "The date of his victory over the Medes is contested — 550 BCE by the Nabonidus Chronicle, 553 BCE by the Nabonidus Cylinder of Sippar. One way of reconciling them is that the revolt began in 553 and the decisive campaign came in 550."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/articles/person/cyrus-the-great/",
+      "https://www.iranicaonline.org/articles/cyrus-iii/",
+      "https://peabody.yale.edu/news/finkel_talk"
+    ],
+    "confidence": "probable"
+  },
+  {
+    "id": "astyages",
+    "era": "achaemenid",
+    "name": "Astyages",
+    "title": "Last king of the Medes",
+    "reign": "c. 585–550 BCE",
+    "bio": "Cyrus's overlord, and by the Greek tradition his grandfather. He marched out to put down Cyrus's revolt and lost his throne without winning or losing a proper battle: his own army turned on him, tied him up, and handed him over.",
+    "achievement": "Held the Median kingdom at its greatest extent, and lost it. His fall is the moment the Median empire becomes the Persian one.",
+    "disputed": [
+      "Herodotus makes Astyages the grandfather of Cyrus, raising the boy who would destroy him. The story has the shape of a folk tale — an exposed royal infant who survives — and modern historians treat the family link as tradition rather than established fact."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-7-nabonidus-chronicle/",
+      "https://www.iranicaonline.org/articles/astyages-gr"
+    ],
+    "confidence": "probable"
+  },
+  {
+    "id": "darius-iii",
+    "era": "achaemenid",
+    "name": "Darius III",
+    "title": "Last Achaemenid King of Kings",
+    "reign": "336–330 BCE",
+    "bio": "He came to the throne in 336 BCE, the same year Alexander came to his, and spent almost his whole reign losing to him: Issus in November 333 BCE, then Gaugamela on 1 October 331 BCE. He died in July 330 BCE at Choara, killed during the flight east; Bessus took the title after him.",
+    "achievement": "Held the empire together long enough to fight Alexander three times. He is remembered for the defeats, which is most of what the sources — all of them written by the winning side — chose to record.",
+    "disputed": [
+      "Everything known about Darius III comes from Greek and Roman writers describing the man their own hero defeated. His reputation for cowardice at Issus and Gaugamela comes from that tradition and should be read with the bias in view."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/articles/person/darius-iii-codomannus/",
+      "https://www.iranicaonline.org/articles/darius-v"
+    ],
+    "confidence": "probable"
+  },
+  {
+    "id": "ariobarzanes",
+    "era": "achaemenid",
+    "name": "Ariobarzanes",
+    "title": "Satrap of Persis — not a king",
+    "reign": "Commanded at the Persian Gates, 330 BCE",
+    "bio": "The governor of the Persian homeland. With his king already beaten twice and heading east, he took a small force into a narrow gorge in the Zagros and blocked Alexander's road to Persepolis.",
+    "achievement": "He held the pass. He did not hold it forever, and Persepolis fell — but he made the last organised stand of the Achaemenid Empire on its own soil.",
+    "disputed": [
+      "How he died is not agreed. Some accounts have him killed in a final charge; Arrian says he escaped north and later surrendered; another reading has him refused entry at Persepolis and killed outside its walls."
+    ],
+    "sourceRefs": [
+      "https://www.livius.org/articles/battle/persian-gate-330-bce/",
+      "https://en.wikipedia.org/wiki/Ariobarzanes,_Satrap_of_Persis"
+    ],
+    "confidence": "probable"
+  }
+]

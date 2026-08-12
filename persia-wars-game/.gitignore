@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.local
+*.tsbuildinfo
+.DS_Store
+
+# Compiled dev tools (source is tools/*.swift; rebuilt on demand)
+tools/framegrab
+tools/narrate

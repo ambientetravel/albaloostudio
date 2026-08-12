@@ -1,0 +1,15 @@
+{
+  "name": "Persia at War",
+  "short_name": "Persia at War",
+  "description": "Draft an era-appropriate Iranian army, watch it fight, and unlock the real history behind the battle.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1f3b6e",
+  "theme_color": "#1f3b6e",
+  "categories": ["education", "games"],
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
