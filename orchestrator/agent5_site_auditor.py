@@ -332,6 +332,63 @@ def audit_robots(site: Site, session: requests.Session, audit: SiteAudit) -> Non
         )
 
 
+_TEMPLATE_KEY = re.compile(r"[^/?&=]+(?=\.html|$)")
+
+
+def _server_words(html: str) -> int:
+    """Words a crawler sees WITHOUT running JavaScript."""
+    body = re.sub(r"(?is)<(script|style)\b.*?</\1>", " ", html)
+    return len(re.findall(r"[^\W\d_]+", re.sub(r"<[^>]+>", " ", body), re.UNICODE))
+
+
+def _template_of(url: str) -> str:
+    """Group URLs that share a template — /article.html?a=x and ?a=y are one."""
+    base = url.split("?", 1)
+    path = base[0].rstrip("/")
+    return path + ("?" + re.sub(r"=[^&]*", "=", base[1]) if len(base) > 1 else "")
+
+
+def audit_client_rendered(site: Site, probe: list[tuple[str, int]],
+                          audit: SiteAudit) -> list[str]:
+    """
+    Pages whose body arrives client-side, and so is invisible to a crawler that
+    does not run JavaScript.
+
+    The tell is exact: two DIFFERENT urls sharing a template returning the SAME
+    server-rendered word count means the count is the template, not the content.
+    boutimar.ir's article.html?a=<slug> returned exactly 336 words for three
+    different articles on 12 Aug 2026, while its static pages ranged 428–2,985.
+
+    Google renders JS, imperfectly. The crawlers behind AI answers largely do
+    not — so this hits the GEO work hardest, which is the work these sites are
+    being written for.
+    """
+    groups: dict[str, list[tuple[str, int]]] = {}
+    for url, words in probe:
+        groups.setdefault(_template_of(url), []).append((url, words))
+
+    flagged: list[str] = []
+    for tmpl, rows in groups.items():
+        if len(rows) < 2:
+            continue
+        counts = {w for _, w in rows}
+        if len(counts) == 1 and rows[0][1] > 0:
+            flagged.append(tmpl)
+            audit.add(
+                id="content.client_rendered", scope="site", area="technical",
+                severity=HIGH, url=rows[0][0],
+                title="Page body is rendered client-side",
+                evidence=(f"{len(rows)} different URLs on {tmpl} each return exactly "
+                          f"{rows[0][1]} words of server HTML — that is the template, "
+                          f"not the article."),
+                fix="Server-render the body, or pre-build these as static pages. "
+                    "AI crawlers largely do not execute JavaScript, so these "
+                    "pages are close to invisible to the answers this content "
+                    "is written to appear in.",
+            )
+    return flagged
+
+
 def audit_sitemap(site: Site, session: requests.Session, audit: SiteAudit) -> set[str]:
     resp = fetch(session, site.sitemap)
     if resp is None or resp.status_code >= 400:
@@ -391,7 +448,53 @@ def audit_sitemap(site: Site, session: requests.Session, audit: SiteAudit) -> se
             evidence=f"{len(urls)} URLs, 0 lastmod entries.",
             fix="Emit <lastmod>. It is the main signal for recrawl priority.",
         )
+
+    audit_placeholder_content(site, urls, audit)
     return urls
+
+
+# Every one of these is a CMS default that ships with the install and is meant
+# to be deleted. Finding them live means nobody ever did. They were found on
+# dmciran.ir and cruiseshop.ir on 12 Aug 2026 — dmciran's entire indexed
+# inventory was 73 WordPress theme demo posts from 2017–2018, including the
+# literal "Hello World" and an article about the video game No Man's Sky, on a
+# site selling inbound travel to Iran. Both properties had reported zero
+# impressions for 480 days, and this is why: there is nothing real to index.
+_PLACEHOLDER_MARKERS = (
+    "hello-world", "helloworld", "sample-page", "برگه-نمونه",
+    "uncategorized", "دسته‌بندی-نشده",
+    "/author/admin", "lorem-ipsum", "my-first-post",
+)
+
+
+def audit_placeholder_content(site: Site, urls: set[str] | list[str],
+                              audit: SiteAudit) -> list[str]:
+    """
+    CMS demo content that was never deleted, still in the sitemap.
+
+    A site whose public inventory is theme filler tells Google it is abandoned,
+    and it costs far more than the pages themselves: Agent 1 scouts these
+    properties every week for "content gaps", and cannot tell a site with a gap
+    from a site with nothing on it at all.
+    """
+    from urllib.parse import unquote
+
+    hits = sorted({
+        u for u in urls
+        if any(m in unquote(u).lower() for m in _PLACEHOLDER_MARKERS)
+    })
+    if not hits:
+        return []
+    audit.add(
+        id="content.placeholder_indexed", scope="site", area="technical",
+        severity=CRITICAL if len(hits) >= 5 else HIGH, url=site.sitemap,
+        title=f"{len(hits)} CMS placeholder page(s) in the sitemap",
+        evidence="; ".join(h[:90] for h in hits[:5]),
+        fix="Delete the demo posts, the Sample Page, the Uncategorized category "
+            "and the author archive, then regenerate the sitemap. Until then "
+            "this site's public inventory is the theme's, not yours.",
+    )
+    return hits
 
 
 def audit_canonical_host(site: Site, session: requests.Session, audit: SiteAudit) -> None:
@@ -729,6 +832,7 @@ def _audit_site(site: Site, session: requests.Session, sample: int) -> SiteAudit
     # A sample of interior pages — enough to tell a template problem from a
     # one-page problem, without crawling the whole site.
     checked = 0
+    _shell_probe: list[tuple[str, int]] = []
     for url in sorted(sitemap_urls)[:sample]:
         if url.rstrip("/") == site.base_url.rstrip("/"):
             continue
@@ -741,9 +845,11 @@ def _audit_site(site: Site, session: requests.Session, sample: int) -> SiteAudit
                           "and signal a stale build.")
             continue
         audit_page(site, url, resp, audit, is_home=False, from_sitemap=True)
+        _shell_probe.append((url, _server_words(resp.text)))
         checked += 1
         time.sleep(0.2)
 
+    audit_client_rendered(site, _shell_probe, audit)
     audit.stats["sample_pages"] = sample
     audit.stats["pages_checked"] = checked + 1
     audit.stats["duration_ms"] = int((time.time() - started) * 1000)

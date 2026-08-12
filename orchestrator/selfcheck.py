@@ -371,6 +371,46 @@ ok("and the annotation goes to stdout, where GitHub actually reads it",
    and 'fh.write("\\n".join(out))' in _wf1,
    "a ::warning piped into the summary file is grey text, not an annotation")
 
+print("\n=== agent 5 — content that is not there ===")
+import agent5_site_auditor as _a5
+from config import rfc3339 as _r3, utc_now as _un
+def _fresh_audit():
+    return _a5.SiteAudit(domain="x", brand="b", locale="fa-IR", checked_at=_r3(_un()))
+_st = config.load_sites()[0]
+
+# boutimar.ir: three different articles, exactly 336 words each. That is the
+# template, not the article — the body arrives client-side.
+_au = _fresh_audit()
+_flag = _a5.audit_client_rendered(_st, [("https://b.ir/article.html?a=one", 336),
+                                        ("https://b.ir/article.html?a=two", 336),
+                                        ("https://b.ir/aroya.html", 1421)], _au)
+ok("identical word counts across one template are caught as client-rendered",
+   len(_flag) == 1 and any(f.id == "content.client_rendered" for f in _au.findings))
+ok("a site whose pages genuinely differ is not flagged",
+   _a5.audit_client_rendered(_st, [("https://b.ir/a.html", 421),
+                                   ("https://b.ir/b.html", 677)], _fresh_audit()) == [])
+ok("one page of a template proves nothing, so it is not judged",
+   _a5.audit_client_rendered(_st, [("https://b.ir/only.html", 300)], _fresh_audit()) == [])
+ok("and the fix names the reason it matters",
+   any("do not execute JavaScript" in f.fix for f in _au.findings))
+
+# dmciran.ir shipped 73 WordPress demo posts; cruiseshop.ir a Farsi Sample Page.
+_au2 = _fresh_audit()
+_hits = _a5.audit_placeholder_content(_st, [
+    "https://dmciran.ir/2017/07/helloworld/",
+    "https://cruiseshop.ir/%d8%a8%d8%b1%da%af%d9%87-%d9%86%d9%85%d9%88%d9%86%d9%87",
+    "https://cruiseshop.ir/archives/author/admin",
+    "https://x.ir/a-real-page.html",
+], _au2)
+ok("CMS demo content left in the sitemap is a finding", len(_hits) == 3, _hits)
+ok("including a percent-encoded Farsi Sample Page",
+   any("%d8%a8" in h for h in _hits),
+   "the URL is escaped; the marker only matches after unquoting")
+ok("a real page is not mistaken for filler",
+   all("a-real-page" not in h for h in _hits))
+ok("nothing is flagged on a clean site",
+   _a5.audit_placeholder_content(_st, ["https://x.ir/a.html"], _fresh_audit()) == [])
+
 print("\n=== agent 8 — reading someone else's site ===")
 import agent8_competitor_scout as _a8
 _a8src = pathlib.Path(__file__).with_name("agent8_competitor_scout.py").read_text(encoding="utf-8")
