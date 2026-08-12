@@ -1,14 +1,14 @@
 # Albaloo Orchestration Pipeline — Architecture
 
-**A four-agent content and revenue pipeline for the Mozaffari travel portfolio.**
+**A seven-agent SEO, GEO and revenue pipeline for the Mozaffari travel portfolio.**
 
 | | |
 |---|---|
 | **Architect & Owner** | Alireza Mozaffari |
 | **Architecture credit** | **Albaloo Studio** — [albaloostudio.com](https://albaloostudio.com) |
-| **Document version** | 1.0.0 |
+| **Document version** | 2.0.0 |
 | **Payload schema version** | `1.0` |
-| **Status** | All four agents implemented. Agent 2 runs on base44 in production ([contract](BASE44-AGENT2.md)); the FastAPI listener here is the reference implementation |
+| **Status** | All seven agents implemented and running in GitHub Actions. Agents 1 → 2 → 3 chain nightly on one trigger; 5+6 and 7 run weekly; 4 is dispatch-only until a lead source exists |
 
 > This infrastructure — the orchestration model, the message envelope, the
 > compliance gate and the agent contracts described below — is authored under
@@ -21,7 +21,7 @@
 
 ## 1. The portfolio
 
-Seven brands, eight Search Console properties (boutimar runs a `.com` and a
+Nine brands, ten Search Console properties (boutimar runs a `.com` and a
 `.ir` property against one brand — they are separate sites with separate
 languages and separate sitemaps, so they are separate rows everywhere below).
 
@@ -44,68 +44,102 @@ hardcodes a domain.
 
 ## 2. System map
 
+Five workflows. Three of them chain off one nightly trigger; two run weekly;
+one waits for input that does not exist yet.
+
 ```
-                        ┌──────────────────────────────────────────┐
-                        │  GitHub Actions — cron 04:15 UTC daily   │
-                        │  workflow: agent1-seo-scout.yml          │
-                        └────────────────────┬─────────────────────┘
-                                             │ secrets injected
-                                             ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│  AGENT 1 — SEO SCOUT                        (Python 3.11+, ephemeral)    │
-│                                                                          │
-│   ① Google Search Console API  ──►  8 properties, one service account    │
-│      searchanalytics.query (query×page×country, 28d & 90d windows)       │
-│   ② Sitemap + live crawl      ──►  what actually exists on each site     │
-│   ③ Diff  =  demand (GSC) − supply (sitemap)  =  raw gap set             │
-│   ④ OpenAI  ──► gap classification, intent, priority score, outline      │
-│   ⑤ Compliance gate (§7)      ──►  hard rules injected + post-checked    │
-│                                                                          │
-└──────────────────────────────┬───────────────────────────────────────────┘
-                               │  POST  content.brief.v1   (HMAC-SHA256)
-                               ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│  AGENT 2 — THE WRITER          (base44 Super Agent in production)        │
-│                                                                          │
-│   ① Verify signature + timestamp + idempotency key                       │
-│   ② 202 Accepted immediately, work moves to a background task            │
-│   ③ Gemini (long context) ──► full draft in fa-IR or en, brand voice     │
-│   ④ Compliance gate (§7) re-run on the OUTPUT, not just the prompt       │
-│   ⑤ Push to CMS adapter (WordPress REST / Astro PR / base44 / static)    │
-│                                                                          │
-└──────────────────────────────┬───────────────────────────────────────────┘
-                               │  POST  publishing.event.v1   (HMAC-SHA256)
-                               ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│  AGENT 3 — MARKETING BROADCASTER      (FastAPI listener, this directory) │
-│                                                                          │
-│   ① Claude ──► per-channel copy: LinkedIn (B2B), Instagram (D2C),        │
-│      Telegram (fa-IR D2C), email teaser                                  │
-│   ② Queue via the configured scheduler, attach UTM + short links         │
-│   ③ Emit campaign.log.v1 to the warehouse and to Agent 4                 │
-│                                                                          │
-└──────────────────────────────┬───────────────────────────────────────────┘
-                               │  POST  campaign.log.v1
-                               ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│  AGENT 4 — SALES CLOSER               (FastAPI listener, this directory) │
-│                                                                          │
-│   ① Watch inbound: site chat, WhatsApp, Instagram DM, form leads         │
-│   ② Attribute to campaign via UTM / short link / landing path            │
-│   ③ Qualify (BANT-lite), quote ONLY from the live rate feed (§7.3)       │
-│   ④ Escalate ≥ threshold or any corporate/MICE signal → human            │
-│                                                                          │
-└──────────────────────────────────────────────────────────────────────────┘
+04:15 UTC daily
+   │
+   ▼
+┌─ agent1-seo-scout.yml ─────────────────────────────────────────────┐
+│ AGENT 1 — SEO SCOUT                                                │
+│   Search Console (10 properties, 1 service account)                │
+│   × sitemap + live crawl  =  demand − supply  =  gap set           │
+│   → Claude ranks and clusters → content.brief.v1                   │
+│   artifact: seo-scout-run                                          │
+└────────────────────────────┬───────────────────────────────────────┘
+                             │ workflow_run (success only)
+                             ▼
+┌─ agent2-writer.yml ────────────────────────────────────────────────┐
+│ AGENT 2 — WRITER                                                   │
+│   reads the briefs artifact — no webhook, no signature             │
+│   → Gemini drafts → compliance gate on the OUTPUT                  │
+│   → CMS adapter → publishing.event.v1                              │
+│   artifact: agent2-written                                         │
+└────────────────────────────┬───────────────────────────────────────┘
+                             │ workflow_run (success only)
+                             ▼
+┌─ agent3-broadcaster.yml ───────────────────────────────────────────┐
+│ AGENT 3 — BROADCASTER                                              │
+│   SKIPS any event whose live_url is null — you cannot broadcast    │
+│   a page that does not exist                                       │
+│   → Claude writes per-channel copy → gate → scheduler → queue      │
+│   → campaign.log.v1        artifact: agent3-broadcast              │
+└────────────────────────────┬───────────────────────────────────────┘
+                             │ (manual, when leads exist)
+                             ▼
+┌─ agent4-sales-closer.yml ──────────────────────────────────────────┐
+│ AGENT 4 — SALES CLOSER          dispatch-only, no cron             │
+│   redact → attribute to a campaign → Claude qualifies              │
+│   → gate the drafted reply → escalate or queue for a human         │
+│   NO delivery path exists in the code. 0 sent, by construction.    │
+└────────────────────────────────────────────────────────────────────┘
+
+Mondays 05:00 UTC                    Mondays 05:30 UTC
+┌─ agent5-site-audit.yml ──────┐     ┌─ agent7-keyword-geo.yml ─────┐
+│ AGENT 5 — AUDITOR            │     │ AGENT 7 — KEYWORD & GEO      │
+│   crawls every active site,  │     │   per-country visibility     │
+│   no credentials needed      │     │   from the GSC country       │
+│ AGENT 6 — ANALYST            │     │   dimension Agent 1 already  │
+│   audit + demand → strategy, │     │   fetches; market-alignment  │
+│   calendar, paste-ready      │     │   check; Keyword Planner     │
+│   JSON-LD                    │     │   where Ads actually operates│
+└──────────────────────────────┘     └──────────────────────────────┘
+
+on push to main (site files only)
+┌─ deploy-albaloostudio.com ───────────────────────────────────────────┐
+│   stages an ALLOWLIST of 13 files, never a repo mirror — the repo    │
+│   root is both the docroot and the whole workspace                   │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.1 Why webhooks and not a queue
+Every stage degrades rather than failing: a missing model key runs the
+structural path, an ungranted property is skipped and named, an unimplemented
+adapter stages a draft. The point is that a red run means something is actually
+wrong.
 
-Agents 2 and 3 are expected to run on platforms (base44, Make.com) that expose
-an HTTP endpoint and nothing else. Signed HTTP POST is therefore the lowest
-common denominator. Every handoff is nonetheless written to be **queue-shaped**:
-an envelope with a `message_id`, an `idempotency_key`, an `attempt` counter and
-a dead-letter destination. Swapping the transport for SQS/Pub-Sub later means
-replacing the `deliver()` function, not the schemas.
+### 2.1 Why the internal hops are NOT webhooks any more
+
+**Superseded 11 Aug 2026.** This section used to argue that signed HTTP POST was
+the lowest common denominator because Agents 2 and 3 would run on platforms
+(base44, Make.com) exposing an HTTP endpoint and nothing else.
+
+base44 turned out not to be able to run Agent 2 at all:
+
+* Six of the ten sites need **git or filesystem writes** it does not have —
+  `astro_pr` opens a pull request; `static_bundle` and `boutimar_ir_static`
+  write files. Only the two base44-hosted sites were native to it.
+* The contract requires verifying an HMAC over the **raw request bytes** before
+  parsing. Hosted builders hand you a parsed object; re-serialising changes key
+  order and separators and the MAC never matches.
+* It must answer `202` in about two seconds and then draft for 30–90 s. That is
+  background work, not a request handler.
+
+So Agents 2 and 3 moved into GitHub Actions alongside Agent 1, and the webhook
+between them **disappeared rather than being reimplemented**. Each stage reads
+the previous stage's uploaded artifact directly, triggered by `workflow_run`.
+No signature to verify, no endpoint to keep alive, and no `AGENT2_WEBHOOK_URL`
+— the secret whose absence killed the nightly cron on 9 Aug 2026, because a
+scheduled run supplies no inputs and so demanded a delivery endpoint that did
+not exist.
+
+Fewer moving parts, not more. The envelope stayed exactly as it was: every
+payload still carries `message_id`, `idempotency_key`, `attempt` and a
+dead-letter destination, so the transport can become a queue later by replacing
+one function.
+
+**Signed HTTP POST is still the design for anything genuinely external** —
+Agent 3 → the scheduler (Make.com), and Agent 4's lead pull. §3.4 governs those.
 
 ### 2.2 Delivery semantics
 
@@ -193,19 +227,29 @@ prompt string.
 
 ### 3.3 Secret inventory
 
-| Secret | Where it lives | Consumed by |
-|--------|----------------|-------------|
-| `GOOGLE_SERVICE_ACCOUNT_JSON` | GH Actions secret (raw JSON or base64) | Agent 1 |
-| `OPENAI_API_KEY` | GH Actions secret | Agent 1 |
-| `GEMINI_API_KEY` | Agent 2 host env | Agent 2 |
-| `ANTHROPIC_API_KEY` | Agent 3 host env | Agent 3 |
-| `WEBHOOK_SIGNING_SECRET` | Shared by all four agents | 1 → 2 → 3 → 4 |
-| `AGENT2_WEBHOOK_URL` | GH Actions secret | Agent 1 |
-| `AGENT3_WEBHOOK_URL` | Agent 2 host env | Agent 2 |
-| `CMS_*` (per site) | Agent 2 host env | Agent 2 |
+Everything runs in one repository's Actions environment, so "where it lives" is
+the same answer for all of them. What differs is what happens when one is
+missing — and the answer is never "the run fails silently".
 
-No secret is ever written into a payload, a log line or a run artifact. Agent 1
-redacts anything matching `(?i)(key|token|secret|password)` before logging.
+| Secret | Consumed by | Absent ⇒ |
+|--------|-------------|----------|
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | Agents 1, 7 | exit 2 — nothing can be scouted |
+| `ANTHROPIC_API_KEY` | Agents 1, 3, 4 | Agent 1 falls back to deterministic ranking; 3 and 4 run `--no-llm` |
+| `GEMINI_API_KEY` | Agent 2 | runs `--no-llm`: parsing, gate, adapters and event assembly still exercised |
+| `WEBHOOK_SIGNING_SECRET` | Agent 3 → scheduler, Agent 4 lead pull | the lead pull warns loudly and goes unsigned |
+| `SCHEDULER_BASE_URL` · `SCHEDULER_API_KEY` | Agent 3 | backend stays `file`; posts queue to disk |
+| `ASTRO_REPO` · `ASTRO_GITHUB_TOKEN` | Agent 2 | `astro_pr` writes to `bundles/` instead of opening a PR |
+| `WORDPRESS_USER` · `WORDPRESS_APP_PASSWORD` | Agent 2 | unused — no property runs WordPress since 11 Aug 2026 |
+| `ALBALOO_FTP_*` | deploy workflow | albaloostudio.com does not deploy |
+| `OPENAI_API_KEY` | Agent 1 (only if `GAP_ANALYSIS_PROVIDER=openai`) | irrelevant on the Anthropic default |
+
+**Withdrawn:** `AGENT2_WEBHOOK_URL` and `AGENT3_WEBHOOK_URL`. Those hops are
+artifact reads now (§2.1).
+
+No secret is ever written into a payload, a log line or a run artifact.
+`config.redact()` scrubs anything matching `(?i)(key|token|secret|password)`
+before logging, and it is applied to exception text too — a 401 body can carry
+the credential that caused it.
 
 ### 3.4 Webhook signing
 
@@ -274,7 +318,7 @@ Field rules that apply everywhere:
 
 ### 4.1 `content.brief.v1` — Agent 1 ➜ Agent 2
 
-**Endpoint:** `POST {AGENT2_WEBHOOK_URL}` → `202 Accepted`
+**Transport:** written to `runs/<run_id>/briefs/` and uploaded as the `seo-scout-run` artifact; Agent 2 reads it on `workflow_run`. The FastAPI reference implementation still accepts `POST /webhooks/content-brief` → `202`.
 **Response body:** `{"accepted": true, "message_id": "…", "job_id": "…"}`
 
 ```jsonc
@@ -391,7 +435,7 @@ Field rules that apply everywhere:
 
 ### 4.2 `publishing.event.v1` — Agent 2 ➜ Agent 3
 
-**Endpoint:** `POST {routing.callback_url}` → `202 Accepted`
+**Transport:** written to `written/events/` and uploaded as the `agent2-written` artifact; Agent 3 reads it on `workflow_run`. The reference listener still accepts `POST /webhooks/publishing` → `202`, and `routing.callback_url` still routes there when one is supplied.
 
 ```jsonc
 {
@@ -586,9 +630,17 @@ Field rules that apply everywhere:
 
 ### Agent 2 — The Writer
 
-* **Runtime:** either a FastAPI service (`agent2_writer_listener.py`, this
-  directory) or a base44 Super Agent hitting the same schema. The two are
-  interchangeable because the contract is the payload, not the platform.
+* **Runtime:** `agent2_writer_batch.py` in GitHub Actions, reading Agent 1's
+  artifact. `agent2_writer_listener.py` remains the FastAPI reference
+  implementation and is what `selfcheck.py` exercises over HTTP; base44 was
+  evaluated and rejected (§2.1). The contract is still the payload, not the
+  platform — the platform simply had to be able to write files and open pull
+  requests.
+* **Adapters:** an adapter must NEVER report a URL it did not create. Anything
+  unimplemented returns `live_url: null` with the intended path alongside it.
+  `publishing.event.v1` originally *required* `live_url` to be a string, which
+  made honesty impossible and produced phantom URLs for five of ten sites; it
+  is nullable as of 11 Aug 2026.
 * **Concurrency:** one draft per `idempotency_key` at a time; a second delivery
   of the same key while the first is in flight returns `200` with the existing
   `job_id`.
@@ -620,6 +672,45 @@ Field rules that apply everywhere:
   complaint, any refund or cancellation question.
 * Never handles payment, card data or passport numbers. It collects intent and
   hands off.
+
+---
+
+### Agents 5 & 6 — Auditor and Analyst
+
+* **Runtime:** `agent5-site-audit.yml`, Mondays 05:00 UTC. **No credentials of
+  any kind** — Agent 5 crawls the live sites over HTTP, which is why it covers
+  ten properties while Agent 1 covers only the granted ones.
+* **Agent 5** produces technical, GEO and content findings per site.
+* **Agent 6** turns audit + demand into strategy: a five-tier ordering, a topic
+  map, a twelve-week calendar and paste-ready JSON-LD.
+* **The score is sample-independent.** It began as a linear finding count, so it
+  moved with `--sample` and three sites scored 0 at ten pages. Site-scope
+  findings now count once; page-scope findings count as the fraction of sampled
+  pages they affect. `audit_sample_pages` is **pinned at 10** in `sites.yml` and
+  the cron never overrides it — changing the pin restarts the trend line.
+* **Every recommendation carries evidence or it does not ship** —
+  `Recommendation.valid()`. `OUT_OF_SCOPE` states five blind spots explicitly,
+  including no JS rendering and no measured AI citations.
+
+### Agent 7 — Keyword & Geo Scout
+
+* **Runtime:** `agent7-keyword-geo.yml`, Mondays 05:30 UTC, after the audit so a
+  week's reports land together.
+* **Reads data that was already being thrown away.** Agent 1 queries Search
+  Console with the `["query","country"]` dimension pair and keeps only the top
+  country — boutimar.com returns 768 query×country rows across 74 countries
+  every run. Agent 7 reads all of it.
+* **Position is impression-weighted, never a plain mean.** A country where one
+  obscure query sits at position 1 and forty real ones sit at 40 is not a
+  country you rank in, and an unweighted average says it is.
+* **Opportunities exclude the `absent` band.** A country at position 60 does not
+  need optimisation; it needs a decision about whether to compete there, and
+  dressing that up as an SEO task wastes a quarter.
+* **Keyword Planner is unavailable for the Iran-market sites.** Google Ads does
+  not operate there, so `keyword_planner_status()` reports `market_not_served`
+  rather than pretending to be broken. Search Console geo data is the better
+  signal there anyway: it measures what Iranian searchers actually did rather
+  than estimating advertiser demand. See [SETUP-KEYWORD-PLANNER.md](SETUP-KEYWORD-PLANNER.md).
 
 ---
 
@@ -715,17 +806,19 @@ one is a single-field change if the answer differs.
 |---|----------|---------|-------------------|
 | O-1 | boutimar.com and boutimar.ir as separate GSC properties | Yes — separate rows, separate briefs | Merge → one `site` block with a `locales[]` array |
 | O-2 | Farsi drafting locale tag | `fa-IR` everywhere; Jalali dates only in rendered copy, never in payloads | Add `calendar` to `brief` |
-| O-3 | ~~Agent 2 publish mode~~ | **Settled: `draft`** — Agent 2 writes, a human presses publish. Agent 2 runs on base44 ([contract](BASE44-AGENT2.md)) | Set `cms.publish_mode: "publish"` per site in `sites.yml` |
-| O-4 | SERP data source | Inferred from GSC only; no paid SERP API wired in | `opportunity.serp.source` → `serp_api`, add provider key |
+| O-3 | ~~Agent 2 publish mode~~ | **Settled: `draft`, and the platform changed.** Agent 2 runs in GitHub Actions, not base44 (§2.1). `astro_pr` opens a pull request — for a file-generated site a PR *is* the draft: reviewable, diffable, revertible | Set `cms.publish_mode: "publish"` per site — but the WordPress adapter also hard-codes `draft`, deliberately |
+| O-4 | SERP data source | **Still inferred from GSC only.** This blocks the one measured filter we cannot apply: >7 of 10 major brands on page one means a query is walled off (76% of stable AI citations go to brands). `competition_verdict()` implements the threshold and returns `unknown` without a SERP source — and an unknown verdict never filters a brief out | Wire a SERP provider; the filter starts working with no code change |
 | O-5 | ~~Agent 3 autopost~~ | **Settled: composes and queues through the scheduler.** Live posting needs `ALLOW_AUTOPOST=1` **and** `channels[].autopost: true` — two independent yeses | Set both to go live per channel |
 | O-6 | Price data | Only boutimar.ir has a live rate feed; other domains emit `offer.has_offer: false`, and Agent 4 quotes nothing for them | Add `data_dependencies` per site |
-| O-7 | Transport | Signed HTTP POST | Swap `deliver()` for a queue client; schemas unchanged |
+| O-7 | ~~Transport~~ | **Settled: artifacts internally, signed HTTP externally.** 1→2→3 read the previous stage's artifact via `workflow_run`. Signed POST remains for Agent 3 → scheduler and Agent 4's lead pull | Swap for a queue client; schemas unchanged either way |
 | O-8 | ~~Scheduler backend~~ | **Settled: Zernio/Late.** Payload shape verified against the live API 2026-08-06 (`POST /api/v1/posts`, bearer token, `isDraft` for held posts). Default backend stays `file` | Set `SCHEDULER_BACKEND=zernio` + `SCHEDULER_API_KEY` |
 | O-10 | Social accounts | The only connected account is a personal hobby page and is **not** wired to any brand. Every `account_ref` is `null` — see [SETUP-SOCIAL.md](SETUP-SOCIAL.md). One Telegram channel makes the pipeline deliver | Connect per brand, paste IDs into `sites.yml` |
 | O-13 | ~~Audit score comparability~~ | **Settled.** The score was a linear finding count, so it scaled with sample size — three sites hit 0 at `--sample 10`. Now site-scope findings count once and page-scope ones count as the fraction of pages affected, and `audit_sample_pages` is pinned at 10 | Change the pin only with the understanding that it restarts the trend |
 | O-12 | Entity owning Meta/LinkedIn assets | Recommended: **Ambiente Tours GmbH**, matching the EU-only payment rail. Iranian-registered business accounts on Meta/LinkedIn risk termination without notice | Register under the German entity before building a follower base |
 | O-11 | **Imagery** | Instagram rejects text-only posts, and Agent 2 refuses to caption an image whose credit it does not know — so Instagram posts are `blocked`. Nothing in the pipeline sources licensed imagery | Wire a licensed library or supplier press-kit source into `distribution_hints.assets` |
-| O-9 | The three `.ir` sites | Static, hand-built → `static_bundle` adapter: Agent 2 emits a deploy bundle, never claims a live URL | Swap the adapter in `sites.yml` if any moves to a CMS |
+| O-9 | The `.ir` sites | Static → `static_bundle`. dmciran.ir and cruiseshop.ir are being rebuilt as JSON-driven static like boutimar.com | Move to `astro_pr` once they land in git repos |
+| O-14 | ~~WordPress anywhere~~ | **Settled: nowhere.** boutimar.com was assumed WordPress and is a JSON-driven Astro build; dmciran.ir was WordPress and is being rebuilt. The adapter is written, tested and unused | Point `wordpress_rest` at a site if one ever runs WordPress |
+| O-15 | Question-shaped headings | **Downgraded on evidence.** A 100-query AI Overview study found question-format titles had *no* correlation with citation, alongside heavy formatting and fact density. What did correlate: agreeing with the consensus number (+12) and matching the answer's geographic scope (+14). Agent 1 no longer requires them; Agent 6 keeps the finding for readers and valid schema, not as a citation lever | Re-promote only if measurement changes |
 
 ---
 
@@ -772,3 +865,30 @@ orchestrator/
 ---
 
 *Architecture by **Albaloo Studio** — albaloostudio.com. Owner: Alireza Mozaffari.*
+
+---
+
+## 10. What changed in 2.0.0
+
+Version 1.0.0 described a design. This describes what runs. The gap between the
+two is worth recording, because most of it was found by running things rather
+than reading them.
+
+| | 1.0.0 said | 2.0.0 |
+|---|---|---|
+| Agents | four | **seven** — 5, 6 and 7 existed and were undocumented |
+| Properties | eight | **ten** — cruise24.me and albaloostudio.com added |
+| Agent 2 host | base44 | **GitHub Actions** — base44 could not do git or file writes, could not give raw bytes for the HMAC, and could not hold a 90-second job |
+| Internal transport | signed HTTP POST | **artifact reads on `workflow_run`** — the webhook was deleted, not reimplemented |
+| `AGENT2_WEBHOOK_URL` | required | **gone.** Its absence killed the nightly cron on 9 Aug; a scheduled run supplies no inputs and so demanded a live endpoint |
+| Adapters | assumed to publish | **five of ten reported URLs for pages that never existed.** The schema *required* a `live_url` string, which made honesty impossible |
+| Agent 3 | broadcast anything it received | **skips events with no `live_url`** — posting a link to a staged draft sends readers to a 404 |
+| boutimar.com | WordPress | **Astro, JSON-driven.** So was the WordPress adapter's second home. No property runs WordPress |
+| Question headings | a GEO win | **no measured citation benefit.** Kept for readers and valid schema, not sold as a lever |
+| Briefs | keyword + outline | **consensus range first, then a fact nobody else has** — the two things that did measure |
+
+The one thing that did not change is the compliance gate's remit. It got
+sharper — a claim is judged in its clause, not as a term anywhere — but «خلیج
+فارس», the visa rules and never-invent-a-figure are exactly what they were.
+
+---
