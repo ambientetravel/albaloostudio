@@ -467,6 +467,53 @@ _PLACEHOLDER_MARKERS = (
 )
 
 
+def audit_nonascii_slugs(site: Site, probe: list[tuple[str, int]],
+                         audit: SiteAudit, statuses: dict[str, int]) -> list[str]:
+    """
+    URLs whose slug is non-ASCII and which do not resolve.
+
+    Found on cruiseshop.ir, 13 Aug 2026: every ASCII URL returned 200 and every
+    percent-encoded Farsi URL returned 404 — a page and a category archive that
+    WordPress itself still lists in wp-sitemap.xml, and a category the REST API
+    reports as holding a post. Two 404s look like leftover junk; two 404s that
+    are *both* the only non-ASCII slugs on the site are a permalink layer that
+    cannot resolve Persian.
+
+    That matters far beyond the two URLs. Six of the ten properties publish in
+    Farsi. A site that 404s its own Persian slugs will 404 every Farsi article
+    written for it, and the failure only becomes visible once real content is
+    published on top of it.
+    """
+    from urllib.parse import unquote
+
+    def _nonascii(u: str) -> bool:
+        # The URL arrives percent-encoded, and %d8%a8 is pure ASCII — testing
+        # the raw string finds nothing. Decode first, then look at the
+        # characters a reader would actually see.
+        return any(ord(ch) > 127 for ch in unquote(u))
+
+    bad = sorted(u for u, code in statuses.items() if code == 404 and _nonascii(u))
+    good_ascii = [u for u, code in statuses.items() if code < 400 and not _nonascii(u)]
+    if not bad:
+        return []
+    systemic = len(bad) >= 2 and not any(
+        code < 400 for u, code in statuses.items() if _nonascii(u)
+    )
+    audit.add(
+        id="url.nonascii_slug_404", scope="site", area="technical",
+        severity=CRITICAL if systemic else HIGH, url=bad[0],
+        title=("No non-ASCII URL on this site resolves" if systemic
+               else f"{len(bad)} non-ASCII URL(s) return 404"),
+        evidence=(f"{len(bad)} non-ASCII URL(s) 404 while {len(good_ascii)} ASCII "
+                  f"URL(s) return 200: " + "; ".join(u[:70] for u in bad[:3])),
+        fix="Check the permalink structure and the server's handling of "
+            "percent-encoded UTF-8 paths. Until this resolves, every Farsi slug "
+            "published on this site will 404 — the fault is in the URL layer, "
+            "not in any one page.",
+    )
+    return bad
+
+
 def audit_placeholder_content(site: Site, urls: set[str] | list[str],
                               audit: SiteAudit) -> list[str]:
     """
@@ -833,10 +880,12 @@ def _audit_site(site: Site, session: requests.Session, sample: int) -> SiteAudit
     # one-page problem, without crawling the whole site.
     checked = 0
     _shell_probe: list[tuple[str, int]] = []
+    _statuses: dict[str, int] = {}
     for url in sorted(sitemap_urls)[:sample]:
         if url.rstrip("/") == site.base_url.rstrip("/"):
             continue
         resp = fetch(session, url)
+        _statuses[url] = resp.status_code if resp is not None else 0
         if resp is None or resp.status_code >= 400:
             audit.add(id="http.sitemap_url_broken", area="technical", severity=HIGH, url=url,
                       title="Sitemap lists a URL that does not load",
@@ -850,6 +899,7 @@ def _audit_site(site: Site, session: requests.Session, sample: int) -> SiteAudit
         time.sleep(0.2)
 
     audit_client_rendered(site, _shell_probe, audit)
+    audit_nonascii_slugs(site, _shell_probe, audit, _statuses)
     audit.stats["sample_pages"] = sample
     audit.stats["pages_checked"] = checked + 1
     audit.stats["duration_ms"] = int((time.time() - started) * 1000)

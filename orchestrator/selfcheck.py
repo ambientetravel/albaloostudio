@@ -377,6 +377,7 @@ from config import rfc3339 as _r3, utc_now as _un
 def _fresh_audit():
     return _a5.SiteAudit(domain="x", brand="b", locale="fa-IR", checked_at=_r3(_un()))
 _st = config.load_sites()[0]
+_a5src_txt = pathlib.Path(__file__).with_name("agent5_site_auditor.py").read_text(encoding="utf-8")
 
 # boutimar.ir: three different articles, exactly 336 words each. That is the
 # template, not the article — the body arrives client-side.
@@ -393,6 +394,30 @@ ok("one page of a template proves nothing, so it is not judged",
    _a5.audit_client_rendered(_st, [("https://b.ir/only.html", 300)], _fresh_audit()) == [])
 ok("and the fix names the reason it matters",
    any("do not execute JavaScript" in f.fix for f in _au.findings))
+
+# cruiseshop.ir: every ASCII URL 200s, every Farsi one 404s. Six of ten
+# properties publish in Farsi, so a URL layer that cannot resolve Persian is
+# not two junk pages — it is every Farsi article those sites will ever publish.
+_sysmic = {"https://c.ir/": 200, "https://c.ir/b2b": 200,
+           "https://c.ir/%d8%a8%d8%b1%da%af%d9%87": 404,
+           "https://c.ir/%d8%af%d8%b3%d8%aa": 404}
+_au3 = _fresh_audit()
+ok("a site where no Farsi URL resolves is critical, not a broken link",
+   len(_a5.audit_nonascii_slugs(_st, [], _au3, _sysmic)) == 2
+   and _au3.findings[0].severity == _a5.CRITICAL)
+# %d8%a8 is pure ASCII — testing the raw string finds nothing at all.
+ok("the check decodes before looking for non-ASCII characters",
+   "unquote(u)" in _a5src_txt and "ord(ch) > 127" in _a5src_txt,
+   "the first version tested the percent-encoded string and matched nothing")
+_au4 = _fresh_audit()
+_a5.audit_nonascii_slugs(_st, [], _au4,
+                         {"https://c.ir/%d8%a8%d8%b1%da%af%d9%87": 404,
+                          "https://c.ir/%d9%88%d8%a7%d9%82%d8%b9": 200})
+ok("but one broken Farsi URL among working ones is only high",
+   _au4.findings[0].severity == _a5.HIGH,
+   "one 404 is a page; all of them is the URL layer")
+ok("an all-ASCII site raises nothing",
+   _a5.audit_nonascii_slugs(_st, [], _fresh_audit(), {"https://c.ir/a": 200}) == [])
 
 # dmciran.ir shipped 73 WordPress demo posts; cruiseshop.ir a Farsi Sample Page.
 _au2 = _fresh_audit()
