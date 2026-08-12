@@ -18,6 +18,7 @@ import {
 import { useGame } from '../state/store';
 import { ArenaIntro } from './ArenaIntro';
 import { Avatar } from './Avatar';
+import { shortName } from './labels';
 import { UnitCard } from './UnitCard';
 import { UnitGlyph } from './UnitGlyph';
 
@@ -349,15 +350,23 @@ function LedgerBand({ ledger, side, where }: { ledger: Ledger; side: Side; where
               transition={{ type: 'spring', stiffness: 460, damping: 24 }}
               title={`${getUnit(entry.unitId).name}${entry.traits.length ? ` · ${entry.traits.map((t) => getUpgrade(t).name).join(', ')}` : ''}`}
             >
-              <UnitGlyph kind={getUnit(entry.unitId).art.silhouette} size={26} unitId={entry.unitId} />
-              {entry.tier > 1 && <span className="ledger__tier">{ROMAN[entry.tier - 1]}</span>}
-              {entry.traits.length > 0 && (
-                <span className="ledger__traits" aria-hidden="true">
-                  {entry.traits.map((t) => (
-                    <span key={t} className="ledger__trait" />
-                  ))}
-                </span>
-              )}
+              {/* The rank badge and trait pips hang off the ART, not off the
+                  squad box — otherwise adding the name row below pushes them
+                  down onto the text. */}
+              <span className="ledger__art">
+                <UnitGlyph kind={getUnit(entry.unitId).art.silhouette} size={26} unitId={entry.unitId} />
+                {entry.tier > 1 && <span className="ledger__tier">{ROMAN[entry.tier - 1]}</span>}
+                {entry.traits.length > 0 && (
+                  <span className="ledger__traits" aria-hidden="true">
+                    {entry.traits.map((t) => (
+                      <span key={t} className="ledger__trait" />
+                    ))}
+                  </span>
+                )}
+              </span>
+              <span className="ledger__name">
+                {shortName(entry.unitId, getUnit(entry.unitId).name)}
+              </span>
             </motion.li>
           ))}
         </AnimatePresence>

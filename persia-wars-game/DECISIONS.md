@@ -1033,3 +1033,46 @@ identity some other way.
 
 Art tally: 25 of 25 units, 7 of 8 cards. 39 of 71 pieces outstanding — all of
 them arenas, commanders, capital, codex figures and mission images.
+
+## The Ledger says the name, because at 26px the picture cannot
+
+The Army Ledger drew each squad as a bare 26px glyph. The unit's name existed
+only in a `title` attribute — which a phone has no way to show — so during a
+match the player was asked to tell six squads apart by a picture at the one size
+where six of them look alike. Six plain infantry render as the same brown
+ten-pixel figure there, and no redraw fixes a box smaller than the difference.
+
+So the box now holds a picture **and** a word. Identity comes from the word; the
+art goes back to being flavour, which is what it is good at.
+
+The word is the DISTINGUISHING one, which is usually the people rather than the
+weapon: 'Bactrian' and 'Colchian' separate where 'Archer' and 'Shieldman' would
+not. Two entries had to be changed after they were written — Persian Archer and
+Persian Cavalry both wanted to be 'Persian', which is the exact failure the
+label exists to prevent, so a test now fails on any duplicate.
+
+Everything below was measured in the browser, not estimated:
+
+- **'Chorasmian' needed 49px in a 40px box** and ellipsised. Nine characters is
+  the real ceiling at 8px, not the ten I first assumed — 'Sagartian' needs 39px
+  and fits exactly. Shortened to 'Chorasm.', and the test now asserts the
+  measured number with the measurement written down beside it.
+- **The rank badge sat on top of the name** and ate the last letter of 'Camel'.
+  It hung 4px below the art; it is now flush with the art's bottom edge. The
+  badges were also rehoused onto a `.ledger__art` wrapper so that adding a row
+  beneath the art can never push them onto text again.
+- **At 320px six squads wrapped to two rows**, taking the band from 60px to
+  109px — doubled, on both sides, out of a 700px screen. A 360px tier drops the
+  slot to 40px and the gap to 2px: 6x40 + 5x2 = 250 inside the 258px available.
+  41px with a 3px gap came to 261 and wrapped by three pixels, which is the kind
+  of margin that only a measurement finds.
+
+Verified at 320, 375 and 768, in the offer phase and the battle phase, with an
+empty ledger, a single untiered squad, and six squads carrying rank badges and
+trait pips. No name ellipsises, no badge overlaps a name, nothing wraps, the
+page never scrolls sideways. The battlefield canvas still gets 323x428 on a
+375x812 screen.
+
+One thing checked and left alone: the Result screen draws units at 22px but
+already prints the full name beside the glyph. The Ledger was the only place a
+unit had to be recognised from the picture alone.

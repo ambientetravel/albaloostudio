@@ -880,22 +880,53 @@ a {
   border-block-end-color: var(--ochre);
 }
 
+/* A squad is a picture AND a word.
+   The picture alone could not do it: six of the plain infantry are the same
+   brown ten-pixel figure at this size, and no redraw fixes a box smaller than
+   the difference. The name was already here as a `title`, which a phone cannot
+   show — so it is on screen now. */
 .ledger li {
   position: relative;
   display: grid;
-  place-items: center;
-  width: 38px;
-  height: 34px;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  align-content: center;
+  gap: 1px;
+  width: 50px;
+  padding: 3px 1px 2px;
   border-radius: var(--r-sm);
   background: color-mix(in srgb, var(--lapis-deep) 45%, transparent);
   border: 2px solid color-mix(in srgb, var(--rim) 70%, transparent);
 }
 
+/* The badges hang off this, not off the squad box, so the name row below cannot
+   push them onto the text. */
+.ledger__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.ledger__name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--stone);
+  text-shadow: 0 1px 0 rgb(0 0 0 / 45%);
+}
+
 /* The rank badge. Only shown above Levy — a tier-1 squad needs no decoration. */
 .ledger__tier {
   position: absolute;
-  inset-block-end: -5px;
-  inset-inline-end: -5px;
+  /* Flush with the bottom of the ART, not hanging below it — hanging put the
+     badge straight on top of the name and ate the last letter of 'Camel'. */
+  inset-block-end: 0;
+  inset-inline-end: -6px;
   min-width: 16px;
   padding: 0 3px;
   border-radius: 999px;
@@ -910,10 +941,12 @@ a {
 }
 
 /* Selector has to out-specify `.ledger li`, or the fixed square sizing wins and
-   the placeholder wraps to three lines inside a 38px box. */
+   the placeholder wraps to three lines inside a 50px box. */
 .ledger li.ledger__empty {
+  display: block;
   width: auto;
   height: auto;
+  padding: 0;
   white-space: nowrap;
   background: none;
   border: none;
@@ -1611,8 +1644,37 @@ button.unit-card:active:not(:disabled) {
 
 @media (max-width: 560px) {
   .ledger li {
-    width: 34px;
-    height: 31px;
+    width: 46px;
+  }
+
+  /* Six squads at 46px plus five 6px gaps is 306px, which clears a 360px
+     viewport once the screen padding is taken off. Wrapping to a second row
+     would cost the battlefield another band's height. */
+  .ledger {
+    gap: 4px;
+    padding: 5px 4px;
+  }
+}
+
+/* The smallest phone still in use. Six squads at 46px wrapped to two rows here
+   and took the band from 60px to 109px — doubled, on both sides, out of a 700px
+   screen. One tight row beats two comfortable ones when the battlefield pays. */
+@media (max-width: 360px) {
+  .ledger li {
+    width: 40px;
+    padding: 2px 0;
+  }
+
+  /* 6x40 + 5x2 = 250 inside the 258px a 320px viewport leaves. Measured, not
+     estimated — 41px with a 3px gap came to 261 and wrapped by three pixels. */
+  .ledger {
+    gap: 2px;
+    padding: 4px 3px;
+  }
+
+  .ledger__name {
+    font-size: 7px;
+    letter-spacing: -0.03em;
   }
 
   .battle__banners {
@@ -4062,8 +4124,8 @@ button.unit-card:active:not(:disabled) {
    is not a rank. */
 .ledger__traits {
   position: absolute;
-  inset-block-end: 1px;
-  inset-inline-start: 2px;
+  inset-block-end: 0;
+  inset-inline-start: -4px;
   display: flex;
   gap: 2px;
 }
