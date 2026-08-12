@@ -230,6 +230,17 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Ou
                        ensure_ascii=False, indent=2), encoding="utf-8")
         return oc
     except Exception as exc:
+        # An exhausted balance or a revoked key is not a defect in this
+        # pipeline, and it will be just as exhausted for every remaining event.
+        # Agent 1 already treats that class of failure as a configuration gap
+        # rather than a run failure; Agent 3 does the same, or one dead key
+        # turns the whole nightly chain red for something no retry can fix.
+        if config.terminal_provider_error(str(exc)):
+            oc.status = "skipped"
+            oc.error = ("Claude is unavailable at the account level "
+                        f"({config.redact(str(exc))[:200]}). Copy is composed on the "
+                        "next run; nothing was lost.")
+            return oc
         oc.status = "failed"
         oc.error = config.redact(str(exc))[:400]
         return oc

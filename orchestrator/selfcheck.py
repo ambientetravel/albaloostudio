@@ -236,16 +236,39 @@ ok("the reasons reach the manifest and the annotation",
    '"degraded_reasons"' in _a1src and "Cause: {why}" in _wf1)
 # Run #12 made the same failing Claude call once per domain and printed "credit
 # balance is too low" four times. The second call was never going to succeed.
+print("\n=== agent 1 — the nightly scout runs on the free tier ===")
+# The $5 Anthropic balance emptied in four days. Agent 1 is why: one Opus 5 call
+# per property per night at up to 16k output tokens, $25 per million output.
+ok("gap analysis defaults to Gemini, not the metered vendor",
+   config.GAP_ANALYSIS_PROVIDER == "gemini", config.GAP_ANALYSIS_PROVIDER)
+ok("and Gemini defaults to a model the free tier actually allows",
+   config.GEMINI_MODEL.endswith("flash") or "GEMINI_MODEL" in os.environ,
+   config.GEMINI_MODEL)
+ok("the scout has a real Gemini path, not just a config value",
+   "def _analyse_with_gemini" in _a1src and "def _gemini_generate" in _a1src)
+ok("all three providers stay reachable by env var",
+   all(f'GAP_ANALYSIS_PROVIDER == "{p}"' in _a1src for p in ("gemini", "anthropic")),
+   "topping the balance up is a repository variable, not an edit")
+# Agent 2 drafts prose at 0.85; ranking the same candidates twice should not
+# produce two different rankings.
+ok("analysis samples tighter than drafting does",
+   _a1sp._GEMINI_ANALYSIS_CONFIG["temperature"] < 0.5,
+   _a1sp._GEMINI_ANALYSIS_CONFIG["temperature"])
+ok("and asks for JSON rather than parsing prose",
+   _a1sp._GEMINI_ANALYSIS_CONFIG["response_mime_type"] == "application/json")
+ok("the workflow passes the key the default provider needs",
+   "GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}" in _wf1)
+
 ok("an exhausted credit balance is recognised as account-level",
-   bool(_a1sp.terminal_provider_error(
+   bool(config.terminal_provider_error(
        "Error code: 400 - Your credit balance is too low to access the Anthropic API.")))
 ok("so is a revoked key and an exhausted OpenAI quota",
-   bool(_a1sp.terminal_provider_error("invalid x-api-key"))
-   and bool(_a1sp.terminal_provider_error("insufficient_quota")))
+   bool(config.terminal_provider_error("invalid x-api-key"))
+   and bool(config.terminal_provider_error("insufficient_quota")))
 ok("a timeout is NOT — the next site may well succeed",
-   not _a1sp.terminal_provider_error("Request timed out after 60s"))
+   not config.terminal_provider_error("Request timed out after 60s"))
 ok("nor is a 503",
-   not _a1sp.terminal_provider_error("503 service unavailable"))
+   not config.terminal_provider_error("503 service unavailable"))
 ok("and once it is known, the model is skipped for every remaining site",
    '_PROVIDER_DOWN.get("reason")' in _a1src)
 ok("the run summary collapses one cause repeated per domain",

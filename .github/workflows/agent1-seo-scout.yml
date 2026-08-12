@@ -67,13 +67,22 @@ jobs:
       - name: Run the scout
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          # The gap analysis runs on Anthropic (GAP_ANALYSIS_PROVIDER default).
-          # Without this the step still "succeeds" — it just silently drops to
-          # the deterministic fallback, which does not deduplicate or rank, so
-          # the failure looks like poor output rather than a missing secret.
+          # The gap analysis runs on Gemini (GAP_ANALYSIS_PROVIDER default).
+          # It moved off Anthropic on 12 Aug 2026: this is the pipeline's
+          # highest-volume model call — once per property, every night, up to
+          # 16k output tokens at $25/M on Opus 5 — and it emptied the $5 balance
+          # in four days. Gemini's free tier has no balance to exhaust.
+          #
+          # Whichever provider is selected, a missing key does NOT fail the
+          # step: it drops to the deterministic fallback, which the run now
+          # announces as DEGRADED rather than passing off as a normal result.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          # Kept so GAP_ANALYSIS_PROVIDER=anthropic works the moment the balance
+          # is topped up — no edit here, just the repository variable.
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-5' }}
-          GAP_ANALYSIS_PROVIDER: ${{ vars.GAP_ANALYSIS_PROVIDER || 'anthropic' }}
+          GAP_ANALYSIS_PROVIDER: ${{ vars.GAP_ANALYSIS_PROVIDER || 'gemini' }}
           # Kept so GAP_ANALYSIS_PROVIDER=openai still works if you switch back.
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1' }}

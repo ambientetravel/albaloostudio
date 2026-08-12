@@ -45,12 +45,43 @@ BASE_DIR = Path(__file__).resolve().parent
 SITES_FILE = Path(os.getenv("SITES_FILE", BASE_DIR / "sites.yml"))
 RUNS_DIR = Path(os.getenv("RUNS_DIR", BASE_DIR / "runs"))
 
+# Substrings that mean "this account cannot call this model right now", as
+# opposed to a timeout or a malformed response, which are worth retrying on the
+# next site.
+_TERMINAL_PROVIDER_ERRORS = (
+    "credit balance is too low",
+    "invalid x-api-key",
+    "authentication_error",
+    "permission_error",
+    "insufficient_quota",
+)
+
+
+def terminal_provider_error(msg: str) -> str:
+    """The reason this will fail for every other site too, or '' if it will not."""
+    low = msg.lower()
+    for needle in _TERMINAL_PROVIDER_ERRORS:
+        if needle in low:
+            return needle
+    return ""
+
+
 # ── models (overridable; never pinned inside a prompt) ────────────────────────
 
-# Agent 1's gap analysis: `anthropic` (default) or `openai`. Both do the job;
-# Anthropic is the default because Agents 3, 4 and 6 already require that key,
-# so one vendor means one key, one bill, one thing to rotate.
-GAP_ANALYSIS_PROVIDER = os.getenv("GAP_ANALYSIS_PROVIDER", "anthropic").lower()
+# Agent 1's gap analysis: `gemini` (default), `anthropic`, or `openai`.
+#
+# Anthropic was the default until 12 Aug 2026, on the reasoning that Agents 3, 4
+# and 6 already need that key — one vendor, one bill, one thing to rotate. What
+# that reasoning left out is that Agent 1 is by far the most expensive caller in
+# the pipeline: one Opus 5 call per property per night, up to 16k output tokens
+# each, at $25 per million output. Eight properties × five runs emptied the $5
+# balance in four days, and when it emptied, the head of the chain went with it.
+#
+# Gemini already drafts every article in Agent 2 on a key with no balance to
+# exhaust, and gap analysis — classify, deduplicate, rank, outline — is the
+# easier of the two jobs. Putting the nightly scout on the free tier and keeping
+# the paid key for the agents that run occasionally is the right way round.
+GAP_ANALYSIS_PROVIDER = os.getenv("GAP_ANALYSIS_PROVIDER", "gemini").lower()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 # Flash, not Pro, and the reason is not preference. Gemini 2.5 Pro is not on
 # the free tier at all: the API answers a request for it with 429 and

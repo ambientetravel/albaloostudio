@@ -664,10 +664,12 @@ def analyse_gaps(
     briefs. On any provider failure we fall back to the deterministic builder —
     a degraded run beats a dead one.
 
-    Provider is config.GAP_ANALYSIS_PROVIDER: `anthropic` (default) or `openai`.
-    The step is analytical — classify, deduplicate, rank, outline — and both
-    models do it well. Anthropic is the default because the rest of the pipeline
-    already runs on it; one vendor is one key, one bill, one thing to rotate.
+    Provider is config.GAP_ANALYSIS_PROVIDER: `gemini` (default), `anthropic`,
+    or `openai`. The step is analytical — classify, deduplicate, rank, outline —
+    and all three do it well. Gemini is the default because this is the
+    pipeline's highest-volume model call (once per property, every night) and
+    the free tier has no balance to exhaust; Anthropic held the default until
+    its $5 ran out on 12 Aug 2026 and took the head of the chain with it.
     """
     if not candidates:
         return []
@@ -678,6 +680,9 @@ def analyse_gaps(
         # identical line in the summary.
         return [_fallback_brief(site, c, _PROVIDER_DOWN["reason"])
                 for c in candidates[:limit]]
+
+    if config.GAP_ANALYSIS_PROVIDER == "gemini":
+        return _analyse_with_gemini(site, candidates, limit)
 
     if config.GAP_ANALYSIS_PROVIDER == "anthropic":
         return _analyse_with_anthropic(site, candidates, limit)
@@ -729,11 +734,126 @@ def analyse_gaps(
     except Exception as exc:  # provider outage, quota, schema refusal
         log.error("%s — OpenAI step failed (%s); using deterministic fallback", site.domain, exc)
         reason = f"OpenAI call failed: {exc}"
-        if terminal_provider_error(str(exc)):
+        if config.terminal_provider_error(str(exc)):
             _PROVIDER_DOWN["reason"] = reason
             log.error("This is an account-level failure — skipping the model for "
                       "every remaining site rather than repeating the same call.")
         return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
+
+
+# Analysis, not prose. Agent 2 drafts at temperature 0.85 for voice; this step
+# classifies, deduplicates, ranks and outlines, where a wandering sampler just
+# produces a different ranking each night for the same data.
+_GEMINI_ANALYSIS_CONFIG = {
+    "temperature": 0.2,
+    "top_p": 0.95,
+    "max_output_tokens": 8192,
+    "response_mime_type": "application/json",
+}
+
+
+def _analyse_with_gemini(
+    site: Site, candidates: list[dict[str, Any]], limit: int
+) -> list[dict[str, Any]]:
+    """
+    Same contract as the other two paths, same schema, same fallback on failure.
+
+    Reuses Agent 2's model resolution rather than pinning a name. That machinery
+    exists because pinning failed twice in one evening: gemini-2.5-pro answers
+    429 "limit: 0" (absent from the free tier, which reads as rate-limiting and
+    is not), and gemini-2.5-flash answers 404 "no longer available" for keys
+    issued after its withdrawal. Asking the account what it can call beats
+    asserting it. The import is deferred so a missing FastAPI or pydantic never
+    breaks the scout at module load — this agent does not otherwise need them.
+    """
+    try:
+        from agent2_writer_listener import mark_model_unusable, resolve_model
+        model_name = resolve_model()
+    except Exception as exc:
+        log.error(
+            "%s — Gemini unavailable (%s); using the deterministic fallback. "
+            "Candidates will not be deduplicated or ranked.", site.domain, exc,
+        )
+        return [_fallback_brief(site, c, f"Gemini unavailable: {exc}")
+                for c in candidates[:limit]]
+
+    system = _analysis_system_prompt(site)
+    prompt = _analysis_user_prompt(site, candidates, limit)
+
+    # One retry, and only for the one failure that a retry can fix: the model
+    # being withdrawn for this key, where resolve_model() hands back a different
+    # name. Retrying anything else here just doubles the latency.
+    for attempt in (1, 2):
+        try:
+            text, usage = _gemini_generate(system, prompt, model_name)
+            briefs = json.loads(text).get("briefs", [])
+            if usage:
+                log.info("%s — Gemini %s: %s in / %s out", site.domain, model_name,
+                         getattr(usage, "prompt_token_count", "?"),
+                         getattr(usage, "candidates_token_count", "?"))
+            if not briefs:
+                raise ValueError("model returned no briefs")
+            return [_clamp_analysis(b) for b in briefs[:limit]]
+        except Exception as exc:
+            msg = str(exc)
+            if attempt == 1 and "NOT_FOUND" in msg and "no longer available" in msg:
+                mark_model_unusable(model_name)
+                nxt = resolve_model()
+                if nxt != model_name:
+                    log.warning("%s is withdrawn for this key — retrying with %s",
+                                model_name, nxt)
+                    model_name = nxt
+                    continue
+            log.error("%s — Gemini step failed (%s); using deterministic fallback",
+                      site.domain, exc)
+            reason = f"Gemini call failed: {exc}"
+            if config.terminal_provider_error(msg):
+                _PROVIDER_DOWN["reason"] = reason
+                log.error("This is an account-level failure — skipping the model for "
+                          "every remaining site rather than repeating the same call.")
+            return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
+
+    # Unreachable: every path in the loop returns. Present so a future edit that
+    # adds a `continue` cannot fall out of the function returning None.
+    return [_fallback_brief(site, c, "Gemini retries exhausted")
+            for c in candidates[:limit]]
+
+
+def _gemini_generate(system: str, prompt: str, model_name: str) -> tuple[str, Any]:
+    """
+    One Gemini generation. Returns (text, usage_metadata).
+
+    Two SDKs because Google shipped a replacement: `google-genai` is the current
+    unified client and is preferred when installed; `google-generativeai` is the
+    legacy package and the fallback. Same shape as Agent 2's caller — the
+    generation config differs, the transport does not.
+    """
+    try:
+        from google import genai as new_genai
+        from google.genai import types as genai_types
+
+        client = new_genai.Client(api_key=config.require_env("GEMINI_API_KEY"))
+        resp = client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=system, **_GEMINI_ANALYSIS_CONFIG
+            ),
+        )
+        return (resp.text or "").strip(), getattr(resp, "usage_metadata", None)
+    except ImportError:
+        pass
+
+    import google.generativeai as genai   # legacy SDK — deprecated by Google
+
+    genai.configure(api_key=config.require_env("GEMINI_API_KEY"))
+    model = genai.GenerativeModel(
+        model_name=model_name,
+        system_instruction=system,
+        generation_config=_GEMINI_ANALYSIS_CONFIG,
+    )
+    resp = model.generate_content(prompt)
+    return (resp.text or "").strip(), getattr(resp, "usage_metadata", None)
 
 
 def _analyse_with_anthropic(
@@ -803,7 +923,7 @@ def _analyse_with_anthropic(
         log.error("%s — Claude step failed (%s); using deterministic fallback",
                   site.domain, exc)
         reason = f"Claude call failed: {exc}"
-        if terminal_provider_error(str(exc)):
+        if config.terminal_provider_error(str(exc)):
             _PROVIDER_DOWN["reason"] = reason
             log.error("This is an account-level failure — skipping the model for "
                       "every remaining site rather than repeating the same call.")
@@ -819,27 +939,6 @@ def _analyse_with_anthropic(
 # A dict rather than a module-level string so the two analysis functions can set
 # it without a `global` declaration in each.
 _PROVIDER_DOWN: dict[str, str] = {}
-
-# Substrings that mean "this account cannot call this model right now", as
-# opposed to a timeout or a malformed response, which are worth retrying on the
-# next site.
-_TERMINAL_PROVIDER_ERRORS = (
-    "credit balance is too low",
-    "invalid x-api-key",
-    "authentication_error",
-    "permission_error",
-    "insufficient_quota",
-)
-
-
-def terminal_provider_error(msg: str) -> str:
-    """The reason this will fail for every other site too, or '' if it will not."""
-    low = msg.lower()
-    for needle in _TERMINAL_PROVIDER_ERRORS:
-        if needle in low:
-            return needle
-    return ""
-
 
 def _fallback_brief(site: Site, c: dict[str, Any], reason: str = "") -> dict[str, Any]:
     """
