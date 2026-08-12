@@ -206,6 +206,9 @@ _fb = _a1sp._fallback_brief(
     {"query": "لانزاروته", "gap_type": "missing_page", "impressions": 120,
      "position": 41.0, "local_score": 60},
 )
+_a1src = pathlib.Path(__file__).with_name("agent1_seo_scout.py").read_text(encoding="utf-8")
+_wf1 = (pathlib.Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "agent1-seo-scout.yml").read_text(encoding="utf-8")
 ok("a fallback brief marks itself as degraded", _fb.get("_degraded") is True)
 ok("and it genuinely has none of what the GEO rules require",
    _fb["must_include"] == [], "no consensus figure, no proprietary fact")
@@ -213,6 +216,24 @@ ok("a Farsi keyword with no ASCII strips to a placeholder path, not a real one",
    _fb["target_url_path"] == "/opportunity",
    "which is why publishing one is worse than deferring it")
 _a1src = pathlib.Path(__file__).with_name("agent1_seo_scout.py").read_text(encoding="utf-8")
+# Knowing a run degraded is half the answer; the other half is why. Reading it
+# meant expanding a collapsed log step by hand, which is not a thing anyone does
+# at 04:15.
+ok("a fallback brief carries the reason the model did not answer",
+   _a1sp._fallback_brief(
+       [x for x in config.load_sites() if x.domain == "boutimar.ir"][0],
+       {"query": "q", "gap_type": "missing_page", "impressions": 1,
+        "position": 40.0, "local_score": 1},
+       "Anthropic unavailable: boom")["_degraded_reason"] == "Anthropic unavailable: boom")
+ok("and the reason is redacted before it is stored",
+   "config.redact(reason)" in pathlib.Path(__file__).with_name(
+       "agent1_seo_scout.py").read_text(encoding="utf-8"),
+   "an exception body can carry the key that failed")
+ok("every fallback call site supplies a reason",
+   _a1src.count("_fallback_brief(site, c)") == 0,
+   "a bare call would report a degraded run with no cause")
+ok("the reasons reach the manifest and the annotation",
+   '"degraded_reasons"' in _a1src and "Cause: {why}" in _wf1)
 ok("degraded briefs are counted into the run manifest",
    '"degraded_briefs"' in _a1src and '"degraded_domains"' in _a1src)
 ok("the flag travels on the wire, not just in the log",

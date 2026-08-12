@@ -689,7 +689,8 @@ def analyse_gaps(
             "Candidates will not be deduplicated or ranked.",
             site.domain, exc,
         )
-        return [_fallback_brief(site, c) for c in candidates[:limit]]
+        return [_fallback_brief(site, c, f"OpenAI unavailable: {exc}")
+                for c in candidates[:limit]]
 
     try:
         resp = client.chat.completions.create(
@@ -720,7 +721,8 @@ def analyse_gaps(
         return [_clamp_analysis(b) for b in briefs[:limit]]
     except Exception as exc:  # provider outage, quota, schema refusal
         log.error("%s — OpenAI step failed (%s); using deterministic fallback", site.domain, exc)
-        return [_fallback_brief(site, c) for c in candidates[:limit]]
+        return [_fallback_brief(site, c, f"OpenAI call failed: {exc}")
+                for c in candidates[:limit]]
 
 
 def _analyse_with_anthropic(
@@ -743,7 +745,8 @@ def _analyse_with_anthropic(
             "%s — Anthropic unavailable (%s); using the deterministic fallback. "
             "Candidates will not be deduplicated or ranked.", site.domain, exc,
         )
-        return [_fallback_brief(site, c) for c in candidates[:limit]]
+        return [_fallback_brief(site, c, f"Anthropic unavailable: {exc}")
+                for c in candidates[:limit]]
 
     kwargs: dict[str, Any] = {
         "model": config.ANTHROPIC_MODEL,
@@ -788,10 +791,11 @@ def _analyse_with_anthropic(
     except Exception as exc:
         log.error("%s — Claude step failed (%s); using deterministic fallback",
                   site.domain, exc)
-        return [_fallback_brief(site, c) for c in candidates[:limit]]
+        return [_fallback_brief(site, c, f"Claude call failed: {exc}")
+                for c in candidates[:limit]]
 
 
-def _fallback_brief(site: Site, c: dict[str, Any]) -> dict[str, Any]:
+def _fallback_brief(site: Site, c: dict[str, Any], reason: str = "") -> dict[str, Any]:
     """
     No-LLM brief. Coarser, but every field the schema needs is present.
 
@@ -812,6 +816,10 @@ def _fallback_brief(site: Site, c: dict[str, Any]) -> dict[str, Any]:
     slug = re.sub(r"[^a-z0-9]+", "-", c["query"].lower()).strip("-") or "opportunity"
     return {
         "_degraded": True,
+        # Why the model did not answer, carried to the manifest and the run
+        # summary. Without it the only way to learn that a green run produced
+        # nothing usable is to expand a collapsed log step by hand.
+        "_degraded_reason": config.redact(reason)[:300],
         "primary_keyword": c["query"],
         "gap_type": c["gap_type"],
         "search_intent": "commercial",
@@ -1097,7 +1105,7 @@ def process_site(
         # Briefs this site produced without the LLM step. Green-but-degraded is
         # the run state that hides best, so it gets its own counter rather than
         # living only in a log line nobody scrolls to.
-        "degraded_briefs": 0, "error": None,
+        "degraded_briefs": 0, "degraded_reason": "", "error": None,
     }
     try:
         gsc = collect_gsc(service, site)
@@ -1134,7 +1142,8 @@ def process_site(
         analyses = (
             analyse_gaps(site, candidates, limit)
             if use_llm
-            else [_fallback_brief(site, c) for c in candidates[:limit]]
+            else [_fallback_brief(site, c, "--no-llm requested")
+                  for c in candidates[:limit]]
         )
 
         for analysis in analyses:
@@ -1161,6 +1170,8 @@ def process_site(
             stat["briefs_emitted"] += 1
             if analysis.get("_degraded"):
                 stat["degraded_briefs"] += 1
+                stat["degraded_reason"] = (stat.get("degraded_reason")
+                                           or analysis.get("_degraded_reason", ""))
 
             briefs_dir = run_dir / "briefs"
             briefs_dir.mkdir(parents=True, exist_ok=True)
@@ -1318,6 +1329,8 @@ def main(argv: list[str] | None = None) -> int:
     manifest["not_granted"] = ungranted
     manifest["degraded_domains"] = [s["domain"] for s in stats
                                     if s.get("degraded_briefs")]
+    manifest["degraded_reasons"] = sorted({s["degraded_reason"] for s in stats
+                                           if s.get("degraded_reason")})
     (run_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
     )
@@ -1340,6 +1353,8 @@ def main(argv: list[str] | None = None) -> int:
             "but these briefs are not worth publishing.",
             t["degraded_briefs"], t["briefs_emitted"], doms,
         )
+        for r in manifest["degraded_reasons"]:
+            log.error("DEGRADED because: %s", r)
     if any(s["status"] == "failed" for s in stats):
         return 1
     return 1 if t["dlq"] else 0
