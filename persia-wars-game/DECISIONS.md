@@ -997,3 +997,39 @@ reminder that the tool keeps ONE shape, and any emblem built from separate
 pieces will lose all but the biggest.
 
 Art tally: 7 of 8 cards, 4 of 25 units. 60 of 71 pieces outstanding.
+
+## The whole roster arrives at once — and the Army Ledger is now the weak link
+
+All 21 remaining units came back in one batch and all 21 cut out on the first
+pass. The roster is complete: 25 of 25. Verified in the running game, not
+inferred — `artProgress()` reports 25/25 units with an empty missing list, zero
+placeholder shapes remain on the units screen, no image 404s, and a driven AI
+match rendered sprites on the battlefield with correct team rings and HP bars.
+Build clean, 187 tests pass, 1.5 MB for the whole roster.
+
+The silhouette hooks written into the prompts mostly worked. The ones that
+carried at 22px: the Ethiopian bow overtopping its own archer, the Indian
+archer's white cotton (the brightest thing on the sheet), the Sagartian rope
+loop, the camel's hump, the Apple-bearer's gold sphere, the Immortal's and
+Shield-bearer's shield slabs, the chariot, the elephant.
+
+**They did not all work, and the honest reading is that six units converge.**
+At 22–26px `bactrian-archer`, `colchian-shieldman`, `egyptian-marine`,
+`kissian-levy`, `lydian-hoplite` and `paphlagonian-javelineer` are the same
+picture: a brown standing figure about ten pixels wide. Three of the four
+cavalry converge the same way. Everything separates cleanly from 40px up.
+
+That matters because of exactly one screen. `MatchScreen.tsx:352` draws the Army
+Ledger as glyphs at 26px **with no label** — the unit name is in a `title`
+attribute, which a phone cannot show. So during a match the player is asked to
+tell six squads apart by a picture at the size where six of them look alike.
+
+This is not a regression: before the art, those units drew shared placeholder
+silhouettes — twelve infantry all rendering as 'shield' or 'spear' — so the
+ledger was strictly less readable than it is now. But it is the next real
+problem, and it is a UI problem rather than an art one. Regenerating six good
+illustrations to fight a 26px box is the wrong fix; the ledger needs to carry
+identity some other way.
+
+Art tally: 25 of 25 units, 7 of 8 cards. 39 of 71 pieces outstanding — all of
+them arenas, commanders, capital, codex figures and mission images.
