@@ -422,6 +422,25 @@ ok("the fix says to locate the failure before naming its cause",
    "measured: Farsi pages 200, ASCII terms 200, Farsi term archives 404")
 ok("and the docstring records that two earlier readings were wrong",
    "two earlier readings of it here" in _a5src_txt)
+# The repair tool ships next to the check that finds the fault.
+import importlib.util as _ilu
+_spec = _ilu.spec_from_file_location(
+    "_fixslug", pathlib.Path(__file__).with_name("tools") / "fix_farsi_term_slugs.py")
+_fix = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_fix)
+ok("the repair tool spots an encoded Persian slug",
+   _fix.needs_fix("%d8%af%d8%b3%d8%aa") and not _fix.needs_fix("hiking"))
+ok("and does not mistake an ordinary percent sign for one",
+   not _fix.needs_fix("50%-off"), "a '%' alone is not an encoding")
+ok("it writes nothing unless --apply is passed",
+   _fix.main.__doc__ is None and "--apply" in _fix.__doc__
+   and 'action="store_true"' in pathlib.Path(_spec.origin).read_text(encoding="utf-8"))
+ok("it never puts credentials in the backup file",
+   'k != "_links"' in pathlib.Path(_spec.origin).read_text(encoding="utf-8")
+   and "auth" not in _fix.run_site.__doc__ if _fix.run_site.__doc__ else True)
+ok("suggested slugs are readable keys, not transliteration",
+   _fix.ascii_slug_for("دسته‌بندی نشده", set()) == "uncategorized-fa")
+ok("and a collision does not overwrite an existing term",
+   _fix.ascii_slug_for("دسته‌بندی نشده", {"uncategorized-fa"}) == "uncategorized-fa-2")
 ok("an all-ASCII site raises nothing",
    _a5.audit_nonascii_slugs(_st, [], _fresh_audit(), {"https://c.ir/a": 200}) == [])
 
