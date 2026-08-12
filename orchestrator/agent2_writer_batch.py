@@ -200,6 +200,42 @@ def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
         return oc
 
 
+def select_round_robin(
+    briefs: list[dict[str, Any]], limit: int
+) -> tuple[list[dict[str, Any]], int]:
+    """
+    Take one brief per site in rotation until the limit is reached.
+
+    --limit used to cut a filename-sorted list, and Agent 1 names brief files
+    by domain. Run #8 scouted eight properties, emitted 11 briefs, wrote 5 —
+    and all five were boutimar.com. The other seven sites were scouted and not
+    one of them got a word, and no amount of re-running would have changed
+    that: the same five briefs sort first every night.
+
+    The limit is a cost ceiling, not a priority order. Rotating spends it on
+    breadth, and a site that has more briefs than the others still gets its
+    extra ones — just after every site has had a first.
+
+    Site order is first-appearance in the input, which is the sorted filename
+    order, so the rotation is deterministic and a re-run writes the same five.
+    Returns the selection and how many eligible briefs it deferred.
+    """
+    by_domain: dict[str, list[dict[str, Any]]] = {}
+    for payload in briefs:
+        dom = str(payload.get("site", {}).get("domain", "")).lower()
+        by_domain.setdefault(dom, []).append(payload)
+
+    ordered: list[dict[str, Any]] = []
+    while any(by_domain.values()):
+        for queue in by_domain.values():
+            if queue:
+                ordered.append(queue.pop(0))
+
+    if limit and limit < len(ordered):
+        return ordered[:limit], len(ordered) - limit
+    return ordered, 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--briefs", required=True, help="directory of content.brief.v1 JSON files")
@@ -244,20 +280,29 @@ def main(argv: list[str] | None = None) -> int:
     wanted = {d.lower() for d in (args.domain or [])}
     outcomes: list[Outcome] = []
 
+    # Read and group before writing anything, so the limit can be spent across
+    # sites rather than down a sorted list.
+    eligible: list[dict[str, Any]] = []
     for path in files:
-        if args.limit and len(outcomes) >= args.limit:
-            break
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
         except Exception as exc:
+            # Never counts against the limit: an unreadable file is a fault to
+            # report, not a brief that consumed a slot.
             outcomes.append(Outcome(brief_file=path.name, status="failed",
                                     error=f"unreadable: {exc}"))
             continue
-
         dom = str(payload.get("site", {}).get("domain", "")).lower()
         if wanted and dom not in wanted:
             continue
+        eligible.append(payload)
 
+    selected, deferred = select_round_robin(eligible, args.limit)
+    if deferred:
+        log.warning("--limit %d: writing %d of %d eligible briefs, %d deferred "
+                    "to the next run", args.limit, args.limit, len(eligible), deferred)
+
+    for payload in selected:
         oc = write_one(payload, out_dir, dry_run=args.dry_run, no_llm=args.no_llm)
         outcomes.append(oc)
         log.info("%s — %s — %r → %s%s",
@@ -276,6 +321,8 @@ def main(argv: list[str] | None = None) -> int:
         "no_llm": args.no_llm,
         "briefs_seen": len(files),
         "processed": len(outcomes),
+        "deferred": deferred,
+        "domains_written": sorted({o.domain for o in outcomes if o.domain}),
         "drafted": sum(o.status == "drafted" for o in outcomes),
         "blocked": sum(o.status == "blocked" for o in outcomes),
         "failed": sum(o.status == "failed" for o in outcomes),

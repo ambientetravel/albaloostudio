@@ -86,14 +86,14 @@ jobs:
           if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
           if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
 
-          # Agent 2 is not built yet, so a scheduled run — which never passes
-          # dry_run — had nowhere to deliver and died on the missing secret every
-          # night at 04:15. Scouting is still worth doing without a consumer: the
-          # briefs are the artifact. This is self-healing, not a permanent
-          # opt-out — the night AGENT2_WEBHOOK_URL exists, delivery starts on its
-          # own with no edit here.
+          # The hand-off to Agent 2 is the run artifact, not a webhook. Agent 2
+          # runs in this same repo on workflow_run and downloads seo-scout-run,
+          # so there is no endpoint to POST to and no signature to verify — one
+          # less credential. AGENT2_WEBHOOK_URL survives only for an external
+          # consumer; when it is unset, which is the normal state, the scout
+          # skips the POST rather than failing on a missing secret.
           if [ -z "$AGENT2_WEBHOOK_URL" ] && [ "${{ inputs.dry_run }}" != "true" ]; then
-            echo "::notice title=No delivery endpoint::AGENT2_WEBHOOK_URL is not set — Agent 2 has no endpoint yet. Building briefs and archiving them as the run artifact; delivering nothing."
+            echo "::notice title=Briefs hand off via artifact::No external webhook configured. Briefs are archived as seo-scout-run and Agent 2 picks them up on workflow_run — this is the designed path, not a gap."
             ARGS="$ARGS --dry-run"
           fi
 

@@ -166,6 +166,34 @@ ok("and its generation_meta flags itself as non-model output",
    "NOT MODEL OUTPUT" in pathlib.Path(__file__).with_name(
        "agent2_writer_batch.py").read_text(encoding="utf-8"))
 
+print("\n=== agent 2 — how the per-run limit is spent ===")
+# Run #8's shape exactly: eight briefs for boutimar.com sorting ahead of one
+# each for three other sites. Sorted-and-truncated wrote five boutimar.com
+# briefs and nothing else; rotation must reach every site first.
+_briefs = ([{"site": {"domain": "boutimar.com"}, "n": i} for i in range(8)]
+           + [{"site": {"domain": "boutimar.ir"}, "n": 100},
+              {"site": {"domain": "cruisebaz.com"}, "n": 101},
+              {"site": {"domain": "exploreorient.com"}, "n": 102}])
+_sel, _def = a2b.select_round_robin(_briefs, 5)
+_doms = [b["site"]["domain"] for b in _sel]
+ok("the per-run limit is spent across sites, not down a sorted list",
+   len(set(_doms)) == 4, _doms)
+ok("every site gets a brief before any site gets a second",
+   _doms.count("boutimar.com") == 2, f"boutimar.com took {_doms.count('boutimar.com')} of 5")
+ok("and the briefs it could not fit are reported, not dropped silently",
+   _def == 6, _def)
+ok("no limit means every eligible brief is written",
+   a2b.select_round_robin(_briefs, 0) == (a2b.select_round_robin(_briefs, 0)[0], 0)
+   and len(a2b.select_round_robin(_briefs, 0)[0]) == 11)
+# Determinism matters more than it looks: a re-run that reshuffles the
+# selection writes a different five and the deferred ones never come up.
+ok("the selection is deterministic across calls",
+   [b["n"] for b in a2b.select_round_robin(_briefs, 5)[0]]
+   == [b["n"] for b in a2b.select_round_robin(_briefs, 5)[0]])
+ok("a single-site portfolio still fills the limit",
+   len(a2b.select_round_robin(
+       [{"site": {"domain": "boutimar.com"}, "n": i} for i in range(9)], 5)[0]) == 5)
+
 print("\n=== agent 2 — retry semantics ===")
 ok("the default Gemini model is one the free tier actually allows",
    config.GEMINI_MODEL.endswith("flash") or "GEMINI_MODEL" in os.environ,

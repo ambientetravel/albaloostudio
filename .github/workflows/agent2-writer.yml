@@ -182,6 +182,12 @@ jobs:
                     "assembled from the briefs and are not publishable.\n")
           print(f"{m['drafted']} drafted · {m['blocked']} blocked · {m['failed']} failed "
                 f"(of {m['briefs_seen']} briefs)\n")
+          if m.get("deferred"):
+              print(f"> {m['deferred']} brief(s) deferred to the next run by the "
+                    f"per-run limit. Briefs are taken one per site in rotation, so "
+                    f"the limit never spends a whole run on one domain.\n")
+          if m.get("domains_written"):
+              print(f"Sites written: {', '.join(m['domains_written'])}\n")
           print("| Site | Keyword | Status | Target | Words |")
           print("|---|---|---|---|---:|")
           for o in m["outcomes"]:
