@@ -190,8 +190,9 @@ jobs:
                     f"the limit never spends a whole run on one domain.\n")
           if m.get("deferred_upstream"):
               print(f"> **{m['deferred_upstream']} brief(s) deferred — the model was "
-                    f"overloaded.** Nothing is wrong with these briefs and nothing "
-                    f"needs fixing; they draft on the next run.\n")
+                    f"busy.** Overloaded or rate-limited; the reason for each is "
+                    f"under *Not drafted* below. Nothing is wrong with these briefs "
+                    f"and nothing needs fixing; they draft on the next run.\n")
           if m.get("domains_written"):
               print(f"Sites written: {', '.join(m['domains_written'])}\n")
           if m.get("domains_skipped"):

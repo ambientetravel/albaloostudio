@@ -299,6 +299,9 @@ ok("and raises the transient type so the run stays green",
    "or config.rate_limited(str(last_error))" in _a2lsrc)
 _wf2 = (pathlib.Path(__file__).resolve().parents[1]
         / ".github" / "workflows" / "agent2-writer.yml").read_text(encoding="utf-8")
+ok("the deferral note does not name a cause it did not check",
+   "the model was \" \n" not in _wf2 and "overloaded.**" not in _wf2,
+   "run #16 called a 429 rate limit an overload")
 ok("a brief that was not drafted says why on the run page",
    "### Not drafted" in _wf2,
    "a row of zeros meant expanding a collapsed log step by hand")
