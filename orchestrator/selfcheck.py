@@ -403,6 +403,11 @@ ok("and the report says the section diff does not apply rather than showing none
    and _flat["sections_they_cover_that_we_do_not"] == []
    and _flat["note"],
    "an empty list would read as 'no gaps found'")
+ok("competitors declared in sites.yml reach the Site object",
+   len([x for x in config.load_sites() if x.competitors]) >= 1,
+   "the field existed on the dataclass but load_sites never passed it through")
+ok("and every other site stays empty rather than inheriting a guess",
+   all(not x.competitors for x in config.load_sites() if x.domain != "boutimar.ir"))
 ok("Agent 8 never claims to know rankings",
    "never who *ranks*" in (_a8.__doc__ or "")
    and "rankings" in (_a8.compare.__doc__ or ""),

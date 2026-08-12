@@ -117,6 +117,23 @@ sites:
         account_ref: null          # needs a BRAND Instagram (Business acct + FB Page)
         requires_media: true
 
+    # From the Iranian Cruise Competitor Map (23 Jul 2026). These five are the
+    # ones that analysis flags as head-to-head, not the biggest names:
+    #   eavar          — the deepest all-in-one Farsi cruise hub; the benchmark
+    #   gotosafar      — the ONLY strong «کروز آرویا» page in Farsi, and AROYA
+    #                    is the identified blue ocean
+    #   nilfamtravel   — Persian Gulf specialist with per-port itineraries
+    #   lastsecond     — strongest «خلیج فارس» + MSC blog cluster, our home term
+    #   flytoday       — the single broadest cruise guide page in the market
+    # Instagram and Telegram sellers dominate the long tail but are login-walled,
+    # so a crawler cannot see them; that gap is real and is not closed here.
+    competitors:
+      - https://eavar.com
+      - https://gotosafar.com
+      - https://nilfamtravel.com
+      - https://lastsecond.ir
+      - https://flytoday.ir
+
   - domain: exploreorient.com
     property_uri: "sc-domain:exploreorient.com"
     gsc_account: "contactmozaffari@gmail.com"

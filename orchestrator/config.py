@@ -287,6 +287,7 @@ def load_sites(
                 compliance_profile=merged.get("compliance_profile", "boutimar_v1"),
                 status=str(merged.get("status", "active")).lower(),
                 audit_sample_pages=int(merged.get("audit_sample_pages", 10)),
+                competitors=[str(u).rstrip("/") for u in (merged.get("competitors") or [])],
             )
         )
 
