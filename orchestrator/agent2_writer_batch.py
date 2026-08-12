@@ -351,7 +351,13 @@ def main(argv: list[str] | None = None) -> int:
         # this run's cost ceiling, the other is the model being busy.
         "deferred_by_limit": deferred,
         "deferred_upstream": sum(o.status == "deferred" for o in outcomes),
-        "domains_written": sorted({o.domain for o in outcomes if o.domain}),
+        # Drafted only. Listing every domain the run touched labelled four sites
+        # as written in run #12, where all five briefs were skipped and not one
+        # word was produced.
+        "domains_written": sorted({o.domain for o in outcomes
+                                   if o.domain and o.status == "drafted"}),
+        "domains_skipped": sorted({o.domain for o in outcomes
+                                   if o.domain and o.status == "skipped"}),
         "drafted": sum(o.status == "drafted" for o in outcomes),
         "blocked": sum(o.status == "blocked" for o in outcomes),
         "failed": sum(o.status == "failed" for o in outcomes),

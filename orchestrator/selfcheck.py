@@ -258,6 +258,9 @@ ok("the flag travels on the wire, not just in the log",
 ok("Agent 2's model accepts the flag and defaults it False for older briefs",
    _a2l.BriefBlock(working_title="t", target_url_path="/x",
                    language="en").degraded_no_llm is False)
+ok("a skipped site is not reported as a written one",
+   'if o.domain and o.status == "drafted"' in _a2bsrc,
+   "run #12 wrote nothing and named four sites as written")
 ok("and Agent 2 skips a degraded brief instead of paying for a draft",
    'getattr(brief.brief, "degraded_no_llm", False)' in _a2bsrc
    and 'oc.status = "skipped"' in _a2bsrc)

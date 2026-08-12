@@ -194,6 +194,8 @@ jobs:
                     f"needs fixing; they draft on the next run.\n")
           if m.get("domains_written"):
               print(f"Sites written: {', '.join(m['domains_written'])}\n")
+          if m.get("domains_skipped"):
+              print(f"Sites skipped: {', '.join(m['domains_skipped'])}\n")
           print("| Site | Keyword | Status | Target | Words |")
           print("|---|---|---|---|---:|")
           for o in m["outcomes"]:
