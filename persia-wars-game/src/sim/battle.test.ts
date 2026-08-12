@@ -270,7 +270,7 @@ describe('the AI opponent', () => {
     expect(pool).toContain('persian-cavalry');
     // skill 1 disables the deliberate mistake, so this pins the scoring rather
     // than the slip — the slip is covered by the ladder tests in progression.
-    const sharp = { name: 'Test', avatar: 0, skill: 1 };
+    const sharp = { name: 'Test', avatar: 0, skill: 1, style: 'massing' as const };
     expect(aiRoundPick(forced, 'b', sharp)).toBe('persian-cavalry');
   });
 

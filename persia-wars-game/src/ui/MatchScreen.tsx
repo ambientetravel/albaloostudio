@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { getArena, getBattle, getCommander, getDoctrine, getUnit, getUpgrade } from '../content';
 import { arenaForTrophies } from '../game/progression';
 import { BattleCanvas } from '../render/BattleCanvas';
-import { thinkTime } from '../sim/ai';
+import { STYLE_LABEL, thinkTime, type RivalStyle } from '../sim/ai';
 import { deficitOf, finalClash, holdsRally } from '../sim/match';
 import {
   ROUNDS_MAX,
@@ -132,6 +132,7 @@ export function MatchScreen() {
         names={{ a: nameFor('a'), b: nameFor('b') }}
         avatars={{ a: avatarFor('a'), b: avatarFor('b') }}
         bot={{ a: isBot('a'), b: isBot('b') }}
+        rivalStyle={online ? undefined : aiOpponent?.style}
         commanders={matchState.commanders}
         final={finalClash(matchState)}
       />
@@ -247,6 +248,7 @@ function ScoreRow({
   names,
   avatars,
   bot,
+  rivalStyle,
   commanders,
   final,
 }: {
@@ -256,6 +258,8 @@ function ScoreRow({
   names: Record<Side, string>;
   avatars: Record<Side, number>;
   bot: Record<Side, boolean>;
+  /** Only set offline — a person's drafting habit is theirs to reveal. */
+  rivalStyle?: RivalStyle;
   commanders: Record<Side, string>;
   final: boolean;
 }) {
@@ -266,6 +270,7 @@ function ScoreRow({
         name={names[theirSide]}
         avatar={avatars[theirSide]}
         bot={bot[theirSide]}
+        style={rivalStyle}
         side={theirSide}
         commander={commanders[theirSide]}
       />
@@ -297,12 +302,14 @@ function Corner({
   bot,
   side,
   commander,
+  style,
 }: {
   name: string;
   avatar: number;
   bot: boolean;
   side: Side;
   commander: string;
+  style?: RivalStyle;
 }) {
   const c = getCommander(commander);
   return (
@@ -315,6 +322,11 @@ function Corner({
         {c.name}
       </span>
       {bot && <span className="bot-tag">cpu</span>}
+      {/* A rival's habit is on the plate rather than hidden, so a player can
+          learn to read one — 'drills its troops' means the traits are coming
+          and the ranks are not. It is only shown for the computer, because a
+          person's habit is theirs to reveal. */}
+      {bot && style && <span className="score-row__style">{STYLE_LABEL[style]}</span>}
     </div>
   );
 }

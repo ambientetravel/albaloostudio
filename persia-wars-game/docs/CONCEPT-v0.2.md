@@ -691,8 +691,17 @@ opens only after the historical path, tracks separately and pays nothing.
 Mission 10's survival objective shipped in M4. See DECISIONS.md, including the
 four dossiers that had Herodotus filed as contemporary evidence.
 
-**M6 — recorded rivals.** `RecordedRivalDecisionProvider` reading the existing replay
-log; three bot personalities; bot backfill labelled honestly (§10).
+**M6 — recorded rivals. ◐ PART DONE.** Three bot personalities shipped and
+measured: massing, drilling, planning — they differ in which card KIND they
+spend a pick on, every pairing sits inside 35-65% with the side advantage
+cancelled, and the habit is printed on the rival's nameplate beside the CPU tag.
+Two findings in DECISIONS.md, including that counter-weighting turned out to be
+competence rather than personality (90/10 before it was equalised).
+
+Still open: `RecordedRivalDecisionProvider`. It was specified as "reading the
+existing replay log" and **there is no replay log** — nothing records a match's
+decision sequence. That has to be built before rivals can be recorded, so M6 is
+really recorder → provider → backfill.
 
 Explicitly out, per §17: live ranked, clans, chat, subscriptions, loot boxes, fantasy
 units, the other twelve books, a city builder.

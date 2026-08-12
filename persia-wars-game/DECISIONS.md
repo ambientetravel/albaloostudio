@@ -1076,3 +1076,58 @@ page never scrolls sideways. The battlefield canvas still gets 323x428 on a
 One thing checked and left alone: the Result screen draws units at 22px but
 already prints the full name beside the glyph. The Ledger was the only place a
 unit had to be recognised from the picture alone.
+
+
+## Three rivals, and two things the measurement threw out
+
+The offline opponent differed only by a `skill` scalar — a hit rate, not a
+habit. Twenty-four differently-named rivals all drafted the same army, so the
+whole offline game had one shape. It now has three, and a rival's habit is
+printed on its nameplate beside the CPU tag so it can be learned rather than
+guessed at.
+
+**The first design was wrong and the tests said so.** They were written as tall
+/ counter-picking / wide. Two of those did not survive contact:
+
+*Counter-weighting is competence, not personality.* The style that weighted the
+matchup triangle highest beat the style that weighted it lowest **90% of the
+time**. In a game whose core mechanic is a counter triangle, "how much do you
+care about counters" is just a difficulty slider wearing a costume. All three
+styles now weight it identically, and only after that did every pairing settle
+inside 35-65%.
+
+*The harness was measuring the wrong thing.* Sides a and b get different
+improvised decks and the simulation is not mirror-symmetric, so a pairing played
+from one side alone measures style advantage and side advantage added together.
+The same matchup reported as 34% and as 66% depending on which style name sorted
+first. Every pairing is now played both ways round and summed.
+
+What survives is which KIND of card a rival spends a pick on — the three kinds
+M2 built. Measured over 90 matches each, both ways round:
+
+| style | rank | doctrines | traits | reads as |
+|---|---|---|---|---|
+| massing | 1.36 | 0.17 | 0.61 | masses its ranks |
+| drilling | 1.30 | 0.30 | 1.09 | drills its troops |
+| planning | 1.16 | 0.99 | 0.44 | plans the whole line |
+
+Head to head: massing/planning 54.4%, drilling/massing 39.4%, drilling/planning
+46.1%, over 180 matches each.
+
+**A correction worth keeping.** Midway through, the scorer was also changed to
+stop charging a rank-up the mixed-front penalty — a rank deepens a squad, it does
+not widen the front, so the penalty looked like double-counting. It was reverted
+for two reasons. It changes what the AI picks under NEUTRAL weights, and it broke
+the 200-match commander sweep that M3 was accepted on. And it flattened the rank
+column above to 1.42/1.39/1.40 — nothing — which briefly made "goes tall"
+look impossible and produced a confident, wrong comment saying so. The reading
+that a rank-up is double-penalised is still probably right; it is just not free,
+and it is not this piece of work.
+
+The old weights are kept verbatim as `NEUTRAL` and used whenever no opponent is
+supplied, so every figure already measured against this AI still means what it
+meant. A style is a deviation from something, and that is the something.
+
+**M6 is only part done.** It was specified as `RecordedRivalDecisionProvider`
+"reading the existing replay log". There is no replay log — nothing in the game
+records a match's decision sequence. Recorded rivals need a recorder first.

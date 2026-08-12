@@ -4115,6 +4115,17 @@ button.unit-card:active:not(:disabled) {
 
 /* --- traits and doctrines in the Ledger ----------------------------------- */
 
+/* A rival's drafting habit, on the nameplate. Shown only for the computer, and
+   only alongside the 'cpu' tag — it is a tell to learn to read, not a boast. */
+.score-row__style {
+  grid-column: 1 / -1;
+  font-size: 9px;
+  font-style: italic;
+  line-height: 1.1;
+  color: var(--stone-dim);
+  opacity: 0.85;
+}
+
 .ledger-band {
   display: grid;
   gap: 3px;
