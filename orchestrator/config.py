@@ -90,6 +90,9 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 # that already fixes the outline, headings and must-cover points, the gap
 # between the two is small. Override with GEMINI_MODEL once billing is on.
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+# Seconds between Agent 1's per-property Gemini calls. The free tier's ceiling
+# is requests-per-minute, and the scout otherwise fires ten in a row.
+GEMINI_MIN_INTERVAL_S = float(os.getenv("GEMINI_MIN_INTERVAL_S", "20"))
 
 # Claude Opus 5 is the default for Agents 3 and 4. Notes that matter for the
 # request shape on this model family:

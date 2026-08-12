@@ -682,6 +682,17 @@ def analyse_gaps(
                 for c in candidates[:limit]]
 
     if config.GAP_ANALYSIS_PROVIDER == "gemini":
+        # Free-tier limits are per minute and the scout fires one call per
+        # property with nothing in between. Run #14 answered two properties and
+        # 429'd the next two. A few seconds of spacing costs a run that already
+        # takes minutes almost nothing, and is cheaper than burning two of the
+        # three retries per site to discover the same ceiling.
+        if _GEMINI_LAST_CALL["at"]:
+            gap = config.GEMINI_MIN_INTERVAL_S - (time.time() - _GEMINI_LAST_CALL["at"])
+            if gap > 0:
+                log.info("pacing Gemini: %.1fs before %s", gap, site.domain)
+                time.sleep(gap)
+        _GEMINI_LAST_CALL["at"] = time.time()
         return _analyse_with_gemini(site, candidates, limit)
 
     if config.GAP_ANALYSIS_PROVIDER == "anthropic":
@@ -821,10 +832,11 @@ def _analyse_with_gemini(
                                 model_name, nxt)
                     model_name = nxt
                     continue
-            if is_overloaded(msg) and attempt < 3:
+            if (is_overloaded(msg) or _rate_limited(msg)) and attempt < 3:
                 wait = _OVERLOAD_BACKOFF[min(attempt - 1, len(_OVERLOAD_BACKOFF) - 1)]
-                log.warning("%s — Gemini overloaded (attempt %d); waiting %ds",
-                            site.domain, attempt, wait)
+                log.warning("%s — Gemini %s (attempt %d); waiting %ds", site.domain,
+                            "overloaded" if is_overloaded(msg) else "rate-limited",
+                            attempt, wait)
                 time.sleep(wait + random.uniform(0, 3))
                 continue
             break
@@ -837,6 +849,25 @@ def _analyse_with_gemini(
         log.error("This is an account-level failure — skipping the model for "
                   "every remaining site rather than repeating the same call.")
     return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
+
+
+def _rate_limited(msg: str) -> bool:
+    """
+    A 429 that waiting will fix, as opposed to one that never will.
+
+    The free tier limits requests per minute, and run #14 spent them: four
+    properties in quick succession, two answered, two got 429
+    RESOURCE_EXHAUSTED. That is a queue problem, not a plan problem, and the
+    fix is to wait rather than to fall back.
+
+    "limit: 0" is the one 429 that is NOT this — it means the model is absent
+    from the plan entirely, so every retry returns the same zero. Agent 2
+    learned that distinction the expensive way; it is worth keeping here.
+    """
+    m = msg.upper()
+    if "LIMIT: 0" in m:
+        return False
+    return "429" in m or "RESOURCE_EXHAUSTED" in m or "RATE LIMIT" in m
 
 
 def _briefs_from(text: str) -> list[dict[str, Any]]:
@@ -984,6 +1015,9 @@ def _analyse_with_anthropic(
 # A dict rather than a module-level string so the two analysis functions can set
 # it without a `global` declaration in each.
 _PROVIDER_DOWN: dict[str, str] = {}
+
+# When the last Gemini call went out, so per-site calls can be spaced.
+_GEMINI_LAST_CALL: dict[str, float] = {"at": 0.0}
 
 def _fallback_brief(site: Site, c: dict[str, Any], reason: str = "") -> dict[str, Any]:
     """
