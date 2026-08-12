@@ -234,6 +234,23 @@ ok("every fallback call site supplies a reason",
    "a bare call would report a degraded run with no cause")
 ok("the reasons reach the manifest and the annotation",
    '"degraded_reasons"' in _a1src and "Cause: {why}" in _wf1)
+# Run #12 made the same failing Claude call once per domain and printed "credit
+# balance is too low" four times. The second call was never going to succeed.
+ok("an exhausted credit balance is recognised as account-level",
+   bool(_a1sp.terminal_provider_error(
+       "Error code: 400 - Your credit balance is too low to access the Anthropic API.")))
+ok("so is a revoked key and an exhausted OpenAI quota",
+   bool(_a1sp.terminal_provider_error("invalid x-api-key"))
+   and bool(_a1sp.terminal_provider_error("insufficient_quota")))
+ok("a timeout is NOT — the next site may well succeed",
+   not _a1sp.terminal_provider_error("Request timed out after 60s"))
+ok("nor is a 503",
+   not _a1sp.terminal_provider_error("503 service unavailable"))
+ok("and once it is known, the model is skipped for every remaining site",
+   '_PROVIDER_DOWN.get("reason")' in _a1src)
+ok("the run summary collapses one cause repeated per domain",
+   'r.split("\'request_id\'")[0]' in _wf1,
+   "four request_ids made one exhausted balance look like four faults")
 ok("degraded briefs are counted into the run manifest",
    '"degraded_briefs"' in _a1src and '"degraded_domains"' in _a1src)
 ok("the flag travels on the wire, not just in the log",

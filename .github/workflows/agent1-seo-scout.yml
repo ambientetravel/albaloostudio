@@ -131,15 +131,23 @@ jobs:
                   f"unranked slug for a URL. Agent 2 skips them rather than paying "
                   f"for a draft that cannot pass the content rules; Agent 1 "
                   f"re-scouts the same gaps on the next run.\n")
+              # degraded_reasons is already a set, but four sites failing on
+              # one exhausted balance produced four request_ids and so four
+              # distinct strings. Cut at the request_id.
+              seen = []
               for r in m.get("degraded_reasons", []):
-                  out.append(f"> **Why:** `{r}`\n")
+                  head = r.split("'request_id'")[0].rstrip(", {")
+                  if head not in seen:
+                      seen.append(head)
+              for head in seen:
+                  out.append(f"> **Why:** `{head}`\n")
           if m.get("not_granted"):
               out.append(f"> Not granted: {', '.join(m['not_granted'])}\n")
           out.append("\n*Architecture credit: Albaloo Studio*\n")
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
               fh.write("\n".join(out))
           if deg:
-              why = " | ".join(m.get("degraded_reasons", [])) or "no reason recorded"
+              why = " | ".join(seen) or "no reason recorded"
               print(f"::warning title=Degraded run::{deg} of {tot} briefs were built "
                     f"without the LLM step ({doms}). Cause: {why}")
           PY

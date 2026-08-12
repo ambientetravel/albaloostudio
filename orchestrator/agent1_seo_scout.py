@@ -672,6 +672,13 @@ def analyse_gaps(
     if not candidates:
         return []
 
+    if _PROVIDER_DOWN.get("reason"):
+        # Already established, on an earlier site, that this account cannot call
+        # the model at all. Asking again produces the same 400 and a second
+        # identical line in the summary.
+        return [_fallback_brief(site, c, _PROVIDER_DOWN["reason"])
+                for c in candidates[:limit]]
+
     if config.GAP_ANALYSIS_PROVIDER == "anthropic":
         return _analyse_with_anthropic(site, candidates, limit)
 
@@ -721,8 +728,12 @@ def analyse_gaps(
         return [_clamp_analysis(b) for b in briefs[:limit]]
     except Exception as exc:  # provider outage, quota, schema refusal
         log.error("%s — OpenAI step failed (%s); using deterministic fallback", site.domain, exc)
-        return [_fallback_brief(site, c, f"OpenAI call failed: {exc}")
-                for c in candidates[:limit]]
+        reason = f"OpenAI call failed: {exc}"
+        if terminal_provider_error(str(exc)):
+            _PROVIDER_DOWN["reason"] = reason
+            log.error("This is an account-level failure — skipping the model for "
+                      "every remaining site rather than repeating the same call.")
+        return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
 
 
 def _analyse_with_anthropic(
@@ -791,8 +802,43 @@ def _analyse_with_anthropic(
     except Exception as exc:
         log.error("%s — Claude step failed (%s); using deterministic fallback",
                   site.domain, exc)
-        return [_fallback_brief(site, c, f"Claude call failed: {exc}")
-                for c in candidates[:limit]]
+        reason = f"Claude call failed: {exc}"
+        if terminal_provider_error(str(exc)):
+            _PROVIDER_DOWN["reason"] = reason
+            log.error("This is an account-level failure — skipping the model for "
+                      "every remaining site rather than repeating the same call.")
+        return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
+
+
+# Set the first time a provider says something that will be equally true for
+# every remaining site — an exhausted credit balance, a revoked key, a model the
+# plan does not include. Run #12 made the same failing Claude call once per
+# domain and printed the same "credit balance is too low" four times; the second
+# call was never going to succeed, and on a ten-property portfolio that is ten
+# round-trips to learn one fact.
+# A dict rather than a module-level string so the two analysis functions can set
+# it without a `global` declaration in each.
+_PROVIDER_DOWN: dict[str, str] = {}
+
+# Substrings that mean "this account cannot call this model right now", as
+# opposed to a timeout or a malformed response, which are worth retrying on the
+# next site.
+_TERMINAL_PROVIDER_ERRORS = (
+    "credit balance is too low",
+    "invalid x-api-key",
+    "authentication_error",
+    "permission_error",
+    "insufficient_quota",
+)
+
+
+def terminal_provider_error(msg: str) -> str:
+    """The reason this will fail for every other site too, or '' if it will not."""
+    low = msg.lower()
+    for needle in _TERMINAL_PROVIDER_ERRORS:
+        if needle in low:
+            return needle
+    return ""
 
 
 def _fallback_brief(site: Site, c: dict[str, Any], reason: str = "") -> dict[str, Any]:
