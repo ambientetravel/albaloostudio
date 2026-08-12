@@ -722,7 +722,7 @@ def analyse_gaps(
             },
         )
         content = resp.choices[0].message.content or "{}"
-        briefs = json.loads(content).get("briefs", [])
+        briefs = _briefs_from(content)
         usage = getattr(resp, "usage", None)
         if usage:
             log.info(
@@ -777,16 +777,33 @@ def _analyse_with_gemini(
         return [_fallback_brief(site, c, f"Gemini unavailable: {exc}")
                 for c in candidates[:limit]]
 
-    system = _analysis_system_prompt(site)
+    try:
+        from agent2_writer_listener import _OVERLOAD_BACKOFF, is_overloaded
+    except Exception:  # keep the analysis working even if that module moves
+        _OVERLOAD_BACKOFF, is_overloaded = (15, 45), lambda _m: False
+
+    # The OpenAI and Anthropic paths pass GAP_ANALYSIS_SCHEMA as a request
+    # parameter and the provider enforces the envelope. Gemini's JSON mode
+    # guarantees valid JSON and nothing about its shape, so the shape has to be
+    # in the prompt — run #13 asked for briefs and got a bare array.
+    system = (_analysis_system_prompt(site) + "\n\n"
+              "Return a single JSON object of exactly this shape:\n"
+              '{"briefs": [ <brief>, ... ]}\n'
+              "The top level is an OBJECT with the key \"briefs\", never a bare "
+              "array. Each brief matches this JSON Schema:\n"
+              + json.dumps(GAP_ANALYSIS_SCHEMA["properties"]["briefs"]["items"],
+                           ensure_ascii=False))
     prompt = _analysis_user_prompt(site, candidates, limit)
 
-    # One retry, and only for the one failure that a retry can fix: the model
-    # being withdrawn for this key, where resolve_model() hands back a different
-    # name. Retrying anything else here just doubles the latency.
-    for attempt in (1, 2):
+    # Retries are per failure kind, not a blanket count. A withdrawn model is
+    # fixed by resolving a new name; a 503 is fixed by waiting long enough for
+    # the spike to pass — run #13 hit both on the same night. Anything else
+    # fails the same way twice, so retrying it only doubles the latency.
+    last_error: Exception | None = None
+    for attempt in range(1, 4):
         try:
             text, usage = _gemini_generate(system, prompt, model_name)
-            briefs = json.loads(text).get("briefs", [])
+            briefs = _briefs_from(text)
             if usage:
                 log.info("%s — Gemini %s: %s in / %s out", site.domain, model_name,
                          getattr(usage, "prompt_token_count", "?"),
@@ -795,8 +812,8 @@ def _analyse_with_gemini(
                 raise ValueError("model returned no briefs")
             return [_clamp_analysis(b) for b in briefs[:limit]]
         except Exception as exc:
-            msg = str(exc)
-            if attempt == 1 and "NOT_FOUND" in msg and "no longer available" in msg:
+            last_error, msg = exc, str(exc)
+            if "NOT_FOUND" in msg and "no longer available" in msg:
                 mark_model_unusable(model_name)
                 nxt = resolve_model()
                 if nxt != model_name:
@@ -804,19 +821,47 @@ def _analyse_with_gemini(
                                 model_name, nxt)
                     model_name = nxt
                     continue
-            log.error("%s — Gemini step failed (%s); using deterministic fallback",
-                      site.domain, exc)
-            reason = f"Gemini call failed: {exc}"
-            if config.terminal_provider_error(msg):
-                _PROVIDER_DOWN["reason"] = reason
-                log.error("This is an account-level failure — skipping the model for "
-                          "every remaining site rather than repeating the same call.")
-            return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
+            if is_overloaded(msg) and attempt < 3:
+                wait = _OVERLOAD_BACKOFF[min(attempt - 1, len(_OVERLOAD_BACKOFF) - 1)]
+                log.warning("%s — Gemini overloaded (attempt %d); waiting %ds",
+                            site.domain, attempt, wait)
+                time.sleep(wait + random.uniform(0, 3))
+                continue
+            break
 
-    # Unreachable: every path in the loop returns. Present so a future edit that
-    # adds a `continue` cannot fall out of the function returning None.
-    return [_fallback_brief(site, c, "Gemini retries exhausted")
-            for c in candidates[:limit]]
+    log.error("%s — Gemini step failed (%s); using deterministic fallback",
+              site.domain, last_error)
+    reason = f"Gemini call failed: {last_error}"
+    if config.terminal_provider_error(str(last_error)):
+        _PROVIDER_DOWN["reason"] = reason
+        log.error("This is an account-level failure — skipping the model for "
+                  "every remaining site rather than repeating the same call.")
+    return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
+
+
+def _briefs_from(text: str) -> list[dict[str, Any]]:
+    """
+    Pull the brief list out of a model's JSON, whatever shape it chose.
+
+    `response_mime_type: application/json` guarantees valid JSON and nothing
+    about its top level. Run #13 asked for briefs and got a bare array; the
+    caller did `.get("briefs")` on it and every site fell back with
+    "'list' object has no attribute 'get'" — a parser assumption reported as a
+    model failure. Accept the array, the documented envelope, and the case
+    where the model named the key something else but there is only one list to
+    choose from.
+    """
+    data = json.loads(text)
+    if isinstance(data, list):
+        return data
+    if not isinstance(data, dict):
+        raise ValueError(f"expected an object or array of briefs, got {type(data).__name__}")
+    if isinstance(data.get("briefs"), list):
+        return data["briefs"]
+    lists = [v for v in data.values() if isinstance(v, list)]
+    if len(lists) == 1:
+        return lists[0]
+    raise ValueError(f"no brief list in JSON with keys {sorted(data)}")
 
 
 def _gemini_generate(system: str, prompt: str, model_name: str) -> tuple[str, Any]:
@@ -908,7 +953,7 @@ def _analyse_with_anthropic(
         text = "".join(
             b.text for b in resp.content if getattr(b, "type", "") == "text"
         ).strip()
-        briefs = json.loads(text).get("briefs", [])
+        briefs = _briefs_from(text)
         usage = getattr(resp, "usage", None)
         if usage:
             log.info(

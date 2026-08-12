@@ -256,6 +256,27 @@ ok("analysis samples tighter than drafting does",
    _a1sp._GEMINI_ANALYSIS_CONFIG["temperature"])
 ok("and asks for JSON rather than parsing prose",
    _a1sp._GEMINI_ANALYSIS_CONFIG["response_mime_type"] == "application/json")
+# Run #13: Gemini's JSON mode guarantees valid JSON and nothing about its
+# shape. It returned a bare array, the caller did .get("briefs") on it, and all
+# ten sites fell back with "'list' object has no attribute 'get'" — a parser
+# assumption reported to the user as a model failure.
+ok("a bare array of briefs is accepted", len(_a1sp._briefs_from('[{"a":1}]')) == 1)
+ok("so is the documented envelope",
+   len(_a1sp._briefs_from('{"briefs":[{"a":1},{"b":2}]}')) == 2)
+ok("and a differently-named single list",
+   len(_a1sp._briefs_from('{"opportunities":[{"a":1}]}')) == 1)
+_amb = False
+try:
+    _a1sp._briefs_from('{"x":[],"y":[]}')
+except ValueError:
+    _amb = True
+ok("but two candidate lists is refused, not guessed at", _amb)
+ok("the Gemini prompt states the envelope the other two get from a schema",
+   'The top level is an OBJECT with the key' in _a1src,
+   "Gemini takes no response-schema parameter here")
+ok("an overloaded Gemini waits instead of falling straight back",
+   "is_overloaded(msg) and attempt < 3" in _a1src,
+   "run #13 also hit a 503 on this path with no backoff")
 ok("the workflow passes the key the default provider needs",
    "GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}" in _wf1)
 
