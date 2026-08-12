@@ -371,6 +371,43 @@ ok("and the annotation goes to stdout, where GitHub actually reads it",
    and 'fh.write("\\n".join(out))' in _wf1,
    "a ::warning piped into the summary file is grey text, not an annotation")
 
+print("\n=== agent 8 — reading someone else's site ===")
+import agent8_competitor_scout as _a8
+from urllib.robotparser import RobotFileParser as _RFP
+_rp = _RFP(); _rp.parse(["User-agent: *", "Disallow: /private/", "Disallow: /admin"])
+ok("a competitor's robots.txt is obeyed, not merely audited",
+   not _a8._allowed(_rp, "https://rival.com/private/x")
+   and _a8._allowed(_rp, "https://rival.com/guides/x"),
+   "Agent 5 audits robots because it crawls our sites; this one does not")
+_bad = _RFP(); _bad.parse([])
+ok("a robots.txt we cannot evaluate is never treated as permission",
+   _a8._allowed(None, "https://rival.com/x") is True
+   and "return False" in pathlib.Path(__file__).with_name(
+       "agent8_competitor_scout.py").read_text(encoding="utf-8"))
+ok("requests to a stranger's server are spaced", _a8.CRAWL_DELAY_S >= 1.0,
+   f"{_a8.CRAWL_DELAY_S}s")
+# boutimar.ir has 130 pages, all at the root. Keyed on filename it reported 130
+# "sections" of one page each, and a diff against that is noise.
+ok("a flat site collapses to one bucket instead of 130",
+   _a8.topic_of("https://x.ir/about.html") == "(root)"
+   and _a8.topic_of("https://x.ir/fa/about.html") == "(root)")
+ok("a locale prefix is not mistaken for a section",
+   _a8.topic_of("https://x.com/fa/cruises/aroya") == "cruises")
+ok("a real section still reads as one",
+   _a8.topic_of("https://x.com/destinations/dubai") == "destinations")
+_flat = _a8.compare(None, ["https://x.ir/a.html", "https://x.ir/b.html"],
+                    [_a8.CompetitorReport(domain="r", base_url="https://r.com",
+                                          topics={"guides": 9})])
+ok("and the report says the section diff does not apply rather than showing none",
+   _flat["our_site_is_flat"] is True
+   and _flat["sections_they_cover_that_we_do_not"] == []
+   and _flat["note"],
+   "an empty list would read as 'no gaps found'")
+ok("Agent 8 never claims to know rankings",
+   "never who *ranks*" in (_a8.__doc__ or "")
+   and "rankings" in (_a8.compare.__doc__ or ""),
+   "content coverage and search position are different claims")
+
 print("\n=== the scheduled agents do not depend on a balance ===")
 import llm as _llm
 _a3src = pathlib.Path(__file__).with_name("agent3_broadcaster.py").read_text(encoding="utf-8")

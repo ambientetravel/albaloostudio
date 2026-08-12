@@ -222,6 +222,10 @@ class Site:
     compliance_profile: str = "boutimar_v1"
     status: str = "active"          # active | hold
     audit_sample_pages: int = 10    # pinned in sites.yml — see the note there
+    # Named rivals for Agent 8. A list, never discovered: who you actually
+    # compete with is a judgement about the business, and a crawler guessing at
+    # it would confidently study the wrong sites.
+    competitors: list[str] = field(default_factory=list)
 
     @property
     def on_hold(self) -> bool:

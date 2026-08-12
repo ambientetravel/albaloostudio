@@ -45,6 +45,14 @@ defaults:
   # restart the trend line: old scores stop being comparable to new ones.
   audit_sample_pages: 10
 
+# Agent 8 reads `competitors:` per site — a named list of real rivals.
+# Deliberately empty until Alireza supplies them: who you actually compete with
+# is a judgement about the business, and a crawler that guessed would study the
+# wrong sites confidently. Add 3–5 per brand, e.g.
+#
+#   competitors:
+#     - https://example-rival.com
+#
 sites:
   - domain: boutimar.com
     property_uri: "sc-domain:boutimar.com"
