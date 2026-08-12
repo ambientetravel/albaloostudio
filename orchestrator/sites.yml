@@ -79,6 +79,18 @@ sites:
       adapter: astro_pr
       content_root: "src/content/"
       publish_mode: draft
+      # Agent 2 writes into an Astro content collection, and Astro will refuse
+      # to build a file that does not match the collection's zod schema. So the
+      # schema lives here rather than in the adapter: boutimar.com's `journal`
+      # requires title, date, category and author, and a generic
+      # title/description/pubDate frontmatter would fail the build on push.
+      collection: journal
+      frontmatter:
+        title: "{title}"
+        date: "{date}"
+        category: "{category}"
+        author: "Boutimar DMC Desk"
+        summary: "{summary}"
     channels:
       - name: linkedin
         audience: b2b

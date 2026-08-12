@@ -378,6 +378,28 @@ ok("and the annotation goes to stdout, where GitHub actually reads it",
    and 'fh.write("\\n".join(out))' in _wf1,
    "a ::warning piped into the summary file is grey text, not an annotation")
 
+print("\n=== agent 2 — what astro_pr actually writes ===")
+_bc = [x for x in config.load_sites() if x.domain == "boutimar.com"][0]
+_cms = _bc.cms if isinstance(_bc.cms, dict) else {}
+_a2lsrc = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("boutimar.com declares its Astro collection",
+   _cms.get("collection") == "journal", _cms.get("collection"))
+# Astro validates each entry against the collection's zod schema and refuses to
+# build on a mismatch. `journal` requires title, date, category and author; the
+# adapter used to emit title/description/draft/pubDate/lang and nothing else.
+ok("and the frontmatter template covers every REQUIRED schema field",
+   {"title", "date", "category", "author"} <= set(_cms.get("frontmatter") or {}),
+   sorted(_cms.get("frontmatter") or {}))
+ok("the collection comes from the site, not from content_type",
+   'cms.get("collection")' in _a2lsrc,
+   "a brief of type 'guide' would write to src/content/guide/, a collection Astro does not have")
+ok("an empty required field refuses to open a PR",
+   "unbuildable file" in _a2lsrc,
+   "a red build on the target repo blocks every other merge into that site")
+ok("the collection prefix is not repeated in the filename",
+   "segments[0] == collection" in _a2lsrc,
+   "/journal/persian-gardens must not become /journal/journal-persian-gardens/")
+
 print("\n=== two properties are held while they are rebuilt ===")
 # 13 Aug 2026: cruiseshop.ir and dmciran.ir publish CMS scaffolding, not
 # content. Scouting them turns "there is nothing here" into "content gaps".

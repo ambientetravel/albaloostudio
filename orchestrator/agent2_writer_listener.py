@@ -893,17 +893,60 @@ def _push_astro_pr(
         or config.optional_env("ASTRO_REPO")
     token = config.optional_env("ASTRO_GITHUB_TOKEN")
 
-    slug = brief.brief.target_url_path.strip("/").replace("/", "-") or "post"
-    collection = (brief.brief.content_type or "journal").strip("/")
+    # The collection is declared per site, NOT derived from content_type. Astro
+    # only has the collections defined in src/content/config.ts, so a brief of
+    # type "guide" would write to src/content/guide/ — a directory Astro does
+    # not know, which fails the build.
+    cms = site.cms.model_dump() if hasattr(site.cms, "model_dump") else dict(site.cms or {})
+    collection = str(cms.get("collection") or brief.brief.content_type or "journal").strip("/")
+    # Astro derives the URL from collection + filename, so a target path of
+    # /journal/persian-gardens must become journal/persian-gardens.md — not
+    # journal/journal-persian-gardens.md, which would publish at
+    # /journal/journal-persian-gardens/. Drop the leading segment when it is
+    # already the collection name.
+    segments = [x for x in brief.brief.target_url_path.strip("/").split("/") if x]
+    if segments and segments[0] == collection:
+        segments = segments[1:]
+    slug = "-".join(segments) or "post"
     rel_path = f"{site.cms.content_root.strip('/')}/{collection}/{slug}.md"
 
-    front = {
+    # Astro validates every entry against the collection's zod schema and
+    # refuses to build on a mismatch, so the frontmatter shape belongs to the
+    # site, not to this adapter. boutimar.com's `journal` requires title, date,
+    # category and author; the generic title/description/pubDate this used to
+    # emit would have failed the build on the first PR.
+    fields = {
         "title": draft.get("title") or brief.brief.working_title,
-        "description": draft.get("meta_description", ""),
-        "draft": True,          # Astro content collections honour this
-        "pubDate": rfc3339(),
-        "lang": brief.brief.language,
+        "date": utc_now().strftime("%Y-%m-%d"),
+        "category": (brief.opportunity.primary_keyword or "Travel").strip()[:60],
+        "summary": (draft.get("meta_description") or "").strip(),
+        "language": brief.brief.language,
     }
+    template = cms.get("frontmatter") or {}
+    if template:
+        front = {}
+        for key, val in template.items():
+            rendered = str(val)
+            for token, repl in fields.items():
+                rendered = rendered.replace("{" + token + "}", str(repl))
+            front[key] = rendered
+        missing = [k for k, v in front.items() if not v]
+        if missing:
+            # Never open a PR that cannot build. A red build on the target repo
+            # is worse than no PR: it blocks every other merge into that site.
+            raise ValueError(
+                f"{site.domain}: frontmatter field(s) {missing} came out empty for "
+                f"collection '{collection}'. Astro will reject the entry — fix the "
+                f"mapping in sites.yml rather than pushing an unbuildable file."
+            )
+    else:
+        front = {
+            "title": fields["title"],
+            "description": fields["summary"],
+            "draft": True,      # Astro content collections honour this
+            "pubDate": rfc3339(),
+            "lang": brief.brief.language,
+        }
     fm = "\n".join(f'{k}: {json.dumps(v, ensure_ascii=False)}' for k, v in front.items())
     file_body = f"---\n{fm}\n---\n\n{draft.get('body_markdown', '')}"
 
