@@ -15,8 +15,9 @@
 # secret whose absence killed the nightly cron on 9 Aug. Fewer moving parts,
 # not more.
 #
-# The signed-webhook design still stands for Agent 3, which genuinely is
-# external.
+# Agent 3 followed for the same reasons and chains off this workflow the same
+# way. The signed-webhook design now applies only to callers outside this repo;
+# every internal hop is a workflow_run.
 
 name: Agent 2 — Writer
 
@@ -180,12 +181,17 @@ jobs:
           if m.get("no_llm"):
               print("> **Structural run — no model was called.** The drafts below are "
                     "assembled from the briefs and are not publishable.\n")
-          print(f"{m['drafted']} drafted · {m['blocked']} blocked · {m['failed']} failed "
+          print(f"{m['drafted']} drafted · {m['blocked']} blocked · "
+                f"{m.get('deferred_upstream', 0)} deferred · {m['failed']} failed "
                 f"(of {m['briefs_seen']} briefs)\n")
-          if m.get("deferred"):
-              print(f"> {m['deferred']} brief(s) deferred to the next run by the "
-                    f"per-run limit. Briefs are taken one per site in rotation, so "
+          if m.get("deferred_by_limit"):
+              print(f"> {m['deferred_by_limit']} brief(s) deferred to the next run by "
+                    f"the per-run limit. Briefs are taken one per site in rotation, so "
                     f"the limit never spends a whole run on one domain.\n")
+          if m.get("deferred_upstream"):
+              print(f"> **{m['deferred_upstream']} brief(s) deferred — the model was "
+                    f"overloaded.** Nothing is wrong with these briefs and nothing "
+                    f"needs fixing; they draft on the next run.\n")
           if m.get("domains_written"):
               print(f"Sites written: {', '.join(m['domains_written'])}\n")
           print("| Site | Keyword | Status | Target | Words |")

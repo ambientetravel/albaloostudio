@@ -57,6 +57,7 @@ import compliance
 import config
 from agent2_writer_listener import (
     ContentBrief,
+    TransientUpstreamError,
     _call_gemini,
     _resolve_data_dependencies,
     build_publishing_event,
@@ -73,7 +74,7 @@ class Outcome:
     brief_file: str
     domain: str = ""
     keyword: str = ""
-    status: str = "pending"      # drafted | blocked | failed | skipped
+    status: str = "pending"      # drafted | blocked | deferred | failed | skipped
     target_url: str = ""
     words: int = 0
     error: str = ""
@@ -194,6 +195,14 @@ def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
             json.dumps({"brief": payload, "violations": oc.violations},
                        ensure_ascii=False, indent=2), encoding="utf-8")
         return oc
+    except TransientUpstreamError as exc:
+        # Not a failure of this pipeline. The brief is untouched and drafts on
+        # the next run; saying "failed" would put a red cross on the nightly
+        # cron for a capacity spike at Google, and a cron that is red for
+        # reasons nobody can act on is a cron nobody opens.
+        oc.status = "deferred"
+        oc.error = config.redact(str(exc))[:400]
+        return oc
     except Exception as exc:  # one bad brief must not end the batch
         oc.status = "failed"
         oc.error = config.redact(str(exc))[:400]
@@ -311,6 +320,8 @@ def main(argv: list[str] | None = None) -> int:
         if oc.status == "blocked":
             for v in oc.violations[:3]:
                 log.error("    BLOCKED %s: %s", v.get("rule"), str(v.get("excerpt"))[:100])
+        elif oc.status == "deferred":
+            log.warning("    %s", oc.error)
         elif oc.status == "failed":
             log.error("    %s", oc.error)
 
@@ -321,7 +332,10 @@ def main(argv: list[str] | None = None) -> int:
         "no_llm": args.no_llm,
         "briefs_seen": len(files),
         "processed": len(outcomes),
-        "deferred": deferred,
+        # Two different deferrals, and conflating them would hide both: one is
+        # this run's cost ceiling, the other is the model being busy.
+        "deferred_by_limit": deferred,
+        "deferred_upstream": sum(o.status == "deferred" for o in outcomes),
         "domains_written": sorted({o.domain for o in outcomes if o.domain}),
         "drafted": sum(o.status == "drafted" for o in outcomes),
         "blocked": sum(o.status == "blocked" for o in outcomes),
@@ -331,8 +345,9 @@ def main(argv: list[str] | None = None) -> int:
     (out_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    log.info("Agent 2 finished — %d drafted, %d blocked, %d failed (of %d briefs)",
-             manifest["drafted"], manifest["blocked"], manifest["failed"], len(files))
+    log.info("Agent 2 finished — %d drafted, %d blocked, %d deferred, %d failed "
+             "(of %d briefs)", manifest["drafted"], manifest["blocked"],
+             manifest["deferred_upstream"], manifest["failed"], len(files))
 
     # A blocked brief is the gate working, not the run failing. Only a genuine
     # error — an unreadable payload, a model or adapter fault — is exit 1.

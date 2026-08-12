@@ -464,6 +464,32 @@ _MODEL_PREFERENCE = (
 )
 
 
+class TransientUpstreamError(RuntimeError):
+    """
+    The model provider was temporarily unable to answer.
+
+    Distinct from every other failure because the correct response is
+    different: nothing here is wrong, nothing needs fixing, and the brief will
+    draft on the next run untouched. A 503 capacity spike at Google is not a
+    defect in this pipeline, and turning the nightly cron red for one is how a
+    cron stops being read — the same reasoning that made an ungranted Search
+    Console property a configuration gap in Agent 1 rather than a failure.
+    """
+
+
+# Seconds to wait after an overload response, per attempt. Google's own advice
+# on 503 is that spikes are usually temporary; the generic 1s/2s backoff does
+# not outlast one. Run #9 spent all three attempts inside 31 seconds.
+_OVERLOAD_BACKOFF = (15, 45)
+
+
+def is_overloaded(msg: str) -> bool:
+    """True when the provider said 'busy, come back later' rather than 'no'."""
+    m = msg.upper()
+    return ("UNAVAILABLE" in m or "503" in m
+            or "OVERLOADED" in m or "HIGH DEMAND" in m.upper())
+
+
 def resolve_model() -> str:
     """
     The model this API key can actually call, asked rather than assumed.
@@ -648,8 +674,21 @@ def _call_gemini(
                 ) from exc
             last_error = exc
             log.warning("gemini attempt %d failed: %s", attempt, exc)
+            if is_overloaded(msg):
+                # Google says a 503 spike is "usually temporary". The general
+                # backoff answers that with 1s and 2s, which is not a wait —
+                # run #9 burned all three attempts inside 31 seconds and lost
+                # the brief to a capacity blip. Wait long enough for the spike
+                # to actually pass.
+                time.sleep(_OVERLOAD_BACKOFF[min(attempt - 1, len(_OVERLOAD_BACKOFF) - 1)]
+                           + random.uniform(0, 3))
+                continue
         time.sleep((2 ** (attempt - 1)) + random.uniform(0, 0.4))
 
+    if last_error is not None and is_overloaded(str(last_error)):
+        raise TransientUpstreamError(
+            f"Gemini was overloaded on all 3 attempts: {last_error}"
+        ) from last_error
     raise RuntimeError(f"Gemini failed after 3 attempts: {last_error}")
 
 

@@ -588,9 +588,22 @@ def _analysis_system_prompt(site: Site) -> str:
         # being matched on agreement." Agreement is the entry ticket; the real
         # number is the differentiation.
         "EVERY brief's must_include list MUST contain two entries, in this order:",
-        "  1. A statement of the CONSENSUS range for the topic — the figure, "
-        "duration or price band a reader would meet everywhere else. State it "
-        "plainly and early, in the first section.",
+        "  1. A statement of the CONSENSUS figure for the topic — the number, "
+        "duration or band a reader would meet everywhere else — stated plainly "
+        "and early, in the first section. A consensus figure is something you "
+        "OBSERVED, not something you estimated: it must come from the supplied "
+        "data, the site's own live feed, or a named public source, and the brief "
+        "must say which. Write the instruction so the writer states the figure "
+        "WITH its source attached.",
+        "  NEVER instruct the writer to state a PRICE as consensus unless the "
+        "number is in the live feed with a price_asof timestamp. Prices are the "
+        "one figure the writer may not reconstruct, and a plausible-looking "
+        "nightly band is the exact failure this rule keeps producing: run #9 was "
+        "blocked for '$50 to $150 USD per room', a number nobody measured. If "
+        "there is no sourced price, make the consensus a NON-PRICE figure — "
+        "duration, distance, season length, room count, sailing frequency — or "
+        "write 'no sourced consensus figure available; state the range only if "
+        "the draft can cite one'.",
         "  2. At least one fact that is TRUE OF THIS BUSINESS AND NOBODY ELSE — "
         "a real fare from the live feed, a real port fee, a real sailing date, a "
         "real cabin category. Frame it as our own experience, placed after the "

@@ -194,6 +194,35 @@ ok("a single-site portfolio still fills the limit",
    len(a2b.select_round_robin(
        [{"site": {"domain": "boutimar.com"}, "n": i} for i in range(9)], 5)[0]) == 5)
 
+print("\n=== agent 2 — a busy model is not a broken pipeline ===")
+import agent2_writer_listener as _a2l
+ok("a 503 is recognised as the provider being busy",
+   _a2l.is_overloaded("503 UNAVAILABLE. This model is currently experiencing high demand."))
+ok("so is an explicit overload message",
+   _a2l.is_overloaded("The model is overloaded. Please try again later."))
+ok("a 429 quota refusal is NOT read as busy",
+   not _a2l.is_overloaded("429 RESOURCE_EXHAUSTED quota limit: 0"),
+   "limit: 0 means the model is absent from the plan — waiting never fixes it")
+ok("nor is a withdrawn model",
+   not _a2l.is_overloaded("404 NOT_FOUND: model is no longer available"))
+# Run #9 spent attempts 1, 2 and 3 inside 31 seconds against an error whose own
+# text says the spike is temporary, then failed the brief and reddened the run.
+ok("the overload backoff outlasts a capacity spike",
+   sum(_a2l._OVERLOAD_BACKOFF) >= 45, f"{_a2l._OVERLOAD_BACKOFF} = {sum(_a2l._OVERLOAD_BACKOFF)}s")
+ok("and it is far longer than the generic backoff it replaces",
+   min(_a2l._OVERLOAD_BACKOFF) > 4, "generic backoff peaks at 4s")
+ok("an overloaded provider raises a distinct error type",
+   issubclass(_a2l.TransientUpstreamError, RuntimeError))
+_a2bsrc = pathlib.Path(__file__).with_name("agent2_writer_batch.py").read_text(encoding="utf-8")
+ok("which the batch runner records as deferred, not failed",
+   'oc.status = "deferred"' in _a2bsrc)
+ok("so a capacity blip at Google cannot turn the nightly cron red",
+   'return 1 if manifest["failed"] else 0' in _a2bsrc
+   and '"deferred_upstream": sum(o.status == "deferred"' in _a2bsrc)
+ok("and the two kinds of deferral are counted separately",
+   '"deferred_by_limit"' in _a2bsrc and '"deferred_upstream"' in _a2bsrc,
+   "cost ceiling vs busy model — conflating them hides both")
+
 print("\n=== agent 2 — retry semantics ===")
 ok("the default Gemini model is one the free tier actually allows",
    config.GEMINI_MODEL.endswith("flash") or "GEMINI_MODEL" in os.environ,
@@ -374,11 +403,23 @@ ok("the threshold is the tested one, not a round number",
 # proprietary fact is the part a bigger competitor cannot copy.
 _sp = _a1sp._analysis_system_prompt([x for x in config.load_sites()
                                      if x.domain == "boutimar.ir"][0])
-ok("every brief must state the consensus range", "CONSENSUS range" in _sp)
+ok("every brief must state the consensus figure", "CONSENSUS figure" in _sp)
 ok("and must carry a fact nobody else has", "NOBODY ELSE" in _sp)
 ok("a missing proprietary fact is declared, never invented",
    "rather than inventing one" in _sp,
    "the never-invent rule already forbids the alternative")
+# The consensus rule and the never-invent-a-rate rule collided in run #9: the
+# brief said "state the consensus price band", the writer had no sourced band,
+# invented $50–$150, and the gate blocked its own pipeline's output. Asking for
+# a figure without asking where it came from is what produced that.
+ok("a consensus figure must be observed, not estimated",
+   "OBSERVED, not something you estimated" in _sp)
+ok("and the brief must make the writer attach its source",
+   "WITH its source attached" in _sp)
+ok("a price may never be the consensus figure without a price_asof",
+   "unless the number is in the live feed with a price_asof" in _sp)
+ok("with a non-price figure named as the fallback",
+   all(w in _sp for w in ("duration", "season length", "room count")))
 
 # Finding 6: question-format titles did NOT correlate with citation.
 ok("Agent 1 no longer requires question-shaped headings",
