@@ -48,6 +48,7 @@ from typing import Any
 
 import compliance
 import config
+import llm
 from config import rfc3339, utc_now
 
 log = logging.getLogger("agent6.analyst")
@@ -562,9 +563,6 @@ def write_narrative(payload: dict[str, Any], profile: str) -> str | None:
     gate runs on what comes back, because a strategy memo is as capable of
     saying "Arabian Gulf" as a landing page is.
     """
-    from anthropic import Anthropic
-
-    client = Anthropic(api_key=config.require_env("ANTHROPIC_API_KEY"))
     system = "\n".join([
         "You are the SEO lead for a luxury travel group, writing the opening of a "
         "strategy memo for the owner.",
@@ -579,26 +577,21 @@ def write_narrative(payload: dict[str, Any], profile: str) -> str | None:
         "",
         compliance.prompt_constraints(profile),
     ])
-    kwargs: dict[str, Any] = {
-        "model": config.ANTHROPIC_MODEL,
-        "max_tokens": 4000,
-        "system": system,
-        "messages": [{"role": "user", "content": json.dumps(payload, ensure_ascii=False)[:60000]}],
-        "output_config": {"effort": config.ANTHROPIC_EFFORT},
-    }
-    if config.ANTHROPIC_FALLBACKS.lower() not in {"", "off", "false", "0"}:
-        kwargs["betas"] = [config.ANTHROPIC_FALLBACK_BETA]
-        kwargs["fallbacks"] = config.ANTHROPIC_FALLBACKS
-        create = client.beta.messages.create
-    else:
-        create = client.messages.create
 
     try:
-        resp = create(**kwargs)
-        if getattr(resp, "stop_reason", None) == "refusal":
-            log.warning("narrative declined by safety classifiers; omitting")
-            return None
-        text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text").strip()
+        text, _meta = llm.complete(
+            system,
+            json.dumps(payload, ensure_ascii=False)[:60000],
+            max_tokens=4000,
+            purpose="strategy narrative",
+        )
+    except llm.ProviderUnavailable as exc:
+        # The memo is worth publishing without its opening paragraph. Every
+        # number in it was computed here, not by the model — the narrative
+        # orders and explains, it does not discover. Failing the weekly run for
+        # a missing preamble would throw away the part that has the value.
+        log.warning("narrative omitted — %s; the report stands without it", exc)
+        return None
     except Exception as exc:
         log.warning("narrative pass failed (%s); the report stands without it", exc)
         return None

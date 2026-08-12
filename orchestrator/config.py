@@ -146,6 +146,16 @@ ANTHROPIC_EFFORT = os.getenv("ANTHROPIC_EFFORT", "medium")
 ANTHROPIC_FALLBACKS = os.getenv("ANTHROPIC_FALLBACKS", "default")
 ANTHROPIC_FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
+# Which provider writes prose — Agent 3's channel copy, Agent 6's strategy
+# narrative (Agent 4 too, once it has a lead source). `gemini` or `anthropic`.
+#
+# Defaults to gemini for the same reason the scout does: the Anthropic balance
+# ran out on 12 Aug 2026, and Agent 6 runs unattended every Monday. An agent on
+# a schedule should not depend on a balance nobody is watching. Anthropic is one
+# variable away when the key is funded — these are prose tasks and Opus is
+# genuinely better at them than Flash.
+PROSE_PROVIDER = os.getenv("PROSE_PROVIDER", "gemini").lower()
+
 # ── Agent 3 distribution ─────────────────────────────────────────────────────
 # file    — write the queue to disk, publish nothing (default; always safe)
 # zernio  — POST to the Zernio / Late scheduler REST API (bearer token)

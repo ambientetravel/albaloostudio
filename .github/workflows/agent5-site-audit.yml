@@ -92,6 +92,10 @@ jobs:
 
       - name: Strategy
         env:
+          # Agent 6's strategy narrative — same provider switch as Agent 3.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          PROSE_PROVIDER: ${{ vars.PROSE_PROVIDER || 'gemini' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-5' }}
         run: |

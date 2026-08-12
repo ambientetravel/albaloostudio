@@ -112,6 +112,12 @@ jobs:
       - name: Compose, gate and queue
         if: steps.locate.outputs.found != ''
         env:
+          # Channel copy runs on PROSE_PROVIDER (default gemini). It moved off
+          # Anthropic on 12 Aug 2026 with the rest of the scheduled work: an
+          # agent on a cron should not depend on a balance nobody is watching.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          PROSE_PROVIDER: ${{ vars.PROSE_PROVIDER || 'gemini' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-5' }}
           # Deliberately NOT set. Live posting requires this to be 1 AND

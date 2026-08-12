@@ -371,6 +371,36 @@ ok("and the annotation goes to stdout, where GitHub actually reads it",
    and 'fh.write("\\n".join(out))' in _wf1,
    "a ::warning piped into the summary file is grey text, not an annotation")
 
+print("\n=== the scheduled agents do not depend on a balance ===")
+import llm as _llm
+_a3src = pathlib.Path(__file__).with_name("agent3_broadcaster.py").read_text(encoding="utf-8")
+_a6src = pathlib.Path(__file__).with_name("agent6_analyst.py").read_text(encoding="utf-8")
+_wf3 = (pathlib.Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "agent3-broadcaster.yml").read_text(encoding="utf-8")
+_wf5 = (pathlib.Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "agent5-site-audit.yml").read_text(encoding="utf-8")
+ok("prose has a provider setting, and it is not the unfunded one",
+   config.PROSE_PROVIDER == "gemini" or "PROSE_PROVIDER" in os.environ,
+   config.PROSE_PROVIDER)
+ok("both providers are reachable by that setting",
+   set(_llm._PROVIDERS) == {"anthropic", "gemini"}, sorted(_llm._PROVIDERS))
+ok("Agent 3 asks the shared layer, not Anthropic directly",
+   "llm.complete_json(" in _a3src and "from anthropic import Anthropic" not in _a3src)
+ok("Agent 6 too — it runs unattended every Monday",
+   "llm.complete(" in _a6src and "from anthropic import Anthropic" not in _a6src)
+ok("an unavailable provider is its own error type",
+   issubclass(_llm.ProviderUnavailable, RuntimeError))
+ok("an unknown provider name is refused, not silently defaulted",
+   isinstance(_llm._PROVIDERS.get("nonsense"), type(None)))
+# Gemini's JSON mode fixes validity, not shape — Agent 1 got a bare array by
+# leaving the envelope to the provider.
+ok("Agent 3 states the JSON envelope when the provider cannot enforce it",
+   'never a bare ' in _a3src and 'config.PROSE_PROVIDER == "gemini"' in _a3src)
+ok("Agent 6 degrades to a memo without its opening rather than failing",
+   "the report stands without it" in _a6src)
+ok("both scheduled workflows pass the key their default provider needs",
+   "GEMINI_API_KEY" in _wf3 and "GEMINI_API_KEY" in _wf5)
+
 print("\n=== agent 2 — a busy model is not a broken pipeline ===")
 ok("a 503 is recognised as the provider being busy",
    _a2l.is_overloaded("503 UNAVAILABLE. This model is currently experiencing high demand."))

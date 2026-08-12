@@ -36,6 +36,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 import compliance
 import config
+import llm
 from config import build_envelope, rfc3339, utc_now
 from scheduler import Scheduler, autopost_allowed, media_ok
 
@@ -435,68 +436,46 @@ def _call_claude(event: PublishingEvent, channels: list[str], profile: str) -> t
     `budget_tokens` is a 400 — depth is `output_config.effort`. Structured output
     replaces the prefill trick entirely.
     """
-    from anthropic import Anthropic
-
-    client = Anthropic(api_key=config.require_env("ANTHROPIC_API_KEY"))
-
-    kwargs: dict[str, Any] = {
-        "model": config.ANTHROPIC_MODEL,
-        "max_tokens": 16000,
-        "system": _system_prompt(event, profile),
-        "messages": [{"role": "user", "content": _user_prompt(event, channels)}],
-        "output_config": {
-            "effort": config.ANTHROPIC_EFFORT,
-            "format": {"type": "json_schema", "schema": CHANNEL_COPY_SCHEMA},
-        },
-    }
-    # Safety classifiers can decline a request. Server-side fallbacks re-run it
-    # on Anthropic's recommended model instead of handing us the refusal.
-    use_fallbacks = config.ANTHROPIC_FALLBACKS.lower() not in {"", "off", "false", "0"}
-    if use_fallbacks:
-        kwargs["betas"] = [config.ANTHROPIC_FALLBACK_BETA]
-        kwargs["fallbacks"] = config.ANTHROPIC_FALLBACKS
+    system = _system_prompt(event, profile)
+    prompt = _user_prompt(event, channels)
+    # Gemini's JSON mode fixes validity, not shape, so the envelope goes in the
+    # prompt. Agent 1 got a bare array where it expected an object by leaving
+    # this to the provider.
+    if config.PROSE_PROVIDER == "gemini":
+        system += ('\n\nReturn a single JSON object of exactly this shape:\n'
+                   '{"posts": [ <post>, ... ]}\n'
+                   "The top level is an OBJECT with the key \"posts\", never a bare "
+                   "array. Each post matches this JSON Schema:\n"
+                   + json.dumps(CHANNEL_COPY_SCHEMA["properties"]["posts"]["items"],
+                                ensure_ascii=False))
 
     started = time.time()
     last_error: Exception | None = None
     for attempt in range(1, 4):
         try:
-            create = client.beta.messages.create if use_fallbacks else client.messages.create
-            resp = create(**kwargs)
-
-            # Check stop_reason BEFORE reading content — a refusal leaves content
-            # empty (pre-output) or partial (mid-stream).
-            if getattr(resp, "stop_reason", None) == "refusal":
-                detail = getattr(resp, "stop_details", None)
-                category = getattr(detail, "category", None) if detail else None
-                raise RuntimeError(f"Claude declined the request (category={category!r})")
-
-            text = "".join(
-                block.text for block in resp.content if getattr(block, "type", "") == "text"
-            ).strip()
-            posts = json.loads(text).get("posts", [])
+            data, meta = llm.complete_json(
+                system, prompt, CHANNEL_COPY_SCHEMA,
+                max_tokens=16000, purpose="channel copy",
+            )
+            posts = data.get("posts", []) if isinstance(data, dict) else data
             if not posts:
                 raise ValueError("model returned no posts")
-
-            usage = getattr(resp, "usage", None)
-            meta = {
-                "provider": "anthropic",
-                "model": getattr(resp, "model", config.ANTHROPIC_MODEL),
-                "effort": config.ANTHROPIC_EFFORT,
-                "input_tokens": getattr(usage, "input_tokens", None),
-                "output_tokens": getattr(usage, "output_tokens", None),
-                "attempts": attempt,
-                "duration_ms": int((time.time() - started) * 1000),
-            }
+            meta = {**meta, "attempts": attempt,
+                    "duration_ms": int((time.time() - started) * 1000)}
             return posts, meta
-        except (json.JSONDecodeError, ValueError) as exc:
+        except llm.ProviderUnavailable:
+            # Unfunded, rate-limited or refused: no retry inside this run helps,
+            # and the caller already treats it as a hold rather than a failure.
+            raise
+        except (json.JSONDecodeError, ValueError, TypeError) as exc:
             last_error = exc
-            log.warning("claude attempt %d returned unusable output: %s", attempt, exc)
+            log.warning("copy attempt %d returned unusable output: %s", attempt, exc)
         except Exception as exc:
             last_error = exc
-            log.warning("claude attempt %d failed: %s", attempt, exc)
+            log.warning("copy attempt %d failed: %s", attempt, exc)
         time.sleep((2 ** (attempt - 1)) + random.uniform(0, 0.4))
 
-    raise RuntimeError(f"Claude failed after 3 attempts: {last_error}")
+    raise RuntimeError(f"channel copy failed after 3 attempts: {last_error}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════

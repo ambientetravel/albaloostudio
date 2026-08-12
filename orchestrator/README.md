@@ -37,7 +37,7 @@ Verify the whole thing without a single API key or network call:
 python selfcheck.py
 ```
 
-434 assertions across all seven agents — config, the compliance gate, gap
+443 assertions across all seven agents — config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry, the
 autopost gates, PII redaction, escalation rules, and every HTTP surface. Exit 0
 means the pipeline is wired correctly.
@@ -197,6 +197,7 @@ Gulf" is wrong in any framing — question, negation or quotation.
 | [`sites.yml`](sites.yml) | the 10 properties — the only place a domain is declared |
 | [`config.py`](config.py) | env, model IDs, envelope + HMAC signing |
 | [`compliance.py`](compliance.py) | the gate |
+| [`llm.py`](llm.py) | one place to ask a model — `PROSE_PROVIDER` picks gemini or anthropic |
 | [`agent1_seo_scout.py`](agent1_seo_scout.py) | GSC → OpenAI → webhook |
 | [`agent2_writer_batch.py`](agent2_writer_batch.py) | **Agent 2 in production** — reads Agent 1's briefs, drafts, gates, publishes |
 | [`agent2_writer_listener.py`](agent2_writer_listener.py) | the FastAPI variant — reference impl, kept for the HTTP surface tests |
@@ -213,7 +214,7 @@ Gulf" is wrong in any framing — question, negation or quotation.
 | [`agent6_analyst.py`](agent6_analyst.py) | audit + demand → strategy, calendar, paste-ready JSON-LD |
 | [`agent7_keyword_scout.py`](agent7_keyword_scout.py) | per-country visibility + market alignment; Keyword Planner where it works |
 | [`SETUP-KEYWORD-PLANNER.md`](SETUP-KEYWORD-PLANNER.md) | why the Iranian sites cannot use it, and what replaces it |
-| [`selfcheck.py`](selfcheck.py) | 434 assertions, no network |
+| [`selfcheck.py`](selfcheck.py) | 443 assertions, no network |
 | [`schemas/`](schemas) | JSON Schema for the three payloads |
 | `../.github/workflows/agent1-seo-scout.yml` | weekly scout, Sundays 04:15 UTC |
 | `../.github/workflows/agent5-site-audit.yml` | weekly audit + strategy, Mondays 05:00 UTC |

@@ -39,6 +39,7 @@ from typing import Any
 
 import compliance
 import config
+import llm
 from agent3_broadcaster import (
     SCHEDULER,
     PublishingEvent,
@@ -235,9 +236,9 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Ou
         # Agent 1 already treats that class of failure as a configuration gap
         # rather than a run failure; Agent 3 does the same, or one dead key
         # turns the whole nightly chain red for something no retry can fix.
-        if config.terminal_provider_error(str(exc)):
+        if isinstance(exc, llm.ProviderUnavailable) or config.terminal_provider_error(str(exc)):
             oc.status = "skipped"
-            oc.error = ("Claude is unavailable at the account level "
+            oc.error = (f"{config.PROSE_PROVIDER} is unavailable "
                         f"({config.redact(str(exc))[:200]}). Copy is composed on the "
                         "next run; nothing was lost.")
             return oc
@@ -270,12 +271,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if not args.no_llm:
+        needed = {"gemini": "GEMINI_API_KEY", "anthropic": "ANTHROPIC_API_KEY"}.get(
+            config.PROSE_PROVIDER, "ANTHROPIC_API_KEY")
         try:
-            config.require_env("ANTHROPIC_API_KEY")
+            config.require_env(needed)
         except config.ConfigError as exc:
             log.error("%s", exc)
-            log.error("Agent 3 writes channel copy with Claude. Set ANTHROPIC_API_KEY, "
-                      "or run --no-llm to exercise everything except the model call.")
+            log.error("Agent 3 writes channel copy with PROSE_PROVIDER=%s. Set %s, "
+                      "or run --no-llm to exercise everything except the model call.",
+                      config.PROSE_PROVIDER, needed)
             return 2
 
     out_dir = Path(args.out)
