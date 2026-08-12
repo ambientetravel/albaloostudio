@@ -25,12 +25,19 @@ def ok(label, cond, extra=""):
     if not cond: FAIL.append(label)
 
 print("\n=== config ===")
-sites = config.load_sites()
+# include_hold: the REGISTRY is ten properties. Two are paused for a rebuild,
+# which is a runtime state, not a change to the portfolio — and the docs below
+# are checked against the registry, so they must count the same thing.
+sites = config.load_sites(include_hold=True)
 ok("the portfolio loads", len(sites) == 10, len(sites))
+ok("and two of them are currently held",
+   len(config.load_sites()) == 8, len(config.load_sites()))
 ok("every registered domain is unique",
    len({s.domain for s in config.load_sites(include_hold=True)})
    == len(config.load_sites(include_hold=True)))
-ok("active sites are not on hold", all(not s.on_hold for s in sites))
+ok("the default load excludes every held site",
+   all(not s.on_hold for s in config.load_sites()),
+   "`sites` above is the full registry; this is the working set")
 
 # The hold mechanism is tested against a FIXTURE, not against whichever real
 # site happens to be paused today. cruise24.ir used to be the test subject; it
@@ -370,6 +377,23 @@ ok("and the annotation goes to stdout, where GitHub actually reads it",
    'GITHUB_STEP_SUMMARY"] , "a"' not in _wf1
    and 'fh.write("\\n".join(out))' in _wf1,
    "a ::warning piped into the summary file is grey text, not an annotation")
+
+print("\n=== two properties are held while they are rebuilt ===")
+# 13 Aug 2026: cruiseshop.ir and dmciran.ir publish CMS scaffolding, not
+# content. Scouting them turns "there is nothing here" into "content gaps".
+_active = {s.domain for s in config.load_sites()}
+_all = {s.domain for s in config.load_sites(include_hold=True)}
+ok("cruiseshop.ir and dmciran.ir are held, not deleted",
+   {"cruiseshop.ir", "dmciran.ir"} == _all - _active, sorted(_all - _active))
+ok("the other eight keep running", len(_active) == 8, sorted(_active))
+ok("naming a held site explicitly still includes it",
+   [s.domain for s in config.load_sites(only=["dmciran.ir"])] == ["dmciran.ir"],
+   "--domain must override a hold, or you could never audit one deliberately")
+ok("a held site still has its Search Console demand banked",
+   'stat["status"] = "hold"' in _a1src and '"demand"' in _a1src,
+   "the data keeps accruing; only the writing stops")
+ok("and Agent 2 is never handed a brief for one",
+   "no briefs emitted" in _a1src)
 
 print("\n=== agent 5 — content that is not there ===")
 import agent5_site_auditor as _a5
@@ -1066,7 +1090,7 @@ print("\n=== the spec describes the registry it claims to specify ===")
 # called boutimar.com WordPress — a stack the user had already corrected twice.
 # A hand-maintained copy of sites.yml drifts silently; this makes it noisy.
 _arch = pathlib.Path(__file__).with_name("ARCHITECTURE.md").read_text(encoding="utf-8")
-_sites_all = config.load_sites()
+_sites_all = config.load_sites(include_hold=True)
 _missing = [s.domain for s in _sites_all if f"`{s.domain}`" not in _arch]
 ok("every site in sites.yml appears in ARCHITECTURE.md", not _missing, _missing)
 ok("and the spec does not claim a WordPress property",

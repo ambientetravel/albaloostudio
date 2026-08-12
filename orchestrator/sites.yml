@@ -294,6 +294,14 @@ sites:
       - "No meta description on the homepage, no sitemap.xml, no robots.txt."
 
   - domain: cruiseshop.ir
+    # ON HOLD 13 Aug 2026 — being rebuilt before it joins the loop.
+    # Measured that day: this property's public inventory is CMS scaffolding,
+    # not content. Scouting it produces "content gaps" that are really "there
+    # is no content", and Agent 2 would spend model calls drafting into a site
+    # with nowhere to publish. Agent 1 still reads its Search Console and banks
+    # the demand — the data keeps accruing, only the writing stops.
+    # Un-hold by setting status: active once the real pages are live.
+    status: hold
     property_uri: "sc-domain:cruiseshop.ir"
     gsc_account: "alimozzarella@gmail.com"
     brand: CruiseShop
@@ -312,6 +320,14 @@ sites:
     channels: []
 
   - domain: dmciran.ir
+    # ON HOLD 13 Aug 2026 — being rebuilt before it joins the loop.
+    # Measured that day: this property's public inventory is CMS scaffolding,
+    # not content. Scouting it produces "content gaps" that are really "there
+    # is no content", and Agent 2 would spend model calls drafting into a site
+    # with nowhere to publish. Agent 1 still reads its Search Console and banks
+    # the demand — the data keeps accruing, only the writing stops.
+    # Un-hold by setting status: active once the real pages are live.
+    status: hold
     property_uri: "sc-domain:dmciran.ir"
     gsc_account: "alimozzarella@gmail.com"
     brand: DMC Iran
