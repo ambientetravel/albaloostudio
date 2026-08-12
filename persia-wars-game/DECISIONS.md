@@ -959,3 +959,41 @@ placeholder shapes — visibly different from the finished six, which is the
 point of the per-card fallback.
 
 Art tally: 6 of 8 cards, 4 of 25 units. 61 of 71 pieces outstanding.
+
+## The horse arrives; a chocolate bar is turned away
+
+Second card batch. `shoot-the-horses` came back correct — a riderless oxblood
+horse rearing, three gold arrows arcing in — and at 24px it is now a red horse
+where `ready-volley` is a thin arrow. The collision that made the two cards the
+same picture is gone, which was the only art fault so far that changed how the
+game plays. Contact sheet re-run: all seven prepared emblems are distinguishable
+in the 24px column.
+
+Two of the four were rejected rather than shipped:
+
+**`the-centre-holds` regenerated as a bar of chocolate.** Dark brown rectangular
+segments in a grid, gold-edged, on a cream wrapper. The version already in the
+game was weak — a uniform grid that loses the firm-centre idea — but weak and
+neutral beats strong and wrong, so the old file stays and the new one was
+reverted out of `art-in/` rather than left lying around to be picked up by a
+later pass.
+
+**`loosed-rein` came back as a bordered square ground tile of hoofprints.** It
+fills its own frame edge to edge, which the cut-out cannot process — the flood
+fill works inward from the corners and there is nothing to flood. It would also
+read as a brown square at 24px, and it says "tracks" rather than "shoot while
+falling back". Deleted; the card keeps its placeholder shape.
+
+`wheeling-line` is in but is a **style outlier**: flat vector, the look of a
+corporate logo, with none of the gouache texture the other six share. It was
+taken because a legible outlier beats a placeholder and because at 24px style
+barely registers — but it should be redone in the painted style.
+
+One side effect worth recording: the emblem was drawn as a gold hook wrapping a
+cluster of shields, and `keep_largest_shape` dropped the shields, because they
+are a disconnected component. The surviving hook alone actually reads better —
+"goes around and comes back" is the mechanic — so this was left. But it is a
+reminder that the tool keeps ONE shape, and any emblem built from separate
+pieces will lose all but the biggest.
+
+Art tally: 7 of 8 cards, 4 of 25 units. 60 of 71 pieces outstanding.
