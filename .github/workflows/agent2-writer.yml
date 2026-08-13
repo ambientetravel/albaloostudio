@@ -139,6 +139,16 @@ jobs:
           # not. Set the GEMINI_MODEL repository variable to override once
           # billing is enabled on the key's project.
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          # astro_pr — boutimar.com and exploreorient.com. The token needs
+          # contents:write and pull_requests:write on the TARGET repo; the
+          # runner's own GITHUB_TOKEN is scoped to this repo and cannot open a
+          # PR on another. Absent, the adapter stages to bundles/ and says so.
+          # Per-site vars win over the shared one, because the two sites are
+          # different repositories.
+          ASTRO_REPO_BOUTIMAR_COM: ${{ vars.ASTRO_REPO_BOUTIMAR_COM }}
+          ASTRO_REPO_EXPLOREORIENT_COM: ${{ vars.ASTRO_REPO_EXPLOREORIENT_COM }}
+          ASTRO_REPO: ${{ vars.ASTRO_REPO }}
+          ASTRO_GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
           # WordPress. Absent until set, in which case the adapter stages the
           # draft and says so rather than pretending to publish. An Application
           # Password, never the account password — revocable on its own and

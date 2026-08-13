@@ -393,6 +393,38 @@ ok("and the annotation goes to stdout, where GitHub actually reads it",
    and 'fh.write("\\n".join(out))' in _wf1,
    "a ::warning piped into the summary file is grey text, not an annotation")
 
+print("\n=== every secret an agent reads is one a workflow passes ===")
+# Four times in one session a setting was added in one file and silently
+# ignored in another: competitors -> Site, degraded_no_llm -> the wire,
+# frontmatter -> the brief, and ASTRO_* -> the workflow env. Each passed every
+# test that existed. This is the general check that would have caught all four.
+import re as _re
+_wfdir = pathlib.Path(__file__).resolve().parents[1] / ".github" / "workflows"
+_wf_text = "\n".join(f.read_text(encoding="utf-8") for f in _wfdir.glob("*.yml"))
+_agent_src = "\n".join(
+    f.read_text(encoding="utf-8")
+    for f in pathlib.Path(__file__).parent.glob("agent*.py"))
+# Names the agents actually ask the environment for.
+_read = set(_re.findall(r'(?:optional_env|require_env)\(\s*"([A-Z][A-Z0-9_]+)"', _agent_src))
+# Exempt, each for a stated reason — an allowlist with no reasons is just a
+# silenced test.
+_ignore = {
+    # Local output paths, defaulted in config.py; never CI settings.
+    "BUNDLE_DIR", "QUEUE_DIR", "RUNS_DIR", "SITES_FILE",
+    # uvicorn bind settings for the FastAPI reference listeners. Those run on a
+    # developer's machine, never in Actions — the batch runners are what CI uses.
+    "AGENT2_HOST", "AGENT2_PORT", "AGENT3_HOST", "AGENT3_PORT",
+    "AGENT4_HOST", "AGENT4_PORT",
+    # Vestigial, like AGENT2_WEBHOOK_URL before it: Agent 4 reads Agent 3's
+    # artifact on workflow_run, so nothing internal POSTs to it. Kept for an
+    # external consumer, and its absence is the normal state.
+    "AGENT4_WEBHOOK_URL",
+}
+_missing = sorted(n for n in _read - _ignore if n not in _wf_text)
+ok("no agent reads a secret the workflows never pass",
+   not _missing,
+   f"read but never provided: {_missing}")
+
 print("\n=== agent 2 — what astro_pr actually writes ===")
 _bc = [x for x in config.load_sites() if x.domain == "boutimar.com"][0]
 _cms = _bc.cms if isinstance(_bc.cms, dict) else {}
