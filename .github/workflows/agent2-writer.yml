@@ -216,6 +216,23 @@ jobs:
               for o in blocked:
                   for v in o["violations"][:2]:
                       print(f"- **{o['domain']}** — `{v.get('rule')}`: {str(v.get('excerpt'))[:160]}")
+          # Show one file exactly as it would land in the target repo. Until a
+          # token exists these are staged to bundles/ and reviewable only by
+          # downloading a zip, which nobody does — so the thing you are being
+          # asked to approve is invisible at the moment you would approve it.
+          import glob, itertools
+          staged = sorted(glob.glob("bundles/**/*.md", recursive=True))
+          if staged:
+              body = open(staged[0], encoding="utf-8").read()
+              head = "".join(itertools.islice(iter(body.splitlines(keepends=True)), 60))
+              print(f"\n### Preview — `{staged[0]}`\n")
+              print("This is the file byte-for-byte as it would be committed.\n")
+              print("```markdown")
+              print(head.rstrip())
+              if len(body.splitlines()) > 60:
+                  print(f"\n… {len(body.splitlines()) - 60} more line(s), "
+                        f"{len(body.split())} words total")
+              print("```")
           print("\n*Architecture credit: Albaloo Studio*")
           PY
 
@@ -224,6 +241,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: agent2-written
-          path: orchestrator/written/
+          # bundles/ holds the files the CMS adapters staged rather than
+          # published — for astro_pr that is the exact markdown a pull request
+          # would contain. It was being written and then thrown away with the
+          # runner, so the one artefact worth reviewing never left the machine.
+          path: |
+            orchestrator/written/
+            orchestrator/bundles/
           retention-days: 90
           if-no-files-found: warn
