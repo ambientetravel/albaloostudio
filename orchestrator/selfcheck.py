@@ -303,6 +303,18 @@ ok("the output ceiling is no longer 8192",
 ok("and truncation retries for fewer briefs rather than giving up",
    "retrying for %d brief" in _a1src and "limit // 2" in _a1src,
    "half a site's briefs beat none of them")
+# Run #20 degraded on "Server disconnected without sending a response" — not a
+# 503, not a 429, not malformed JSON, so it matched no retry path and went
+# straight to the fallback. The most ordinary transient failure there is.
+ok("a dropped connection is recognised as transient",
+   config.transport_error("Server disconnected without sending a response")
+   and config.transport_error("Connection reset by peer")
+   and config.transport_error("Read timed out"))
+ok("and is not confused with a quota or a bad answer",
+   not config.transport_error("429 RESOURCE_EXHAUSTED")
+   and not config.transport_error("Unterminated string at line 192"))
+ok("the scout retries it rather than falling back",
+   "config.transport_error(msg)" in _a1src)
 ok("a Gemini rate-limit 429 is recognised as worth waiting out",
    config.rate_limited("429 RESOURCE_EXHAUSTED: You exceeded your current quota"))
 ok("but 'limit: 0' is NOT — no wait fixes a model absent from the plan",

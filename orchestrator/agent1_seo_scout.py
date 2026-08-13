@@ -846,10 +846,13 @@ def _analyse_with_gemini(
                             site.domain, limit)
                 prompt = _analysis_user_prompt(site, candidates, limit)
                 continue
-            if (is_overloaded(msg) or config.rate_limited(msg)) and attempt < 3:
+            if (is_overloaded(msg) or config.rate_limited(msg)
+                    or config.transport_error(msg)) and attempt < 3:
                 wait = _OVERLOAD_BACKOFF[min(attempt - 1, len(_OVERLOAD_BACKOFF) - 1)]
-                log.warning("%s — Gemini %s (attempt %d); waiting %ds", site.domain,
-                            "overloaded" if is_overloaded(msg) else "rate-limited",
+                kind = ("overloaded" if is_overloaded(msg)
+                        else "rate-limited" if config.rate_limited(msg)
+                        else "connection dropped")
+                log.warning("%s — Gemini %s (attempt %d); waiting %ds", site.domain, kind,
                             attempt, wait)
                 time.sleep(wait + random.uniform(0, 3))
                 continue

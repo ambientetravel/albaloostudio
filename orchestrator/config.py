@@ -76,6 +76,24 @@ def rate_limited(msg: str) -> bool:
     return "429" in m or "RESOURCE_EXHAUSTED" in m or "RATE LIMIT" in m
 
 
+def transport_error(msg: str) -> bool:
+    """
+    The connection failed, rather than the provider answering unfavourably.
+
+    "Server disconnected without sending a response" degraded a whole scout run
+    on 13 Aug: it is not a 503, not a 429, and not malformed JSON, so it matched
+    none of the retry paths and fell straight through to the fallback. A dropped
+    connection is the most ordinary transient failure there is and the one most
+    obviously worth retrying.
+    """
+    m = msg.lower()
+    return any(s in m for s in (
+        "server disconnected", "connection reset", "connection aborted",
+        "remote end closed", "broken pipe", "timed out", "timeout",
+        "connection error", "temporary failure in name resolution",
+    ))
+
+
 def terminal_provider_error(msg: str) -> str:
     """The reason this will fail for every other site too, or '' if it will not."""
     low = msg.lower()

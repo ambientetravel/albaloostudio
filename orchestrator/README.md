@@ -37,7 +37,7 @@ Verify the whole thing without a single API key or network call:
 python selfcheck.py
 ```
 
-494 assertions across all eight agents — config, the compliance gate, gap
+497 assertions across all eight agents — config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry, the
 autopost gates, PII redaction, escalation rules, and every HTTP surface. Exit 0
 means the pipeline is wired correctly.
@@ -216,7 +216,7 @@ Gulf" is wrong in any framing — question, negation or quotation.
 | [`agent7_keyword_scout.py`](agent7_keyword_scout.py) | per-country visibility + market alignment; Keyword Planner where it works |
 | [`SETUP-KEYWORD-PLANNER.md`](SETUP-KEYWORD-PLANNER.md) | why the Iranian sites cannot use it, and what replaces it |
 | [`tools/fix_farsi_term_slugs.py`](tools/fix_farsi_term_slugs.py) | repairs the Farsi category 404 — dry-run by default, your credentials never leave your shell |
-| [`selfcheck.py`](selfcheck.py) | 494 assertions, no network |
+| [`selfcheck.py`](selfcheck.py) | 497 assertions, no network |
 | [`schemas/`](schemas) | JSON Schema for the three payloads |
 | `../.github/workflows/agent1-seo-scout.yml` | weekly scout, Sundays 04:15 UTC |
 | `../.github/workflows/agent5-site-audit.yml` | weekly audit + strategy, Mondays 05:00 UTC |
