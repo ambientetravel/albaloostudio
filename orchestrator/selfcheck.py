@@ -288,6 +288,21 @@ ok("an overloaded Gemini waits instead of falling straight back",
    "run #13 also hit a 503 on this path with no backoff")
 # Run #14: four properties in quick succession, two answered, two got 429
 # RESOURCE_EXHAUSTED. The free tier limits requests per minute.
+# Run #18: boutimar.com came back "Unterminated string starting at line 192".
+# That is an answer that did not fit, not a bad answer — and it hit the biggest
+# site, so the property that matters most was the one silently degraded.
+ok("a cut-off JSON answer is told apart from a broken one",
+   _a1sp._truncated_json("Unterminated string starting at: line 192")
+   and _a1sp._truncated_json("Expecting value: line 1 column 1"))
+ok("and a quota error is not mistaken for truncation",
+   not _a1sp._truncated_json("429 RESOURCE_EXHAUSTED")
+   and not _a1sp._truncated_json("model returned no briefs"))
+ok("the output ceiling is no longer 8192",
+   _a1sp._GEMINI_ANALYSIS_CONFIG["max_output_tokens"] >= 32768,
+   _a1sp._GEMINI_ANALYSIS_CONFIG["max_output_tokens"])
+ok("and truncation retries for fewer briefs rather than giving up",
+   "retrying for %d brief" in _a1src and "limit // 2" in _a1src,
+   "half a site's briefs beat none of them")
 ok("a Gemini rate-limit 429 is recognised as worth waiting out",
    config.rate_limited("429 RESOURCE_EXHAUSTED: You exceeded your current quota"))
 ok("but 'limit: 0' is NOT — no wait fixes a model absent from the plan",

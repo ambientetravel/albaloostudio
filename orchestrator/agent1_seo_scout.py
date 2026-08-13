@@ -758,7 +758,12 @@ def analyse_gaps(
 _GEMINI_ANALYSIS_CONFIG = {
     "temperature": 0.2,
     "top_p": 0.95,
-    "max_output_tokens": 8192,
+    # 8192 truncated boutimar.com's answer mid-string on run #18 —
+    # "Unterminated string starting at line 192" is a cut-off response, not a
+    # bad one. The biggest site produces the longest answer, so this ceiling
+    # silently degraded the property that matters most while the small sites
+    # looked fine. gemini-2.5-flash allows far more.
+    "max_output_tokens": 32768,
     "response_mime_type": "application/json",
 }
 
@@ -832,6 +837,15 @@ def _analyse_with_gemini(
                                 model_name, nxt)
                     model_name = nxt
                     continue
+            # A truncated JSON answer is not a broken model — it is an answer
+            # that did not fit. Asking for fewer briefs makes it fit, and half a
+            # site's briefs beat none of them.
+            if _truncated_json(msg) and limit > 2 and attempt < 3:
+                limit = max(2, limit // 2)
+                log.warning("%s — Gemini answer was cut off; retrying for %d brief(s)",
+                            site.domain, limit)
+                prompt = _analysis_user_prompt(site, candidates, limit)
+                continue
             if (is_overloaded(msg) or config.rate_limited(msg)) and attempt < 3:
                 wait = _OVERLOAD_BACKOFF[min(attempt - 1, len(_OVERLOAD_BACKOFF) - 1)]
                 log.warning("%s — Gemini %s (attempt %d); waiting %ds", site.domain,
@@ -874,6 +888,13 @@ def _briefs_from(text: str) -> list[dict[str, Any]]:
     if len(lists) == 1:
         return lists[0]
     raise ValueError(f"no brief list in JSON with keys {sorted(data)}")
+
+
+def _truncated_json(msg: str) -> bool:
+    """A JSON parse error caused by the answer being cut short, not malformed."""
+    m = msg.lower()
+    return ("unterminated string" in m or "unexpected end of" in m
+            or "expecting" in m)
 
 
 def _gemini_generate(system: str, prompt: str, model_name: str) -> tuple[str, Any]:
