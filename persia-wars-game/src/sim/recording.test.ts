@@ -4,6 +4,7 @@ import { aiRoundPick, type AiOpponent, type RivalStyle } from './ai';
 import { simulate, type Squad } from './battle';
 import {
   beginRecording,
+  chooseTape,
   recordRound,
   recordedRivalPick,
   recordingBytes,
@@ -153,7 +154,7 @@ describe('a recorded rival is honest about what it is', () => {
     const pool = draftPool(battle, ARENA).map((u) => u.id);
     const m = startMatch(battle, rec.seed, rec.arena, rec.decks, rec.commanders);
     void pool;
-    const d = recordedRivalPick(rec, 'a', m, () => m.offers.a[0].id);
+    const d = recordedRivalPick(rec, m, 'a', () => m.offers.a[0].id);
     expect(d.recorded).toBe(true);
     expect(d.cardId).toBe(rec.rounds[0].picks.a);
   });
@@ -168,7 +169,7 @@ describe('a recorded rival is honest about what it is', () => {
       b: improviseDeck(pool, 5, 4),
     });
     const empty: MatchRecording = { ...rec, rounds: [] };
-    const d = recordedRivalPick(empty, 'a', other, () => other.offers.a[0].id);
+    const d = recordedRivalPick(empty, other, 'a', () => other.offers.a[0].id);
     expect(d.recorded).toBe(false);
     expect(other.offers.a.some((c) => c.id === d.cardId)).toBe(true);
   });
@@ -183,9 +184,78 @@ describe('a recorded rival is honest about what it is', () => {
         a: improviseDeck(pool, seed, 4),
         b: improviseDeck(pool, seed ^ 0x51ed, 4),
       });
-      const d = recordedRivalPick(rec, 'a', m, () => m.offers.a[0].id);
+      const d = recordedRivalPick(rec, m, 'a', () => m.offers.a[0].id);
       expect(m.offers.a.some((c) => c.id === d.cardId)).toBe(true);
     }
+  });
+});
+
+describe('a recorded rival copies the person, not the bot', () => {
+  it('plays the human side of the tape even when it is on the other side', () => {
+    // The bug this pins: reading picks[playing] would replay whatever sat
+    // opposite the human — which is the AI this feature exists to replace.
+    const { rec } = playAndRecord(20260813, { a: 'massing', b: 'planning' });
+    const humanFirst = rec.rounds[0].picks.a;
+    const botFirst = rec.rounds[0].picks.b;
+    expect(humanFirst).not.toBe(botFirst);
+
+    // Replay the tape's own match, and ask the rival on side b what it wants.
+    const m = startMatch(battle, rec.seed, rec.arena, rec.decks, rec.commanders);
+    const d = recordedRivalPick(rec, m, 'b', () => m.offers.b[0].id);
+    // It wants the human's card, not the one its own side took.
+    if (d.recorded) expect(d.cardId).toBe(humanFirst);
+    else expect(m.offers.b.some((c) => c.id === d.cardId)).toBe(true);
+  });
+});
+
+describe('choosing a tape to play back', () => {
+  const tape = (over: Partial<MatchRecording>): MatchRecording => ({
+    ...playAndRecord(11, { a: 'massing', b: 'massing' }).rec,
+    ...over,
+  });
+
+  it('returns null when there is nothing stored', () => {
+    expect(chooseTape([], 'pasargadae-550', ARENA, 1)).toBeNull();
+  });
+
+  it('never picks a tape from another battle', () => {
+    const t = tape({ battleId: 'somewhere-else' });
+    for (let seed = 1; seed <= 200; seed += 1) {
+      expect(chooseTape([t], 'pasargadae-550', ARENA, seed)).toBeNull();
+    }
+  });
+
+  it('never picks a tape from another arena', () => {
+    // Offers derive from the draft pool, which is a function of battle AND
+    // arena — a tape from elsewhere would miss nearly every round and leave the
+    // 'replaying a real game' label lying.
+    const t = tape({ arena: ARENA - 4 });
+    for (let seed = 1; seed <= 200; seed += 1) {
+      expect(chooseTape([t], 'pasargadae-550', ARENA, seed)).toBeNull();
+    }
+  });
+
+  it('never picks an empty tape', () => {
+    const t = tape({ rounds: [] });
+    for (let seed = 1; seed <= 200; seed += 1) {
+      expect(chooseTape([t], 'pasargadae-550', ARENA, seed)).toBeNull();
+    }
+  });
+
+  it('declines roughly half the time, so you do not face your own last draft every match', () => {
+    const t = tape({});
+    let used = 0;
+    for (let seed = 1; seed <= 400; seed += 1) {
+      if (chooseTape([t], t.battleId, t.arena, seed)) used += 1;
+    }
+    expect(used).toBeGreaterThan(120);
+    expect(used).toBeLessThan(280);
+  });
+
+  it('is stable for a seed, so a rematch faces the same rival', () => {
+    const t = tape({});
+    const first = chooseTape([t], t.battleId, t.arena, 4242);
+    expect(chooseTape([t], t.battleId, t.arena, 4242)).toEqual(first);
   });
 });
 

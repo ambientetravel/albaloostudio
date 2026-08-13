@@ -19,6 +19,7 @@ export function Result() {
     go,
     conn,
     campaign,
+    rivalTapeHits,
   } = useGame();
 
   // A `choice` mission finishes without a match at all, so the mission result
@@ -209,6 +210,25 @@ export function Result() {
             ))}
           </ul>
         </section>
+      )}
+
+      {/* The claim about the rival is made HERE, after the fact, with the real
+          number in it. At the start of a match the game cannot honestly say how
+          much of the opponent will be a person, because a recording is a
+          decision sequence and the offer often does not contain what it wants. */}
+      {!online && rivalTapeHits > 0 && matchState && (
+        <p className="result__tape">
+          {rivalTapeHits === matchState.history.length ? (
+            <>
+              Every round of that opponent came from a game somebody really played.
+            </>
+          ) : (
+            <>
+              {rivalTapeHits} of {matchState.history.length} rounds came from a game somebody
+              really played. The computer chose the rest.
+            </>
+          )}
+        </p>
       )}
 
       <div className="result__actions">

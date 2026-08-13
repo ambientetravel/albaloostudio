@@ -1183,3 +1183,37 @@ written on nearly every action, and a corrupt or oversized tape must never be
 able to take a child's collection down with it. Quota failures, corrupt JSON, a
 non-array value and a missing `localStorage` entirely are all covered — the game
 plays, it just does not remember matches.
+
+
+## The recorded rival, and a bug in the thing I had just built
+
+Wiring the rival in immediately exposed a mistake in `recordedRivalPick` from
+the previous commit: it read `picks[side]` — the side the rival was PLAYING.
+The rival sits on side b; the human was side a. So it would have replayed
+whatever sat opposite the person, which is the scoring function this feature
+exists to replace. It now reads `picks[rec.human]` and plays those decisions on
+whichever side it occupies. Tested by asserting the two sides took different
+cards and that the rival wants the human's one.
+
+**A tape is only used from the same battle and the same arena.** Offers derive
+from the draft pool, which is a function of both. A tape from anywhere else
+would miss nearly every round, and the rival would be the ordinary AI wearing a
+"replaying a real game" label — precisely the claim §10 exists to stop. It also
+declines about half the time, from the match seed, so a player who has
+recordings does not face their own last draft every single match.
+
+**When the claim is made matters more than the wording.** The nameplate says
+"replaying a real game" only after a round has actually come from the tape, not
+from the start of the match — at the start the game genuinely does not know how
+much of the rival will be a person. The exact number is stated on the result
+screen, after the fact, where it can be true: "4 of 4 rounds came from a game
+somebody really played."
+
+That copy needed fixing after the first live run, which returned 4 of 4 and then
+added "The rest the computer chose." There was no rest. All three branches —
+all, some, none — are now separate and were checked in the browser.
+
+Verified live rather than assumed: a match where a tape was chosen produced a
+rival whose ledger was `spara-bearer, persian-cavalry, persian-archer` against
+the tape's human picks of exactly those cards, 4 hits in 4 rounds, with the
+nameplate carrying the tape label and the result screen the exact figure.

@@ -691,26 +691,43 @@ opens only after the historical path, tracks separately and pays nothing.
 Mission 10's survival objective shipped in M4. See DECISIONS.md, including the
 four dossiers that had Herodotus filed as contemporary evidence.
 
-**M6 — recorded rivals. ◐ PART DONE.** Three bot personalities shipped and
-measured: massing, drilling, planning — they differ in which card KIND they
-spend a pick on, every pairing sits inside 35-65% with the side advantage
-cancelled, and the habit is printed on the rival's nameplate beside the CPU tag.
-Two findings in DECISIONS.md, including that counter-weighting turned out to be
-competence rather than personality (90/10 before it was equalised).
+**M6 — recorded rivals. ✅ DONE.** Three bot personalities — massing, drilling,
+planning — differing in which card KIND they spend a pick on, every pairing
+inside 35-65% with the side advantage cancelled. A recorder storing a match as
+its decisions (867 bytes for seven rounds, replaying to a byte-identical
+`MatchState`). And a recorded rival that drafts a real person's picks, verified
+live taking 4 of 4 rounds from a stored tape with its ledger matching that
+person's exactly.
 
-The recorder now exists too. A match is stored as its decisions — battle, seed,
-arena, decks, commanders, then per round the rerolls and the two card ids — and
-replayed through the same pure simulation. Measured: **867 bytes** for a full
-seven-round match, replaying to a byte-identical `MatchState`, verified both
-across 40 simulated matches and on a real one played through the UI. Finished
-tapes go to their own localStorage key, newest first, capped at 24.
+Backfill is labelled honestly, and the labelling is the interesting part. The
+nameplate says "replaying a real game" only once a round has ACTUALLY come from
+the tape, because at the start of a match the game cannot know how much of the
+rival will be a person — a recording is a decision sequence, not a script, and
+the offer often does not contain the card it wants. The exact figure is stated
+on the result screen afterwards, where it can be true. See DECISIONS.md.
 
-Still open: wiring `recordedRivalPick` in as an actual opponent — the function
-and its honesty flag are built and tested, but nothing in the game yet drafts
-from a stored tape. That last step is where the §10 labelling has to land, since
-a rival that is part recording and part scoring function must not be shown as a
-person.
+---
 
+## 11a. After M6
+
+M1–M6 are complete; the concept defines nothing beyond them. What is left is not
+another design milestone but the work of shipping, and most of it is blocked on
+something other than code:
+
+**Art.** 39 of 71 pieces outstanding — 11 arenas, 2 commanders, 5 capital, 4
+codex figures, 14 mission images, and the one rejected card (`loosed-rein`).
+All 25 units and 7 of 8 cards are in. Prompts and the cut-out pipeline exist;
+this is generation time, not engineering.
+
+**Audio.** Nothing at all. Blocked on the SUNO tracks.
+
+**Specialist historical review.** Every dossier is marked `drafted`. §10 lists
+twelve claims that must not ship as fact without a sign-off. This needs a
+historian, not a developer.
+
+**Shipping.** Mobile packaging (Capacitor is the recommendation), an age gate for
+COPPA/GDPR-K, account persistence beyond localStorage, and store compliance.
+This is the only block that is purely code, and it is the sensible M7.
 Explicitly out, per §17: live ranked, clans, chat, subscriptions, loot boxes, fantasy
 units, the other twelve books, a city builder.
 

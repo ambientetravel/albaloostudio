@@ -51,6 +51,7 @@ export function MatchScreen() {
     trophies,
     reading,
     turnDeadline,
+    rivalTapeHits,
     makePick,
     runAiPick,
     finishRound,
@@ -133,6 +134,7 @@ export function MatchScreen() {
         avatars={{ a: avatarFor('a'), b: avatarFor('b') }}
         bot={{ a: isBot('a'), b: isBot('b') }}
         rivalStyle={online ? undefined : aiOpponent?.style}
+        rivalTapeHits={online ? 0 : rivalTapeHits}
         commanders={matchState.commanders}
         final={finalClash(matchState)}
       />
@@ -249,6 +251,7 @@ function ScoreRow({
   avatars,
   bot,
   rivalStyle,
+  rivalTapeHits,
   commanders,
   final,
 }: {
@@ -260,6 +263,8 @@ function ScoreRow({
   bot: Record<Side, boolean>;
   /** Only set offline — a person's drafting habit is theirs to reveal. */
   rivalStyle?: RivalStyle;
+  /** Rounds this rival has actually taken from a recording, so far. */
+  rivalTapeHits: number;
   commanders: Record<Side, string>;
   final: boolean;
 }) {
@@ -271,6 +276,7 @@ function ScoreRow({
         avatar={avatars[theirSide]}
         bot={bot[theirSide]}
         style={rivalStyle}
+        tapeHits={rivalTapeHits}
         side={theirSide}
         commander={commanders[theirSide]}
       />
@@ -303,6 +309,7 @@ function Corner({
   side,
   commander,
   style,
+  tapeHits = 0,
 }: {
   name: string;
   avatar: number;
@@ -310,6 +317,7 @@ function Corner({
   side: Side;
   commander: string;
   style?: RivalStyle;
+  tapeHits?: number;
 }) {
   const c = getCommander(commander);
   return (
@@ -326,7 +334,14 @@ function Corner({
           learn to read one — 'drills its troops' means the traits are coming
           and the ranks are not. It is only shown for the computer, because a
           person's habit is theirs to reveal. */}
-      {bot && style && <span className="score-row__style">{STYLE_LABEL[style]}</span>}
+      {bot && (tapeHits > 0 ? (
+        // Only once a round has ACTUALLY come from the tape. Claiming it up
+        // front would sometimes be false: a recording is a decision sequence,
+        // and the offer it meets often does not contain the card it wants.
+        <span className="score-row__style is-tape">replaying a real game</span>
+      ) : (
+        style && <span className="score-row__style">{STYLE_LABEL[style]}</span>
+      ))}
     </div>
   );
 }

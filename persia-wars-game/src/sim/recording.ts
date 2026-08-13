@@ -9,6 +9,7 @@ import {
   startMatch,
   type MatchState,
 } from './match';
+import { makeRng } from './rng.ts';
 import { roundSeedFor, type Side } from './roundCore.ts';
 
 /**
@@ -171,23 +172,46 @@ export interface RivalDecision {
 
 export function recordedRivalPick(
   rec: MatchRecording,
-  side: Side,
   m: MatchState,
+  playing: Side,
   fallback: () => string,
 ): RivalDecision {
-  const round = rec.rounds[m.round - 1];
-  const wanted = round?.picks[side];
-  if (wanted && m.offers[side].some((c) => c.id === wanted)) {
+  // Copy the HUMAN's decisions, not whatever sat opposite them. A recorded
+  // rival exists to play like a person; reading the side it happens to occupy
+  // would replay the old match's bot instead, which is the AI it is replacing.
+  const from = rec.human ?? 'a';
+  const wanted = rec.rounds[m.round - 1]?.picks[from];
+  if (wanted && m.offers[playing].some((c) => c.id === wanted)) {
     return { cardId: wanted, recorded: true };
   }
   return { cardId: fallback(), recorded: false };
 }
 
-/** How many of a recording's rounds this match could actually take from it. */
-export function fidelityAgainst(rec: MatchRecording, m: MatchState, side: Side): number {
-  const round = rec.rounds[m.round - 1];
-  if (!round) return 0;
-  return m.offers[side].some((c) => c.id === round.picks[side]) ? 1 : 0;
+/**
+ * Chooses a tape to drive a rival, or null.
+ *
+ * Only a tape from the same battle and the same arena is eligible. Offers are
+ * derived from the draft pool, which is a function of both, so a tape from
+ * elsewhere would miss on nearly every round — the rival would be the ordinary
+ * scoring function wearing a recorded rival's label, which is exactly the kind
+ * of claim §10 exists to stop.
+ *
+ * It also declines about half the time, from the match seed, so a player who
+ * has recordings does not face their own last draft every single match.
+ */
+export function chooseTape(
+  all: MatchRecording[],
+  battleId: string,
+  arena: number,
+  seed: number,
+): MatchRecording | null {
+  const eligible = all.filter(
+    (r) => r.v === RECORDING_VERSION && r.battleId === battleId && r.arena === arena && r.rounds.length > 0,
+  );
+  if (eligible.length === 0) return null;
+  const rng = makeRng((seed ^ 0x2545f491) >>> 0);
+  if (rng.next() < 0.5) return null;
+  return eligible[rng.int(eligible.length)];
 }
 
 /** Serialised size in bytes — the claim that a recording is small, checked. */

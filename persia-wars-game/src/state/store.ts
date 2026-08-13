@@ -51,8 +51,14 @@ import {
   winnerOf,
   type MatchState,
 } from '../sim/match';
-import { beginRecording, recordRound, type MatchRecording } from '../sim/recording';
-import { saveRecording } from '../game/recordings';
+import {
+  beginRecording,
+  chooseTape,
+  recordRound,
+  recordedRivalPick,
+  type MatchRecording,
+} from '../sim/recording';
+import { loadRecordings, saveRecording } from '../game/recordings';
 import { roundSeedFor } from '../sim/roundCore.ts';
 import type { BattleLog, Side } from '../sim/types';
 
@@ -186,6 +192,18 @@ interface State extends Saved {
    * storage key so a bad one can never take the collection with it.
    */
   recording: MatchRecording | null;
+  /**
+   * A stored match driving the offline rival's draft, when one is in play.
+   * Null means the rival is the ordinary scoring function.
+   */
+  rivalTape: MatchRecording | null;
+  /**
+   * How many rounds this rival actually took FROM the tape. A recording is a
+   * decision sequence, not a script, so it misses often — and §10 means the
+   * game must never claim more of a person than it delivered. This is what the
+   * claim is made from.
+   */
+  rivalTapeHits: number;
   /** The current round's battle. Replaced every round. */
   log: BattleLog | null;
 
@@ -327,6 +345,8 @@ export const useGame = create<State>((set, get) => {
     battleId: null,
     matchState: null,
     recording: null,
+    rivalTape: null,
+    rivalTapeHits: 0,
     log: null,
 
     conn: 'idle',
@@ -491,10 +511,17 @@ export const useGame = create<State>((set, get) => {
       commanders[theirSide] = opponentCommander ?? (s.commander === 'cyrus' ? 'astyages' : 'cyrus');
 
       const opened = startMatch(battle, useSeed, useArena, decks, commanders);
+      // Only offline, and only from a tape of this same battle and arena — the
+      // draft pool is a function of both, so a tape from anywhere else would
+      // miss nearly every round and leave the label lying.
+      const tape =
+        s.mode === 'ai' ? chooseTape(loadRecordings(), battleId, useArena, useSeed) : null;
       set({
         battleId,
         matchState: opened,
         recording: beginRecording(opened, mySide),
+        rivalTape: tape,
+        rivalTapeHits: 0,
         log: null,
         screen: 'battle',
         // Every vs-AI match gets a named opponent, so the board always has a
@@ -536,11 +563,25 @@ export const useGame = create<State>((set, get) => {
     },
 
     runAiPick: () => {
-      const { matchState, mode, aiOpponent } = get();
+      const { matchState, mode, aiOpponent, rivalTape, rivalTapeHits } = get();
       if (mode !== 'ai' || !matchState || matchState.phase !== 'offer') return;
       if (matchState.picked.b !== null) return;
-      const after = choose(matchState, 'b', aiRoundPick(matchState, 'b', aiOpponent ?? undefined));
-      set({ matchState: after });
+
+      // A recorded rival plays back what a PERSON took, and falls back to the
+      // scoring function whenever that card is not on the offer it faces —
+      // which is the common case, not the exception. The hit is counted so the
+      // game can say afterwards how much of the rival was really a person.
+      const decision = rivalTape
+        ? recordedRivalPick(rivalTape, matchState, 'b', () =>
+            aiRoundPick(matchState, 'b', aiOpponent ?? undefined),
+          )
+        : { cardId: aiRoundPick(matchState, 'b', aiOpponent ?? undefined), recorded: false };
+
+      const after = choose(matchState, 'b', decision.cardId);
+      set({
+        matchState: after,
+        rivalTapeHits: rivalTapeHits + (decision.recorded ? 1 : 0),
+      });
       if (bothChosen(after)) get().runRound();
     },
 
@@ -716,6 +757,8 @@ export const useGame = create<State>((set, get) => {
         screen: 'result',
         matchState: null,
         recording: null,
+        rivalTape: null,
+        rivalTapeHits: 0,
         log: null,
       });
       persist();
@@ -828,6 +871,8 @@ net.onMessage((msg: ServerMessage) => {
           match: null,
           matchState: null,
           recording: null,
+          rivalTape: null,
+          rivalTapeHits: 0,
           log: null,
           searching: false,
           turnDeadline: null,

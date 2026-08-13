@@ -4126,6 +4126,24 @@ button.unit-card:active:not(:disabled) {
   opacity: 0.85;
 }
 
+.score-row__style.is-tape {
+  font-style: normal;
+  color: var(--turquoise);
+  opacity: 1;
+}
+
+.result__tape {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--stone);
+  background: color-mix(in srgb, var(--turquoise) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--turquoise) 35%, transparent);
+}
+
 .ledger-band {
   display: grid;
   gap: 3px;
