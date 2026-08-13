@@ -4144,6 +4144,30 @@ button.unit-card:active:not(:disabled) {
   border: 1px solid color-mix(in srgb, var(--turquoise) 35%, transparent);
 }
 
+.screen.age-gate {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 24px 18px;
+}
+
+.age-gate__error {
+  margin: -4px 0 0;
+  font-size: 12.5px;
+  color: #e8a48f;
+}
+
+.age-gate__note {
+  margin: 4px 0 0;
+  font-size: 12px;
+  text-align: center;
+  color: var(--stone-dim);
+}
+
+.name-shuffle {
+  margin-block-start: 4px;
+}
+
 .ledger-band {
   display: grid;
   gap: 3px;

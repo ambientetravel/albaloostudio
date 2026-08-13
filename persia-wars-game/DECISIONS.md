@@ -1217,3 +1217,60 @@ Verified live rather than assumed: a match where a tape was chosen produced a
 rival whose ledger was `spara-bearer, persian-cavalry, persian-archer` against
 the tape's human picks of exactly those cards, 4 hits in 4 rounds, with the
 nameplate carrying the tape label and the result screen the exact figure.
+
+
+## The age gate, and the hole it was actually for
+
+M7 begins with the age gate because it blocks a store submission and needs no
+art. But a gate that only records a number would be theatre, so the first job
+was finding what actually needs gating.
+
+Almost nothing does. Collection, trophies, settings and match recordings are all
+localStorage and never leave the device. **Exactly one thing is broadcast to a
+stranger: the display name.** And the first screen on a fresh install said
+"Choose your name — other players will see this when you play online", with the
+placeholder "Your name", to an audience of nine-to-fourteen-year-olds. That is
+the hole, and closing it is the whole substance of this work.
+
+Two deliberate choices in the gate itself:
+
+**It asks for a birth year, not "are you over 13?"** A yes/no question with an
+obvious right answer teaches a child to lie to it. Nothing on the screen says
+what any answer unlocks.
+
+**Only the bracket is stored, never the date.** A birth date is precisely the
+data a children's app should not hold, and nothing here needs one. The cost is
+that a child who turns 13 stays in the younger bracket until the app's data is
+cleared — which is the safe direction to err in.
+
+Under 16 the name is chosen from a shuffle of 144 adjective-noun titles rather
+than typed. Teens are included on purpose: GDPR-K's line moves between 13 and 16
+by member state, and the safe reading does not depend on knowing where the
+player is.
+
+**Three bugs, each caught by the thing built to catch it.**
+
+The test asserting assigned names survive the server's own validation failed
+first time: 13 of them were over the 14-character limit, because 'Far-seeing'
+and 'Patient' were in the adjective list. A name the server rejects would have
+locked a child out of online play altogether — turning a restriction into a ban.
+
+Live, the shuffle produced Swift Lion, Swift Falcon, Swift Archer, Swift Rider.
+Stepping by one walked a single row of the table, so a child tapping "give me a
+different name" saw twelve nouns before the adjective ever moved. The step is
+now coprime with the total.
+
+Also live: the screen showed 'Swift Spear' and the save recorded 'Swift River'.
+The store was recomputing a name instead of accepting the one the player had
+just chosen. It now keeps any name it would itself have offered, and replaces
+only something that could not have come from the shuffle — which keeps it an
+enforcement point rather than a second, contradictory generator.
+
+That enforcement is real and was checked by attempting the bypass: calling
+`saveProfile('Alireza', …)` directly on the store as a teen saves 'Swift Lion'.
+The restriction does not live in the screen that happens to be showing.
+
+**Not legal advice.** The thresholds are a starting position. COPPA says 13,
+GDPR-K says 13-16 depending on the country, and the UK's Age Appropriate Design
+Code applies to under-18s regardless. A lawyer decides; this provides the
+mechanism to implement whatever they decide.

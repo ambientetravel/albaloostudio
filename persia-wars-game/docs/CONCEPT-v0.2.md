@@ -725,9 +725,19 @@ this is generation time, not engineering.
 twelve claims that must not ship as fact without a sign-off. This needs a
 historian, not a developer.
 
-**Shipping.** Mobile packaging (Capacitor is the recommendation), an age gate for
-COPPA/GDPR-K, account persistence beyond localStorage, and store compliance.
-This is the only block that is purely code, and it is the sensible M7.
+**Shipping — M7, started.** The age gate is in: a birth-year question before the
+name, only the resulting BRACKET stored, and under 16 the display name is chosen
+from a shuffle rather than typed. That last part is the point — the display name
+is the only thing this game broadcasts to a stranger, and the first screen used
+to ask a nine-year-old for it by name. Enforced in the store, not the screen.
+
+**The thresholds still need a lawyer.** COPPA draws at 13, GDPR-K lets each
+member state pick 13-16, and the UK Age Appropriate Design Code covers under-18s
+regardless. What is built is a mechanism with a defensible default, not a ruling.
+
+Still open in M7: mobile packaging (Capacitor), account persistence beyond
+localStorage, a moderation list for names (protocol.ts still only shape-checks),
+and store compliance paperwork.
 Explicitly out, per §17: live ranked, clans, chat, subscriptions, loot boxes, fantasy
 units, the other twelve books, a city builder.
 

@@ -15,6 +15,7 @@ import { Ladder } from './ui/Ladder';
 import { Collection } from './ui/Collection';
 import { Lobby } from './ui/Lobby';
 import { Matchmaking } from './ui/Matchmaking';
+import { AgeGate } from './ui/AgeGate';
 import { ProfileScreen } from './ui/ProfileScreen';
 import { Result } from './ui/Result';
 import { ScenarioSelect } from './ui/ScenarioSelect';
@@ -85,6 +86,7 @@ export function App() {
       </AnimatePresence>
 
       <main>
+        {screen === 'age' && <AgeGate />}
         {screen === 'profile' && <ProfileScreen />}
         {screen === 'lobby' && <Lobby />}
         {screen === 'collection' && <Collection />}
