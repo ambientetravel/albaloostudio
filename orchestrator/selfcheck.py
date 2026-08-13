@@ -397,6 +397,13 @@ print("\n=== agent 2 — what astro_pr actually writes ===")
 _bc = [x for x in config.load_sites() if x.domain == "boutimar.com"][0]
 _cms = _bc.cms if isinstance(_bc.cms, dict) else {}
 _a2lsrc = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
+# Run #20 proved the config was not reaching the adapter: the preview showed
+# the old title/description/draft/pubDate/lang. Agent 1 was hand-picking four
+# cms keys when building the brief, so `collection` and `frontmatter` died at
+# that boundary — the same shape of bug as `competitors` never reaching Site.
+ok("Agent 1 passes the WHOLE cms block into the brief",
+   "**site.cms," in _a1src,
+   "enumerating keys means every new setting silently does nothing until two files agree")
 ok("boutimar.com declares its Astro collection",
    _cms.get("collection") == "journal", _cms.get("collection"))
 # Astro validates each entry against the collection's zod schema and refuses to

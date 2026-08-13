@@ -1113,12 +1113,18 @@ def build_brief_payload(
             "locale": site.locale,
             "market": site.market,
             "base_url": site.base_url,
-            "cms": {
-                "type": site.cms.get("type", "unknown"),
-                "adapter": site.cms.get("adapter"),
-                "content_root": site.cms.get("content_root", "/"),
-                "publish_mode": site.cms.get("publish_mode", "draft"),
-            },
+            # The WHOLE cms block, not a hand-picked four keys. Enumerating
+            # them meant every new setting had to be added in two files, and
+            # silently did nothing until it was: `collection` and `frontmatter`
+            # were added to sites.yml so astro_pr could write schema-valid
+            # Astro entries, never crossed this boundary, and Agent 2 fell back
+            # to generic frontmatter that would have failed the target build.
+            # Third time this pattern has cost a debugging session — the
+            # schema allows extra keys here precisely so it does not have to.
+            **{"cms": {**site.cms,
+                       "type": site.cms.get("type", "unknown"),
+                       "publish_mode": site.cms.get("publish_mode", "draft"),
+                       "content_root": site.cms.get("content_root", "/")}},
         },
         "opportunity": {
             "gap_type": analysis["gap_type"],
