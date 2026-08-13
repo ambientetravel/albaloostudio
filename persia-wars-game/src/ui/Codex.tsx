@@ -19,7 +19,7 @@ const TAB_LABEL: Record<Tab, string> = {
 const ALWAYS_OPEN: Tab[] = ['rules'];
 
 export function Codex() {
-  const { reading, codex, go } = useGame();
+  const { codex, go } = useGame();
   const [tab, setTab] = useState<Tab>('battles');
   const [open, setOpen] = useState<string | null>(null);
 
@@ -84,7 +84,7 @@ export function Codex() {
         Back
       </button>
 
-      {open && <CodexDetail id={open} reading={reading} onClose={() => setOpen(null)} />}
+      {open && <CodexDetail id={open} onClose={() => setOpen(null)} />}
     </div>
   );
 }
@@ -123,7 +123,7 @@ function CodexTile({
   );
 }
 
-function CodexDetail({ id, reading, onClose }: { id: string; reading: 'kid' | 'older'; onClose: () => void }) {
+function CodexDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const [kind, key] = id.split(':');
 
   let title = '';
@@ -140,7 +140,8 @@ function CodexDetail({ id, reading, onClose }: { id: string; reading: 'kid' | 'o
     subtitle = `${b.year} · ${b.site}`;
     bodyParts = [
       `${b.opponents.a} × ${b.opponents.b}`,
-      reading === 'older' ? b.summaryOlder : b.summary,
+      b.summary,
+      b.summaryOlder,
       `What really happened: ${b.victor}`,
     ];
     teaches = b.teaches;
@@ -159,7 +160,11 @@ function CodexDetail({ id, reading, onClose }: { id: string; reading: 'kid' | 'o
     const u = content.units.find((x) => x.id === key)!;
     title = u.name;
     subtitle = CLASS_LABEL[u.class];
-    bodyParts = [reading === 'older' ? u.blurbOlder : u.blurb];
+    // Both, always. The sourced paragraph is where Herodotus, the Persepolis
+    // reliefs and the daric live — 24 of 25 units cite a source there and 1 of
+    // 25 does in the short line. Behind a settings toggle that defaulted to off,
+    // almost nobody ever saw the half of this game that teaches how we know.
+    bodyParts = [u.blurb, u.blurbOlder];
     if (u.attestationNote) bodyParts.push(u.attestationNote);
     disputed = u.disputed;
     sources = u.sourceRefs;

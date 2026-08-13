@@ -2,7 +2,7 @@ import { content, getEra } from '../content';
 import { useGame } from '../state/store';
 
 export function ScenarioSelect() {
-  const { reading, chooseBattle, go } = useGame();
+  const { chooseBattle, go } = useGame();
 
   return (
     <div className="screen scenarios">
@@ -10,7 +10,7 @@ export function ScenarioSelect() {
       <div className="scenario-list">
         {content.battles.map((battle) => {
           const era = getEra(battle.era);
-          const summary = reading === 'older' ? battle.summaryOlder : battle.summary;
+          const summary = battle.summary;
           return (
             <article key={battle.id} className="scenario">
               <div className="scenario__head">

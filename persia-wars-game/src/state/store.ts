@@ -81,7 +81,6 @@ export type Screen =
   | 'battle'
   | 'result';
 export type Mode = 'online' | 'ai';
-export type Reading = 'kid' | 'older';
 
 export interface Codex {
   battles: string[];
@@ -111,7 +110,6 @@ export type Collection = Record<string, CardState>;
 
 interface Saved {
   profile: Profile | null;
-  reading: Reading;
   settings: Settings;
   wallet: Wallet;
   collection: Collection;
@@ -139,7 +137,6 @@ function freshSave(): Saved {
   for (const id of STARTER_UNITS) collection[id] = { count: 0, level: 1 };
   return {
     profile: null,
-    reading: 'kid',
     settings: { sfxVolume: 100, musicVolume: 100, haptics: true },
     wallet: { coins: 500, gems: 25 },
     collection,
@@ -230,7 +227,6 @@ interface State extends Saved {
   lastRewards: { coins: number; trophies: number; cards: string[] };
 
   saveProfile: (name: string, avatar: number, banner: number) => void;
-  setReading: (r: Reading) => void;
   setSettings: (patch: Partial<Settings>) => void;
   go: (screen: Screen) => void;
   dismissNotice: () => void;
@@ -314,7 +310,6 @@ function randomSeed(): number {
 function savedSlice(s: State): Saved {
   return {
     profile: s.profile,
-    reading: s.reading,
     settings: s.settings,
     wallet: s.wallet,
     collection: s.collection,
@@ -374,11 +369,6 @@ export const useGame = create<State>((set, get) => {
       set({ profile: { name, avatar, banner }, screen: 'lobby' });
       persist();
       get().connect();
-    },
-
-    setReading: (reading) => {
-      set({ reading });
-      persist();
     },
 
     setSettings: (patch) => {

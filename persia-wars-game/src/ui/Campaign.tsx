@@ -135,7 +135,7 @@ function MissionRow({
  * you stop reading.
  */
 export function MissionBrief() {
-  const { missionId, reading, campaign, startMission, takeMissionChoice, go } = useGame();
+  const { missionId, campaign, startMission, takeMissionChoice, go } = useGame();
   const [showDossier, setShowDossier] = useState(false);
   if (!missionId) return null;
   const mission = getMission(missionId);
@@ -191,9 +191,7 @@ export function MissionBrief() {
       */}
       <section className="mission-brief__truth">
         <p className="muted">
-          {reading === 'older'
-            ? 'How far this mission can be trusted:'
-            : 'How much of this really happened:'}
+          How much of this really happened:
         </p>
         <ul className="disputed-list">
           {mission.disputed.map((d, i) => (

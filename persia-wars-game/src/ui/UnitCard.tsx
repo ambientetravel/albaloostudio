@@ -1,11 +1,9 @@
 import type { Unit } from '../content/types';
-import type { Reading } from '../state/store';
 import { CLASS_LABEL, listClasses } from './labels';
 import { UnitGlyph } from './UnitGlyph';
 
 interface Props {
   unit: Unit;
-  reading: Reading;
   side?: 'a' | 'b';
   onClick?: () => void;
   disabled?: boolean;
@@ -23,7 +21,6 @@ interface Props {
 
 export function UnitCard({
   unit,
-  reading,
   side = 'a',
   onClick,
   disabled,
@@ -31,7 +28,9 @@ export function UnitCard({
   variant = 'full',
   glyphSize,
 }: Props) {
-  const blurb = reading === 'older' ? unit.blurbOlder : unit.blurb;
+  // The card carries the hook only; the sourced paragraph lives in the codex,
+  // where there is room for it and where it is shown to everyone.
+  const blurb = unit.blurb;
   const Tag = onClick ? 'button' : 'div';
   const compact = variant === 'compact';
 

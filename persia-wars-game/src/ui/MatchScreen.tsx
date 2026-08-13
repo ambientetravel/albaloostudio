@@ -49,7 +49,6 @@ export function MatchScreen() {
     profile,
     aiOpponent,
     trophies,
-    reading,
     turnDeadline,
     rivalTapeHits,
     makePick,
@@ -161,7 +160,6 @@ export function MatchScreen() {
               offer={matchState.offers[mySide]}
               ledger={matchState.ledgers[mySide]}
               round={matchState.round}
-              reading={reading}
               side={mySide}
               chosen={chosen}
               waiting={waiting}
@@ -414,7 +412,6 @@ function Offer({
   offer,
   ledger,
   round,
-  reading,
   side,
   chosen,
   waiting,
@@ -427,7 +424,6 @@ function Offer({
   offer: OfferCard[];
   ledger: Ledger;
   round: number;
-  reading: 'kid' | 'older';
   side: Side;
   chosen: OfferCard | null;
   waiting: boolean;
@@ -473,7 +469,6 @@ function Offer({
               <UnitSlot
                 card={card}
                 ledger={ledger}
-                reading={reading}
                 side={side}
                 waiting={waiting}
                 onPick={onPick}
@@ -482,7 +477,6 @@ function Offer({
             ) : (
               <RuleSlot
                 card={card}
-                reading={reading}
                 side={side}
                 waiting={waiting}
                 onPick={onPick}
@@ -514,7 +508,6 @@ function Offer({
 function UnitSlot({
   card,
   ledger,
-  reading,
   side,
   waiting,
   onPick,
@@ -522,7 +515,6 @@ function UnitSlot({
 }: {
   card: OfferCard;
   ledger: Ledger;
-  reading: 'kid' | 'older';
   side: Side;
   waiting: boolean;
   onPick: (id: string) => void;
@@ -534,7 +526,6 @@ function UnitSlot({
     <>
       <UnitCard
         unit={getUnit(card.id)}
-        reading={reading}
         side={side}
         variant="compact"
         glyphSize={wide ? 30 : 46}
@@ -557,21 +548,19 @@ function UnitSlot({
  */
 function RuleSlot({
   card,
-  reading,
   side,
   waiting,
   onPick,
   wide,
 }: {
   card: OfferCard;
-  reading: 'kid' | 'older';
   side: Side;
   waiting: boolean;
   onPick: (id: string) => void;
   wide: boolean;
 }) {
   const def = card.kind === 'upgrade' ? getUpgrade(card.id) : getDoctrine(card.id);
-  const blurb = reading === 'older' ? def.blurbOlder : def.blurb;
+  const blurb = def.blurb;
   return (
     <>
       <button

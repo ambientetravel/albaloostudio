@@ -47,7 +47,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
 }
 
 function ProfileTab() {
-  const { profile, saveProfile, wins, losses, bestTrophies, collection, reading, setReading } = useGame();
+  const { profile, saveProfile, wins, losses, bestTrophies, collection } = useGame();
   const [name, setName] = useState(
     isAssignedName(profile?.name ?? '') ? (profile?.name ?? '') : assignedName(0),
   );
@@ -133,15 +133,6 @@ function ProfileTab() {
         ))}
       </div>
 
-      <p className="settings-label">Reading level</p>
-      <div className="toggle toggle--wide">
-        <button type="button" className={reading === 'kid' ? 'is-on' : ''} onClick={() => setReading('kid')}>
-          Younger
-        </button>
-        <button type="button" className={reading === 'older' ? 'is-on' : ''} onClick={() => setReading('older')}>
-          Older
-        </button>
-      </div>
 
       <div className="stat-grid">
         <Stat icon="⬆" tone="good" label="Wins" value={wins} />

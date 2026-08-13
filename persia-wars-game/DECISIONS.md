@@ -1318,3 +1318,48 @@ re-rolls, and `saveProfile('Alireza', …)` called straight on the store saves
 Not a loss of expression: a player still chooses from 144 titles plus a badge
 and a banner, and 'Quiet Falcon' is a better name for a nine-year-old's warband
 than anything they would have typed.
+
+
+## One profile: the evidence was hiding behind a settings toggle
+
+Same question as the age gate, one screen along — why two versions of a player?
+The answer is the same, but the reason is sharper, and it is a number.
+
+The game carried a 'reading level' toggle: `kid` and `older`, with a second
+blurb written for 53 pieces of content. It looks like a reading-age feature.
+Measured, it is not:
+
+**24 of 25 units name a source in the `older` blurb. 1 of 25 does in the `kid`
+blurb.**
+
+So the toggle was never about reading age. It was the evidence layer — Herodotus,
+the Persepolis reliefs, the gold daric, the difference between what a source
+says and what we infer — and it defaulted to OFF. The half of this game that
+teaches how we know things was the half almost nobody would ever see.
+
+So: merged, but by promoting the sourced text rather than deleting it. The
+lesson from the age gate applies exactly — **do not make it a mode, make it
+structure.**
+
+- The draft card keeps the short line. It has to fit a card, and it is the hook.
+- The codex detail now shows BOTH, always, for everyone: the hook, then the
+  sourced paragraph, then the source list that was already there.
+- The collection detail does the same.
+- The `reading` mode, its setting, its type, and the prop threaded through
+  UnitCard and four screens are gone.
+
+Verified live: opening Persian Archer in the codex shows the short line, then
+"The royal coinage — the gold daric — shows the king himself as an archer, and
+the Persepolis reliefs make the bow and quiver the mark of a Persian soldier.
+Herodotus equips the Persians with long bows and arrows of reed", then SOURCES.
+Three paragraphs where there was one.
+
+Four tests guard it, because a merge like this can quietly become a deletion —
+with no toggle left to reveal the long text, a missing `blurbOlder` would just
+look like a shorter card. They check it exists for every unit, is not a copy of
+the short line, is actually longer, and that at least 22 of 25 still name a
+source. The last one is the real guard: it fails on drift back toward unsourced
+flavour.
+
+Nothing was thrown away. Both texts are written, both are shown, and the
+specialist history review now covers text that players actually read.

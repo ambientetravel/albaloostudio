@@ -732,6 +732,12 @@ nine to fourteen, so the adult path served almost nobody; the bracket was read
 for exactly one decision; and §17 rules out chat, clans and subscriptions, so
 nothing else would ever read it.
 
+**One profile, one reading.** The `kid`/`older` toggle is gone. It was not a
+reading-age feature — 24 of 25 units named a source in the long blurb and 1 of
+25 did in the short one, so the toggle was the evidence layer and it defaulted
+to off. Both texts are now shown to everyone: the hook on the card, the sourced
+paragraph in the codex detail beneath it.
+
 **Nobody types a name.** Every player picks one from a closed set of 144
 adjective-noun titles. A gate manages a risk; deleting the free-text field
 removes it. There is now no user-generated text anywhere in the product, which

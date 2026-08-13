@@ -6,7 +6,6 @@ import { UnitGlyph } from './UnitGlyph';
 
 export function Result() {
   const {
-    reading,
     mode,
     match,
     battleId,
@@ -34,7 +33,7 @@ export function Result() {
   if (!matchState || !battleId) return null;
 
   const battle = getBattle(battleId);
-  const summary = reading === 'older' ? battle.summaryOlder : battle.summary;
+  const summary = battle.summary;
   const online = mode === 'online';
   const mySide: Side = online && match ? match.you : 'a';
   const theirSide: Side = mySide === 'a' ? 'b' : 'a';

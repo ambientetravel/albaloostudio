@@ -267,3 +267,50 @@ describe('battles are not sited at places that did not exist yet', () => {
     expect(b.disputed.join(' ')).toMatch(/Strabo/);
   });
 });
+
+/**
+ * The evidence layer.
+ *
+ * This text used to sit behind a 'reading level' toggle that defaulted to off,
+ * so almost nobody saw it. Measured at the time: 24 of 25 units named a source
+ * in the long blurb and 1 of 25 did in the short one — which meant the half of
+ * this game that teaches HOW WE KNOW was the half that was hidden.
+ *
+ * Both are now shown to everyone, the short line as the hook and the long one
+ * beneath it. These tests exist because a merge like that can quietly become a
+ * deletion: with no toggle left to reveal it, a missing `blurbOlder` would just
+ * look like a shorter card.
+ */
+describe('the sourced text every card carries', () => {
+  it('exists for every unit, and is not a copy of the short line', () => {
+    const missing = content.units.filter((u) => !u.blurbOlder?.trim());
+    expect(missing.map((u) => u.id)).toEqual([]);
+    const duplicated = content.units.filter((u) => u.blurbOlder === u.blurb);
+    expect(duplicated.map((u) => u.id)).toEqual([]);
+  });
+
+  it('actually says more than the hook', () => {
+    // Not a style rule — the long text is where the attribution lives, and
+    // attribution costs words.
+    const tooShort = content.units
+      .filter((u) => u.blurbOlder.length <= u.blurb.length)
+      .map((u) => u.id);
+    expect(tooShort).toEqual([]);
+  });
+
+  it('names a source for the overwhelming majority of units', () => {
+    // 24 of 25 when this was written. Pinned a little below that so a genuinely
+    // sourceless unit can be added, but a drift back toward unsourced flavour
+    // fails.
+    const cites = /Herodotus|Arrian|Strabo|Xenophon|Ctesias|Persepolis|relief|coin|daric|source|scholar|record/i;
+    const sourced = content.units.filter((u) => cites.test(u.blurbOlder));
+    expect(sourced.length).toBeGreaterThanOrEqual(content.units.length - 3);
+  });
+
+  it('carries the same for both battles and every upgrade and doctrine', () => {
+    for (const b of content.battles) expect(b.summaryOlder?.trim()).toBeTruthy();
+    for (const c of [...content.upgrades, ...content.doctrines]) {
+      expect(c.blurbOlder?.trim()).toBeTruthy();
+    }
+  });
+});

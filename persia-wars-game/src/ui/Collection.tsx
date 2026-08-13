@@ -179,7 +179,7 @@ function SpellTile({ spell, onTap }: { spell: Spell; onTap: () => void }) {
 }
 
 function CardDetail({ id, onClose }: { id: string; onClose: () => void }) {
-  const { collection, wallet, reading, upgradeCard } = useGame();
+  const { collection, wallet, upgradeCard } = useGame();
 
   if (id.startsWith('spell:')) {
     const spell = content.spells.find((s) => s.id === id.slice(6))!;
@@ -192,7 +192,8 @@ function CardDetail({ id, onClose }: { id: string; onClose: () => void }) {
             This is a story, not an event. It is recorded in Iranian literature, and it has not yet been checked by a
             historian for this game.
           </p>
-          <p>{reading === 'older' ? spell.blurbOlder : spell.blurb}</p>
+          <p>{spell.blurb}</p>
+          <p className="muted">{spell.blurbOlder}</p>
           {spell.disputed.length > 0 && (
             <section className="disputed">
               <h4>What&apos;s disputed</h4>
@@ -234,7 +235,8 @@ function CardDetail({ id, onClose }: { id: string; onClose: () => void }) {
         <p className="modal__sub">
           {CLASS_LABEL[unit.class]} · Level {level} · Unlocks in {getArena(unit.arena).name}
         </p>
-        <p>{reading === 'older' ? unit.blurbOlder : unit.blurb}</p>
+        <p>{unit.blurb}</p>
+        <p className="detail__evidence">{unit.blurbOlder}</p>
 
         <dl className="stats stats--detail">
           <div>
