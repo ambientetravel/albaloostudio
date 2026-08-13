@@ -27,6 +27,18 @@ export const ROUNDS_MAX = 7;
  * is first-to-2, the finale is the full first-to-4. Everything downstream is
  * derived from the target so a first-to-2 cannot run past three rounds.
  */
+/**
+ * The seed a single round's simulation runs on.
+ *
+ * Was copy-pasted in nine places — the store, four sim tests, three net tests.
+ * A recorder replays a match by re-running these rounds, so any drift between
+ * two copies of this expression would produce a replay that diverges from the
+ * match it claims to be, silently. One definition, imported.
+ */
+export function roundSeedFor(seed: number, round: number): number {
+  return (seed ^ ((round * 0x5bf03635) >>> 0)) >>> 0;
+}
+
 export function roundsMaxFor(winsNeeded: number): number {
   return Math.max(1, winsNeeded * 2 - 1);
 }

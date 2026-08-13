@@ -1131,3 +1131,55 @@ meant. A style is a deviation from something, and that is the something.
 **M6 is only part done.** It was specified as `RecordedRivalDecisionProvider`
 "reading the existing replay log". There is no replay log — nothing in the game
 records a match's decision sequence. Recorded rivals need a recorder first.
+
+
+## The recorder: 867 bytes is a whole match
+
+M6 asked for a rival that replays "the existing replay log". No such log existed,
+so this builds it.
+
+**A match is not stored, its decisions are.** The simulation is already a pure
+function — `sim/` imports neither React nor Pixi and never reads a clock — so
+there is no reason to keep what happened. Keep the inputs and re-run them: the
+battle, the seed, the arena, both decks, both commanders, and then per round the
+rerolls each side spent and the two card ids. Measured at **867 bytes for a full
+seven-round match**, against however many kilobytes an event log would have been.
+
+Because it is inputs rather than a summary, the test can assert something much
+stronger than "looks right": 40 matches replayed to a `MatchState` that is equal
+under `JSON.stringify` to the original, and a real match played through the
+actual UI did the same — score, ledgers, and every round outcome identical.
+
+**Rerolls had to be in the tape.** Spending a Rally feeds the offer seed, so a
+replay that skipped it would derive a different offer and then reject the very
+pick it was replaying. They are recorded per round, and `nextRound` clears them
+— which is why `recordRound` must be called before `commitPicks`, the single
+moment when the picks and the rerolls that produced them are both still present.
+
+**A replay throws rather than improvises.** If a recorded card is not on the
+offer it faces, `replay` refuses. A quiet substitution would produce a
+plausible-looking match that is not the one recorded, and a plausible wrong
+answer is worse here than a crash — the whole value of a recording is that it IS
+the match.
+
+**The rival is honest by construction.** `recordedRivalPick` returns
+`{ cardId, recorded }`, and `recorded` is false whenever it fell back. That is
+not a nicety: a recording is a decision sequence, not a script for the world, so
+facing it with a different seed or a different opponent means the stored card is
+often simply not on offer — falling back is the normal case. §10's honesty rule
+means a rival that is part recording and part scoring function must never be
+presented as a person, and the caller cannot know which it got unless the
+function says so.
+
+**One thing extracted on the way.** The round seed expression
+`(seed ^ ((round * 0x5bf03635) >>> 0)) >>> 0` was copy-pasted in nine places —
+the store, four sim tests, three net tests. A recorder replays by re-running
+those rounds, so any drift between two copies would produce a replay that
+silently diverges from the match it claims to be. It is now `roundSeedFor` in
+`roundCore`, with a test asserting it still equals the inlined expression.
+
+Storage is its own localStorage key rather than the save file. The save is
+written on nearly every action, and a corrupt or oversized tape must never be
+able to take a child's collection down with it. Quota failures, corrupt JSON, a
+non-array value and a missing `localStorage` entirely are all covered — the game
+plays, it just does not remember matches.

@@ -51,6 +51,9 @@ import {
   winnerOf,
   type MatchState,
 } from '../sim/match';
+import { beginRecording, recordRound, type MatchRecording } from '../sim/recording';
+import { saveRecording } from '../game/recordings';
+import { roundSeedFor } from '../sim/roundCore.ts';
 import type { BattleLog, Side } from '../sim/types';
 
 export type Screen =
@@ -177,6 +180,12 @@ interface State extends Saved {
   battleId: string | null;
   /** The contest in progress: rounds, ledgers, score. Null outside a match. */
   matchState: MatchState | null;
+  /**
+   * The tape for the match in progress. Deliberately NOT in the saved slice —
+   * it is finished tapes that are worth keeping, and they go to their own
+   * storage key so a bad one can never take the collection with it.
+   */
+  recording: MatchRecording | null;
   /** The current round's battle. Replaced every round. */
   log: BattleLog | null;
 
@@ -317,6 +326,7 @@ export const useGame = create<State>((set, get) => {
     mode: 'ai',
     battleId: null,
     matchState: null,
+    recording: null,
     log: null,
 
     conn: 'idle',
@@ -480,9 +490,11 @@ export const useGame = create<State>((set, get) => {
       commanders[mySide] = s.commander;
       commanders[theirSide] = opponentCommander ?? (s.commander === 'cyrus' ? 'astyages' : 'cyrus');
 
+      const opened = startMatch(battle, useSeed, useArena, decks, commanders);
       set({
         battleId,
-        matchState: startMatch(battle, useSeed, useArena, decks, commanders),
+        matchState: opened,
+        recording: beginRecording(opened, mySide),
         log: null,
         screen: 'battle',
         // Every vs-AI match gets a named opponent, so the board always has a
@@ -537,6 +549,11 @@ export const useGame = create<State>((set, get) => {
       const { matchState, battleId } = get();
       if (!matchState || !battleId || !bothChosen(matchState)) return;
       const battle = getBattle(battleId);
+      // Recorded BEFORE the commit — the only moment both picks and the reroll
+      // counts that produced them are still on the state; nextRound clears the
+      // rerolls and the offer they derived is then unreproducible.
+      const { recording } = get();
+      if (recording) set({ recording: recordRound(recording, matchState) });
       const committed = commitPicks(matchState);
       const squadFor = (side: Side): Squad => {
         const c = getCommander(committed.commanders[side]);
@@ -552,7 +569,7 @@ export const useGame = create<State>((set, get) => {
       const squadB = squadFor('b');
       // One seed per round, derived from the match seed — so both clients watch
       // the identical fight without the server ever simulating one.
-      const roundSeed = (matchState.seed ^ ((matchState.round * 0x5bf03635) >>> 0)) >>> 0;
+      const roundSeed = roundSeedFor(matchState.seed, matchState.round);
       const log = simulate(battle, squadA, squadB, roundSeed, committed.round);
       set({ matchState: committed, log, turnDeadline: null });
     },
@@ -578,6 +595,11 @@ export const useGame = create<State>((set, get) => {
       const { battleId, matchState, log } = s;
       if (!battleId || !matchState || !log) return;
       const battle = getBattle(battleId);
+
+      // Keep the tape. Its own storage key, and failure there is swallowed —
+      // a recording is the one thing in this app that is safe to lose, and it
+      // must never be able to cost somebody their collection.
+      if (s.recording) saveRecording(s.recording);
 
       const mySide: Side = s.mode === 'online' && s.match ? s.match.you : 'a';
       const mission = matchState.missionId ? getMission(matchState.missionId) : null;
@@ -693,6 +715,7 @@ export const useGame = create<State>((set, get) => {
         missionId,
         screen: 'result',
         matchState: null,
+        recording: null,
         log: null,
       });
       persist();
@@ -804,6 +827,7 @@ net.onMessage((msg: ServerMessage) => {
         useGame.setState({
           match: null,
           matchState: null,
+          recording: null,
           log: null,
           searching: false,
           turnDeadline: null,

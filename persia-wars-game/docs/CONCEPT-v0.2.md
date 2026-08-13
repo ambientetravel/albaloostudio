@@ -698,10 +698,18 @@ cancelled, and the habit is printed on the rival's nameplate beside the CPU tag.
 Two findings in DECISIONS.md, including that counter-weighting turned out to be
 competence rather than personality (90/10 before it was equalised).
 
-Still open: `RecordedRivalDecisionProvider`. It was specified as "reading the
-existing replay log" and **there is no replay log** — nothing records a match's
-decision sequence. That has to be built before rivals can be recorded, so M6 is
-really recorder → provider → backfill.
+The recorder now exists too. A match is stored as its decisions — battle, seed,
+arena, decks, commanders, then per round the rerolls and the two card ids — and
+replayed through the same pure simulation. Measured: **867 bytes** for a full
+seven-round match, replaying to a byte-identical `MatchState`, verified both
+across 40 simulated matches and on a real one played through the UI. Finished
+tapes go to their own localStorage key, newest first, capped at 24.
+
+Still open: wiring `recordedRivalPick` in as an actual opponent — the function
+and its honesty flag are built and tested, but nothing in the game yet drafts
+from a stored tape. That last step is where the §10 labelling has to land, since
+a rival that is part recording and part scoring function must not be shown as a
+person.
 
 Explicitly out, per §17: live ranked, clans, chat, subscriptions, loot boxes, fantasy
 units, the other twelve books, a city builder.
