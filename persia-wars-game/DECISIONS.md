@@ -1274,3 +1274,47 @@ The restriction does not live in the screen that happens to be showing.
 GDPR-K says 13-16 depending on the country, and the UK's Age Appropriate Design
 Code applies to under-18s regardless. A lawyer decides; this provides the
 mechanism to implement whatever they decide.
+
+
+## The age gate is gone, and that is the better answer
+
+Built yesterday, removed today, on a one-line challenge: *why do we have young
+and adult from the beginning?*
+
+Checking it rather than defending it settled it in three facts. The audience is
+nine to fourteen, so an adult path serves almost nobody — and it existed only to
+grant the single privilege that carries all of the risk. The bracket was read
+for exactly one decision, whether a name could be typed. And §17 rules out chat,
+clans and subscriptions, so nothing else was ever going to read it.
+
+That is a standard compliance pattern applied without asking whether this
+product needed it. **A gate manages a risk. Deleting the free-text field removes
+it.** Nobody types a name now; everyone picks one from a closed set of 144.
+
+What the removal bought, all of it real:
+
+- One screen fewer before a child can play.
+- No birth year asked, and no age stored even as a bracket — the save file no
+  longer has the field at all.
+- **No profanity list, ever.** It was on the M7 list an hour ago. There is now
+  no user-generated text anywhere in the product for it to moderate.
+- The server checks set MEMBERSHIP instead of string shape. The old
+  `sanitizeName` stripped disallowed characters and truncated to 14, which would
+  have passed any slur spelled in letters. A modified client can no longer put
+  arbitrary text in front of another player at all.
+
+Two things the sweep turned up. `SettingsModal` had a SECOND name field — a
+pencil opening a text input — which the store would now have silently
+overruled, so the player would have typed a name and watched it change. It
+re-rolls instead. And Vite's HMR kept serving the deleted `AgeGate.tsx` until
+the dev server was restarted, which briefly looked like a source error and was
+not; the production build was clean throughout.
+
+Verified live on a fresh install: no gate, no text field anywhere, the shuffle
+varies both words, the saved name is the one shown, the settings pencil
+re-rolls, and `saveProfile('Alireza', …)` called straight on the store saves
+'Swift Lion' instead.
+
+Not a loss of expression: a player still chooses from 144 titles plus a badge
+and a banner, and 'Quiet Falcon' is a better name for a nine-year-old's warband
+than anything they would have typed.

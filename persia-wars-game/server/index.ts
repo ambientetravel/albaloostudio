@@ -34,6 +34,7 @@ import {
   type OfferCard,
   type Side,
 } from '../src/sim/roundCore.ts';
+import { assignedName, isAssignedName } from '../src/game/playerNames.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dataDir = join(here, '..', 'src', 'content', 'data');
@@ -279,12 +280,19 @@ function send(p: Player, msg: unknown): void {
   if (p.ws.readyState === p.ws.OPEN) p.ws.send(JSON.stringify(msg));
 }
 
+/**
+ * Names come from a closed set of 144, so this checks MEMBERSHIP rather than
+ * shape — and that is the whole point of closing the set.
+ *
+ * The old version stripped disallowed characters and truncated to 14, which is
+ * a shape check: it would have passed any slur that happened to be spelled in
+ * letters. Enforcing membership means a modified client cannot put arbitrary
+ * text in front of another player at all, and the game needs no profanity list
+ * in any language — there is no user-generated text left in it to filter.
+ */
 function sanitizeName(raw: unknown): string {
-  return String(raw ?? '')
-    .replace(/[^\p{L}\p{N} _-]/gu, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 14);
+  const name = String(raw ?? '').trim();
+  return isAssignedName(name) ? name : assignedName(name.length);
 }
 
 function broadcastStats(): void {

@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { assignedName, mayTypeOwnName } from '../game/age';
-import { NAME_MAX, NAME_MIN, isValidName, sanitizeName } from '../net/protocol';
+import { assignedName } from '../game/playerNames';
 import { useGame } from '../state/store';
 import { Avatar } from './Avatar';
 import { AVATARS } from './avatars';
@@ -12,59 +11,33 @@ import { ACHAEMENID_PALETTE, bannerAt } from './palette';
  * matches, so it is sanitised here and again on the server.
  */
 export function ProfileScreen() {
-  const { profile, saveProfile, ageBracket } = useGame();
-  // Under the line, a name is chosen FOR the player rather than typed. The one
-  // thing this game broadcasts to a stranger is the display name, and the
-  // audience is nine to fourteen — a free-text field here is the whole risk.
-  const canType = mayTypeOwnName(ageBracket ?? 'child');
+  const { profile, saveProfile } = useGame();
+  // Nobody types a name. The display name is the only thing this game sends to
+  // a stranger and the audience is nine to fourteen, so it is chosen from a
+  // closed set rather than typed — which removes the risk instead of gating it.
   const [shuffle, setShuffle] = useState(0);
-  const [typed, setTyped] = useState(profile?.name ?? '');
-  const name = canType ? typed : assignedName(shuffle);
-  const setName = setTyped;
+  const name = assignedName(shuffle);
   const [avatar, setAvatar] = useState(profile?.avatar ?? 0);
   const [banner, setBanner] = useState(profile?.banner ?? 0);
-  const ok = isValidName(name);
   const chosen = bannerAt(banner);
 
   return (
     <div className="screen profile-screen">
-      <h2>{canType ? 'Choose your name' : 'Your name'}</h2>
-      <p className="muted">
-        {canType
-          ? 'Other players will see this when you play online.'
-          : 'This is the name other players will see. Tap for a different one.'}
-      </p>
+      <h2>Choose your name</h2>
+      <p className="muted">This is what other players see. Tap for a different one.</p>
 
       <div className="profile-preview" style={{ background: chosen.hex, color: chosen.ink }}>
         <Avatar index={avatar} size={80} />
-        <span className="profile-preview__name">{sanitizeName(name) || 'Player'}</span>
+        <span className="profile-preview__name">{name}</span>
       </div>
 
-      {canType ? (
-        <label className="field">
-          <span>Name</span>
-          <input
-            className="text-input"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-            maxLength={NAME_MAX + 4}
-            autoComplete="off"
-            spellCheck={false}
-          />
-          <span className={`field__hint${name && !ok ? ' is-bad' : ''}`}>
-            {NAME_MIN}–{NAME_MAX} characters, letters and numbers
-          </span>
-        </label>
-      ) : (
-        <button
-          className="btn btn--teal name-shuffle"
-          type="button"
-          onClick={() => setShuffle((n) => n + 1)}
-        >
-          Give me a different name
-        </button>
-      )}
+      <button
+        className="btn btn--teal name-shuffle"
+        type="button"
+        onClick={() => setShuffle((n) => n + 1)}
+      >
+        Give me a different name
+      </button>
 
       <p className="settings-label">Pick a badge</p>
       <div className="avatar-grid">
@@ -106,7 +79,6 @@ export function ProfileScreen() {
       <button
         className="btn btn--gold btn--big"
         type="button"
-        disabled={!ok}
         onClick={() => saveProfile(name, avatar, banner)}
       >
         LET&apos;S GO

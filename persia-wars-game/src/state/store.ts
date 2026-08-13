@@ -35,7 +35,7 @@ import {
   type CampaignState,
 } from '../game/campaign';
 import { net, type ConnState } from '../net/client';
-import { sanitizeName, type PlayerInfo, type ServerMessage } from '../net/protocol';
+import { type PlayerInfo, type ServerMessage } from '../net/protocol';
 import { aiRoundPick, makeOpponent, type AiOpponent } from '../sim/ai';
 import { simulate, type Squad } from '../sim/battle';
 import {
@@ -59,12 +59,11 @@ import {
   type MatchRecording,
 } from '../sim/recording';
 import { loadRecordings, saveRecording } from '../game/recordings';
-import { assignedName, isAssignedName, mayTypeOwnName, type AgeBracket } from '../game/age';
+import { assignedName, isAssignedName } from '../game/playerNames';
 import { roundSeedFor } from '../sim/roundCore.ts';
 import type { BattleLog, Side } from '../sim/types';
 
 export type Screen =
-  | 'age'
   | 'profile'
   | 'lobby'
   | 'collection'
@@ -112,11 +111,6 @@ export type Collection = Record<string, CardState>;
 
 interface Saved {
   profile: Profile | null;
-  /**
-   * The age BRACKET only — never a birth date. Nothing here needs one, and a
-   * children's app should not be holding one. See game/age.ts.
-   */
-  ageBracket: AgeBracket | null;
   reading: Reading;
   settings: Settings;
   wallet: Wallet;
@@ -145,7 +139,6 @@ function freshSave(): Saved {
   for (const id of STARTER_UNITS) collection[id] = { count: 0, level: 1 };
   return {
     profile: null,
-    ageBracket: null,
     reading: 'kid',
     settings: { sfxVolume: 100, musicVolume: 100, haptics: true },
     wallet: { coins: 500, gems: 25 },
@@ -240,8 +233,6 @@ interface State extends Saved {
   setReading: (r: Reading) => void;
   setSettings: (patch: Partial<Settings>) => void;
   go: (screen: Screen) => void;
-  /** Records the bracket and moves on to the name. */
-  setAgeBracket: (bracket: AgeBracket) => void;
   dismissNotice: () => void;
   notify: (message: string) => void;
 
@@ -323,7 +314,6 @@ function randomSeed(): number {
 function savedSlice(s: State): Saved {
   return {
     profile: s.profile,
-    ageBracket: s.ageBracket,
     reading: s.reading,
     settings: s.settings,
     wallet: s.wallet,
@@ -351,10 +341,7 @@ export const useGame = create<State>((set, get) => {
 
   return {
     ...load(),
-    // The gate comes before the name, because the answer decides whether a name
-    // may be typed at all. An existing save with a profile but no bracket is
-    // from before the gate existed — it is asked once, then never again.
-    screen: !load().ageBracket ? 'age' : load().profile ? 'lobby' : 'profile',
+    screen: load().profile ? 'lobby' : 'profile',
     mode: 'ai',
     battleId: null,
     matchState: null,
@@ -380,16 +367,10 @@ export const useGame = create<State>((set, get) => {
       // A player who may not type their own name gets an assigned one whatever
       // arrives here — the restriction is enforced at the store, not only in the
       // screen that happens to be showing.
-      const bracket = get().ageBracket ?? 'child';
-      // A restricted player still CHOOSES, from the shuffle — so an assigned
-      // name that arrives here is kept. Only something they could not have been
-      // offered is replaced, which is what makes this an enforcement point
-      // rather than a second, contradictory name generator.
-      const name = mayTypeOwnName(bracket)
-        ? sanitizeName(rawName) || 'Player'
-        : isAssignedName(rawName)
-          ? rawName
-          : assignedName(avatar * 31 + banner * 7);
+      // Nobody types a name. The player CHOOSES one from the shuffle, so a name
+      // from the set is kept as chosen; anything else — a modified client, an
+      // older save — is replaced. Enforced here rather than in the screen.
+      const name = isAssignedName(rawName) ? rawName : assignedName(avatar * 31 + banner * 7);
       set({ profile: { name, avatar, banner }, screen: 'lobby' });
       persist();
       get().connect();
@@ -402,11 +383,6 @@ export const useGame = create<State>((set, get) => {
 
     setSettings: (patch) => {
       set({ settings: { ...get().settings, ...patch } });
-      persist();
-    },
-
-    setAgeBracket: (bracket) => {
-      set({ ageBracket: bracket, screen: get().profile ? 'lobby' : 'profile' });
       persist();
     },
 

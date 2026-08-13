@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NAME_MAX, NAME_MIN, isValidName, sanitizeName } from '../net/protocol';
+import { assignedName, isAssignedName } from '../game/playerNames';
 import { TOTAL_UNIT_CARDS, totalCardsCollected, useGame } from '../state/store';
 import { Avatar } from './Avatar';
 import { AVATARS } from './avatars';
@@ -48,14 +48,15 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
 
 function ProfileTab() {
   const { profile, saveProfile, wins, losses, bestTrophies, collection, reading, setReading } = useGame();
-  const [name, setName] = useState(profile?.name ?? '');
+  const [name, setName] = useState(
+    isAssignedName(profile?.name ?? '') ? (profile?.name ?? '') : assignedName(0),
+  );
+  const [shuffle, setShuffle] = useState(0);
   const [avatar, setAvatar] = useState(profile?.avatar ?? 0);
   const [banner, setBanner] = useState(profile?.banner ?? 0);
-  const [editingName, setEditingName] = useState(false);
 
   const played = wins + losses;
   const rate = played > 0 ? Math.round((wins / played) * 100) : 0;
-  const ok = isValidName(name);
   const chosen = bannerAt(banner);
 
   // Saving from here keeps the player on the lobby; the modal closes over it.
@@ -65,37 +66,25 @@ function ProfileTab() {
 
   return (
     <>
+      {/* The pencil re-rolls rather than opening a field. Nobody types a name
+          in this game — see game/playerNames.ts — and a text box here would be
+          a second way in that the store would silently overrule anyway. */}
       <div className="edit-row">
-        {editingName ? (
-          <input
-            className="text-input"
-            value={name}
-            autoFocus
-            maxLength={NAME_MAX + 4}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={() => {
-              if (ok) commit({ name });
-              setEditingName(false);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && ok) {
-                commit({ name });
-                setEditingName(false);
-              }
-            }}
-          />
-        ) : (
-          <span className="edit-row__value">{sanitizeName(name) || 'Player'}</span>
-        )}
-        <button className="pencil" type="button" onClick={() => setEditingName(true)} aria-label="Edit name">
-          ✎
+        <span className="edit-row__value">{name}</span>
+        <button
+          className="pencil"
+          type="button"
+          onClick={() => {
+            const next = assignedName(shuffle + 1);
+            setShuffle((n) => n + 1);
+            setName(next);
+            commit({ name: next });
+          }}
+          aria-label="Give me a different name"
+        >
+          ⟳
         </button>
       </div>
-      {editingName && (
-        <p className={`field__hint${name && !ok ? ' is-bad' : ''}`}>
-          {NAME_MIN}–{NAME_MAX} characters, letters and numbers
-        </p>
-      )}
 
       <p className="settings-label">Badge</p>
       <div className="avatar-grid">

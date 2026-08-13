@@ -725,19 +725,24 @@ this is generation time, not engineering.
 twelve claims that must not ship as fact without a sign-off. This needs a
 historian, not a developer.
 
-**Shipping — M7, started.** The age gate is in: a birth-year question before the
-name, only the resulting BRACKET stored, and under 16 the display name is chosen
-from a shuffle rather than typed. That last part is the point — the display name
-is the only thing this game broadcasts to a stranger, and the first screen used
-to ask a nine-year-old for it by name. Enforced in the store, not the screen.
+**Shipping — M7, started.** No age gate, and that is the decision rather than an
+omission. One was built — birth year, three brackets, typed names for adults —
+and then removed, because it was the wrong shape for this game. The audience is
+nine to fourteen, so the adult path served almost nobody; the bracket was read
+for exactly one decision; and §17 rules out chat, clans and subscriptions, so
+nothing else would ever read it.
 
-**The thresholds still need a lawyer.** COPPA draws at 13, GDPR-K lets each
-member state pick 13-16, and the UK Age Appropriate Design Code covers under-18s
-regardless. What is built is a mechanism with a defensible default, not a ruling.
+**Nobody types a name.** Every player picks one from a closed set of 144
+adjective-noun titles. A gate manages a risk; deleting the free-text field
+removes it. There is now no user-generated text anywhere in the product, which
+means: one screen fewer before a child can play, no birth year asked, no age
+stored even as a bracket, and no profanity list to build or maintain in any
+language. The server checks set MEMBERSHIP rather than string shape, so a
+modified client cannot put arbitrary text in front of another player at all.
 
 Still open in M7: mobile packaging (Capacitor), account persistence beyond
-localStorage, a moderation list for names (protocol.ts still only shape-checks),
-and store compliance paperwork.
+localStorage, and store compliance paperwork. The moderation list that was on
+this list is no longer needed — there is nothing left for it to moderate.
 Explicitly out, per §17: live ranked, clans, chat, subscriptions, loot boxes, fantasy
 units, the other twelve books, a city builder.
 
