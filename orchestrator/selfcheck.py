@@ -1858,5 +1858,94 @@ ok("report shows the tier order",
 ok("report includes out-of-scope section", "Out-of-scope notes" in md6)
 ok("report credits Albaloo Studio", "Albaloo Studio" in md6)
 
+# ---------------------------------------------------------------- cost
+# What a run spent. Added 14 Aug 2026, when enabling billing on the Gemini key
+# turned "the pipeline does not record token counts" from a curiosity into a
+# blind spot: both providers returned usage on every call and the scout logged
+# it and dropped it, so no manifest could say what a run cost.
+print("\n=== what a run costs ===")
+
+ok("a known model is priced", config.estimate_cost_usd("gemini-2.5-flash", 1_000_000, 0) == 0.30)
+ok("output is priced separately from input",
+   config.estimate_cost_usd("gemini-2.5-flash", 0, 1_000_000) == 2.50)
+# A versioned model name must inherit the family rate, or every routine model
+# rename silently turns a priced run into an unpriced one.
+ok("a versioned variant inherits the family rate",
+   config.estimate_cost_usd("gemini-2.5-flash-preview-09-2025", 1_000_000, 0) == 0.30)
+# Longest prefix wins: -flash is a prefix of -flash-lite, and matching it first
+# would bill the cheaper model at three times its rate.
+ok("a longer model name is not swallowed by a shorter prefix",
+   config.estimate_cost_usd("gemini-2.5-flash-lite", 1_000_000, 0) == 0.10)
+# The single most important assertion here: an unknown model must NOT price
+# as zero. A run that reports $0.00 because nobody entered a rate reads as free.
+ok("an unpriced model returns None, never 0.0",
+   config.estimate_cost_usd("some-model-nobody-priced", 1_000_000, 1_000_000) is None)
+ok("an empty model name returns None", config.estimate_cost_usd("", 1000, 1000) is None)
+_prices = os.environ.get("TOKEN_PRICES_JSON")
+os.environ["TOKEN_PRICES_JSON"] = '{"gemini-2.5-flash": [1.00, 1.00]}'
+ok("TOKEN_PRICES_JSON overrides a built-in rate without a code change",
+   config.estimate_cost_usd("gemini-2.5-flash", 1_000_000, 0) == 1.00)
+os.environ["TOKEN_PRICES_JSON"] = "{not json"
+ok("a malformed price override falls back rather than raising",
+   config.estimate_cost_usd("gemini-2.5-flash", 1_000_000, 0) == 0.30)
+os.environ.pop("TOKEN_PRICES_JSON", None)
+if _prices is not None:
+    os.environ["TOKEN_PRICES_JSON"] = _prices
+
+# Agent 1 — every provider names the token fields differently, and a provider
+# whose names are unhandled contributes a silent zero.
+_a1 = _a1sp
+_a1._USAGE.clear()
+_a1._record_usage("a.ir", "gemini-2.5-flash",
+                  type("U", (), {"prompt_token_count": 100, "candidates_token_count": 50})())
+_a1._record_usage("b.ir", "claude-sonnet-5",
+                  type("U", (), {"input_tokens": 200, "output_tokens": 60})())
+_a1._record_usage("c.ir", "gpt-4.1",
+                  type("U", (), {"prompt_tokens": 300, "completion_tokens": 70})())
+_u1 = _a1._usage_summary()
+ok("Gemini token field names are counted", _u1["by_domain"]["a.ir"]["input_tokens"] == 100)
+ok("Anthropic token field names are counted", _u1["by_domain"]["b.ir"]["input_tokens"] == 200)
+ok("OpenAI token field names are counted", _u1["by_domain"]["c.ir"]["input_tokens"] == 300)
+ok("one unpriced model makes the RUN total unpriced",
+   _u1["estimated_cost_usd"] is None and _u1["unpriced_models"] == ["gpt-4.1"])
+_a1._USAGE.pop("c.ir")
+ok("and the total resolves once every model is priced",
+   _a1._usage_summary()["estimated_cost_usd"] is not None)
+_a1._record_usage("a.ir", "gemini-2.5-flash",
+                  type("U", (), {"prompt_token_count": 100, "candidates_token_count": 50})())
+ok("repeat calls to one domain accumulate rather than overwrite",
+   _a1._usage_summary()["by_domain"]["a.ir"]["calls"] == 2)
+_a1._record_usage("d.ir", "gemini-2.5-flash", None)
+ok("a response carrying no usage is not counted as a call",
+   "d.ir" not in _a1._usage_summary()["by_domain"])
+_a1._USAGE.clear()
+
+# Agent 2 — a draft the compliance gate blocked was still generated and billed.
+_a2 = a2b
+_mk = lambda m, i, o, st: _a2.Outcome(brief_file="x", status=st, model=m,
+                                      input_tokens=i, output_tokens=o)
+_u2 = _a2._usage_summary([_mk("gemini-2.5-flash", 1000, 500, "drafted"),
+                          _mk("gemini-2.5-flash", 1000, 500, "blocked"),
+                          _mk("", 0, 0, "skipped")])
+ok("a blocked draft still counts as spend", _u2["calls"] == 2)
+ok("a skipped brief never counts as spend", _u2["input_tokens"] == 2000)
+ok("Agent 2 totals its cost",
+   _u2["estimated_cost_usd"] == round((2000 * 0.30 + 1000 * 2.50) / 1e6, 6),
+   _u2["estimated_cost_usd"])
+ok("Agent 2 reports unpriced rather than free",
+   _a2._usage_summary([_mk("mystery-model", 1000, 500, "drafted")])["estimated_cost_usd"] is None)
+
+# Both manifests must actually carry it — the "added in one file, ignored in
+# another" bug has shipped four times in this repo.
+ok("Agent 1 puts usage in the manifest",
+   '"usage": _usage_summary()' in pathlib.Path("agent1_seo_scout.py").read_text(encoding="utf-8"))
+ok("Agent 2 puts usage in the manifest",
+   '"usage": _usage_summary(outcomes)' in pathlib.Path("agent2_writer_batch.py").read_text(encoding="utf-8"))
+# ...and both workflows must render it, or it is a number nobody ever sees.
+for _wf in ("agent1-seo-scout", "agent2-writer"):
+    _y = pathlib.Path(f"../.github/workflows/{_wf}.yml").read_text(encoding="utf-8")
+    ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
+    ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

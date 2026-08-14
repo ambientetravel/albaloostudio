@@ -129,7 +129,80 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 # Seconds between Agent 1's per-property Gemini calls. The free tier's ceiling
 # is requests-per-minute, and the scout otherwise fires ten in a row.
+#
+# This is a FREE-TIER workaround, not a politeness setting. On a billed key the
+# ceiling rises by orders of magnitude and 20s per property is pure wall-clock
+# for nothing — eight properties spend 2m40s asleep. Drop it to 1 in the same
+# change that enables billing, by setting the GEMINI_MIN_INTERVAL_S repository
+# variable. It is deliberately left high by default so that turning billing OFF
+# again does not silently start tripping 429s.
 GEMINI_MIN_INTERVAL_S = float(os.getenv("GEMINI_MIN_INTERVAL_S", "20"))
+
+# ── What a run costs ────────────────────────────────────────────────────────
+#
+# USD per MILLION tokens, (input, output). These are an ASSUMPTION, not a
+# measurement: the pipeline cannot read a vendor's price list, and rates change
+# without notice. They are recorded here, with the date they were entered, so
+# that a number in a run summary can always be traced to a stated rate rather
+# than looking like something the pipeline knows.
+#
+# Verify against the vendor's current pricing page before trusting a total, and
+# override without a code change by setting TOKEN_PRICES_JSON, e.g.
+#     TOKEN_PRICES_JSON='{"gemini-2.5-flash": [0.30, 2.50]}'
+#
+# A model that is not in this table is reported as UNPRICED — tokens counted,
+# cost blank. Guessing a rate for an unknown model would produce a total that
+# looks authoritative and is fiction.
+_DEFAULT_TOKEN_PRICES: dict[str, tuple[float, float]] = {
+    # Entered 14 Aug 2026.
+    "gemini-2.5-flash": (0.30, 2.50),
+    "gemini-2.5-flash-lite": (0.10, 0.40),
+    "gemini-2.0-flash": (0.10, 0.40),
+    "claude-opus-5": (5.00, 25.00),
+    "claude-sonnet-5": (3.00, 15.00),
+    "claude-haiku-4-5-20251001": (1.00, 5.00),
+}
+
+
+def token_prices() -> dict[str, tuple[float, float]]:
+    """The price table, with any TOKEN_PRICES_JSON override merged over it."""
+    prices = dict(_DEFAULT_TOKEN_PRICES)
+    raw = os.getenv("TOKEN_PRICES_JSON", "").strip()
+    if not raw:
+        return prices
+    try:
+        for model, pair in json.loads(raw).items():
+            prices[str(model)] = (float(pair[0]), float(pair[1]))
+    except Exception:
+        # A malformed override must not take the run down over a cost estimate.
+        pass
+    return prices
+
+
+def estimate_cost_usd(model: str, input_tokens: int, output_tokens: int) -> float | None:
+    """
+    Cost of one call, or None when the model is not priced.
+
+    None is a real answer and callers must render it as "unpriced" rather than
+    coercing it to 0.0 — a run that silently reports $0.00 because nobody
+    entered a rate is worse than one that says it does not know.
+    """
+    if not model:
+        return None
+    prices = token_prices()
+    rate = prices.get(model)
+    if rate is None:
+        # Vendors version model names ("-preview", a date suffix) far faster
+        # than a price table gets updated, and those variants price the same as
+        # the family. Longest prefix wins so -flash-lite never matches -flash.
+        for name in sorted(prices, key=len, reverse=True):
+            if model.startswith(name):
+                rate = prices[name]
+                break
+    if rate is None:
+        return None
+    return (input_tokens or 0) / 1_000_000 * rate[0] + \
+           (output_tokens or 0) / 1_000_000 * rate[1]
 
 # Claude Opus 5 is the default for Agents 3 and 4. Notes that matter for the
 # request shape on this model family:

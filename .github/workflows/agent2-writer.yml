@@ -203,6 +203,19 @@ jobs:
                     f"busy.** Overloaded or rate-limited; the reason for each is "
                     f"under *Not drafted* below. Nothing is wrong with these briefs "
                     f"and nothing needs fixing; they draft on the next run.\n")
+          u = m.get("usage") or {}
+          if u.get("calls"):
+              cost = u.get("estimated_cost_usd")
+              # "unpriced" and "$0.00" mean opposite things and the difference
+              # is the whole point of printing this. A missing rate must never
+              # render as free.
+              shown = f"~${cost:.4f}" if cost is not None else (
+                  f"unpriced ({', '.join(u.get('unpriced_models') or ['unknown model'])})")
+              print(f"**Tokens** — {u['input_tokens']:,} in / {u['output_tokens']:,} out "
+                    f"over {u['calls']} call(s) · estimated cost **{shown}**  \n")
+              print("<sub>Cost uses the rate table in `config.py`, which is a recorded "
+                    "assumption, not a live price. Verify against the vendor's pricing "
+                    "page; override with `TOKEN_PRICES_JSON`.</sub>\n")
           if m.get("domains_written"):
               print(f"Sites written: {', '.join(m['domains_written'])}\n")
           if m.get("domains_skipped"):

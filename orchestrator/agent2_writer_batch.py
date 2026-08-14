@@ -80,6 +80,39 @@ class Outcome:
     error: str = ""
     violations: list[dict[str, Any]] = field(default_factory=list)
     warnings: int = 0
+    # What this one article cost to draft. _call_gemini already returned these
+    # and only build_publishing_event ever looked at them, so the counts reached
+    # the event file and never the manifest — the one place anybody reads.
+    model: str = ""
+    input_tokens: int = 0
+    output_tokens: int = 0
+
+
+def _usage_summary(outcomes: list["Outcome"]) -> dict[str, Any]:
+    """
+    What this run spent on drafting, totalled from the per-article counts.
+
+    Cost is None — rendered "unpriced" — the moment any model in the run has no
+    entry in the price table, rather than being silently totalled as if the
+    unpriced calls were free.
+    """
+    billed = [o for o in outcomes if o.input_tokens or o.output_tokens]
+    priced, total = True, 0.0
+    for o in billed:
+        c = config.estimate_cost_usd(o.model, o.input_tokens, o.output_tokens)
+        if c is None:
+            priced = False
+        else:
+            total += c
+    return {
+        "calls": len(billed),
+        "input_tokens": sum(o.input_tokens for o in billed),
+        "output_tokens": sum(o.output_tokens for o in billed),
+        "estimated_cost_usd": round(total, 6) if priced and billed else None,
+        "unpriced_models": sorted({o.model for o in billed
+                                   if config.estimate_cost_usd(
+                                       o.model, o.input_tokens, o.output_tokens) is None}),
+    }
 
 
 def _draft_surface(draft: dict[str, Any]) -> str:
@@ -169,6 +202,11 @@ def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
         # snapshot the model saw, or it is checking a different article.
         data = _resolve_data_dependencies(brief)
         draft, gen_meta = _stub_draft(brief) if no_llm else _call_gemini(brief, data)
+        # Captured here rather than after the compliance gate: a draft that is
+        # blocked downstream was still generated and still billed.
+        oc.model = gen_meta.get("model", "") or ""
+        oc.input_tokens = int(gen_meta.get("input_tokens") or 0)
+        oc.output_tokens = int(gen_meta.get("output_tokens") or 0)
         oc.words = len(draft.get("body_markdown", "").split())
 
         ctx = {
@@ -361,6 +399,7 @@ def main(argv: list[str] | None = None) -> int:
         "drafted": sum(o.status == "drafted" for o in outcomes),
         "blocked": sum(o.status == "blocked" for o in outcomes),
         "failed": sum(o.status == "failed" for o in outcomes),
+        "usage": _usage_summary(outcomes),
         "outcomes": [o.__dict__ for o in outcomes],
     }
     (out_dir / "manifest.json").write_text(

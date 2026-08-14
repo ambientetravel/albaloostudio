@@ -735,6 +735,7 @@ def analyse_gaps(
         content = resp.choices[0].message.content or "{}"
         briefs = _briefs_from(content)
         usage = getattr(resp, "usage", None)
+        _record_usage(site.domain, config.OPENAI_MODEL, usage)
         if usage:
             log.info(
                 "%s — OpenAI %s: %s in / %s out",
@@ -820,6 +821,11 @@ def _analyse_with_gemini(
         try:
             text, usage = _gemini_generate(system, prompt, model_name)
             briefs = _briefs_from(text)
+            # Recorded BEFORE the empty-briefs check below. A call that came
+            # back unusable still consumed tokens and still gets billed, so
+            # attributing spend only to successful calls under-reports exactly
+            # the runs that went wrong.
+            _record_usage(site.domain, model_name, usage)
             if usage:
                 log.info("%s — Gemini %s: %s in / %s out", site.domain, model_name,
                          getattr(usage, "prompt_token_count", "?"),
@@ -991,6 +997,8 @@ def _analyse_with_anthropic(
         ).strip()
         briefs = _briefs_from(text)
         usage = getattr(resp, "usage", None)
+        _record_usage(site.domain,
+                      getattr(resp, "model", config.GAP_ANALYSIS_MODEL), usage)
         if usage:
             log.info(
                 "%s — Claude %s: %s in / %s out", site.domain,
@@ -1023,6 +1031,80 @@ _PROVIDER_DOWN: dict[str, str] = {}
 
 # When the last Gemini call went out, so per-site calls can be spaced.
 _GEMINI_LAST_CALL: dict[str, float] = {"at": 0.0}
+
+# What this run has spent, per domain. Both providers hand back token counts on
+# every response and the scout logged them and dropped them, so the run manifest
+# could say how many briefs it produced but not what they cost — which is
+# tolerable on a free key and not tolerable on a billed one. Accumulated here in
+# the same module-state idiom as the two dicts above, and totalled into the
+# manifest by main().
+_USAGE: dict[str, dict[str, Any]] = {}
+
+
+def _record_usage(domain: str, model: str, usage: Any) -> None:
+    """
+    Add one call's tokens to the run total.
+
+    Never raises. Every SDK reports usage as an optional attribute on the
+    response and any field can be absent or None; a cost estimate is not worth
+    failing a run that otherwise produced good briefs.
+
+    All three providers this scout can use name the fields differently, and the
+    names are checked in one place rather than at each call site so that adding
+    a provider cannot quietly contribute zero:
+
+        Gemini    prompt_token_count / candidates_token_count
+        Anthropic input_tokens       / output_tokens
+        OpenAI    prompt_tokens      / completion_tokens
+    """
+    if usage is None:
+        return
+
+    def _first(*names: str) -> int:
+        for n in names:
+            v = getattr(usage, n, None)
+            if v:
+                return int(v)
+        return 0
+
+    in_t = _first("prompt_token_count", "input_tokens", "prompt_tokens")
+    out_t = _first("candidates_token_count", "output_tokens", "completion_tokens")
+    bucket = _USAGE.setdefault(
+        domain, {"model": model, "calls": 0, "input_tokens": 0, "output_tokens": 0})
+    bucket["model"] = model or bucket["model"]
+    bucket["calls"] += 1
+    bucket["input_tokens"] += int(in_t)
+    bucket["output_tokens"] += int(out_t)
+
+def _usage_summary() -> dict[str, Any]:
+    """
+    What this run spent, ready for the manifest.
+
+    `estimated_cost_usd` is None when any model in the run is unpriced, and the
+    workflow renders that as "unpriced" rather than as zero. Reporting a
+    confident $0.00 because a rate is missing is the failure mode this whole
+    block exists to avoid.
+    """
+    per_domain = {d: dict(v) for d, v in _USAGE.items()}
+    priced = True
+    total_cost = 0.0
+    for d, v in per_domain.items():
+        c = config.estimate_cost_usd(v["model"], v["input_tokens"], v["output_tokens"])
+        v["estimated_cost_usd"] = None if c is None else round(c, 6)
+        if c is None:
+            priced = False
+        else:
+            total_cost += c
+    return {
+        "calls": sum(v["calls"] for v in per_domain.values()),
+        "input_tokens": sum(v["input_tokens"] for v in per_domain.values()),
+        "output_tokens": sum(v["output_tokens"] for v in per_domain.values()),
+        "estimated_cost_usd": round(total_cost, 6) if priced else None,
+        "unpriced_models": sorted({v["model"] for v in per_domain.values()
+                                   if v["estimated_cost_usd"] is None}),
+        "by_domain": per_domain,
+    }
+
 
 def _fallback_brief(site: Site, c: dict[str, Any], reason: str = "") -> dict[str, Any]:
     """
@@ -1554,6 +1636,7 @@ def main(argv: list[str] | None = None) -> int:
             for key in ("gsc_rows", "candidates", "briefs_emitted", "delivered",
                         "dlq", "blocked", "degraded_briefs")
         },
+        "usage": _usage_summary(),
     }
     (run_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
