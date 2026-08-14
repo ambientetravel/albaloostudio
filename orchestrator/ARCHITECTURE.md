@@ -207,6 +207,42 @@ Setup, once:
 4. Repeat signed in as **contactmozaffari@gmail.com** for the remaining
    properties.
 5. Verify: `python agent1_seo_scout.py --list-properties` must print eight rows.
+
+### 3.2 Which Google account holds which credential
+
+Recorded 14 Aug 2026 after a browser audit of both accounts, because nothing
+wrote it down the first time and re-deriving it cost an hour. The pipeline
+authenticates by key, never by account, so this matters only when a credential
+has to be **billed, rotated or replaced** — which is exactly when nobody
+remembers.
+
+| Credential | Google account | Cloud project | Project ID |
+|---|---|---|---|
+| `GEMINI_API_KEY` | `contactmozaffari@` | Default Gemini Project | `gen-lang-client-0161776641` |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | `alimozzarella@` *(inferred)* | albaloo-orchestrator | `albaloo-orchestrator` |
+
+**How the Gemini row was established**, since four keys exist across two
+accounts and their names are identical: `GEMINI_API_KEY` first entered the
+workflows in `41745f6` on **11 Aug 2026**, and the `contactmozaffari@` keys were
+created **11 Aug 2026**. The `alimozzarella@` keys predate the pipeline by three
+months (1 May 2026). Both `contactmozaffari@` keys sit in the *same* project, so
+billing does not require knowing which of the two is in the secret — billing is
+per project, not per key.
+
+**How the service-account row was inferred:** the address is
+`albaloo-orchestrator@albaloo-orchestrator.iam.gserviceaccount.com`, and the
+segment before `.iam.gserviceaccount.com` **is** the project ID — so the project
+is deliberately named `albaloo-orchestrator`, not auto-generated. It is absent
+from `contactmozaffari@`'s Resource Manager, which leaves `alimozzarella@`.
+Marked *inferred* rather than confirmed for the reason below.
+
+> ⚠️ **`alimozzarella@` is currently locked out of Google Cloud.** Google now
+> enforces 2-step verification on it and Resource Manager refuses to load,
+> offering only an "Enable MFA" button. That account is the probable home of the
+> service-account project — the single credential the entire Search Console read
+> path depends on. Nothing breaks while the existing JSON key keeps working, but
+> **that key cannot be rotated, and the project cannot be administered, until
+> 2SV is enabled on the account.** Enable it; do not wait for the day it matters.
    If it prints fewer, step 3/4 was missed on the difference — the script names
    the missing ones explicitly.
 
