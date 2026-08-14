@@ -219,7 +219,7 @@ remembers.
 | Credential | Google account | Cloud project | Project ID |
 |---|---|---|---|
 | `GEMINI_API_KEY` | `contactmozaffari@` | Default Gemini Project | `gen-lang-client-0161776641` |
-| `GOOGLE_SERVICE_ACCOUNT_JSON` | `alimozzarella@` *(inferred)* | albaloo-orchestrator | `albaloo-orchestrator` |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | **unknown — not either of these** | albaloo-orchestrator | `albaloo-orchestrator` |
 
 **How the Gemini row was established**, since four keys exist across two
 accounts and their names are identical: `GEMINI_API_KEY` first entered the
@@ -229,20 +229,36 @@ months (1 May 2026). Both `contactmozaffari@` keys sit in the *same* project, so
 billing does not require knowing which of the two is in the secret — billing is
 per project, not per key.
 
-**How the service-account row was inferred:** the address is
-`albaloo-orchestrator@albaloo-orchestrator.iam.gserviceaccount.com`, and the
-segment before `.iam.gserviceaccount.com` **is** the project ID — so the project
-is deliberately named `albaloo-orchestrator`, not auto-generated. It is absent
-from `contactmozaffari@`'s Resource Manager, which leaves `alimozzarella@`.
-Marked *inferred* rather than confirmed for the reason below.
+**The service account's project is real, active, and nobody knows where it is.**
+Its address is `albaloo-orchestrator@albaloo-orchestrator.iam.gserviceaccount.com`
+and the segment before `.iam.gserviceaccount.com` **is** the project ID — so
+`albaloo-orchestrator` was named deliberately, not auto-generated. That it still
+*works* is the proof it exists: a service account cannot authenticate out of a
+deleted project, and Agent 1 reads all ten properties with it every run.
 
-> ⚠️ **`alimozzarella@` is currently locked out of Google Cloud.** Google now
-> enforces 2-step verification on it and Resource Manager refuses to load,
-> offering only an "Enable MFA" button. That account is the probable home of the
-> service-account project — the single credential the entire Search Console read
-> path depends on. Nothing breaks while the existing JSON key keeps working, but
-> **that key cannot be rotated, and the project cannot be administered, until
-> 2SV is enabled on the account.** Enable it; do not wait for the day it matters.
+It was first guessed to be under `alimozzarella@`. That was checked on 14 Aug
+2026 once 2SV was enabled there, and **disproved** — both `alimozzarella@` and
+`contactmozaffari@` hold exactly one project each, the auto-created
+`Default Gemini Project`, with nothing pending deletion. So it belongs to a
+third Google account. `ARCHITECTURE.md` §3.1 already notes the portfolio spans
+more than two — `ambienteturizm@` and `cruisebazonline@` are the known
+candidates.
+
+> ⚠️ **Do not read a permission-denied page as proof of existence.** Opening
+> `…/iam-admin/serviceaccounts?project=albaloo-orchestrator` from an account
+> without access returns *"You need additional access to the project"*, listing
+> `iam.serviceAccounts.list` and `resourcemanager.projects.get` as missing.
+> Google returns that identical page whether the project does not exist **or**
+> exists under an account you are not signed into. It narrows nothing. The only
+> page that answers the question is Resource Manager, signed in as the owner.
+
+**Why this is worth closing.** Nothing breaks today. But the key cannot be
+rotated, the project's API quotas cannot be seen, and if that account is ever
+lost or hit with an enforcement change — exactly what just happened to
+`alimozzarella@` — the Search Console read path for all ten properties dies with
+no way to repair it in place. The fallback is not catastrophic but it is not
+cheap either: create a fresh service account in a project that is definitely
+controlled, then re-grant it on all ten properties, one owning account at a time.
    If it prints fewer, step 3/4 was missed on the difference — the script names
    the missing ones explicitly.
 
