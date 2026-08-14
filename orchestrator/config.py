@@ -186,6 +186,41 @@ def token_prices() -> dict[str, tuple[float, float]]:
     return prices
 
 
+# The brake, in USD per run. A Google Cloud free trial is a hard cap — credit
+# runs out and everything stops, with the card never charged. Upgrading to
+# pay-as-you-go removes that cap: spend accrues and the card is billed at a
+# threshold. A Cloud budget only emails; it does not stop anything (its
+# spend-cap enforcement is preview-only and does not clearly cover the
+# Generative Language API). So the only brake that actually exists is this one,
+# and it lives here because this code is what does the spending.
+#
+# An observed run is ~$0.11 for eight properties and ~$0.02 for five articles,
+# so $1.00 is roughly 9x headroom — high enough never to fire on a normal run,
+# low enough that a loop calling the model a thousand times cannot quietly cost
+# real money. Raise it deliberately with MAX_RUN_COST_USD; set 0 to disable.
+MAX_RUN_COST_USD = float(os.getenv("MAX_RUN_COST_USD", "1.00"))
+
+
+def over_budget(spent_usd: float | None) -> str:
+    """
+    Reason string when a run has spent its ceiling, or "" to continue.
+
+    A None cost means the model is unpriced, and an unpriced model must NOT be
+    treated as free — but it must not halt the run either, since a missing rate
+    is a bookkeeping gap and not evidence of overspending. Unpriced spend is
+    therefore allowed through and reported, which is why every summary names the
+    unpriced model rather than burying it.
+    """
+    if MAX_RUN_COST_USD <= 0 or spent_usd is None:
+        return ""
+    if spent_usd < MAX_RUN_COST_USD:
+        return ""
+    return (f"run cost ceiling reached — estimated ${spent_usd:.4f} spent, "
+            f"limit ${MAX_RUN_COST_USD:.2f} (MAX_RUN_COST_USD). No further "
+            f"model calls this run; nothing is wrong with the remaining work "
+            f"and it is retried on the next run.")
+
+
 def estimate_cost_usd(model: str, input_tokens: int, output_tokens: int) -> float | None:
     """
     Cost of one call, or None when the model is not priced.

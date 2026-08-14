@@ -1947,5 +1947,56 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== the run cost ceiling ===")
+# Added 14 Aug 2026, when the Cloud billing account was upgraded from a free
+# trial to pay-as-you-go. The trial was a HARD cap — credit ran out, everything
+# stopped, the card was never charged. Postpay has no cap, and a Cloud budget
+# only sends email. This is the only brake that actually stops anything.
+_mx = config.MAX_RUN_COST_USD
+ok("a run under the ceiling continues", config.over_budget(_mx * 0.5) == "")
+ok("a run at the ceiling stops", config.over_budget(_mx) != "")
+ok("a run over the ceiling stops", config.over_budget(_mx * 10) != "")
+ok("the halt reason names the limit and the spend",
+   "MAX_RUN_COST_USD" in config.over_budget(_mx) and "$" in config.over_budget(_mx))
+# The dangerous case: unpriced must not read as free, and must not read as
+# infinite either. It is a bookkeeping gap, not evidence of overspending — so
+# it is reported (every summary names the unpriced model) and allowed through.
+ok("an unpriced run does not halt on a missing rate", config.over_budget(None) == "")
+_saved = config.MAX_RUN_COST_USD
+config.MAX_RUN_COST_USD = 0
+ok("setting the ceiling to 0 disables the brake", config.over_budget(9999.0) == "")
+config.MAX_RUN_COST_USD = _saved
+ok("the default ceiling is well above a real run, and finite",
+   0 < config.MAX_RUN_COST_USD < 100, config.MAX_RUN_COST_USD)
+
+# Agent 1 halts by setting _PROVIDER_DOWN, so every remaining property takes the
+# existing degraded path and the cause is stated once rather than per site.
+_a1sp._USAGE.clear()
+_a1sp._PROVIDER_DOWN.clear()
+_a1sp._record_usage("spendy.ir", "gemini-2.5-pro",
+                    type("U", (), {"prompt_token_count": 50_000_000,
+                                   "candidates_token_count": 50_000_000})())
+_over = _a1sp._usage_summary()["estimated_cost_usd"]
+ok("a runaway run is priced far above the ceiling",
+   _over > config.MAX_RUN_COST_USD * 100, _over)
+ok("and over_budget halts on it", config.over_budget(_over) != "")
+_a1sp._USAGE.clear()
+_a1sp._PROVIDER_DOWN.clear()
+ok("the guard leaves no state behind for the next run",
+   not _a1sp._PROVIDER_DOWN and not _a1sp._USAGE)
+
+# Both agents must actually consult it — the "added in one file, ignored in
+# another" bug has now shipped five times in this repo.
+_src1 = pathlib.Path("agent1_seo_scout.py").read_text(encoding="utf-8")
+_src2 = pathlib.Path("agent2_writer_batch.py").read_text(encoding="utf-8")
+ok("Agent 1 consults the ceiling before calling a provider",
+   "config.over_budget(" in _src1)
+ok("Agent 2 consults the ceiling between articles",
+   "config.over_budget(" in _src2)
+# Indexing the remaining briefs by len(outcomes) is wrong — unreadable files
+# append failures before the loop, so the two counts differ.
+ok("Agent 2 defers the remainder by loop index, not by len(outcomes)",
+   "for i, payload in enumerate(selected)" in _src2 and "selected[i:]" in _src2)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

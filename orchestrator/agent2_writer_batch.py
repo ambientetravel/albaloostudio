@@ -364,7 +364,27 @@ def main(argv: list[str] | None = None) -> int:
         log.warning("--limit %d: writing %d of %d eligible briefs, %d deferred "
                     "to the next run", args.limit, args.limit, len(eligible), deferred)
 
-    for payload in selected:
+    for i, payload in enumerate(selected):
+        # Stop spending, do not fail. Each article is a separate model call, so
+        # the ceiling is checked between them rather than inside one — a single
+        # draft cannot overshoot by much, a hundred of them can. Remaining
+        # briefs are deferred, which already means "nothing is wrong with these,
+        # they run next time".
+        #
+        # Indexed by enumerate, not by len(outcomes): unreadable files above
+        # already appended failures, so the two are not the same number and
+        # slicing by the wrong one would silently skip or duplicate briefs.
+        halt = config.over_budget(_usage_summary(outcomes)["estimated_cost_usd"])
+        if halt:
+            log.error("BUDGET: %s", halt)
+            for rest in selected[i:]:
+                outcomes.append(Outcome(
+                    brief_file=rest.get("envelope", {}).get("message_id", "unknown"),
+                    domain=str(rest.get("site", {}).get("domain", "")),
+                    keyword=str(rest.get("brief", {}).get("primary_keyword", "")),
+                    status="deferred", error=halt))
+            break
+
         oc = write_one(payload, out_dir, dry_run=args.dry_run, no_llm=args.no_llm)
         outcomes.append(oc)
         log.info("%s — %s — %r → %s%s",

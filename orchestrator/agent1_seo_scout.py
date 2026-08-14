@@ -674,6 +674,16 @@ def analyse_gaps(
     if not candidates:
         return []
 
+    # Checked before the provider-down gate so that the ceiling is recorded as
+    # the reason rather than whatever the next call happens to fail with. Sets
+    # _PROVIDER_DOWN so every remaining property takes the same path and the
+    # cause is stated once — the run does not fail, it stops spending.
+    if not _PROVIDER_DOWN.get("reason"):
+        halt = config.over_budget(_usage_summary()["estimated_cost_usd"])
+        if halt:
+            _PROVIDER_DOWN["reason"] = halt
+            log.error("BUDGET: %s", halt)
+
     if _PROVIDER_DOWN.get("reason"):
         # Already established, on an earlier site, that this account cannot call
         # the model at all. Asking again produces the same 400 and a second
