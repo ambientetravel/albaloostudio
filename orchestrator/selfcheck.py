@@ -1947,6 +1947,31 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== a 429 that waiting will never fix ===")
+# Run #21, 14 Aug 2026. Gemini answered 429 RESOURCE_EXHAUSTED carrying
+# "Your prepayment credits are depleted" — an exhausted BALANCE wearing a
+# throttle's status code. rate_limited() matched on "429"/"RESOURCE_EXHAUSTED"
+# and so treated it as transient: three retries for one property, and thirty
+# across the full portfolio, every one certain to fail.
+_DEPLETED = ("429 RESOURCE_EXHAUSTED. {'error': 'code': 429, 'message': 'Your "
+             "prepayment credits are depleted. Please go to AI Studio at "
+             "https://ai.studio/projects to manage your project and billing. "
+             "Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay.")
+ok("a depleted prepay balance is NOT rate limiting", not config.rate_limited(_DEPLETED))
+ok("a depleted prepay balance IS terminal", bool(config.terminal_provider_error(_DEPLETED)))
+# The regression that matters: a real per-minute 429 must still retry, or the
+# fix for one failure mode silently creates another.
+ok("a genuine per-minute 429 is still rate limiting",
+   config.rate_limited("429 RESOURCE_EXHAUSTED: quota exceeded for requests per minute"))
+ok("...and is still NOT terminal",
+   not config.terminal_provider_error("429 quota exceeded for requests per minute"))
+ok("limit: 0 remains a false 429",
+   not config.rate_limited("429 RESOURCE_EXHAUSTED ... limit: 0 ..."))
+ok("Anthropic's exhausted balance is still terminal",
+   bool(config.terminal_provider_error("Your credit balance is too low")))
+ok("classification is case-insensitive",
+   not config.rate_limited(_DEPLETED.upper()) and not config.rate_limited(_DEPLETED.lower()))
+
 print("\n=== the run cost ceiling ===")
 # Added 14 Aug 2026, when the Cloud billing account was upgraded from a free
 # trial to pay-as-you-go. The trial was a HARD cap — credit ran out, everything

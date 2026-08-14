@@ -54,6 +54,22 @@ _TERMINAL_PROVIDER_ERRORS = (
     "authentication_error",
     "permission_error",
     "insufficient_quota",
+    # Gemini's version of "credit balance is too low", and it arrives dressed as
+    # a 429 RESOURCE_EXHAUSTED, which is why it slipped past rate_limited() and
+    # got retried three times per property on 14 Aug. Depleted credits are not
+    # restored by waiting.
+    "credits are depleted",
+    "prepayment credit",
+)
+
+# 429s that are NOT rate limiting. Both are plan/balance problems wearing a
+# throttle's status code, and retrying either returns the identical answer.
+_FALSE_429S = (
+    # The model is absent from the plan entirely, so every retry returns zero.
+    "limit: 0",
+    # Prepaid balance exhausted — only a purchase changes this, never a wait.
+    "credits are depleted",
+    "prepayment credit",
 )
 
 
@@ -65,15 +81,24 @@ def rate_limited(msg: str) -> bool:
     queue problem, not a plan problem, and the fix is to wait — so it must not
     be reported as a failed run.
 
-    "limit: 0" is the one 429 that is NOT this: it means the model is absent
-    from the plan entirely, so every retry returns the same zero. Agent 2
-    learned that distinction the expensive way in August; keeping both agents on
-    one definition is how it stays learned.
+    Not every 429 is one. Two are plan-or-balance problems wearing a throttle's
+    status code, and retrying either returns the identical answer:
+
+      * `limit: 0` — the model is absent from the plan entirely. Agent 2 learned
+        that one the expensive way in August.
+      * `prepayment credits are depleted` — Gemini's exhausted-balance error,
+        which arrives as `429 RESOURCE_EXHAUSTED` and so matched this function
+        exactly. On 14 Aug it was retried three times for one property and would
+        have been thirty calls across the full portfolio, every one of them
+        certain to fail, before anything said why.
+
+    Keeping both agents on one definition is how the distinction stays learned.
     """
-    m = msg.upper()
-    if "LIMIT: 0" in m:
+    m = msg.lower()
+    if any(s in m for s in _FALSE_429S):
         return False
-    return "429" in m or "RESOURCE_EXHAUSTED" in m or "RATE LIMIT" in m
+    u = msg.upper()
+    return "429" in u or "RESOURCE_EXHAUSTED" in u or "RATE LIMIT" in u
 
 
 def transport_error(msg: str) -> bool:
