@@ -285,14 +285,36 @@ So the split is deliberate:
 If `albaloo-orchestrator` ever does need billing, disable the unused APIs
 **first**, then link it.
 
-**A Google Cloud free trial does NOT put the Gemini API on the paid tier.**
-Measured 14 Aug 2026, after linking a trial billing account to
-`gen-lang-client-0161776641`: AI Studio's *Billing Tier* column stopped saying
-`Free tier` and started saying **`Activate billing` / `Free trial`** — which is
-neither. The trial grants credit, not a tier. Free-tier requests-per-minute and
-per-day ceilings still apply, so the degraded runs this was meant to fix
-continue until the billing account is **upgraded to pay-as-you-go**. Linking
-billing is necessary and not sufficient; the upgrade is the step that matters.
+**Google Cloud billing does not fund the Gemini API. Prepay does.** This cost
+most of 14 Aug 2026 to establish, so the whole chain is recorded:
+
+| Step taken | AI Studio *Billing Tier* | API result |
+|---|---|---|
+| no billing at all | `Free tier` | free-tier ceilings |
+| Cloud trial billing account linked | `Activate billing` / `Free trial` | free-tier ceilings |
+| upgraded trial → pay-as-you-go | `Activate billing` / `Free trial` | **429 credits depleted** |
+| prepay credits purchased | `Tier 1` *(expected)* | paid limits |
+
+Three findings, each of which cost a round trip:
+
+1. **Prepay is the default for Gemini API accounts created after 23 March 2026**
+   and applies globally — it is not a Turkey or TRY peculiarity, which is what
+   the TRY billing currency first suggested. AI Studio → Billing states it
+   outright: *"Prepay is required for this billing account."*
+2. **Google Cloud free-trial credit cannot pay for the Gemini API.** Google's
+   billing docs say so directly: *"the Google Cloud Welcome credit or free trial
+   credit can't be used towards the Gemini API or AI Studio."* The ₺14,219 of
+   trial credit is worth nothing here. Separate pools.
+3. **Linking a Cloud billing account and upgrading it are both necessary and
+   neither is sufficient.** The account links correctly, the upgrade completes,
+   the tier column does not move, and the API answers 429 *"Your prepayment
+   credits are depleted"* — a **balance** error wearing a throttle's status
+   code, which is why `config.rate_limited()` had to learn about it.
+
+The remaining step is a purchase on AI Studio → Billing → **Set up prepay**.
+Minimum is **$10 or local equivalent**, and $10 is what qualifies an account for
+Tier 1. Against an observed ~$0.11 per weekly run that is well over a year of
+operation, so it is bought once and forgotten rather than topped up.
 
 Two other things the console does that the older instructions above assume it
 does not:
