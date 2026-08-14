@@ -293,7 +293,7 @@ most of 14 Aug 2026 to establish, so the whole chain is recorded:
 | no billing at all | `Free tier` | free-tier ceilings |
 | Cloud trial billing account linked | `Activate billing` / `Free trial` | free-tier ceilings |
 | upgraded trial → pay-as-you-go | `Activate billing` / `Free trial` | **429 credits depleted** |
-| prepay credits purchased | `Tier 1` *(expected)* | paid limits |
+| prepay credits purchased | **`Tier 1 · Prepay`** *(confirmed 14 Aug 2026)* | paid limits |
 
 Three findings, each of which cost a round trip:
 
