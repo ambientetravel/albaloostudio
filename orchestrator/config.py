@@ -158,6 +158,13 @@ _DEFAULT_TOKEN_PRICES: dict[str, tuple[float, float]] = {
     "gemini-2.5-flash": (0.30, 2.50),
     "gemini-2.5-flash-lite": (0.10, 0.40),
     "gemini-2.0-flash": (0.10, 0.40),
+    # Priced ahead of being usable. Pro is absent from the free tier entirely —
+    # it answers 429 "limit: 0" — so it becomes selectable on the same day
+    # billing is enabled, which is precisely the day a missing rate would turn
+    # every cost line into "unpriced". Note the ratio before switching: Pro is
+    # ~4x Flash on both sides, and gap analysis (classify, dedupe, rank,
+    # outline against a fixed schema) is not work that needs it.
+    "gemini-2.5-pro": (1.25, 10.00),
     "claude-opus-5": (5.00, 25.00),
     "claude-sonnet-5": (3.00, 15.00),
     "claude-haiku-4-5-20251001": (1.00, 5.00),
