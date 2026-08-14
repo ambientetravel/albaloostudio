@@ -285,6 +285,35 @@ So the split is deliberate:
 If `albaloo-orchestrator` ever does need billing, disable the unused APIs
 **first**, then link it.
 
+**A Google Cloud free trial does NOT put the Gemini API on the paid tier.**
+Measured 14 Aug 2026, after linking a trial billing account to
+`gen-lang-client-0161776641`: AI Studio's *Billing Tier* column stopped saying
+`Free tier` and started saying **`Activate billing` / `Free trial`** — which is
+neither. The trial grants credit, not a tier. Free-tier requests-per-minute and
+per-day ceilings still apply, so the degraded runs this was meant to fix
+continue until the billing account is **upgraded to pay-as-you-go**. Linking
+billing is necessary and not sufficient; the upgrade is the step that matters.
+
+Two other things the console does that the older instructions above assume it
+does not:
+
+* **Budgets can now enforce, not just alert.** Budget creation offers
+  `Alerts only` and `Spend cap enforcement` *(Preview, "limited services")*,
+  the latter pausing usage at the cap. This pipeline uses **Alerts only** on
+  purpose: the preview does not clearly cover the Generative Language API, and
+  a cap that pauses mid-run converts a small cost problem into an outage. The
+  $5-equivalent alert plus a sub-$1 monthly spend is the control.
+* **Budget scope silently defaults to the whole billing account.** The
+  per-project checkbox is greyed out when only one project exists, so the
+  budget reads `Applies to: This billing account`. Equivalent today, wrong the
+  day a second project joins — re-scope then via Budgets & alerts → the budget
+  → Scope → Projects.
+
+The billing account was registered in **Turkey**, so it bills in **TRY**, not
+EUR. Country is fixed at creation and cannot be changed afterwards. Immaterial
+at this spend, but it means the cost does not land on the Ambiente Tours GmbH
+books; a second billing account would be needed if that is ever wanted.
+
 **What remains open.** The key still cannot expire and will not prompt for
 rotation, so rotating it is a calendar decision. Access is at least no longer a
 mystery: it is `albaloostudio@`, recorded above.
