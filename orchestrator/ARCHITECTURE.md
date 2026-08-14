@@ -219,7 +219,12 @@ remembers.
 | Credential | Google account | Cloud project | Project ID |
 |---|---|---|---|
 | `GEMINI_API_KEY` | `contactmozaffari@` | Default Gemini Project | `gen-lang-client-0161776641` |
-| `GOOGLE_SERVICE_ACCOUNT_JSON` | **unknown — not either of these** | albaloo-orchestrator | `albaloo-orchestrator` |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | `albaloostudio@` | albaloo-orchestrator | `albaloo-orchestrator` |
+
+The portfolio spans **six** signed-in Google accounts, which is why this took
+three passes to pin down: `alimozzarella@`, `contactmozaffari@`,
+`ambienteturizm@`, `cruisebazonline@`, `albaloostudio@`, `mozzafiatojourney@`.
+Only two of them own a Cloud project at all.
 
 **How the Gemini row was established**, since four keys exist across two
 accounts and their names are identical: `GEMINI_API_KEY` first entered the
@@ -229,20 +234,24 @@ months (1 May 2026). Both `contactmozaffari@` keys sit in the *same* project, so
 billing does not require knowing which of the two is in the secret — billing is
 per project, not per key.
 
-**The service account's project is real, active, and nobody knows where it is.**
-Its address is `albaloo-orchestrator@albaloo-orchestrator.iam.gserviceaccount.com`
-and the segment before `.iam.gserviceaccount.com` **is** the project ID — so
-`albaloo-orchestrator` was named deliberately, not auto-generated. That it still
-*works* is the proof it exists: a service account cannot authenticate out of a
-deleted project, and Agent 1 reads all ten properties with it every run.
+**The service account lives under `albaloostudio@`**, confirmed 14 Aug 2026 by
+opening Resource Manager as each signed-in account in turn. `albaloo-orchestrator`
+is that account's only project. State as observed:
 
-It was first guessed to be under `alimozzarella@`. That was checked on 14 Aug
-2026 once 2SV was enabled there, and **disproved** — both `alimozzarella@` and
-`contactmozaffari@` hold exactly one project each, the auto-created
-`Default Gemini Project`, with nothing pending deletion. So it belongs to a
-third Google account. `ARCHITECTURE.md` §3.1 already notes the portfolio spans
-more than two — `ambienteturizm@` and `cruisebazonline@` are the known
-candidates.
+* service account `albaloo-orchestrator@albaloo-orchestrator.iam.gserviceaccount.com` — **Enabled**
+* **exactly one** JSON key, created **8 Aug 2026**, active — so there are no
+  stray downloaded credentials in circulation, which was the real worry
+* Google Search Console API enabled and **working**: 7 requests in 24h, 0% errors
+* **no billing account linked** — and §3.3 explains why it must stay that way
+
+The key's expiry reads `Jan 1, 10000`. GCP service-account keys **do not expire**;
+rotation is a manual discipline, not something the platform will ever prompt for.
+
+Two earlier guesses were wrong and are recorded so they are not repeated: it was
+assumed to be under whichever account created it per `SETUP-GSC.md` ("either
+account"), then inferred to `alimozzarella@`. Both `alimozzarella@` and
+`contactmozaffari@` in fact hold one auto-created `Default Gemini Project` each
+and nothing else.
 
 > ⚠️ **Do not read a permission-denied page as proof of existence.** Opening
 > `…/iam-admin/serviceaccounts?project=albaloo-orchestrator` from an account
@@ -252,13 +261,33 @@ candidates.
 > exists under an account you are not signed into. It narrows nothing. The only
 > page that answers the question is Resource Manager, signed in as the owner.
 
-**Why this is worth closing.** Nothing breaks today. But the key cannot be
-rotated, the project's API quotas cannot be seen, and if that account is ever
-lost or hit with an enforcement change — exactly what just happened to
-`alimozzarella@` — the Search Console read path for all ten properties dies with
-no way to repair it in place. The fallback is not catastrophic but it is not
-cheap either: create a fresh service account in a project that is definitely
-controlled, then re-grant it on all ten properties, one owning account at a time.
+### 3.3 Bill the Gemini project. Never bill `albaloo-orchestrator`.
+
+The tidy-looking move is to put everything in `albaloo-orchestrator` and bill
+one project. **Do not.** That project has **23 APIs enabled** — the default set
+Google switches on for a new project — of which 22 have never served a request.
+Among them are BigQuery (API, Storage, Connection, Data Transfer, Reservation,
+Migration, Data Policy), Analytics Hub, Dataform, Dataplex, Cloud Storage ×3,
+Datastore and Cloud SQL.
+
+While no billing account is linked, **none of that can charge anything** — an
+unbilled project is a hard ceiling, not a soft one. Linking billing would remove
+that ceiling for all 23 at once, and BigQuery and Cloud Storage are the classic
+sources of a bill nobody meant to run up.
+
+So the split is deliberate:
+
+| Project | Billing | Why |
+|---|---|---|
+| `gen-lang-client-0161776641` | **enable** | holds `GEMINI_API_KEY`; the only thing that needs a paid tier |
+| `albaloo-orchestrator` | **leave disabled** | Search Console API is free at this volume; staying unbilled guarantees the 22 idle APIs can never cost anything |
+
+If `albaloo-orchestrator` ever does need billing, disable the unused APIs
+**first**, then link it.
+
+**What remains open.** The key still cannot expire and will not prompt for
+rotation, so rotating it is a calendar decision. Access is at least no longer a
+mystery: it is `albaloostudio@`, recorded above.
    If it prints fewer, step 3/4 was missed on the difference — the script names
    the missing ones explicitly.
 
