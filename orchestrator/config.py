@@ -183,6 +183,19 @@ _DEFAULT_TOKEN_PRICES: dict[str, tuple[float, float]] = {
     "gemini-2.5-flash": (0.30, 2.50),
     "gemini-2.5-flash-lite": (0.10, 0.40),
     "gemini-2.0-flash": (0.10, 0.40),
+    # The `-latest` ALIASES, which is what resolve_model() actually settles on:
+    # run #22 reported `gemini-flash-latest` and the cost line read "unpriced"
+    # because only the pinned names were listed. Pinned names are the ones this
+    # key cannot use — 2.5-flash is withdrawn for keys issued after a certain
+    # date, and this key was created 11 Aug 2026 — so the alias is the normal
+    # case and the pinned name is the exception.
+    #
+    # An alias is a moving target: the price here is whatever the alias points
+    # at TODAY, and it can change without the model name changing. That is a
+    # real limitation and the reason every cost line says it is an assumption.
+    "gemini-flash-latest": (0.30, 2.50),
+    "gemini-flash-lite-latest": (0.10, 0.40),
+    "gemini-pro-latest": (1.25, 10.00),
     # Priced ahead of being usable. Pro is absent from the free tier entirely —
     # it answers 429 "limit: 0" — so it becomes selectable on the same day
     # billing is enabled, which is precisely the day a missing rate would turn
