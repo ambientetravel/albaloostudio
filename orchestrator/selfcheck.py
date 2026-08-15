@@ -1947,6 +1947,28 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== 'drafted' is not the same as 'published' ===")
+# Run #25, 14 Aug 2026: "2 drafted · 0 blocked · 0 deferred · 0 failed", zero
+# pull requests opened and zero files staged. _push_astro_pr caught its own
+# RequestException, returned the reason in `note`, and the summary printed none
+# of it — so two silent failures read as the cleanest run the pipeline had ever
+# produced. The status field answers "did the model write something", never
+# "did it reach anywhere".
+_oc = a2b.Outcome(brief_file="x", status="drafted")
+ok("an Outcome carries where the draft went",
+   hasattr(_oc, "pr_url") and hasattr(_oc, "staged_path") and hasattr(_oc, "cms_note"))
+_src2 = pathlib.Path("agent2_writer_batch.py").read_text(encoding="utf-8")
+ok("and write_one fills them from the adapter result",
+   'oc.pr_url = str(result.get("pr_url")' in _src2
+   and 'oc.cms_note = str(result.get("note")' in _src2)
+_wf2 = pathlib.Path("../.github/workflows/agent2-writer.yml").read_text(encoding="utf-8")
+ok("the summary reports where each draft went", "Where the drafts went" in _wf2)
+ok("a draft that reached nowhere is called out, not just listed",
+   "went nowhere" in _wf2 and "no pull request and no staged" in _wf2)
+# The failure mode that started this: neither a PR nor a staged path.
+ok("a lost draft is detected by having neither destination",
+   not _oc.pr_url and not _oc.staged_path)
+
 print("\n=== a 429 that waiting will never fix ===")
 # Run #21, 14 Aug 2026. Gemini answered 429 RESOURCE_EXHAUSTED carrying
 # "Your prepayment credits are depleted" — an exhausted BALANCE wearing a

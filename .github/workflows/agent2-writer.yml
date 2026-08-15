@@ -228,6 +228,30 @@ jobs:
           # A failed brief printed a row of zeros and nothing else, so the only
           # way to learn the cause was to expand a collapsed log step by hand.
           # Same gap Agent 1 had; same fix.
+          # Where each drafted article actually WENT. "drafted" only means the
+          # model produced text and the gate passed it — run #25 said "2 drafted"
+          # while the astro_pr adapter caught a RequestException on both, opened
+          # no pull request and staged no file, and nothing printed the reason.
+          done = [o for o in m["outcomes"] if o["status"] == "drafted"]
+          if done:
+              print("\n### Where the drafts went\n")
+              lost = []
+              for o in done:
+                  if o.get("pr_url"):
+                      print(f"- **{o['domain']}** — pull request: {o['pr_url']}")
+                  elif o.get("staged_path"):
+                      print(f"- **{o['domain']}** — staged to `{o['staged_path']}` "
+                            f"(not published): {o.get('cms_note') or 'no reason given'}")
+                  else:
+                      lost.append(o)
+                      print(f"- **{o['domain']}** — ⚠️ **no pull request and no staged "
+                            f"file**: {o.get('cms_note') or 'the adapter gave no reason'}")
+              if lost:
+                  print(f"\n> ### {len(lost)} article(s) were written and went nowhere\n>\n"
+                        f"> The model produced text and the compliance gate passed it, but "
+                        f"the CMS adapter neither published nor staged it. The words were "
+                        f"paid for and lost. This is a configuration or credential fault, "
+                        f"not a content one — the reason is on each line above.\n")
           failed = [o for o in m["outcomes"] if o["status"] in ("failed", "deferred")]
           if failed:
               print("\n### Not drafted\n")

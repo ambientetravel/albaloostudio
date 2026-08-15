@@ -86,6 +86,15 @@ class Outcome:
     model: str = ""
     input_tokens: int = 0
     output_tokens: int = 0
+    # What the CMS adapter actually achieved. "drafted" only ever meant "the
+    # model produced text and the gate passed it" — it says nothing about
+    # whether the article reached anywhere. Run #25 reported `2 drafted`, opened
+    # zero pull requests, and staged zero files: the astro_pr adapter caught its
+    # own RequestException, returned the reason in `note`, and nothing printed
+    # it. Two silent failures read as a clean run.
+    pr_url: str = ""
+    staged_path: str = ""
+    cms_note: str = ""
 
 
 def _usage_summary(outcomes: list["Outcome"]) -> dict[str, Any]:
@@ -226,6 +235,9 @@ def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
             return oc
 
         result = push_to_cms(brief, draft)
+        oc.pr_url = str(result.get("pr_url") or "")
+        oc.staged_path = str(result.get("staged_path") or "")
+        oc.cms_note = str(result.get("note") or "")
         event = build_publishing_event(brief, payload, draft, result, gen_meta, warnings, data)
 
         (out_dir / "events").mkdir(parents=True, exist_ok=True)
