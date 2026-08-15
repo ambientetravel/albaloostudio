@@ -736,7 +736,9 @@ nothing else would ever read it.
 reading-age feature — 24 of 25 units named a source in the long blurb and 1 of
 25 did in the short one, so the toggle was the evidence layer and it defaulted
 to off. Both texts are now shown to everyone: the hook on the card, the sourced
-paragraph in the codex detail beneath it.
+paragraph in the codex detail beneath it. The fields are `blurb` and `evidence`
+— they were `blurb`/`blurbOlder`, which went on claiming an age split after the
+product had stopped making one.
 
 **Nobody types a name.** Every player picks one from a closed set of 144
 adjective-noun titles. A gate manages a risk; deleting the free-text field

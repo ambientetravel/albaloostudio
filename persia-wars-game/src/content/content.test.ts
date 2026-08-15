@@ -278,14 +278,14 @@ describe('battles are not sited at places that did not exist yet', () => {
  *
  * Both are now shown to everyone, the short line as the hook and the long one
  * beneath it. These tests exist because a merge like that can quietly become a
- * deletion: with no toggle left to reveal it, a missing `blurbOlder` would just
+ * deletion: with no toggle left to reveal it, a missing `evidence` would just
  * look like a shorter card.
  */
 describe('the sourced text every card carries', () => {
   it('exists for every unit, and is not a copy of the short line', () => {
-    const missing = content.units.filter((u) => !u.blurbOlder?.trim());
+    const missing = content.units.filter((u) => !u.evidence?.trim());
     expect(missing.map((u) => u.id)).toEqual([]);
-    const duplicated = content.units.filter((u) => u.blurbOlder === u.blurb);
+    const duplicated = content.units.filter((u) => u.evidence === u.blurb);
     expect(duplicated.map((u) => u.id)).toEqual([]);
   });
 
@@ -293,7 +293,7 @@ describe('the sourced text every card carries', () => {
     // Not a style rule — the long text is where the attribution lives, and
     // attribution costs words.
     const tooShort = content.units
-      .filter((u) => u.blurbOlder.length <= u.blurb.length)
+      .filter((u) => u.evidence.length <= u.blurb.length)
       .map((u) => u.id);
     expect(tooShort).toEqual([]);
   });
@@ -303,14 +303,14 @@ describe('the sourced text every card carries', () => {
     // sourceless unit can be added, but a drift back toward unsourced flavour
     // fails.
     const cites = /Herodotus|Arrian|Strabo|Xenophon|Ctesias|Persepolis|relief|coin|daric|source|scholar|record/i;
-    const sourced = content.units.filter((u) => cites.test(u.blurbOlder));
+    const sourced = content.units.filter((u) => cites.test(u.evidence));
     expect(sourced.length).toBeGreaterThanOrEqual(content.units.length - 3);
   });
 
   it('carries the same for both battles and every upgrade and doctrine', () => {
-    for (const b of content.battles) expect(b.summaryOlder?.trim()).toBeTruthy();
+    for (const b of content.battles) expect(b.evidence?.trim()).toBeTruthy();
     for (const c of [...content.upgrades, ...content.doctrines]) {
-      expect(c.blurbOlder?.trim()).toBeTruthy();
+      expect(c.evidence?.trim()).toBeTruthy();
     }
   });
 });

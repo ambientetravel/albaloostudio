@@ -141,7 +141,7 @@ function CodexDetail({ id, onClose }: { id: string; onClose: () => void }) {
     bodyParts = [
       `${b.opponents.a} × ${b.opponents.b}`,
       b.summary,
-      b.summaryOlder,
+      b.evidence,
       `What really happened: ${b.victor}`,
     ];
     teaches = b.teaches;
@@ -164,7 +164,7 @@ function CodexDetail({ id, onClose }: { id: string; onClose: () => void }) {
     // reliefs and the daric live — 24 of 25 units cite a source there and 1 of
     // 25 does in the short line. Behind a settings toggle that defaulted to off,
     // almost nobody ever saw the half of this game that teaches how we know.
-    bodyParts = [u.blurb, u.blurbOlder];
+    bodyParts = [u.blurb, u.evidence];
     if (u.attestationNote) bodyParts.push(u.attestationNote);
     disputed = u.disputed;
     sources = u.sourceRefs;

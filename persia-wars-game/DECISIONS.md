@@ -1363,3 +1363,31 @@ flavour.
 
 Nothing was thrown away. Both texts are written, both are shown, and the
 specialist history review now covers text that players actually read.
+
+
+## `blurbOlder` was still claiming an audience that no longer exists
+
+Follow-up to the merge, on the right question: is there still a younger
+players' version?
+
+Not as a mode — that went with the toggle. But the FIELD was still called
+`blurbOlder`, and `summaryOlder` on battles, so the data model went on asserting
+an age split the product had stopped making. A name that describes a deleted
+feature is a lie the next person has to discover.
+
+The two texts are kept, because they do different jobs — and the jobs are about
+length and context, not age:
+
+- **`blurb`** is the hook. It appears on the draft card, which is read in about
+  two seconds while choosing under a timer against two other cards. One idea,
+  and it has to fit.
+- **`evidence`** is the same subject with its attribution — Herodotus, the
+  Persepolis reliefs, the gold daric. It appears in the codex, where there is
+  room. It is longer because attribution costs words.
+
+An adult drafting needs the short one too; a nine-year-old in the codex can read
+the long one. Neither text belongs to an age.
+
+Renamed across 53 data entries in six files, five type declarations, two screens
+and the content tests. Verified live afterwards: opening Persian Archer still
+gives three paragraphs ending in the daric and the Persepolis reliefs.

@@ -6,7 +6,7 @@
     "arena": 1,
     "consequence": "Your middle stands firm. Your wings give ground.",
     "blurb": "Put your best men in the middle and tell them not to move. The edges of the line will bend — that is the price, and you pay it on purpose.",
-    "blurbOlder": "The king and his guard stood in the centre of an Achaemenid line, and Greek accounts of Cunaxa and Gaugamela describe a Persian centre that held while the wings gave way. Concentrating strength somewhere means thinning it somewhere else.",
+    "evidence": "The king and his guard stood in the centre of an Achaemenid line, and Greek accounts of Cunaxa and Gaugamela describe a Persian centre that held while the wings gave way. Concentrating strength somewhere means thinning it somewhere else.",
     "confidence": "reconstructed-for-gameplay",
     "disputed": [
       "That the centre was deliberately reinforced at the expense of the wings is an inference from where the king stood, not a recorded doctrine."
@@ -15,7 +15,9 @@
       "https://www.iranicaonline.org/articles/army-i",
       "https://www.iranicaonline.org/articles/gaugamela"
     ],
-    "art": { "silhouette": "shield" }
+    "art": {
+      "silhouette": "shield"
+    }
   },
   {
     "id": "shoot-the-horses",
@@ -24,7 +26,7 @@
     "arena": 5,
     "consequence": "Every archer you have shoots at riders first, whatever else is closer.",
     "blurb": "A rider on foot is just a man. Ignore the infantry walking at you and put every arrow into the horses — then deal with what is left.",
-    "blurbOlder": "Bringing down the mount rather than the rider is the standard answer to cavalry across the ancient world, and it is a choice with a cost: while the archers are shooting at the wings, nothing is shooting at what is coming up the middle.",
+    "evidence": "Bringing down the mount rather than the rider is the standard answer to cavalry across the ancient world, and it is a choice with a cost: while the archers are shooting at the wings, nothing is shooting at what is coming up the middle.",
     "confidence": "reconstructed-for-gameplay",
     "disputed": [
       "Target priority is a game abstraction. No ancient source describes an Achaemenid rule for what archers shot at first."
@@ -33,7 +35,9 @@
       "https://www.iranicaonline.org/articles/archery-in-iran",
       "https://www.iranicaonline.org/articles/cavalry"
     ],
-    "art": { "silhouette": "bow" }
+    "art": {
+      "silhouette": "bow"
+    }
   },
   {
     "id": "broken-ground",
@@ -42,7 +46,7 @@
     "arena": 8,
     "consequence": "Your whole army fights better in a pass, and worse on open plain.",
     "blurb": "Learn to fight where there is no room. It will win you a gorge and lose you a field, so look at the ground before you take this.",
-    "blurbOlder": "Ariobarzanes held the Persian Gates against Alexander with a small force precisely because the ground took away everything a larger army could do with it. Troops trained for close country pay for it wherever the country is open.",
+    "evidence": "Ariobarzanes held the Persian Gates against Alexander with a small force precisely because the ground took away everything a larger army could do with it. Troops trained for close country pay for it wherever the country is open.",
     "confidence": "reconstructed-for-gameplay",
     "disputed": [
       "The Persian Gates action is attested; a standing doctrine of training for broken country is not. This card generalises one engagement into a choice."
@@ -51,6 +55,8 @@
       "https://www.iranicaonline.org/articles/persian-gates",
       "https://www.iranicaonline.org/articles/army-i"
     ],
-    "art": { "silhouette": "spear" }
+    "art": {
+      "silhouette": "spear"
+    }
   }
 ]

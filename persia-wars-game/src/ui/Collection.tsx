@@ -193,7 +193,7 @@ function CardDetail({ id, onClose }: { id: string; onClose: () => void }) {
             historian for this game.
           </p>
           <p>{spell.blurb}</p>
-          <p className="muted">{spell.blurbOlder}</p>
+          <p className="muted">{spell.evidence}</p>
           {spell.disputed.length > 0 && (
             <section className="disputed">
               <h4>What&apos;s disputed</h4>
@@ -236,7 +236,7 @@ function CardDetail({ id, onClose }: { id: string; onClose: () => void }) {
           {CLASS_LABEL[unit.class]} · Level {level} · Unlocks in {getArena(unit.arena).name}
         </p>
         <p>{unit.blurb}</p>
-        <p className="detail__evidence">{unit.blurbOlder}</p>
+        <p className="detail__evidence">{unit.evidence}</p>
 
         <dl className="stats stats--detail">
           <div>

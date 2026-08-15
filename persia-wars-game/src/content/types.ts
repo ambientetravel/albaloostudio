@@ -143,10 +143,23 @@ export interface Unit extends Sourced {
   counters: UnitClass[];
   counteredBy: UnitClass[];
 
-  /** Kid reading level. */
+  /**
+   * The hook. Shown on the draft card, which is read in about two seconds while
+   * choosing under a timer, so it has to be one idea and it has to fit.
+   */
   blurb: string;
-  /** Older reading level, toggled by the reading setting. */
-  blurbOlder: string;
+  /**
+   * The same subject with its ATTRIBUTION. Herodotus, the Persepolis reliefs,
+   * the gold daric — what we know this from, and how firmly.
+   *
+   * These were once `blurb` and `blurbOlder`, a kid/older reading toggle that
+   * defaulted to kid. That was never a reading-age split: 24 of 25 units named
+   * a source in the long text and 1 of 25 did in the short one, so the toggle
+   * was the evidence layer and it was off. Both are now shown to everyone — the
+   * hook on the card, this in the codex beneath it — and the field is named for
+   * the job it does rather than for an audience that no longer exists.
+   */
+  evidence: string;
 
   /**
    * Year this unit is first firmly attested in an Iranian army (negative = BCE).
@@ -173,7 +186,7 @@ export interface Spell extends Sourced {
   arena: number;
   kind: 'legend';
   blurb: string;
-  blurbOlder: string;
+  evidence: string;
   art: { silhouette: Silhouette };
 }
 
@@ -207,7 +220,7 @@ export interface Battle extends Sourced {
   onIranianSoil: boolean;
   site: string;
   summary: string;
-  summaryOlder: string;
+  evidence: string;
   teaches: string[];
   /** King ids unlocked in the codex by playing this scenario. */
   kings: string[];
@@ -250,7 +263,7 @@ interface Playable extends Sourced {
   arena: number;
   consequence: string;
   blurb: string;
-  blurbOlder: string;
+  evidence: string;
   art: { silhouette: Silhouette };
 }
 
@@ -287,7 +300,7 @@ export interface Commander extends Sourced {
   passive: { id: PassiveId; name: string; reads: string };
   order: { id: OrderId; name: string; reads: string; trigger: string };
   blurb: string;
-  blurbOlder: string;
+  evidence: string;
   art: { silhouette: Silhouette };
 }
 

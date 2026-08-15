@@ -3,11 +3,13 @@
     "id": "ready-volley",
     "name": "Ready Volley",
     "trait": "ready-volley",
-    "appliesTo": ["archer"],
+    "appliesTo": [
+      "archer"
+    ],
     "arena": 1,
     "consequence": "Archers loose before contact — but are caught flat-footed if anything reaches them.",
     "blurb": "Nock, draw, loose, again. Archers who start shooting sooner hurt the enemy on the way in — and have nothing to hide behind when the enemy arrives.",
-    "blurbOlder": "Persian archery worked at volume rather than at precision: massed shooting into an advancing formation, judged by rate rather than by aim. Starting the volleys earlier bought casualties on the approach at the cost of readiness for the moment of contact.",
+    "evidence": "Persian archery worked at volume rather than at precision: massed shooting into an advancing formation, judged by rate rather than by aim. Starting the volleys earlier bought casualties on the approach at the cost of readiness for the moment of contact.",
     "confidence": "reconstructed-for-gameplay",
     "disputed": [
       "The name is ours. No Achaemenid drill command is recorded; the trait abstracts what massed archery is described as doing, not a named formation."
@@ -16,17 +18,22 @@
       "https://www.iranicaonline.org/articles/archery-in-iran",
       "https://www.iranicaonline.org/articles/army-i"
     ],
-    "art": { "silhouette": "bow" }
+    "art": {
+      "silhouette": "bow"
+    }
   },
   {
     "id": "locked-shields",
     "name": "Locked Shields",
     "trait": "locked-shields",
-    "appliesTo": ["infantry", "heavy-infantry"],
+    "appliesTo": [
+      "infantry",
+      "heavy-infantry"
+    ],
     "arena": 2,
     "consequence": "The wall holds against horses. It takes the middle of the field and will not go past it.",
     "blurb": "Big wicker shields planted in the ground, edge to edge, and nobody steps out of line. Horses will not charge a solid wall — but a wall cannot chase anybody.",
-    "blurbOlder": "The spara was a standing shield of wicker and hide, planted rather than carried, with spearmen behind it and archers shooting over. It was built to stop a charge, which is the opposite of being built to pursue one.",
+    "evidence": "The spara was a standing shield of wicker and hide, planted rather than carried, with spearmen behind it and archers shooting over. It was built to stop a charge, which is the opposite of being built to pursue one.",
     "confidence": "reconstructed-for-gameplay",
     "disputed": [
       "That the spara wall was used as a fixed line is inferred from its construction and from Greek descriptions of Persian infantry; no Persian source describes the drill."
@@ -35,17 +42,22 @@
       "https://www.iranicaonline.org/articles/army-i",
       "https://www.iranicaonline.org/articles/sparabara"
     ],
-    "art": { "silhouette": "shield" }
+    "art": {
+      "silhouette": "shield"
+    }
   },
   {
     "id": "long-reach",
     "name": "Long Reach",
     "trait": "long-reach",
-    "appliesTo": ["infantry", "heavy-infantry"],
+    "appliesTo": [
+      "infantry",
+      "heavy-infantry"
+    ],
     "arena": 4,
     "consequence": "Strikes first when the lines meet. Does nothing at all at range.",
     "blurb": "A longer spear reaches the other man before his reaches you. That is the whole idea, and it is worth nothing to someone being shot at from a distance.",
-    "blurbOlder": "Spear length was a live argument across the ancient Mediterranean and Near East, and the side with the longer reach touched first in a clash. It bought nothing against archery, which is one reason infantry that relied on it needed screening.",
+    "evidence": "Spear length was a live argument across the ancient Mediterranean and Near East, and the side with the longer reach touched first in a clash. It bought nothing against archery, which is one reason infantry that relied on it needed screening.",
     "confidence": "reconstructed-for-gameplay",
     "disputed": [
       "Persian spear lengths are not securely known and reliefs are stylised. The trait models the advantage of reach, not a measured weapon."
@@ -54,17 +66,22 @@
       "https://www.iranicaonline.org/articles/army-i",
       "https://www.iranicaonline.org/articles/arms-and-armor-i"
     ],
-    "art": { "silhouette": "spear" }
+    "art": {
+      "silhouette": "spear"
+    }
   },
   {
     "id": "wheeling-line",
     "name": "Wheeling Line",
     "trait": "wheeling-line",
-    "appliesTo": ["cavalry", "horse-archer"],
+    "appliesTo": [
+      "cavalry",
+      "horse-archer"
+    ],
     "arena": 6,
     "consequence": "Holds back, then comes in from the flank once the lines have met.",
     "blurb": "Riders who wait. They sit out the first clash, ride wide, and arrive on the side of an enemy who is already busy fighting somebody else.",
-    "blurbOlder": "Achaemenid armies used cavalry on the wings rather than in the centre, and the value of the arm was in where and when it arrived rather than in the weight of the charge. Committing late and wide is the shape that pattern takes.",
+    "evidence": "Achaemenid armies used cavalry on the wings rather than in the centre, and the value of the arm was in where and when it arrived rather than in the weight of the charge. Committing late and wide is the shape that pattern takes.",
     "confidence": "reconstructed-for-gameplay",
     "disputed": [
       "Persian cavalry deployment is reconstructed largely from Greek battle narratives written by opponents. The timing modelled here is an abstraction."
@@ -73,17 +90,22 @@
       "https://www.iranicaonline.org/articles/army-i",
       "https://www.iranicaonline.org/articles/cavalry"
     ],
-    "art": { "silhouette": "horse" }
+    "art": {
+      "silhouette": "horse"
+    }
   },
   {
     "id": "loosed-rein",
     "name": "Loosed Rein",
     "trait": "loosed-rein",
-    "appliesTo": ["horse-archer", "cavalry"],
+    "appliesTo": [
+      "horse-archer",
+      "cavalry"
+    ],
     "arena": 3,
     "consequence": "Gives ground faster while shooting. Much slower to close in.",
     "blurb": "Never let them catch you. Shoot, fall back, shoot again — and never be the one who rides in.",
-    "blurbOlder": "The steppe method: refuse contact, keep shooting while withdrawing, and let an enemy exhaust itself following. The Saka fought this way against Cyrus; the Parthians made it famous against Rome four centuries later.",
+    "evidence": "The steppe method: refuse contact, keep shooting while withdrawing, and let an enemy exhaust itself following. The Saka fought this way against Cyrus; the Parthians made it famous against Rome four centuries later.",
     "confidence": "probable",
     "disputed": [
       "Attested for steppe peoples across a long period, but the specific practice of Saka contingents inside an Achaemenid army is inferred rather than described."
@@ -92,6 +114,8 @@
       "https://www.iranicaonline.org/articles/saka-tribe",
       "https://www.iranicaonline.org/articles/archery-in-iran"
     ],
-    "art": { "silhouette": "horse-bow" }
+    "art": {
+      "silhouette": "horse-bow"
+    }
   }
 ]
