@@ -1023,10 +1023,32 @@ def _push_astro_pr(
             "note": "pull request opened — review and merge to add the file",
         }
     except requests.RequestException as exc:
-        log.error("%s — astro_pr failed: %s", site.domain, config.redact(str(exc))[:200])
+        # 401 and 403 look alike and mean opposite things, and guessing wrong
+        # sends you to the wrong settings page. GitHub is strict about it:
+        #   401 — the credential itself was rejected. The token is malformed,
+        #         truncated, expired or revoked. Permissions are irrelevant;
+        #         GitHub never got far enough to check them.
+        #   403 — the token is valid and lacks a permission, or the resource
+        #         owner did not grant it access to this repository.
+        #   404 — valid token, but it cannot see this repo at all: usually the
+        #         wrong repo name in ASTRO_REPO_*, or the repo was not selected.
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        hint = {
+            401: (f"the token in ASTRO_GITHUB_TOKEN was REJECTED — it is malformed, "
+                  f"truncated, expired or revoked. This is not a permissions problem; "
+                  f"re-create the token and paste the whole value."),
+            403: (f"the token is valid but lacks a permission on {repo}. It needs "
+                  f"Contents: Read and write, and Pull requests: Read and write."),
+            404: (f"the token cannot see {repo} at all — check the repository name in "
+                  f"ASTRO_REPO_{site.domain.replace('.', '_').upper()} and that the "
+                  f"token selected this repository."),
+        }.get(status, "")
+        detail = config.redact(str(exc))[:200]
+        log.error("%s — astro_pr failed: %s%s", site.domain, detail,
+                  f" — {hint}" if hint else "")
         return {"status": "draft", "live_url": None, "intended_url": url,
                 "record_id": None, "published_at": None, "scheduled_for": None,
-                "note": f"astro_pr error: {config.redact(str(exc))[:200]}"}
+                "note": f"astro_pr error: {detail}" + (f" — {hint}" if hint else "")}
 
 
 def _write_static_bundle(
