@@ -1033,10 +1033,19 @@ def _push_astro_pr(
         #   404 — valid token, but it cannot see this repo at all: usually the
         #         wrong repo name in ASTRO_REPO_*, or the repo was not selected.
         status = getattr(getattr(exc, "response", None), "status_code", None)
+        # Shape of the credential, never the credential. A 401 that survives a
+        # careful re-paste needs to distinguish "truncated" from "wrong kind of
+        # token" from "right token, revoked", and those are indistinguishable
+        # from the outside. Length and the PUBLIC prefix settle it and leak
+        # nothing: github_pat_ is documented, and a length is not a secret.
+        kind = next((p for p in ("github_pat_", "ghp_", "gho_", "ghu_", "ghs_", "ghr_")
+                     if token.startswith(p)), "unrecognised-prefix")
+        shape = (f"[token shape: {len(token)} chars, {kind}; a complete "
+                 f"fine-grained token is ~93 chars and starts github_pat_]")
         hint = {
             401: (f"the token in ASTRO_GITHUB_TOKEN was REJECTED — it is malformed, "
                   f"truncated, expired or revoked. This is not a permissions problem; "
-                  f"re-create the token and paste the whole value."),
+                  f"re-create the token and paste the whole value. {shape}"),
             403: (f"the token is valid but lacks a permission on {repo}. It needs "
                   f"Contents: Read and write, and Pull requests: Read and write."),
             404: (f"the token cannot see {repo} at all — check the repository name in "
