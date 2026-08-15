@@ -4168,6 +4168,14 @@ button.unit-card:active:not(:disabled) {
   margin-block-start: 4px;
 }
 
+.settings-note {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--stone-dim);
+  font-style: italic;
+}
+
 .ledger-band {
   display: grid;
   gap: 3px;

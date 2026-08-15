@@ -165,6 +165,13 @@ function SettingsTab() {
   return (
     <>
       <div className="settings-block">
+        {/* The game labels its unbuilt spell cards on screen rather than hiding
+            them; a slider that silently controls nothing is the same omission
+            in the other direction. The values ARE stored and will apply the
+            moment there is sound — it is only the effect that does not exist. */}
+        <p className="settings-note">
+          There is no sound in this build yet. These are saved for when there is.
+        </p>
         <label className="slider-row">
           <span>
             Sound effects <strong>{settings.sfxVolume}</strong>
@@ -192,6 +199,7 @@ function SettingsTab() {
       </div>
 
       <div className="settings-block">
+        <p className="settings-note">Not wired up yet either.</p>
         <label className="check-row">
           <span>Haptic feedback</span>
           <input
