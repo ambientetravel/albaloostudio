@@ -621,8 +621,21 @@ ok("the word count documents that it sees only server-rendered HTML",
 ok("competitors declared in sites.yml reach the Site object",
    len([x for x in config.load_sites() if x.competitors]) >= 1,
    "the field existed on the dataclass but load_sites never passed it through")
-ok("and every other site stays empty rather than inheriting a guess",
-   all(not x.competitors for x in config.load_sites() if x.domain != "boutimar.ir"))
+# Was "every site except boutimar.ir is empty", which encoded the state on the
+# day it was written and failed the moment two more lists were added legitimately.
+# The property actually worth protecting is that a list is never INHERITED or
+# defaulted — every site that has one has it written down for that site — so
+# the count of sites carrying competitors must equal the count of `competitors:`
+# blocks in the file.
+_declared = len(_re.findall(r"^\s*competitors:\s*$",
+                            pathlib.Path("sites.yml").read_text(encoding="utf-8"),
+                            _re.M))
+_carrying = [x.domain for x in config.load_sites(include_hold=True) if x.competitors]
+ok("a competitor list is declared per site, never inherited or defaulted",
+   len(_carrying) == _declared, f"{len(_carrying)} sites carry a list, {_declared} declared")
+ok("and a site without a declared list has none",
+   all(not x.competitors for x in config.load_sites(include_hold=True)
+       if x.domain not in _carrying))
 ok("Agent 8 never claims to know rankings",
    "never who *ranks*" in (_a8.__doc__ or "")
    and "rankings" in (_a8.compare.__doc__ or ""),
