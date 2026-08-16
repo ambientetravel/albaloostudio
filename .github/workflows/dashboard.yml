@@ -1,0 +1,126 @@
+# Portfolio dashboard
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Everything the pipeline knows lives in eight separate job summaries, which
+# means it is read by whoever opens the right tab on the right day. Alireza
+# asked for an HTML view on 16 Aug 2026. This is it.
+#
+# It is DELIBERATELY NOT DEPLOYED. The page carries competitor research, per-run
+# cost, and drafts nobody has reviewed — none of which belongs on a public site.
+# It is uploaded as an artifact, which requires a GitHub login to download. If
+# it is ever hosted, it needs auth in front of it first.
+#
+# Reads the latest SUCCESSFUL run of each agent independently, so one agent
+# having a bad day does not blank the whole page — a missing input renders as
+# "no manifest found", never as a zero.
+
+name: Portfolio dashboard
+
+on:
+  schedule:
+    # Mondays 06:00 UTC — after agent 5+6 (05:00) and agent 7 (05:30), so a
+    # week's worth of runs is complete before it is summarised.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read      # to list and download the other workflows' artifacts
+
+concurrency:
+  group: dashboard
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: orchestrator
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Each agent resolved separately and allowed to fail. `|| true` is the
+      # point: agent 8 having no successful run yet must not stop the page from
+      # showing agent 1 and 2, which is exactly the failure mode that makes
+      # dashboards get abandoned.
+      - name: Collect the agents' latest manifests
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          grab () {                 # $1 workflow file, $2 artifact name, $3 dest
+            run=$(gh run list --workflow "$1" --status success --limit 1 \
+                    --json databaseId --jq '.[0].databaseId' \
+                    --repo "${{ github.repository }}" 2>/dev/null || true)
+            if [ -z "${run:-}" ] || [ "$run" = "null" ]; then
+              echo "::notice title=No data from $1::No successful run to read. That section of the dashboard will say so rather than showing a zero."
+              return 0
+            fi
+            mkdir -p "$3"
+            gh run download "$run" --name "$2" --dir "$3" \
+               --repo "${{ github.repository }}" 2>/dev/null \
+              || echo "::notice title=Artifact missing::$2 not present on run $run."
+          }
+          grab agent1-seo-scout.yml       seo-scout-run   _dl/agent1
+          grab agent2-writer.yml          agent2-written  _dl/agent2
+          grab agent8-competitor-scout.yml competitor-scout _dl/agent8
+
+          # The artifacts preserve their own directory shape, so move each into
+          # the layout build_dashboard.py looks for rather than teaching the
+          # generator about GitHub's packaging.
+          mkdir -p runs written competitors
+          [ -d _dl/agent1 ] && cp -R _dl/agent1/. runs/ 2>/dev/null || true
+          [ -d _dl/agent2 ] && cp -R _dl/agent2/written/. written/ 2>/dev/null || true
+          [ -d _dl/agent8 ] && cp -R _dl/agent8/. competitors/ 2>/dev/null || true
+          echo "collected:"; ls -d runs written competitors 2>/dev/null || true
+
+      - name: Build the page
+        run: python3 tools/build_dashboard.py --out dashboard.html
+
+      - name: Show it in the run summary too
+        run: |
+          set -euo pipefail
+          {
+            echo "## Portfolio dashboard"
+            echo
+            echo "Built \`dashboard.html\` — download it from **Artifacts** below."
+            echo
+            echo "> Not deployed anywhere on purpose: it carries competitor research,"
+            echo "> per-run cost and unreviewed drafts. The artifact needs a GitHub"
+            echo "> login to fetch, which is the access control."
+            echo
+            echo "\`\`\`"
+            # A plain-text digest so the numbers are visible without downloading.
+            python3 - <<'PY'
+          import json, pathlib
+          for label, p in (("agent 1", "runs"), ("agent 2", "written"),
+                           ("agent 8", "competitors")):
+              hits = list(pathlib.Path(p).rglob("*.json")) if pathlib.Path(p).exists() else []
+              print(f"{label:8} {'found' if hits else 'no manifest'}")
+          PY
+            echo "\`\`\`"
+            echo
+            echo "*Architecture credit: Albaloo Studio*"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the dashboard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-dashboard
+          path: orchestrator/dashboard.html
+          retention-days: 90
+          if-no-files-found: warn

@@ -1960,6 +1960,50 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== the dashboard shows absence as absence, never as zero ===")
+# Asked for on 16 Aug and delivered the same day after being lost under the
+# billing work. The failure mode that matters is not an ugly page — it is a
+# page that renders "0 briefs" when it simply could not find the manifest,
+# because one wrong number teaches people to distrust every number on it.
+_dash = _ilu.spec_from_file_location("build_dashboard", "tools/build_dashboard.py")
+_dm = _ilu.module_from_spec(_dash); _dash.loader.exec_module(_dm)
+
+_empty = _dm.render(None, None, None)
+ok("with no manifests at all it still renders", len(_empty) > 500)
+ok("and says the measurement is absent, not zero",
+   "absent measurement" in _empty and ">0 briefs<" not in _empty)
+ok("the registry section works without any run data",
+   "Can each site receive an article?" in _empty)
+
+# It must never invent a live URL either — same rule as the adapters.
+_writer = {"outcomes": [
+    {"domain": "a.com", "keyword": "k", "status": "drafted", "words": 900,
+     "pr_url": "https://github.com/x/y/pull/1"},
+    {"domain": "b.com", "keyword": "k2", "status": "drafted", "words": 800},
+    {"domain": "c.com", "keyword": "k3", "status": "drafted", "words": 700,
+     "staged_path": "bundles/c.com/x"}], "usage": {"estimated_cost_usd": 0.01}}
+_html = _dm.render(None, _writer, None)
+ok("a drafted article with a PR links to it", "pull/1" in _html)
+ok("a drafted article that reached nowhere is called out",
+   "nowhere — words lost" in _html)
+ok("a staged article is not called lost", "staged, not live" in _html)
+
+# Coverage must reflect the registry, including the sites that cannot publish.
+_cov = _dm._coverage()
+ok("coverage covers the whole registry",
+   len(_cov) == len(config.load_sites(include_hold=True)))
+ok("held sites are marked held, not broken",
+   any(r["cls"] == "hold" for r in _cov))
+ok("a site with no adapter is marked as such",
+   any(r["cls"] == "bad" for r in _cov))
+ok("escapes its inputs", "&lt;" in _dm.render(
+    None, {"outcomes": [{"domain": "<script>", "keyword": "x", "status": "drafted",
+                         "words": 1}]}, None))
+_wfd = pathlib.Path("../.github/workflows/dashboard.yml").read_text(encoding="utf-8")
+ok("the workflow uploads it rather than deploying it",
+   "upload-artifact" in _wfd and "NOT DEPLOYED" in _wfd,
+   "it carries competitor research, cost and unreviewed drafts")
+
 print("\n=== an adapter must never report a URL it did not create ===")
 # push_to_cms says exactly that in its docstring, and two adapters broke it
 # eleven lines below: the unimplemented branch and _write_static_bundle both
