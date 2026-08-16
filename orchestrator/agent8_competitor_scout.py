@@ -53,6 +53,7 @@ import argparse
 import json
 import logging
 import re
+import statistics
 import sys
 import time
 import xml.etree.ElementTree as ET
@@ -317,8 +318,11 @@ def scout_competitor(session: requests.Session, base_url: str,
 
         rep.pages_sampled = len(rep.samples)
         if words_seen:
-            words_seen.sort()
-            rep.median_words = words_seen[len(words_seen) // 2]
+            # statistics.median, not sorted(...)[len//2]. On an EVEN count the
+            # index form returns the upper-middle value rather than the mean of
+            # the two middles, which biases every figure upward — and the
+            # default sample size is 10, so the even case is the normal one.
+            rep.median_words = round(statistics.median(words_seen))
         return rep
 
     except Exception as exc:
@@ -362,8 +366,11 @@ def compare(site: Site, ours: list[str], reports: list[CompetitorReport]) -> dic
         "sections_they_cover_that_we_do_not": [
             {"section": t, "their_pages": n} for t, n in missing[:25]
         ],
+        # Same correction as the per-site median above. Run #1 reported the
+        # rivals' median as 2,014 from [289, 1735, 2014, 2374] — the true median
+        # is 1,874.5, so the headline depth gap was overstated by 140 words.
         "their_median_words": (
-            sorted(r.median_words for r in usable)[len(usable) // 2] if usable else None
+            round(statistics.median([r.median_words for r in usable])) if usable else None
         ),
         "reachable_competitors": len(usable),
         "blocked_by_robots": [r.domain for r in reports if r.status == "disallowed"],

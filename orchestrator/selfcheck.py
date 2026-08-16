@@ -1947,6 +1947,29 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== a median of an even sample is not the upper-middle value ===")
+# Agent 8's first live run reported the rivals' median as 2,014 from
+# [289, 1735, 2014, 2374]. The arithmetic was right for what it computed —
+# sorted(...)[len//2] — but that is the upper-middle, not the median, and it
+# biases every figure upward. The default sample is 10 pages, so the even case
+# is the NORMAL one, not an edge case. The headline depth gap was overstated by
+# 140 words.
+_a8_src = pathlib.Path("agent8_competitor_scout.py").read_text(encoding="utf-8")
+ok("agent 8 uses statistics.median, not an index",
+   "statistics.median" in _a8_src and "sorted(r.median_words for r in usable)" not in _a8_src)
+ok("and imports it", "\nimport statistics" in _a8_src)
+ok("no [len(...) // 2] median remains in agent 8",
+   not _re.search(r"words_seen\[len\(words_seen\) // 2\]", _a8_src))
+import statistics as _st
+_even = [289, 1735, 2014, 2374]
+ok("the even case now averages the two middles",
+   round(_st.median(_even)) == 1874, round(_st.median(_even)))
+ok("and differs from the old index form, which is the whole point",
+   round(_st.median(_even)) != sorted(_even)[len(_even) // 2])
+ok("the odd case is unchanged",
+   round(_st.median([289, 1735, 2374])) == sorted([289, 1735, 2374])[1])
+ok("a single competitor still works", round(_st.median([900])) == 900)
+
 print("\n=== a missing signing secret must never mean 'send it unsigned' ===")
 # The repository stores a secret named WEBHOOK_SINGING_SECRET — a typo — so the
 # correctly-spelled variable is empty everywhere. That has caused no failure,
