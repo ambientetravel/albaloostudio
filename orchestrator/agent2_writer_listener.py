@@ -746,17 +746,20 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
     draft["body_markdown"] = draft.get("body_markdown", "") + footer
 
     if site.cms.type == "unknown" or adapter == "unimplemented":
-        log.warning(
-            "%s has no CMS adapter — staging the draft, not publishing", site.domain
-        )
-        return {
-            "status": "draft",
-            "live_url": url,
-            "record_id": None,
-            "published_at": None,
-            "scheduled_for": None,
-            "note": f"no adapter for cms.type={site.cms.type!r}",
-        }
+        # This branch said "staging the draft" and staged nothing, then returned
+        # live_url=url for a page that does not exist — in a function whose own
+        # docstring, eleven lines up, forbids exactly that. On 16 Aug
+        # cruisebaz.com drafted 1,330 words through here and they were lost.
+        #
+        # Now it actually stages, so an unimplemented adapter costs a download
+        # rather than the article, and reports no live_url because there isn't
+        # one.
+        log.warning("%s has no CMS adapter — staging the draft, not publishing",
+                    site.domain)
+        result = _write_static_bundle(site, brief, draft, url)
+        result["note"] = (f"no adapter for cms.type={site.cms.type!r} — draft staged "
+                          f"at {result.get('staged_path')}, NOT published")
+        return result
 
     if adapter == "wordpress_rest":
         return _push_wordpress(brief, draft, url)
@@ -1334,11 +1337,20 @@ def _write_static_bundle(
     log.info("%s — static bundle written to %s", site.domain, out)
     return {
         "status": "draft",
-        "live_url": url,
+        # NOT `url`. A bundle on the runner's disk is not a live page, and this
+        # function's own contract says an adapter must never report a URL it did
+        # not create. Returning one meant anything trusting live_url — Agent 3
+        # broadcasts from it — would have pointed the world at a 404.
+        "live_url": None,
+        "intended_url": url,
         "record_id": record_id,
         "published_at": None,
         "scheduled_for": None,
-        "note": f"deploy bundle at {out}",
+        # Reported so the summary can say where the words went. Without this the
+        # "Where the drafts went" section calls a correctly-staged bundle
+        # "went nowhere", which is the opposite of the truth.
+        "staged_path": str(out),
+        "note": f"deploy bundle at {out} — not live until it is deployed",
     }
 
 

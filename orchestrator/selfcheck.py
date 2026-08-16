@@ -1960,6 +1960,31 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== an adapter must never report a URL it did not create ===")
+# push_to_cms says exactly that in its docstring, and two adapters broke it
+# eleven lines below: the unimplemented branch and _write_static_bundle both
+# returned live_url = url for pages that do not exist. That is not cosmetic —
+# agent 3 gates on live_url and uses it as the link it POSTS to social, so any
+# site on those adapters would have had the pipeline broadcasting a 404.
+#
+# The unimplemented branch also logged "staging the draft" while staging
+# nothing, which is how cruisebaz.com's 1,330 words were lost on 16 Aug.
+_pc_src = pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("no adapter hands back live_url = url",
+   not _re.search(r'"live_url":\s*url\b', _pc_src),
+   "a staged or unpublished draft has no live URL")
+ok("the unimplemented adapter actually stages instead of claiming to",
+   "result = _write_static_bundle(site, brief, draft, url)" in _pc_src)
+ok("a static bundle reports where it staged",
+   '"staged_path": str(out)' in _pc_src,
+   "without it the summary calls a correct bundle 'went nowhere'")
+ok("the intended URL is still carried, just not as live_url",
+   '"intended_url": url' in _pc_src)
+# Agent 3 must keep gating on live_url — that is what makes the skip correct.
+_a3b = pathlib.Path("agent3_broadcaster_batch.py").read_text(encoding="utf-8")
+ok("agent 3 still refuses to broadcast without a live_url",
+   "if not event.publication.live_url:" in _a3b)
+
 print("\n=== a site's own configuration blocking a draft is not a failure ===")
 # Run #33 — the first full scheduled chain — went RED because exploreorient's
 # heroImage guard fired. That guard is correct and deliberate: sites.yml leaves
