@@ -63,6 +63,20 @@ sites:
     base_url: "https://boutimar.com"
     sitemap: "https://boutimar.com/sitemap.xml"    # verified 2026-08-06; not sitemap_index.xml
     min_impressions: 20        # 361 queries / 1,233 impressions in 90d — 20 yields ~10 candidates
+    # Inbound Iran DMCs selling the same thing to the same buyer: international
+    # agencies, not travellers. Found by searching the terms boutimar.com itself
+    # ranks for — boutimar.com appears alongside these — rather than recalled,
+    # because a guessed rival is a crawler studying the wrong site confidently.
+    #
+    # Each verified live on 16 Aug 2026: 200 on the home page, a readable
+    # sitemap.xml, and no blanket Disallow. That check is not ceremony —
+    # lastsecond.ir sits in boutimar.ir's list and returns nothing usable
+    # because it publishes no sitemap, which costs a row in every report.
+    competitors:
+      - https://letsgoiran.com      # ~30 yrs, B2B incoming specialist
+      - https://nilutours.com       # agency-only Iran DMC, complex group programmes
+      - https://irandoostan.com     # has a named Iran MICE Services division
+      - https://radtourism.com      # inbound groups, cultural and adventure
     cms:
       # NOT WordPress. Corrected 11 Aug 2026 after the WordPress adapter was
       # built and pointed here: /wp-admin, /wp-json and /wp-login.php all
@@ -165,6 +179,20 @@ sites:
     market: INT
     base_url: "https://exploreorient.com"
     sitemap: "https://exploreorient.com/sitemap-index.xml"
+    # A different competitive set from boutimar.com, and deliberately so.
+    # exploreorient sells MULTI-COUNTRY ground handling across Turkey, the
+    # Caucasus, Central Asia and MENA — its rivals are the operators who can
+    # also quote a route that crosses borders, not single-country Iran DMCs.
+    # That is why none of boutimar.com's four appear here.
+    #
+    # Verified live 16 Aug 2026, same three checks. anurtour.com was a good fit
+    # on paper and was DROPPED: it publishes no sitemap.xml and names none in
+    # robots.txt, so Agent 8 could only read its home page and the row would say
+    # nothing — the exact failure lastsecond.ir already contributes elsewhere.
+    competitors:
+      - https://mir-dmc.com        # Central Asia + South Caucasus, offices Tashkent/Tbilisi
+      - https://travel-dmc.com     # multi-destination B2B ground handling, cross-border
+      - https://dmcturkey.org      # Turkey ground handling for FIT, groups and MICE
     cms:
       type: astro
       adapter: astro_pr          # opens a PR against the exploreorient repo
