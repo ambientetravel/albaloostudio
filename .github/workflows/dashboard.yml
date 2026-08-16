@@ -116,11 +116,17 @@ jobs:
             echo "\`\`\`"
             # A plain-text digest so the numbers are visible without downloading.
             python3 - <<'PY'
-          import json, pathlib
-          for label, p in (("agent 1", "runs"), ("agent 2", "written"),
-                           ("agent 8", "competitors")):
-              hits = list(pathlib.Path(p).rglob("*.json")) if pathlib.Path(p).exists() else []
-              print(f"{label:8} {'found' if hits else 'no manifest'}")
+          import pathlib
+          # All five, not three. The strategy and geography sections were added
+          # after this digest was written, so it kept reporting a complete page
+          # while two of its sections said "absent measurement".
+          for label, pat in (("agent 1 scout", "runs/**/manifest.json"),
+                             ("agent 2 writer", "written/manifest.json"),
+                             ("agent 6 strategy", "reports/strategy-*.json"),
+                             ("agent 7 geo", "reports/geo-*.json"),
+                             ("agent 8 rivals", "competitors/*.json")):
+              hits = sorted(pathlib.Path(".").glob(pat))
+              print(f"{label:18} {hits[-1].name if hits else 'NO DATA — section will say so'}")
           PY
             echo "\`\`\`"
             echo
