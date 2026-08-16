@@ -68,15 +68,23 @@ sites:
     # ranks for — boutimar.com appears alongside these — rather than recalled,
     # because a guessed rival is a crawler studying the wrong site confidently.
     #
-    # Each verified live on 16 Aug 2026: 200 on the home page, a readable
-    # sitemap.xml, and no blanket Disallow. That check is not ceremony —
-    # lastsecond.ir sits in boutimar.ir's list and returns nothing usable
-    # because it publishes no sitemap, which costs a row in every report.
+    # HOW TO VERIFY A NAME BEFORE ADDING IT. The first version of this list
+    # checked only that the home page returned 200, and that was not enough:
+    # radtourism.com was added on that basis and is a PARKED DOMAIN that 301s to
+    # hugedomains.com, where it is for sale. The 200 came from the sale page.
+    # Three checks, all of them:
+    #   1. the FINAL host after redirects equals the domain — compare hosts, not
+    #      substrings, because hugedomains.com/…?d=radtourism.com contains it;
+    #   2. a sitemap actually PARSES and contains <loc> entries — /sitemap.xml
+    #      or whatever robots.txt names — not merely a 200, which an HTML error
+    #      page also returns;
+    #   3. robots.txt does not blanket-Disallow our user-agent.
+    # A fourth cannot be checked from here: whether the site answers a GitHub
+    # runner's datacenter IP. Only a run proves that.
     competitors:
       - https://letsgoiran.com      # ~30 yrs, B2B incoming specialist
       - https://nilutours.com       # agency-only Iran DMC, complex group programmes
       - https://irandoostan.com     # has a named Iran MICE Services division
-      - https://radtourism.com      # inbound groups, cultural and adventure
     cms:
       # NOT WordPress. Corrected 11 Aug 2026 after the WordPress adapter was
       # built and pointed here: /wp-admin, /wp-json and /wp-login.php all
@@ -185,14 +193,24 @@ sites:
     # also quote a route that crosses borders, not single-country Iran DMCs.
     # That is why none of boutimar.com's four appear here.
     #
-    # Verified live 16 Aug 2026, same three checks. anurtour.com was a good fit
-    # on paper and was DROPPED: it publishes no sitemap.xml and names none in
-    # robots.txt, so Agent 8 could only read its home page and the row would say
-    # nothing — the exact failure lastsecond.ir already contributes elsewhere.
+    # Verified by the three checks documented on boutimar.com above.
+    #
+    # Two names were removed after run #3 proved them useless rather than
+    # assumed them fine:
+    #   anurtour.com   fits on paper, publishes no sitemap anywhere — Agent 8
+    #                  could only ever read its home page.
+    #   dmcturkey.org  passes all three checks from a laptop and returned NOTHING
+    #                  to the runner. Its robots.txt is Cloudflare-managed and
+    #                  blocks ClaudeBot, GPTBot, CCBot and others by name; we are
+    #                  permitted by the `*` rule, so this is bot management
+    #                  refusing a datacenter IP, not a site refusing us. Either
+    #                  way the row was empty, and the answer is to drop it rather
+    #                  than find a way around a site's protection.
     competitors:
       - https://mir-dmc.com        # Central Asia + South Caucasus, offices Tashkent/Tbilisi
       - https://travel-dmc.com     # multi-destination B2B ground handling, cross-border
-      - https://dmcturkey.org      # Turkey ground handling for FIT, groups and MICE
+      - https://kazindmc.com       # B2B Central Asia + Caucasus, growing MICE side
+      - https://advantour.com      # 17,641 URLs — the inventory benchmark for the region
     cms:
       type: astro
       adapter: astro_pr          # opens a PR against the exploreorient repo
