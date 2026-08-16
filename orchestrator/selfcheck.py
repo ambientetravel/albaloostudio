@@ -1947,6 +1947,41 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== nothing may reuse a credential's name as a loop variable ===")
+# The astro_pr adapter read the GitHub token into `token`, then rendered the
+# frontmatter with `for token, repl in fields.items()`. The loop rebound the
+# credential to the last key in `fields` — the string "language" — and every
+# request went out as `Authorization: Bearer language`. GitHub answered 401,
+# which is indistinguishable from a bad token, and cost three re-pastes, a
+# delete-and-recreate of the secret and a live curl test before the value was
+# printed and turned out to be a word.
+#
+# A grep, not a unit test, because the failure is a NAME COLLISION: it type-checks,
+# it reads correctly line by line, and it only misbehaves at a distance.
+_CRED_NAMES = ("token", "secret", "password", "api_key", "apikey", "credential")
+_shadowed = []
+for _py in sorted(pathlib.Path(".").glob("*.py")):
+    # This file quotes the offending line as a string literal in the assertion
+    # below, so scanning itself makes the check fail on its own evidence.
+    if _py.name == "selfcheck.py":
+        continue
+    for _n, _line in enumerate(_py.read_text(encoding="utf-8").splitlines(), 1):
+        _s = _line.strip()
+        if _s.startswith("#"):
+            continue
+        for _c in _CRED_NAMES:
+            # `for token, x in ...` / `for token in ...` / comprehension binding
+            if _re.search(rf"\bfor\s+{_c}\s*[,)]|\bfor\s+{_c}\s+in\b", _s):
+                _shadowed.append(f"{_py.name}:{_n}: {_s[:70]}")
+ok("no loop binds a variable named like a credential",
+   not _shadowed, "; ".join(_shadowed[:4]))
+# And specifically the line that caused it, so the fix cannot be reverted quietly.
+_a2l_src = pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("the frontmatter renderer uses `placeholder`, not `token`",
+   "for placeholder, repl in fields.items()" in _a2l_src)
+ok("and `token` is never rebound after the credential is read",
+   "for token, repl in fields.items()" not in _a2l_src)
+
 print("\n=== 'drafted' is not the same as 'published' ===")
 # Run #25, 14 Aug 2026: "2 drafted · 0 blocked · 0 deferred · 0 failed", zero
 # pull requests opened and zero files staged. _push_astro_pr caught its own

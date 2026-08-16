@@ -927,8 +927,19 @@ def _push_astro_pr(
         front = {}
         for key, val in template.items():
             rendered = str(val)
-            for token, repl in fields.items():
-                rendered = rendered.replace("{" + token + "}", str(repl))
+            # `placeholder`, NOT `token`. This loop used to bind `token`, which
+            # is the name of the GitHub credential fetched at the top of this
+            # function — so rendering the frontmatter silently overwrote the
+            # credential with the last key in `fields`, the string "language".
+            # Every request then went out as `Authorization: Bearer language`
+            # and came back 401, which reads exactly like a bad token and sent
+            # three re-pastes, a delete-and-recreate and a live curl test after
+            # a credential that was correct the whole time.
+            #
+            # It only bit sites that define `frontmatter:` in sites.yml, which
+            # is why boutimar.com failed and nothing else did.
+            for placeholder, repl in fields.items():
+                rendered = rendered.replace("{" + placeholder + "}", str(repl))
             front[key] = rendered
         missing = [k for k, v in front.items() if not v]
         if missing:
