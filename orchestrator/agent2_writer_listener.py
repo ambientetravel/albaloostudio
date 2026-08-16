@@ -1392,7 +1392,24 @@ def run_writing_job(brief: ContentBrief, raw_payload: dict[str, Any]) -> None:
             log.warning("no callback_url and no AGENT3_WEBHOOK_URL — event not forwarded")
             return
 
-        ok, reason = _deliver(callback, event, config.require_env("WEBHOOK_SIGNING_SECRET"))
+        # Decided HERE, beside the callback check, rather than by raising inside
+        # the delivery call. A missing signing secret is a configuration state,
+        # not an exception: reaching _deliver and exploding on a credential is
+        # how you get a stack trace where a one-line reason belongs.
+        #
+        # Never deliver unsigned as a fallback. The signature is the only thing
+        # telling the receiver this envelope came from us.
+        secret = config.optional_env("WEBHOOK_SIGNING_SECRET")
+        if not secret:
+            log.error(
+                "callback is configured but WEBHOOK_SIGNING_SECRET is not — refusing "
+                "to forward unsigned. Check the SPELLING of the stored secret: the "
+                "repository holds one named WEBHOOK_SINGING_SECRET, which no code "
+                "reads."
+            )
+            return
+
+        ok, reason = _deliver(callback, event, secret)
         if ok:
             log.info("forwarded publishing.event → agent3 for %s", result["live_url"])
         else:

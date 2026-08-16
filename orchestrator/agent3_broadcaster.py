@@ -700,7 +700,21 @@ def run_broadcast_job(event: PublishingEvent, raw_payload: dict[str, Any]) -> No
         if not callback:
             log.warning("AGENT4_WEBHOOK_URL not set — campaign.log not forwarded")
             return
-        ok, reason = _deliver(callback, campaign_log, config.require_env("WEBHOOK_SIGNING_SECRET"))
+        # Same shape as agent 2's forward: a missing signing secret is decided
+        # beside the callback check, never by raising inside _deliver. Raising
+        # here would surface as a generic failure from the enclosing try, which
+        # is the least useful way to report a one-line configuration gap.
+        secret = config.optional_env("WEBHOOK_SIGNING_SECRET")
+        if not secret:
+            log.error(
+                "AGENT4_WEBHOOK_URL is set but WEBHOOK_SIGNING_SECRET is not — "
+                "campaign.log not forwarded, and deliberately not forwarded "
+                "unsigned. Check the SPELLING of the stored secret: the repository "
+                "holds one named WEBHOOK_SINGING_SECRET, which no code reads."
+            )
+            return
+
+        ok, reason = _deliver(callback, campaign_log, secret)
         if not ok:
             CAMPAIGNS.update(idem, error=f"forward failed: {reason}")
             log.error("forward to agent4 failed: %s", reason)

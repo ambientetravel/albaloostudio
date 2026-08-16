@@ -1947,6 +1947,30 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== a missing signing secret must never mean 'send it unsigned' ===")
+# The repository stores a secret named WEBHOOK_SINGING_SECRET — a typo — so the
+# correctly-spelled variable is empty everywhere. That has caused no failure,
+# because every path needing it sits behind a webhook URL nobody has set: the
+# scout's workflow switches to --dry-run without AGENT2_WEBHOOK_URL, agents 2
+# and 3 return early without a callback, and the two FastAPI verifiers belong to
+# HTTP services that are not run at all — the _batch runners are.
+#
+# What it WOULD have caused is the reason for this fix: set a callback and the
+# old code decided to deliver, then raised on a credential from inside the
+# delivery call, surfacing as a generic error where a one-line reason belongs.
+_a2l_txt = pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8")
+_a3_txt = pathlib.Path("agent3_broadcaster.py").read_text(encoding="utf-8")
+for _name, _txt in (("agent 2", _a2l_txt), ("agent 3", _a3_txt)):
+    ok(f"{_name} checks the secret beside the callback, not inside _deliver",
+       'secret = config.optional_env("WEBHOOK_SIGNING_SECRET")' in _txt)
+    ok(f"{_name} refuses to forward unsigned", "unsigned" in _txt)
+    # The message has to name the misspelling, because the secret LOOKS present
+    # in the settings list and that is exactly what makes it hard to spot.
+    ok(f"{_name} names the misspelling in the error", "WEBHOOK_SINGING_SECRET" in _txt)
+ok("neither forward path raises on the missing credential any more",
+   'config.require_env("WEBHOOK_SIGNING_SECRET"))' not in _a2l_txt
+   and 'config.require_env("WEBHOOK_SIGNING_SECRET"))' not in _a3_txt)
+
 print("\n=== boutimar.ir stores articles as data, not files ===")
 # `boutimar_ir_static` was named in sites.yml from the start and the dispatcher
 # never had a branch for it, so boutimar.ir — the live Farsi site — fell through
