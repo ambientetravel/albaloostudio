@@ -266,12 +266,17 @@ def render(scout: dict | None, writer: dict | None,
             out.append('<table><tr><th>Competitor</th><th class="n">URLs</th>'
                        '<th class="n">Median words</th><th>Status</th></tr>')
             for c in s.get("competitors", []):
-                bad = c.get("status") != "ok"
+                # Built outside the f-string. Python 3.11 — which is what the
+                # runners use — forbids a backslash inside an f-string
+                # expression; 3.12 relaxed it (PEP 701). This file compiled
+                # cleanly on a 3.14 laptop and was a SyntaxError in CI.
+                flag = ('<span class="pill hold">not crawled</span>'
+                        if c.get("status") != "ok" else "")
                 out.append(
                     f'<tr><td>{_esc(c.get("domain","?"))}</td>'
                     f'<td class="n">{c.get("urls_listed",0):,}</td>'
                     f'<td class="n">{c.get("median_words",0):,}</td>'
-                    f'<td>{"<span class=\"pill hold\">not crawled</span>" if bad else ""}</td></tr>')
+                    f'<td>{flag}</td></tr>')
             out.append("</table>")
             gap = cmp_.get("depth_gap")
             if gap is not None:

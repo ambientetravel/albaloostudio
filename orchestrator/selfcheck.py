@@ -8,7 +8,7 @@ Mocks Search Console and Gemini. Exercises config, the compliance gate, gap
 detection, payload assembly, JSON-Schema conformance, delivery retry and the
 Agent 2 HTTP surface end to end.
 """
-import json, os, sys, pathlib
+import ast, json, os, sys, pathlib
 
 os.environ.setdefault("WEBHOOK_SIGNING_SECRET", "test-secret-123")
 os.environ.setdefault("PIPELINE_ENVIRONMENT", "staging")
@@ -1959,6 +1959,29 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     _y = pathlib.Path(f"../.github/workflows/{_wf}.yml").read_text(encoding="utf-8")
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
+
+print("\n=== every module must parse on the RUNNER's python, not this laptop's ===")
+# build_dashboard.py compiled cleanly locally and was a SyntaxError in CI: a
+# backslash inside an f-string expression, which Python 3.12 legalised (PEP 701)
+# and 3.11 rejects. The workflows pin python-version 3.11; a developer laptop
+# is whatever it is. py_compile on the wrong interpreter can never catch this,
+# so parse against the runner's grammar explicitly.
+_RUNNER_PY = (3, 11)
+_incompat = []
+for _p in sorted(pathlib.Path(".").rglob("*.py")):
+    if "__pycache__" in str(_p):
+        continue
+    try:
+        ast.parse(_p.read_text(encoding="utf-8"), feature_version=_RUNNER_PY)
+    except SyntaxError as _e:
+        _incompat.append(f"{_p}:{_e.lineno} {_e.msg}")
+ok(f"every module parses under python {_RUNNER_PY[0]}.{_RUNNER_PY[1]}",
+   not _incompat, "; ".join(_incompat[:3]))
+# And the pin must actually be what we checked against.
+_pins = {_m for _w in pathlib.Path("../.github/workflows").glob("*.yml")
+         for _m in _re.findall(r'python-version:\s*"([\d.]+)"',
+                               _w.read_text(encoding="utf-8"))}
+ok("and the workflows all pin that version", _pins == {"3.11"}, _pins)
 
 print("\n=== the dashboard shows absence as absence, never as zero ===")
 # Asked for on 16 Aug and delivered the same day after being lost under the
