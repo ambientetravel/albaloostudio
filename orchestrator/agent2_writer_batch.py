@@ -56,6 +56,7 @@ from typing import Any
 import compliance
 import config
 from agent2_writer_listener import (
+    AdapterNotConfigured,
     ContentBrief,
     TransientUpstreamError,
     _call_gemini,
@@ -74,7 +75,11 @@ class Outcome:
     brief_file: str
     domain: str = ""
     keyword: str = ""
-    status: str = "pending"      # drafted | blocked | deferred | failed | skipped
+    # blocked        = the compliance gate rejected the words
+    # blocked_config = the TARGET SITE cannot accept them, by its own config
+    # deferred       = the provider blinked; retry next run
+    # failed         = an actual fault, and the only one that reddens the run
+    status: str = "pending"
     target_url: str = ""
     words: int = 0
     error: str = ""
@@ -260,6 +265,16 @@ def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
             json.dumps({"brief": payload, "violations": oc.violations},
                        ensure_ascii=False, indent=2), encoding="utf-8")
         return oc
+    except AdapterNotConfigured as exc:
+        # Not a fault. The target site is configured in a way that makes
+        # publishing impossible, on purpose and in writing — exploreorient's
+        # required heroImage, which sites.yml leaves empty so that no
+        # unbuildable pull request is ever opened. Reported loudly, never red:
+        # run #33 failed on this and would have failed every Sunday after it,
+        # for a decision already recorded.
+        oc.status = "blocked_config"
+        oc.error = config.redact(str(exc))[:400]
+        return oc
     except TransientUpstreamError as exc:
         # Not a failure of this pipeline. The brief is untouched and drafts on
         # the next run; saying "failed" would put a red cross on the nightly
@@ -430,6 +445,7 @@ def main(argv: list[str] | None = None) -> int:
                                    if o.domain and o.status == "skipped"}),
         "drafted": sum(o.status == "drafted" for o in outcomes),
         "blocked": sum(o.status == "blocked" for o in outcomes),
+        "blocked_config": sum(o.status == "blocked_config" for o in outcomes),
         "failed": sum(o.status == "failed" for o in outcomes),
         "usage": _usage_summary(outcomes),
         "outcomes": [o.__dict__ for o in outcomes],

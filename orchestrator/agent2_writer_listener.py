@@ -468,6 +468,27 @@ _MODEL_PREFERENCE = (
 )
 
 
+class AdapterNotConfigured(RuntimeError):
+    """
+    The site's CMS adapter refused a draft that its own config cannot satisfy.
+
+    A third category, between "this brief is bad" and "the provider blinked".
+    The brief is fine, the draft is fine, the gate passed it — and the target
+    site is configured in a way that makes publishing impossible, deliberately
+    and in writing. exploreorient.com's `blog` collection requires a heroImage
+    the pipeline has no way to supply, so `sites.yml` leaves it empty on
+    purpose and the astro adapter refuses rather than opening a pull request
+    that reddens someone else's build.
+
+    Raised rather than returned so the adapter cannot be half-completed, and
+    caught as its own status so it does NOT fail the run. Run #33 went red for
+    exactly this, which would have meant a red cross every Sunday for a
+    decision already recorded in sites.yml — and a cron that is red for a known
+    documented state is a cron nobody opens, which is the same argument
+    TransientUpstreamError makes below.
+    """
+
+
 class TransientUpstreamError(RuntimeError):
     """
     The model provider was temporarily unable to answer.
@@ -952,7 +973,7 @@ def _push_astro_pr(
         if missing:
             # Never open a PR that cannot build. A red build on the target repo
             # is worse than no PR: it blocks every other merge into that site.
-            raise ValueError(
+            raise AdapterNotConfigured(
                 f"{site.domain}: frontmatter field(s) {missing} came out empty for "
                 f"collection '{collection}'. Astro will reject the entry — fix the "
                 f"mapping in sites.yml rather than pushing an unbuildable file."

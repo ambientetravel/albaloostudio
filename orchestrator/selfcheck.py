@@ -1960,6 +1960,37 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== a site's own configuration blocking a draft is not a failure ===")
+# Run #33 — the first full scheduled chain — went RED because exploreorient's
+# heroImage guard fired. That guard is correct and deliberate: sites.yml leaves
+# the field empty so no unbuildable PR is ever opened. But it would then have
+# reddened every Sunday run for a decision already recorded, and a cron that is
+# red for a known documented state is a cron nobody opens — the same argument
+# the file already makes for TransientUpstreamError.
+_anc = _a2l.AdapterNotConfigured
+ok("the adapter has its own exception type for this",
+   issubclass(_anc, RuntimeError) and not issubclass(_anc, _a2l.TransientUpstreamError))
+_a2l_txt2 = pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("the empty-frontmatter guard raises it, not a bare ValueError",
+   "raise AdapterNotConfigured(" in _a2l_txt2)
+_b_src = pathlib.Path("agent2_writer_batch.py").read_text(encoding="utf-8")
+ok("the batch runner maps it to blocked_config",
+   "except AdapterNotConfigured" in _b_src and 'oc.status = "blocked_config"' in _b_src)
+ok("and counts it separately in the manifest", '"blocked_config": sum(' in _b_src)
+ok("the exit code still keys on `failed` alone",
+   'return 1 if manifest["failed"] else 0' in _b_src)
+# The distinction that matters: config-blocked stays green, a real fault does not.
+_mk = lambda st: a2b.Outcome(brief_file="x", status=st)
+_green = [_mk("drafted"), _mk("blocked_config"), _mk("deferred")]
+_red = _green + [_mk("failed")]
+ok("a config-blocked brief leaves the run green",
+   sum(o.status == "failed" for o in _green) == 0)
+ok("a genuine failure still reddens it",
+   sum(o.status == "failed" for o in _red) == 1)
+_wf2b = pathlib.Path("../.github/workflows/agent2-writer.yml").read_text(encoding="utf-8")
+ok("and the summary gives it its own section, not silence",
+   "Blocked by the target site's own configuration" in _wf2b)
+
 print("\n=== a median of an even sample is not the upper-middle value ===")
 # Agent 8's first live run reported the rivals' median as 2,014 from
 # [289, 1735, 2014, 2374]. The arithmetic was right for what it computed —

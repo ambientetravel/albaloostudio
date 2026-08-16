@@ -192,8 +192,20 @@ jobs:
               print("> **Structural run — no model was called.** The drafts below are "
                     "assembled from the briefs and are not publishable.\n")
           print(f"{m['drafted']} drafted · {m['blocked']} blocked · "
+                f"{m.get('blocked_config', 0)} blocked by site config · "
                 f"{m.get('deferred_upstream', 0)} deferred · {m['failed']} failed "
                 f"(of {m['briefs_seen']} briefs)\n")
+          # Its own section, because it is neither a fault nor transient: the
+          # target site's configuration makes publishing impossible on purpose,
+          # and the fix is a decision recorded in sites.yml, not a retry.
+          cfg = [o for o in m["outcomes"] if o["status"] == "blocked_config"]
+          if cfg:
+              print("\n### Blocked by the target site's own configuration\n")
+              print("Not a failure and not worth a retry — the article was written and "
+                    "the gate passed it, but the destination cannot accept it until a "
+                    "decision in `sites.yml` is made.\n")
+              for o in cfg:
+                  print(f"- **{o['domain']}** — {o['error']}")
           if m.get("deferred_by_limit"):
               print(f"> {m['deferred_by_limit']} brief(s) deferred to the next run by "
                     f"the per-run limit. Briefs are taken one per site in rotation, so "
