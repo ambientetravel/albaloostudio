@@ -1947,6 +1947,50 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== boutimar.ir stores articles as data, not files ===")
+# `boutimar_ir_static` was named in sites.yml from the start and the dispatcher
+# never had a branch for it, so boutimar.ir — the live Farsi site — fell through
+# to "no adapter" and staged silently. Nothing caught it because every run
+# before 16 Aug 2026 failed further up the chain and no draft ever reached an
+# adapter.
+_a2l_src_now = pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("the dispatcher now has a boutimar_ir_static branch",
+   'adapter == "boutimar_ir_static"' in _a2l_src_now)
+_ir = [s for s in config.load_sites(include_hold=True) if s.domain == "boutimar.ir"][0]
+ok("and sites.yml names the repo it writes to",
+   _ir.cms.get("repo") == "ambientetravel/boutimarfarsi")
+ok("and the path inside it", _ir.cms.get("articles_path") == "data/articles.json")
+
+# The store documents its own block vocabulary in `_howToAdd`. Emitting anything
+# else renders as nothing, silently.
+_conv = _a2l._markdown_to_daryanameh_blocks
+_blocks = _conv("## سر\n\nمتن یک\nمتن دو\n\n- الف\n- ب\n\n> هشدار")
+_kinds = [list(b)[0] for b in _blocks]
+ok("markdown becomes h/p/list/note in order", _kinds == ["h", "p", "list", "note"], _kinds)
+ok("only the four documented block types are emitted",
+   all(set(b) <= {"h", "p", "list", "note"} for b in _blocks))
+ok("a bullet run collapses into ONE list block", _kinds.count("list") == 1)
+ok("and keeps every bullet", _blocks[2]["list"] == ["الف", "ب"])
+ok("a multi-line paragraph is joined, not split", _blocks[1]["p"] == "متن یک متن دو")
+ok("nothing is emitted empty", all(b[list(b)[0]] for b in _blocks))
+ok("empty markdown yields no blocks rather than one empty one", _conv("") == [])
+
+# The shape must match the live store exactly — a stray or missing key is a
+# card that renders wrong on a site with real traffic.
+_store = json.load(open("../boutimar-ir/data/articles.json", encoding="utf-8"))
+_real_keys = set(_store["articles"][0])
+ok("the emitted article shape matches a real entry",
+   _real_keys == {"slug", "date", "kind", "title", "dek",
+                  "image", "read", "body", "related"}, sorted(_real_keys))
+ok("kind values in the store are the documented enum",
+   {a["kind"] for a in _store["articles"]} <= {"راهنما", "روایت", "خبر"})
+# image is emitted empty ON PURPOSE — a data file renders a card without a
+# picture, which unlike a missing Astro field does not break a build.
+ok("the adapter leaves image empty for a human, and says so in the PR",
+   '"image": ""' in _a2l_src_now and "set `image`" in _a2l_src_now)
+ok("and never fabricates related links",
+   '"related": []' in _a2l_src_now)
+
 print("\n=== every agent that exists must be reachable ===")
 # Agent 8 was written and tested on 13 Aug 2026 and had no workflow file, so it
 # had never run unattended and nobody noticed for three days. An agent with no

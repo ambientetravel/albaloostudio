@@ -749,6 +749,13 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
     if adapter == "astro_pr":
         return _push_astro_pr(brief, draft, url)
 
+    # Named in sites.yml since the registry was written, and never dispatched:
+    # boutimar.ir fell straight through to "no adapter" and staged silently.
+    # Nobody noticed because every run before 16 Aug 2026 failed further up the
+    # chain, so the drafts never reached an adapter at all.
+    if adapter == "boutimar_ir_static":
+        return _push_boutimar_ir_article(site, brief, draft, url)
+
     # A missing_page brief whose path already exists is a hard error, never an
     # overwrite (ARCHITECTURE.md §5, Agent 2).
     if brief.opportunity.gap_type == "missing_page" and _url_exists(url):
@@ -1078,6 +1085,194 @@ def _push_astro_pr(
         return {"status": "draft", "live_url": None, "intended_url": url,
                 "record_id": None, "published_at": None, "scheduled_for": None,
                 "note": f"astro_pr error: {detail}" + (f" — {hint}" if hint else "")}
+
+
+def _markdown_to_daryanameh_blocks(md: str) -> list[dict[str, Any]]:
+    """
+    Markdown → دریانامه's block array.
+
+    boutimar.ir does not store articles as files. `article.html` is a shell that
+    renders `data/articles.json` via `?a=<slug>`, and `body` there is a list of
+    typed blocks, not prose. The file documents the four it accepts:
+
+        {"h": "…"}      a subheading
+        {"p": "…"}      a paragraph
+        {"list": […]}   a bullet list
+        {"note": "…"}   a highlighted caution
+
+    Anything not recognised becomes a paragraph rather than being dropped: a
+    silently missing paragraph is worse than a mis-typed one, because the
+    article still reads and nobody notices the hole.
+    """
+    blocks: list[dict[str, Any]] = []
+    bullets: list[str] = []
+
+    def flush() -> None:
+        if bullets:
+            blocks.append({"list": bullets.copy()})
+            bullets.clear()
+
+    for raw in (md or "").split("\n\n"):
+        chunk = raw.strip()
+        if not chunk:
+            continue
+        lines = [ln.strip() for ln in chunk.splitlines() if ln.strip()]
+        # A bullet run may sit inside one chunk or span several, so bullets are
+        # accumulated across chunks and flushed when something else arrives.
+        if lines and all(ln.startswith(("- ", "* ")) for ln in lines):
+            bullets.extend(ln[2:].strip() for ln in lines)
+            continue
+        flush()
+        if chunk.startswith("#"):
+            blocks.append({"h": chunk.lstrip("#").strip()})
+        elif chunk.startswith(">"):
+            # A blockquote is the closest markdown has to "caution", and the
+            # writer prompt uses it for exactly that.
+            blocks.append({"note": " ".join(ln.lstrip("> ").strip() for ln in lines)})
+        else:
+            blocks.append({"p": " ".join(lines)})
+    flush()
+    return blocks
+
+
+def _push_boutimar_ir_article(
+    site: SiteBlock, brief: ContentBrief, draft: dict[str, Any], url: str
+) -> dict[str, Any]:
+    """
+    Add one article to دریانامه and open a pull request on boutimarfarsi.
+
+    Every other adapter writes a FILE. This one edits a shared JSON array, and
+    that difference drives the implementation: the file has to be read, parsed,
+    appended to and written back with its blob sha, rather than simply created.
+
+    Two consequences worth knowing rather than discovering:
+
+      * Two articles in one run branch from the same main, so both PRs touch
+        the same array and the second to merge will conflict. GitHub shows it
+        plainly and a human resolves it; that is preferable to one PR carrying
+        several articles, where rejecting one means rejecting all.
+      * `image` is emitted EMPTY. The store requires "a real file under img/"
+        and the pipeline has none, so the reviewer fills one field before
+        merging. Unlike exploreorient this does not block the PR, because an
+        empty string in a data file renders a card without a picture — it does
+        not redden a build and block every other merge into the repo.
+    """
+    repo = str(site.cms.get("repo") or "").strip()
+    path = str(site.cms.get("articles_path") or "data/articles.json").strip("/")
+    token = config.optional_env("ASTRO_GITHUB_TOKEN")
+    if not repo or not token:
+        return _write_static_bundle(site, brief, draft, url)
+
+    # kind drives the filter chips on the index and is an enum, not free text.
+    # An unrecognised value would render a chip nobody can filter by.
+    kind = {"guide": "راهنما", "news": "خبر", "story": "روایت",
+            "narrative": "روایت"}.get(
+        str(getattr(brief.brief, "content_type", "") or "").lower(), "راهنما")
+
+    slug = brief.brief.target_url_path.strip("/").split("/")[-1] or "article"
+    body = _markdown_to_daryanameh_blocks(draft.get("body_markdown", ""))
+    words = len(str(draft.get("body_markdown", "")).split())
+    article = {
+        "slug": slug,
+        "date": utc_now().strftime("%Y-%m"),      # YYYY-MM, per _howToAdd
+        "kind": kind,
+        "title": draft.get("title") or brief.brief.working_title,
+        "dek": (draft.get("meta_description") or "").strip(),
+        "image": "",                              # reviewer supplies — see docstring
+        "read": max(1, round(words / 200)),
+        "body": body,
+        # Deliberately empty. _howToAdd wants cruise ids from the feed or real
+        # destination filenames; guessing either produces a card that links
+        # nowhere, which is worse than a card with no links.
+        "related": [],
+    }
+
+    api = "https://api.github.com"
+    hdr = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
+           "User-Agent": config.USER_AGENT}
+    branch = f"agent2/{slug}"
+    try:
+        r = requests.get(f"{api}/repos/{repo}", headers=hdr, timeout=config.WEBHOOK_TIMEOUT_S)
+        r.raise_for_status()
+        base = r.json()["default_branch"]
+
+        r = requests.get(f"{api}/repos/{repo}/git/ref/heads/{base}", headers=hdr,
+                         timeout=config.WEBHOOK_TIMEOUT_S)
+        r.raise_for_status()
+        sha = r.json()["object"]["sha"]
+
+        rb = requests.post(f"{api}/repos/{repo}/git/refs", headers=hdr,
+                           json={"ref": f"refs/heads/{branch}", "sha": sha},
+                           timeout=config.WEBHOOK_TIMEOUT_S)
+        if rb.status_code not in (201, 422):     # 422 = branch exists, a redelivery
+            rb.raise_for_status()
+
+        import base64 as _b64
+        rf = requests.get(f"{api}/repos/{repo}/contents/{path}", headers=hdr,
+                          params={"ref": branch}, timeout=config.WEBHOOK_TIMEOUT_S)
+        rf.raise_for_status()
+        blob = rf.json()
+        store = json.loads(_b64.b64decode(blob["content"]).decode("utf-8"))
+        existing = store.get("articles", [])
+        # Idempotent on slug: a redelivery must update its own entry, never
+        # append a second one that the index would render twice.
+        existing = [a for a in existing if a.get("slug") != slug]
+        store["articles"] = existing + [article]
+
+        r = requests.put(
+            f"{api}/repos/{repo}/contents/{path}", headers=hdr,
+            json={"message": f"دریانامه: {article['title']}"[:72],
+                  "content": _b64.b64encode(
+                      json.dumps(store, ensure_ascii=False, indent=2).encode("utf-8")
+                  ).decode("ascii"),
+                  "sha": blob["sha"], "branch": branch},
+            timeout=config.WEBHOOK_TIMEOUT_S)
+        r.raise_for_status()
+
+        rp = requests.post(
+            f"{api}/repos/{repo}/pulls", headers=hdr,
+            json={"title": f"دریانامه draft: {article['title']}"[:72],
+                  "head": branch, "base": base,
+                  "body": (f"Drafted by Agent 2 from the Search Console gap "
+                           f"`{brief.opportunity.primary_keyword}`.\n\n"
+                           f"Adds one object to `{path}`. No new HTML file and no "
+                           f"redeploy — `article.html?a={slug}` renders it.\n\n"
+                           f"**Before merging, set `image`** to a real file under "
+                           f"`img/`. It is left empty on purpose: the pipeline has no "
+                           f"photograph for a page it has just written, and choosing "
+                           f"one would assert a credit nobody checked.\n\n"
+                           f"`related` is empty for the same reason — it takes cruise "
+                           f"ids from the feed or real destination filenames.\n\n"
+                           f"_Pipeline architecture by {config.ARCHITECTURE_CREDIT}_")},
+            timeout=config.WEBHOOK_TIMEOUT_S)
+        if rp.status_code == 422:
+            return {"status": "draft", "live_url": None, "intended_url": url,
+                    "record_id": slug, "published_at": None, "scheduled_for": None,
+                    "note": f"pull request already open for {branch}"}
+        rp.raise_for_status()
+        pr = rp.json()
+        log.info("%s — opened PR #%s: %s", site.domain, pr.get("number"), pr.get("html_url"))
+        return {
+            "status": "draft", "live_url": None, "intended_url": url,
+            "record_id": slug, "published_at": None, "scheduled_for": None,
+            "pr_url": pr.get("html_url"), "pr_number": pr.get("number"),
+            "note": "pull request opened — set `image` before merging",
+        }
+    except requests.RequestException as exc:
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        hint = {
+            401: "ASTRO_GITHUB_TOKEN was rejected — malformed, expired or revoked.",
+            403: f"the token lacks Contents/Pull-requests write on {repo}.",
+            404: (f"the token cannot see {repo}. It is scoped per repository, and "
+                  f"boutimarfarsi is a THIRD repo — adding boutimar and exploreorient "
+                  f"did not include it."),
+        }.get(status, "")
+        detail = config.redact(str(exc))[:200]
+        log.error("%s — daryanameh push failed: %s%s", site.domain, detail,
+                  f" — {hint}" if hint else "")
+        return {"status": "draft", "live_url": None, "intended_url": url,
+                "record_id": None, "published_at": None, "scheduled_for": None,
+                "note": f"daryanameh error: {detail}" + (f" — {hint}" if hint else "")}
 
 
 def _write_static_bundle(

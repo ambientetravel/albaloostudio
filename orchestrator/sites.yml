@@ -115,6 +115,17 @@ sites:
       adapter: boutimar_ir_static
       content_root: "/"
       publish_mode: draft
+      # boutimar.ir stores articles as DATA, not files. `article.html` is a
+      # shell that renders one entry of data/articles.json via ?a=<slug>, so
+      # publishing adds an object to an array — no new HTML file, no rebuild,
+      # no redeploy. The store documents its own rules in `_howToAdd` and
+      # `_editorialRule`; the adapter follows them rather than inventing a
+      # shape.
+      #
+      # A THIRD repository, and the content token is scoped per repo: granting
+      # boutimar and exploreorient did not grant this one.
+      repo: ambientetravel/boutimarfarsi
+      articles_path: data/articles.json
     data_dependencies:
       - field: price_from
         source: "https://boutimar.ir/api/cruises.php"
