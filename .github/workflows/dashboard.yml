@@ -124,3 +124,99 @@ jobs:
           path: orchestrator/dashboard.html
           retention-days: 90
           if-no-files-found: warn
+
+      # ── dashboard.boutimar.com ──────────────────────────────────────────
+      # Same shape as deploy-albaloostudio.yml: lftp to a scoped FTP account
+      # held in GitHub's secret store and revocable by deleting the account.
+      #
+      # TWO destinations, and the split is the whole security model:
+      #   public_html/index.php   the password gate
+      #   private/dashboard.html  the data, OUTSIDE the web root
+      #
+      # Netafraz serves static files through nginx directly — which is why
+      # Header and Expires rules on this host only ever reached PHP. A
+      # dashboard.html sitting in public_html would therefore be readable by
+      # anyone with the URL no matter what .htaccess said. Putting it outside
+      # the root is not belt-and-braces; it is the only thing that works here.
+      - name: Install lftp
+        if: success()
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Deploy to dashboard.boutimar.com
+        if: success()
+        env:
+          FTP_HOST: ${{ secrets.DASHBOARD_FTP_HOST }}
+          FTP_USER: ${{ secrets.DASHBOARD_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.DASHBOARD_FTP_PASSWORD }}
+          PW_HASH: ${{ secrets.DASHBOARD_PASSWORD_HASH }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FTP_HOST:-}" ] || [ -z "${FTP_USER:-}" ] || [ -z "${FTP_PASSWORD:-}" ]; then
+            echo "::notice title=Not deployed::DASHBOARD_FTP_* secrets are not set, so the page was built and uploaded as an artifact only. See orchestrator/SETUP-DASHBOARD.md."
+            exit 0
+          fi
+          if [ -z "${PW_HASH:-}" ]; then
+            echo "::error title=No password hash::DASHBOARD_PASSWORD_HASH is not set. Refusing to deploy — index.php fails closed on a missing hash, but shipping an ungated page is not something to risk on that."
+            exit 1
+          fi
+
+          mkdir -p _pub _priv
+          cp ../dashboard-site/index.php _pub/index.php
+          cp dashboard.html _priv/dashboard.html
+          # The hash, never the password. Written as PHP so it is not servable
+          # as text even if it somehow lands inside the web root.
+          #
+          # Checked before writing: a bcrypt hash is $2y$<cost>$<53 chars> and
+          # contains no quote or backslash, which is why a bare printf is safe
+          # here. Anything else is a pasting accident, and an auth file built
+          # from one would fail open-ish in confusing ways.
+          case "$PW_HASH" in
+            \$2y\$*|\$2b\$*|\$2a\$*) : ;;
+            *) echo "::error title=Not a bcrypt hash::DASHBOARD_PASSWORD_HASH does not start with \$2y\$. Generate it with the command in SETUP-DASHBOARD.md and store the HASH, not the password."; exit 1 ;;
+          esac
+          printf "<?php return '%s';\n" "$PW_HASH" > _priv/dashboard-auth.php
+
+          # mirror -R uploads a directory; two calls because the destinations
+          # are siblings, not nested.
+          lftp -c "
+            set ftp:ssl-allow true;
+            set ssl:verify-certificate false;
+            set net:max-retries 2; set net:timeout 20;
+            open -u '$FTP_USER','$FTP_PASSWORD' '$FTP_HOST';
+            mkdir -p private;
+            mirror -R --only-newer --verbose _pub  public_html;
+            mirror -R --only-newer --verbose _priv private;
+            bye
+          "
+          echo "deployed"
+
+      - name: Verify the gate is actually gating
+        if: success()
+        run: |
+          set -euo pipefail
+          if [ -z "${{ secrets.DASHBOARD_FTP_HOST }}" ]; then exit 0; fi
+          sleep 8
+          fail=0
+          # The page must answer, and must NOT contain the dashboard itself.
+          body=$(curl -sS -L --max-time 25 https://dashboard.boutimar.com/ || true)
+          case "$body" in
+            *"Albaloo orchestration"*) echo "gate renders ✓" ;;
+            *) echo "::error::dashboard.boutimar.com did not return the login page"; fail=1 ;;
+          esac
+          case "$body" in
+            *"Can each site receive an article"*)
+              echo "::error title=NOT GATED::The dashboard content was served without a password."
+              fail=1 ;;
+            *) echo "content withheld until sign-in ✓" ;;
+          esac
+          # And the data file must not be reachable directly.
+          for p in dashboard.html private/dashboard.html ../private/dashboard.html; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 20 "https://dashboard.boutimar.com/$p" || echo 000)
+            if [ "$code" = "200" ]; then
+              echo "::error title=Data file exposed::/$p returned 200 — it must not be servable."
+              fail=1
+            else
+              echo "/$p  $code ✓"
+            fi
+          done
+          exit $fail

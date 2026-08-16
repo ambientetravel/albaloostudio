@@ -1960,6 +1960,39 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== the dashboard gate must fail closed, and hide the data ===")
+# dashboard.boutimar.com. The thing that must never happen is a page that looks
+# gated and is not — which on THIS host is the default outcome, because nginx
+# serves static files directly and a .htaccess block would not touch a static
+# dashboard.html at all.
+_php = pathlib.Path("../dashboard-site/index.php").read_text(encoding="utf-8")
+ok("the data file lives outside the web root",
+   "__DIR__ . '/../private/dashboard.html'" in _php,
+   "inside public_html it is servable no matter what .htaccess says")
+ok("a missing hash returns 503, never an open page",
+   "fail('Not configured yet" in _php and "503" in _php)
+ok("passwords are checked with password_verify, not a comparison",
+   "password_verify(" in _php and "== $hash" not in _php)
+ok("the session id is regenerated on login", "session_regenerate_id(true)" in _php)
+ok("the cookie is httponly and samesite-strict",
+   "'httponly' => true" in _php and "'samesite' => 'Strict'" in _php)
+ok("the page refuses to be indexed", "X-Robots-Tag" in _php and "noindex" in _php)
+ok("the hash is never printed", "echo $hash" not in _php and "print $hash" not in _php)
+
+_wf = pathlib.Path("../.github/workflows/dashboard.yml").read_text(encoding="utf-8")
+ok("the deploy refuses to run without a password hash",
+   "No password hash" in _wf and "exit 1" in _wf)
+ok("and validates the hash actually looks like bcrypt", "Not a bcrypt hash" in _wf)
+ok("missing FTP secrets skip the deploy rather than failing the build",
+   "Not deployed" in _wf)
+# The check that matters more than any of the above.
+ok("after deploying it verifies the content is NOT served unauthenticated",
+   "NOT GATED" in _wf and "Can each site receive an article" in _wf)
+ok("and that the data file is not reachable at a URL",
+   "Data file exposed" in _wf)
+ok("the setup doc the workflow points at exists",
+   pathlib.Path("SETUP-DASHBOARD.md").exists())
+
 print("\n=== every module must parse on the RUNNER's python, not this laptop's ===")
 # build_dashboard.py compiled cleanly locally and was a SyntaxError in CI: a
 # backslash inside an f-string expression, which Python 3.12 legalised (PEP 701)
