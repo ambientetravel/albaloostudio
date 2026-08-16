@@ -1042,6 +1042,15 @@ def _push_astro_pr(
                      if token.startswith(p)), "unrecognised-prefix")
         shape = (f"[token shape: {len(token)} chars, {kind}; a complete "
                  f"fine-grained token is ~93 chars and starts github_pat_]")
+        # The shortest credential GitHub issues is 40 characters. Below that the
+        # value CANNOT be a token, so showing it leaks nothing and is the only
+        # thing that ends a loop of re-pasting: three careful re-pastes and a
+        # delete-and-recreate all produced the same 8 characters, which means
+        # the value never came from the clipboard at all. Naming it identifies
+        # where it did come from.
+        if 0 < len(token) < 20:
+            shape += (f" [value is too short to be any GitHub credential, so it is "
+                      f"printed here to identify it: {token!r}]")
         hint = {
             401: (f"the token in ASTRO_GITHUB_TOKEN was REJECTED — it is malformed, "
                   f"truncated, expired or revoked. This is not a permissions problem; "
