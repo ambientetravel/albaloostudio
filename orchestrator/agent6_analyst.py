@@ -461,6 +461,13 @@ def topic_map(opps: list[Opportunity]) -> dict[str, dict[str, Any]]:
         c["pillar"] = top.keyword
         c["pillar_words"] = "2000–4000"
         c["supporting"] = [o.keyword for o in c["keywords"][1:8]]
+        # Keywords as STRINGS, not Opportunity objects. They were the objects,
+        # which made this whole payload unserialisable — so `--format json` had
+        # never once worked, and nobody noticed because the workflow only ever
+        # asked for markdown. The dashboard reads the JSON, which is how it
+        # surfaced.
+        c["keywords"] = [o.keyword for o in c["keywords"]]
+        c["quadrants"] = dict(c["quadrants"])
     return dict(sorted(out.items(), key=lambda kv: kv[1]["impressions"], reverse=True))
 
 

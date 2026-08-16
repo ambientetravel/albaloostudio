@@ -17,8 +17,17 @@ manifest; this only collects them:
 
     runs/*/manifest.json          agent 1 — briefs, degradation, spend
     written/manifest.json         agent 2 — drafts, PRs, where words went
+    reports/strategy-*.json       agent 6 — quadrants, clusters, the calendar
+    reports/geo-*.json            agent 7 — country visibility and alignment
     competitors/competitors.json  agent 8 — us versus named rivals
     sites.yml                     the registry, which is always present
+
+The first version of this page read only agents 1, 2 and 8, which answered
+"did the machine run" and said nothing about what the machine is FOR. Agent 6
+already scores every gap into quick-win / big-bet / fill-in / avoid, groups
+them into topic clusters with a pillar page, and lays a twelve-week calendar;
+agent 5 scores each site's technical health. Leaving that out made the pipeline
+look like a publishing robot rather than an SEO programme.
 
 A missing file becomes a section that says the data is missing. It never
 invents a number and never renders a zero it did not measure — a dashboard
@@ -60,6 +69,15 @@ def _load(path: Path) -> Any | None:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return None
+
+
+def _newest(root: Path, pattern: str) -> Any | None:
+    """Newest file matching a dated glob. Absent is absent, never an empty dict."""
+    for p in sorted(root.glob(pattern), reverse=True):
+        v = _load(p)
+        if v:
+            return v
+    return None
 
 
 def _latest_scout(root: Path) -> dict | None:
@@ -152,7 +170,8 @@ def _missing(what: str) -> str:
 
 
 def render(scout: dict | None, writer: dict | None,
-           competitors: dict | None) -> str:
+           competitors: dict | None, strategy: dict | None = None,
+           geo: Any = None) -> str:
     now = datetime.now(timezone.utc).strftime("%d %b %Y, %H:%M UTC")
     cov = _coverage()
     can_publish = sum(1 for r in cov if r["cls"] == "ok")
@@ -251,6 +270,119 @@ def render(scout: dict | None, writer: dict | None,
                 f'<td class="n">{o.get("words",0):,}</td><td>{dest}</td></tr>')
         out.append("</table></div>")
 
+    # ── what to write next ──────────────────────────────────────────────────
+    # The reason this pipeline exists, and the first version of this page left
+    # it out entirely: it showed whether the machinery worked and said nothing
+    # about what the machinery is FOR. Agent 6 already scores every gap into a
+    # quadrant, groups them into topic clusters with a pillar page, and lays a
+    # twelve-week calendar that front-loads winnable pages.
+    out.append("<h2>What to write next</h2>")
+    if not strategy:
+        out.append(_missing("agent 6 strategy"))
+    else:
+        opps = strategy.get("opportunities", [])
+        counts: dict[str, int] = {}
+        for o in opps:
+            counts[o.get("quadrant", "?")] = counts.get(o.get("quadrant", "?"), 0) + 1
+        label = {"quick_win": "quick wins", "big_bet": "big bets",
+                 "fill_in": "fill-ins", "avoid": "not worth it"}
+        cards = [_stat(label.get(k, k), str(v))
+                 for k, v in sorted(counts.items(), key=lambda kv: -kv[1])]
+        if cards:
+            out.append(f'<div class="grid">{"".join(cards)}</div>')
+
+        quick = [o for o in opps if o.get("quadrant") == "quick_win"][:8]
+        if quick:
+            out.append('<div class="panel"><strong>Quick wins — ranked, close, '
+                       'and winnable now</strong>'
+                       '<table><tr><th>Keyword</th><th>Site</th><th class="n">Impressions</th>'
+                       '<th class="n">Position</th><th>Intent</th></tr>')
+            for o in quick:
+                out.append(
+                    f'<tr><td>{_esc(o.get("keyword",""))}</td>'
+                    f'<td>{_esc(o.get("domain",""))}</td>'
+                    f'<td class="n">{o.get("impressions",0):,}</td>'
+                    f'<td class="n">{o.get("position",0)}</td>'
+                    f'<td>{_esc(o.get("intent",""))}</td></tr>')
+            out.append("</table></div>")
+
+        topics = strategy.get("topics") or {}
+        if topics:
+            out.append('<div class="panel"><strong>Topic clusters</strong>'
+                       '<table><tr><th>Cluster</th><th>Pillar page</th>'
+                       '<th class="n">Impressions</th><th class="n">Keywords</th></tr>')
+            for name, t in list(topics.items())[:10]:
+                out.append(
+                    f'<tr><td>{_esc(name)}</td><td>{_esc(t.get("pillar",""))} '
+                    f'<span class="missing">{_esc(t.get("pillar_words",""))} words</span></td>'
+                    f'<td class="n">{t.get("impressions",0):,}</td>'
+                    f'<td class="n">{len(t.get("keywords",[])):,}</td></tr>')
+            out.append("</table></div>")
+
+        cal = strategy.get("calendar") or []
+        if cal:
+            out.append('<div class="panel"><strong>The next twelve weeks</strong>'
+                       '<p class="note">Quick wins first, on purpose — the point of '
+                       'weeks 1–4 is to prove the pipeline moves rankings before '
+                       'anyone commits a quarter to it.</p>'
+                       '<table><tr><th class="n">Week</th><th>Starting</th>'
+                       '<th>Pieces</th></tr>')
+            for w in cal[:12]:
+                items = "<br>".join(
+                    f'{_esc(i.get("keyword",""))} '
+                    f'<span class="missing">{_esc(i.get("domain",""))} · '
+                    f'{_esc(i.get("type",""))} · {_esc(i.get("words",""))}w</span>'
+                    for i in w.get("items", []))
+                out.append(f'<tr><td class="n">{w.get("week","")}</td>'
+                           f'<td>{_esc(w.get("starting",""))}</td><td>{items}</td></tr>')
+            out.append("</table></div>")
+
+    # ── site health ─────────────────────────────────────────────────────────
+    out.append("<h2>Site health</h2>")
+    if not strategy or not strategy.get("portfolio"):
+        out.append(_missing("agent 5 audit"))
+    else:
+        out.append(f'<div class="panel"><p class="sub">Mean score '
+                   f'<strong>{strategy.get("mean_score","—")}</strong> across '
+                   f'{strategy.get("sites_audited",0)} audited '
+                   f'{"site" if strategy.get("sites_audited")==1 else "sites"}'
+                   f'{f", {strategy['placeholders']} still on placeholder content" if strategy.get("placeholders") else ""}.</p>'
+                   '<table><tr><th>Site</th><th class="n">Score</th>'
+                   '<th class="n">Findings</th><th>State</th></tr>')
+        for s in strategy["portfolio"]:
+            sc = s.get("score", 0)
+            cls = "ok" if sc >= 70 else ("warn" if sc >= 45 else "bad")
+            state = ('<span class="pill bad">placeholder content</span>'
+                     if s.get("placeholder") else "")
+            out.append(f'<tr><td>{_esc(s.get("domain","?"))}</td>'
+                       f'<td class="n"><span class="pill {cls}">{sc}</span></td>'
+                       f'<td class="n">{s.get("findings",0)}</td><td>{state}</td></tr>')
+        out.append("</table></div>")
+
+    # ── geography ───────────────────────────────────────────────────────────
+    out.append("<h2>Where the audience actually is</h2>")
+    if not geo:
+        out.append(_missing("agent 7 geo"))
+    else:
+        rows = geo if isinstance(geo, list) else geo.get("sites", [])
+        for r in rows:
+            ma = r.get("market_alignment", {})
+            verdict = str(ma.get("verdict", ""))
+            cls = "bad" if verdict == "MISALIGNED" else "ok"
+            out.append(f'<div class="panel"><strong>{_esc(r.get("domain","?"))}</strong> '
+                       f'<span class="pill {cls}">{_esc(verdict or "—")}</span>'
+                       f'<p class="note">{_esc(ma.get("detail",""))}</p>')
+            opps_g = r.get("opportunities", [])[:6]
+            if opps_g:
+                out.append('<table><tr><th>Country</th><th class="n">Impressions</th>'
+                           '<th class="n">Position</th></tr>')
+                for o in opps_g:
+                    out.append(f'<tr><td>{_esc(o.get("country",""))}</td>'
+                               f'<td class="n">{o.get("impressions",0):,}</td>'
+                               f'<td class="n">{o.get("position","—")}</td></tr>')
+                out.append("</table>")
+            out.append("</div>")
+
     # ── competitors ─────────────────────────────────────────────────────────
     out.append("<h2>How we compare</h2>")
     if not competitors:
@@ -307,10 +439,17 @@ def main(argv: list[str] | None = None) -> int:
     scout = _latest_scout(root)
     writer = _load(root / "written" / "manifest.json")
     comp = _load(root / "competitors" / "competitors.json")
+    # Agents 5/6/7 write dated files, so take the newest of each rather than
+    # guessing today's name — a Monday report read on Thursday is still the
+    # current one.
+    strategy = _newest(root, "reports/strategy-*.json")
+    geo = _newest(root, "reports/geo-*.json")
 
-    Path(args.out).write_text(render(scout, writer, comp), encoding="utf-8")
+    Path(args.out).write_text(render(scout, writer, comp, strategy, geo),
+                              encoding="utf-8")
     found = [n for n, v in (("agent1", scout), ("agent2", writer),
-                            ("agent8", comp)) if v]
+                            ("agent8", comp), ("agent6", strategy),
+                            ("agent7", geo)) if v]
     print(f"wrote {args.out} — manifests found: {', '.join(found) or 'none'}")
     # Never fail. A dashboard missing one input is still worth reading, and a
     # red run here would mean nobody sees the parts that DID work.

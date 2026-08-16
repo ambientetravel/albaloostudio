@@ -112,6 +112,17 @@ jobs:
             $GAPS $LLM \
             --out reports/strategy-$(date -u +%Y-%m-%d).md
 
+          # The same analysis as JSON. The markdown is for reading; this is for
+          # the dashboard, which cannot parse prose and would otherwise have
+          # nothing to show for the quadrants, the topic clusters or the
+          # twelve-week calendar — the three things the strategy is actually
+          # for. Written second so a failure here cannot cost the report.
+          python agent6_analyst.py \
+            --audit reports/audit-$(date -u +%Y-%m-%d).json \
+            $GAPS $LLM --format json \
+            --out reports/strategy-$(date -u +%Y-%m-%d).json || \
+            echo "::warning title=No strategy JSON::The markdown report was written but the JSON was not, so the dashboard will show its strategy sections as absent."
+
       - name: Trend
         # Two numbers, in the job summary, so a regression is visible without
         # opening an artifact.

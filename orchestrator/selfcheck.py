@@ -2016,6 +2016,38 @@ _pins = {_m for _w in pathlib.Path("../.github/workflows").glob("*.yml")
                                _w.read_text(encoding="utf-8"))}
 ok("and the workflows all pin that version", _pins == {"3.11"}, _pins)
 
+print("\n=== agent 6's strategy must survive being written as JSON ===")
+# topic_map() put Opportunity OBJECTS in each cluster's `keywords`, so the whole
+# payload was unserialisable and `--format json` had never once worked. Nobody
+# noticed because the workflow only ever asked for markdown — it surfaced the
+# moment the dashboard tried to read the JSON. The quadrants, the clusters and
+# the twelve-week calendar are what this pipeline is FOR, and they were
+# unreachable by anything that could not parse prose.
+_g6 = [{"domain": "a.com", "primary_keyword": "k one", "impressions": 400, "position": 11.0},
+       {"domain": "a.com", "primary_keyword": "k two", "impressions": 80, "position": 34.0},
+       {"domain": "b.com", "primary_keyword": "k three", "impressions": 30, "position": 48.0}]
+_opps6 = a6.build_matrix(_g6)
+_topics6, _cal6 = a6.topic_map(_opps6), a6.calendar(_opps6)
+try:
+    json.dumps({"topics": _topics6, "calendar": _cal6,
+                "opportunities": [o.as_dict() for o in _opps6]}, ensure_ascii=False)
+    _ser = True
+except TypeError as _e:
+    _ser = False
+ok("the strategy payload serialises to JSON", _ser,
+   "--format json raised TypeError before this was fixed")
+ok("cluster keywords are strings, not dataclasses",
+   all(isinstance(k, str) for c in _topics6.values() for k in c["keywords"]))
+ok("and the quadrant tally is a plain dict",
+   all(isinstance(c["quadrants"], dict) for c in _topics6.values()))
+ok("every cluster still names a pillar and its length",
+   all(c.get("pillar") and c.get("pillar_words") for c in _topics6.values()))
+ok("the calendar still front-loads quick wins",
+   not _cal6 or _cal6[0]["items"][0]["type"] in ("cluster", "pillar", "supporting"))
+_a5wf = pathlib.Path("../.github/workflows/agent5-site-audit.yml").read_text(encoding="utf-8")
+ok("the workflow now writes the JSON as well as the markdown",
+   "--format json" in _a5wf and "strategy-$(date -u +%Y-%m-%d).json" in _a5wf)
+
 print("\n=== the dashboard shows absence as absence, never as zero ===")
 # Asked for on 16 Aug and delivered the same day after being lost under the
 # billing work. The failure mode that matters is not an ugly page — it is a
@@ -2059,6 +2091,32 @@ _wfd = pathlib.Path("../.github/workflows/dashboard.yml").read_text(encoding="ut
 ok("the workflow uploads it rather than deploying it",
    "upload-artifact" in _wfd and "NOT DEPLOYED" in _wfd,
    "it carries competitor research, cost and unreviewed drafts")
+# The first version read agents 1, 2 and 8 only — it answered "did the machine
+# run" and said nothing about what to write, which is the point of the pipeline.
+_dsrc = pathlib.Path("tools/build_dashboard.py").read_text(encoding="utf-8")
+for _sec in ("What to write next", "Site health", "Where the audience actually is"):
+    ok(f"the dashboard has a '{_sec}' section", _sec in _dsrc)
+ok("it reads agent 6's strategy and agent 7's geography",
+   'reports/strategy-*.json' in _dsrc and 'reports/geo-*.json' in _dsrc)
+ok("and the workflow collects both artifacts",
+   "site-audit" in _wfd and "keyword-geo-reports" in _wfd)
+ok("agent 5+6's runs/ copy cannot shadow agent 1's newer scout",
+   "_dl/agent56/reports" in _wfd,
+   "that artifact ships runs/ too, and it is older")
+# Rendered end to end with the real shapes, not just present in the source.
+_full = _dm.render(None, None, None,
+                   {"portfolio": [{"domain": "x.com", "score": 33, "findings": 9,
+                                   "placeholder": True}],
+                    "mean_score": 33, "sites_audited": 1, "placeholders": 1,
+                    "opportunities": [o.as_dict() for o in _opps6],
+                    "topics": _topics6, "calendar": _cal6},
+                   [{"domain": "x.com",
+                     "market_alignment": {"verdict": "MISALIGNED", "detail": "d"},
+                     "opportunities": [{"country": "DE", "impressions": 9, "position": 4}]}])
+ok("a low audit score is flagged, not just printed", 'pill bad">33' in _full)
+ok("placeholder content is called out", "placeholder content" in _full)
+ok("a misaligned market is flagged", "MISALIGNED" in _full and 'pill bad' in _full)
+ok("the calendar renders when present", "The next twelve weeks" in _full)
 
 print("\n=== an adapter must never report a URL it did not create ===")
 # push_to_cms says exactly that in its docstring, and two adapters broke it

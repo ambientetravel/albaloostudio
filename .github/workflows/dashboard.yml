@@ -74,18 +74,29 @@ jobs:
                --repo "${{ github.repository }}" 2>/dev/null \
               || echo "::notice title=Artifact missing::$2 not present on run $run."
           }
-          grab agent1-seo-scout.yml       seo-scout-run   _dl/agent1
-          grab agent2-writer.yml          agent2-written  _dl/agent2
-          grab agent8-competitor-scout.yml competitor-scout _dl/agent8
+          grab agent1-seo-scout.yml        seo-scout-run        _dl/agent1
+          grab agent2-writer.yml           agent2-written       _dl/agent2
+          grab agent8-competitor-scout.yml competitor-scout     _dl/agent8
+          # Agents 5+6 (audit and strategy) and 7 (geography) both publish into
+          # reports/. They are the half of this pipeline that says what to WRITE
+          # rather than whether the machine ran, and the first dashboard left
+          # them out entirely.
+          grab agent5-site-audit.yml       site-audit           _dl/agent56
+          grab agent7-keyword-geo.yml      keyword-geo-reports  _dl/agent7
 
           # The artifacts preserve their own directory shape, so move each into
           # the layout build_dashboard.py looks for rather than teaching the
           # generator about GitHub's packaging.
-          mkdir -p runs written competitors
+          mkdir -p runs written competitors reports
           [ -d _dl/agent1 ] && cp -R _dl/agent1/. runs/ 2>/dev/null || true
           [ -d _dl/agent2 ] && cp -R _dl/agent2/written/. written/ 2>/dev/null || true
           [ -d _dl/agent8 ] && cp -R _dl/agent8/. competitors/ 2>/dev/null || true
-          echo "collected:"; ls -d runs written competitors 2>/dev/null || true
+          # agent 5+6 uploads reports/ AND runs/; take only reports so its copy
+          # of runs/ cannot shadow agent 1's newer scout manifest.
+          [ -d _dl/agent56/reports ] && cp -R _dl/agent56/reports/. reports/ 2>/dev/null || true
+          [ -d _dl/agent7 ] && cp -R _dl/agent7/. reports/ 2>/dev/null || true
+          echo "collected:"; ls -d runs written competitors reports 2>/dev/null || true
+          ls reports/ 2>/dev/null | head -8 || true
 
       - name: Build the page
         run: python3 tools/build_dashboard.py --out dashboard.html
