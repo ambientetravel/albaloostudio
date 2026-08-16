@@ -1,0 +1,144 @@
+# Agent 8 — Competitor Scout
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# The agent was written and tested on 13 Aug 2026 and then had no workflow at
+# all, so it had never run unattended. Everything it reports was reachable only
+# by running it by hand, which meant nobody ran it.
+#
+# Sundays 06:00 UTC, after the 04:15 scout. The ordering is the point: Agent 1
+# finds gaps from OUR Search Console — demand we do not serve — and cannot see
+# whether a rival has owned that ground for three years. Reading the competitor
+# picture the same morning puts the two on one page.
+#
+# Needs no credential. It reads public sitemaps and pages, obeys robots.txt,
+# and requests one page at a time with a delay. That politeness is not
+# decorative: these are not our servers, and a scout that gets the pipeline's
+# user-agent blocked has cost more than the data was worth.
+#
+# It reads a NAMED list — `competitors:` in sites.yml — and discovers nothing.
+# A site with no list is skipped rather than guessed at.
+
+name: Agent 8 — Competitor Scout
+
+on:
+  schedule:
+    # Sunday 06:00 UTC, ~1h45m after Agent 1. Long enough that the scout and
+    # its writer have finished and the runner is not competing with them.
+    - cron: "0 6 * * 0"
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Restrict to one domain (blank = every site declaring competitors)"
+        required: false
+        type: string
+      sample:
+        description: "Pages to read per competitor (a median needs enough of them)"
+        required: false
+        default: "10"
+        type: string
+      dry_run:
+        description: "List what would be crawled, fetch nothing"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  # Two scouts crawling the same rivals at once doubles the request rate on
+  # somebody else's server, which is exactly what CRAWL_DELAY_S exists to avoid.
+  group: agent8-competitor-scout
+  cancel-in-progress: false
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    # Generous on purpose: one request at a time with a 1.5s delay, across
+    # several competitors, is slow by design and must not be killed mid-crawl.
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: orchestrator
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Scout the competition
+        env:
+          PIPELINE_ENVIRONMENT: production
+        run: |
+          set -euo pipefail
+          ARGS="--out competitors --sample ${{ inputs.sample || '10' }}"
+          if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          python3 agent8_competitor_scout.py $ARGS
+
+      - name: Summarise
+        if: always()
+        run: |
+          set -euo pipefail
+          [ -f competitors/competitors.json ] || exit 0
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          m = json.load(open("competitors/competitors.json", encoding="utf-8"))
+          print("## Agent 8 — Competitor Scout\n")
+          if m.get("dry_run"):
+              print("> **Dry run — nothing was fetched.**\n")
+          print(f"> {m['note']}\n")
+          for s in m["sites"]:
+              print(f"### {s['domain']}\n")
+              if s.get("dry_run"):
+                  print(f"Would crawl: {', '.join(s['competitors'])}\n")
+                  continue
+              us, cmp = s.get("us", {}), s.get("comparison", {})
+              # Our own numbers first. The first version of this agent measured
+              # every rival and never measured us, so the one comparison that
+              # matters could not be drawn at all.
+              print(f"**Us** — {us.get('urls_listed', 0):,} URLs listed · "
+                    f"{us.get('pages_sampled', 0)} sampled · "
+                    f"median {us.get('median_words', 0):,} words\n")
+              print("| Competitor | Status | URLs listed | Sampled | Median words |")
+              print("|---|---|---:|---:|---:|")
+              for c in s.get("competitors", []):
+                  note = f" — {c['note']}" if c.get("note") else ""
+                  print(f"| {c['domain']} | {c['status']}{note} | {c.get('urls_listed',0):,} "
+                        f"| {c.get('pages_sampled',0)} | {c.get('median_words',0):,} |")
+              gap = cmp.get("depth_gap")
+              if gap is not None:
+                  # Sign matters and is easy to misread, so say it in words.
+                  if gap > 0:
+                      print(f"\n**Depth gap: they publish {gap:,} more words per page "
+                            f"than we do** (their median {cmp.get('their_median_words',0):,} "
+                            f"vs ours {us.get('median_words',0):,}).\n")
+                  else:
+                      print(f"\n**We publish {abs(gap):,} more words per page than they do.**\n")
+              else:
+                  print("\n_Depth gap unavailable — one side produced no sampled pages._\n")
+              blocked = [c for c in s.get("competitors", [])
+                         if c.get("status") in ("disallowed", "unreachable")]
+              if blocked:
+                  print(f"> {len(blocked)} competitor(s) not crawled: "
+                        + ", ".join(f"{c['domain']} ({c['status']})" for c in blocked)
+                        + ". A site that disallows us is reported, never worked around.\n")
+          print("\n*Architecture credit: Albaloo Studio*")
+          PY
+
+      - name: Upload the comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: competitor-scout
+          path: orchestrator/competitors/
+          retention-days: 90
+          if-no-files-found: warn

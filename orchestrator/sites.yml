@@ -159,6 +159,42 @@ sites:
       adapter: astro_pr          # opens a PR against the exploreorient repo
       content_root: "src/content/"
       publish_mode: draft
+      # Read from exploreorient's own src/content.config.ts. Its five
+      # collections are destinations, tours, blog, corridors and venues; only
+      # `blog` takes an article. The other four carry structural data — mapId,
+      # ISO coords, venue capacities — that a writing agent has no business
+      # inventing.
+      collection: blog
+      # exploreorient's blog schema is NOT boutimar's journal schema, and Astro
+      # refuses to build an entry that misses a field. Names here are the zod
+      # field names, not a house style:
+      #   title        z.string()
+      #   description  z.string().max(220)   ← hard cap, see below
+      #   publishDate  z.coerce.date()       ← not `date`
+      #   author       defaults to "Explore Orient Editorial"
+      #   heroImage    z.string()            ← REQUIRED, and has no default
+      frontmatter:
+        title: "{title}"
+        description: "{summary}"
+        publishDate: "{date}"
+        author: "Explore Orient Editorial"
+        # ⚠️ DELIBERATELY EMPTY, so nothing publishes until a human decides.
+        #
+        # `heroImage` is required by the schema and the pipeline has no image
+        # for a page it has just written. Inventing one would mean asserting a
+        # photo credit nobody checked, which is a standing rule against.
+        #
+        # Empty means the adapter's "never open a PR that cannot build" guard
+        # fires and the brief is reported as failed, naming this field. That is
+        # intended: a red build on exploreorient blocks every other merge into
+        # that repo, which is worse than no article.
+        #
+        # To switch exploreorient on, pick ONE:
+        #   a) put a real, correctly-licensed default image URL here, which
+        #      every generated post then carries until an editor replaces it;
+        #   b) make heroImage optional in exploreorient's content.config.ts and
+        #      delete this line.
+        heroImage: ""
     channels:
       - name: linkedin
         audience: b2b

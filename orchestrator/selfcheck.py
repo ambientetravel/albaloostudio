@@ -1947,6 +1947,53 @@ for _wf in ("agent1-seo-scout", "agent2-writer"):
     ok(f"{_wf} prints the token summary", "**Tokens**" in _y)
     ok(f"{_wf} renders a missing rate as unpriced, not $0", "unpriced" in _y)
 
+print("\n=== every agent that exists must be reachable ===")
+# Agent 8 was written and tested on 13 Aug 2026 and had no workflow file, so it
+# had never run unattended and nobody noticed for three days. An agent with no
+# trigger is indistinguishable from an agent that does not exist.
+_wf_dir = pathlib.Path("../.github/workflows")
+_wf_text = " ".join(p.read_text(encoding="utf-8") for p in _wf_dir.glob("*.yml"))
+#
+# Checked per agent NUMBER, not per file. Several agents ship a pair — a
+# library (`agent3_broadcaster.py`) plus the runner a workflow actually invokes
+# (`agent3_broadcaster_batch.py`) — and the library is imported, not executed.
+# Requiring every FILE to appear in a workflow flags those as unreachable and
+# is wrong; requiring every NUMBER to appear is the property that matters and
+# is exactly how agent 8 was missing.
+_agent_nums = sorted({_re.match(r"agent(\d+)", p.stem).group(1)
+                      for p in pathlib.Path(".").glob("agent[0-9]*.py")})
+# `python3?` because the workflows are not consistent: agents 1, 5 and 6 are
+# invoked as `python`, the rest as `python3`. Both resolve to the same
+# interpreter under setup-python, so this is a style split rather than a fault
+# — but a checker that assumes one spelling reports four healthy agents as
+# unreachable, which is worse than the inconsistency it would flag.
+_unreachable = [n for n in _agent_nums
+                if not _re.search(rf"python3? +agent{n}[a-z0-9_]*\.py", _wf_text)]
+ok("every agent number is invoked by some workflow",
+   not _unreachable, f"unreachable agent(s): {_unreachable}")
+ok("agent 8 specifically now has a workflow",
+   (_wf_dir / "agent8-competitor-scout.yml").exists())
+# Agent 8 reads a named list and discovers nothing, so a workflow with no
+# configured competitors would run and report an empty page every Sunday.
+ok("at least one site declares competitors for it to read",
+   any(getattr(s, "competitors", None) for s in config.load_sites(include_hold=True)))
+
+print("\n=== exploreorient's frontmatter must match ITS schema, not boutimar's ===")
+# Astro refuses to build an entry that misses a field, and the two sites do not
+# share a schema: boutimar's `journal` wants date/category, exploreorient's
+# `blog` wants publishDate/description/heroImage. Sending one shape to the
+# other opens a PR that reddens the target repo's build.
+_eo = [s for s in config.load_sites(include_hold=True) if s.domain == "exploreorient.com"][0]
+_eo_fm = _eo.cms.get("frontmatter") or {}
+ok("exploreorient targets the blog collection", _eo.cms.get("collection") == "blog")
+ok("and uses publishDate, not date", "publishDate" in _eo_fm and "date" not in _eo_fm)
+ok("and description, not summary", "description" in _eo_fm and "summary" not in _eo_fm)
+ok("heroImage is present and deliberately empty, so the build guard fires",
+   "heroImage" in _eo_fm and _eo_fm["heroImage"] == "")
+_bm = [s for s in config.load_sites(include_hold=True) if s.domain == "boutimar.com"][0]
+ok("the two astro sites do NOT share a frontmatter shape",
+   set(_bm.cms["frontmatter"]) != set(_eo_fm))
+
 print("\n=== nothing may reuse a credential's name as a loop variable ===")
 # The astro_pr adapter read the GitHub token into `token`, then rendered the
 # frontmatter with `for token, repl in fields.items()`. The loop rebound the
