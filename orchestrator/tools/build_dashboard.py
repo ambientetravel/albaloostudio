@@ -57,6 +57,9 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config  # noqa: E402
+# Imported, not reimplemented. The dashboard and the markdown report must never
+# disagree about what a given script-vs-country gap means.
+from agent7_keyword_scout import reading_for as _reading  # noqa: E402
 
 
 def _esc(v: Any) -> str:
@@ -391,6 +394,33 @@ def render(scout: dict | None, writer: dict | None,
         out.append(_missing("agent 7 geo"))
     else:
         rows = geo if isinstance(geo, list) else geo.get("sites", [])
+        # Script beside country, whole estate, before the per-site panels. The
+        # two numbers were never in one place, so "is this site's foreign
+        # traffic really Iranians on VPNs" could not be answered by looking.
+        _pct = lambda v: "—" if v is None else f"{v:.0%}"
+        if any(r.get("market_alignment", {}).get("persian_query_share") is not None
+               for r in rows):
+            out.append('<div class="panel"><strong>Persian script vs country '
+                       'attribution</strong>'
+                       '<p class="note">A wide positive gap is VPN tunnelling. A wide '
+                       'negative gap is Iranian IPs searching in another language. '
+                       'Different findings, opposite fixes.</p>')
+            out.append('<table><tr><th>Site</th><th class="n">Impressions</th>'
+                       '<th class="n">Persian</th><th class="n">Iran</th>'
+                       '<th class="n">Gap</th><th>Reading</th></tr>')
+            for r in sorted(rows, key=lambda x: -(x.get("total_impressions") or 0)):
+                ma = r.get("market_alignment", {})
+                gap, imp = ma.get("script_vs_country_gap"), r.get("total_impressions") or 0
+                cls = ("hold" if gap is None or imp < 100 else
+                       "bad" if abs(gap) >= 0.15 else "ok")
+                out.append(f'<tr><td>{_esc(r.get("domain","?"))}</td>'
+                           f'<td class="n">{imp:,}</td>'
+                           f'<td class="n">{_pct(ma.get("persian_query_share"))}</td>'
+                           f'<td class="n">{_pct(ma.get("iran_country_share"))}</td>'
+                           f'<td class="n">{"+" if (gap or 0) > 0 else ""}{_pct(gap)}</td>'
+                           f'<td><span class="pill {cls}">'
+                           f'{_esc(_reading(gap, impressions=imp))}</span></td></tr>')
+            out.append("</table></div>")
         for r in rows:
             ma = r.get("market_alignment", {})
             verdict = str(ma.get("verdict", ""))

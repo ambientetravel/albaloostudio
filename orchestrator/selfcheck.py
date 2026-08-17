@@ -1139,6 +1139,68 @@ ok("the figure is reported even when it is zero",
 ok("and is absent, not zero, when there were no rows to measure",
    "persian_query_share" not in a7.market_alignment(_int, a7.geo_visibility(_mixed)))
 
+# ── script BESIDE country, every market ─────────────────────────────────────
+# The comparison that settles the VPN question was in the data from the first
+# run but could not be read off any single report: IR sites printed it as prose,
+# non-IR sites printed only half of it. cruisebaz.com was the case that exposed
+# it — an aligned IR site whose spread nobody could see.
+_KEYS = ("persian_query_share", "iran_country_share", "script_vs_country_gap")
+from types import SimpleNamespace as _SNS
+for _mkt, _rws in (("IR", _vpn), ("INT", _mixed),
+                   ("DACH", [crow("kreuzfahrt", "deu", 300, 8.0)])):
+    _m = a7.market_alignment(_SNS(market=_mkt, domain="x"), a7.geo_visibility(_rws), _rws)
+    ok(f"{_mkt} carries all three measures", all(k in _m for k in _KEYS), sorted(_m))
+ok("the gap is script minus country, in that order",
+   abs(_v["script_vs_country_gap"] - (_v["persian_query_share"] - _v["iran_country_share"])) < 1e-9)
+ok("a tunnelled site has a positive gap", _v["script_vs_country_gap"] > 0.15)
+ok("boutimar.com's shape gives a NEGATIVE gap",
+   a7.market_alignment(_int, a7.geo_visibility(
+       [crow("cruise", "irn", 18, 12.0), crow("cruise", "usa", 82, 14.0)]),
+       [crow("cruise", "irn", 18, 12.0), crow("cruise", "usa", 82, 14.0)]
+   )["script_vs_country_gap"] == -0.18)
+
+# The two numbers are attached even below the verdict floor. A 22-impression
+# site still gets no verdict — it just no longer hides which way its 22 lean.
+_thin22 = a7.market_alignment(_ir, a7.geo_visibility(_close[:1] + [crow(_fa, "deu", 3, 12.0)]),
+                              _close[:1] + [crow(_fa, "deu", 3, 12.0)])
+ok("measures survive the too-little-data branch",
+   all(k in _thin22 for k in _KEYS) or _thin22["verdict"] != "too little data", _thin22)
+
+# Sign is the whole finding, so the phrase must not be shared between the two
+# directions, and a thin site must not be given either one.
+ok("a positive gap reads as tunnelling",
+   "tunnelled" in a7.reading_for(0.6))
+ok("a negative gap reads as the opposite finding",
+   "another language" in a7.reading_for(-0.4))
+ok("the two readings are not the same sentence",
+   a7.reading_for(0.6) != a7.reading_for(-0.4))
+ok("a small gap says the measures agree", a7.reading_for(0.02) == "measures agree")
+ok("an unmeasured gap is not read at all", a7.reading_for(None) == "not measured")
+ok("a thin site gets no reading regardless of its gap",
+   a7.reading_for(0.9, impressions=22) == "too thin to read")
+
+# The dashboard must not reimplement the phrasing — one source, or the two
+# surfaces will eventually disagree about what a gap means.
+_bd = pathlib.Path("tools/build_dashboard.py").read_text(encoding="utf-8")
+ok("the dashboard imports the reading rather than restating it",
+   "from agent7_keyword_scout import reading_for" in _bd)
+ok("the portfolio table is rendered by the report too",
+   callable(getattr(a7, "render_script_table", None)))
+_tbl = "\n".join(a7.render_script_table([
+    {"domain": "a.ir", "market": "IR", "total_impressions": 400,
+     "market_alignment": {"persian_query_share": 0.99, "iran_country_share": 0.30,
+                          "script_vs_country_gap": 0.69}},
+    {"domain": "b.com", "market": "INT", "total_impressions": 1864,
+     "market_alignment": {"persian_query_share": 0.01, "iran_country_share": 0.18,
+                          "script_vs_country_gap": -0.17}}]))
+ok("the table sorts by impressions, biggest first", _tbl.index("b.com") < _tbl.index("a.ir"))
+ok("the table shows both readings", "tunnelled" in _tbl and "another language" in _tbl)
+ok("positive gaps carry their sign", "+69%" in _tbl, _tbl)
+ok("a site with no measurement renders a dash, not a zero",
+   "| — |" in "\n".join(a7.render_script_table(
+       [{"domain": "c.ir", "market": "IR", "total_impressions": 0,
+         "market_alignment": {}}])))
+
 # Opportunities must exclude what is not worth working on.
 _opps = a7.opportunities(a7.geo_visibility([
     crow("a", "deu", 100, 15.0),   # striking distance, real volume -> keep

@@ -261,6 +261,26 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
     total = sum(c.impressions for c in geo)
     top = geo[0]
 
+    # Both measures, on every branch, under the same three keys regardless of
+    # market. Until now the script share was only reported for non-IR sites and
+    # the Iran-by-country share only for IR ones, so the single comparison that
+    # actually settles the VPN question — script BESIDE country, same site, same
+    # window — could not be read off any one report. cruisebaz.com is the case
+    # that exposed it: an aligned IR site whose spread nobody could see.
+    #
+    # These are facts about the data, not verdicts, so they are attached even
+    # below the impressions floor. A 22-impression site still gets no verdict;
+    # it just no longer hides which way its 22 impressions lean.
+    measures: dict[str, Any] = {}
+    if country_rows:
+        _fa = script_share(country_rows)
+        _irn = next((c.impressions for c in geo if c.country == "irn"), 0) / total
+        measures = {
+            "persian_query_share": round(_fa["share"], 3),
+            "iran_country_share": round(_irn, 3),
+            "script_vs_country_gap": round(_fa["share"] - _irn, 3),
+        }
+
     # A verdict needs enough impressions to be a signal rather than noise.
     # Without this, cruise24.ir was reported MISALIGNED on FOURTEEN impressions
     # and ambientetravel.com on 43 — and the two diagnoses point opposite ways:
@@ -280,6 +300,7 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
             "detail": (f"only {total} impressions in the window — too few to judge "
                        f"which market this site reaches. That is itself the finding: "
                        f"the problem here is visibility, not positioning."),
+            **measures,
         }
 
     if site.market == "IR":
@@ -325,6 +346,7 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
             "detail": (
                 f"{share:.0%} of impressions come from Perso-Arabic queries "
                 f"({s['impressions']:,} of {s['total']:,}) — {confidence}. {second}"),
+            **measures,
         }
 
     # Non-IR markets are still read by country — that is the right measure for
@@ -341,7 +363,6 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
     fa_note: dict[str, Any] = {}
     if country_rows:
         s = script_share(country_rows)
-        fa_note = {"persian_query_share": round(s["share"], 3)}
         if s["share"] >= 0.15:
             fa_note["script_note"] = (
                 f"{s['share']:.0%} of impressions come from Perso-Arabic queries "
@@ -356,7 +377,7 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
             "verdict": "aligned" if share >= 0.4 else "MISALIGNED",
             "home_share": round(share, 3),
             "detail": f"{share:.0%} of impressions come from DACH",
-            **fa_note,
+            **measures, **fa_note,
         }
 
     # INT: no single home market, but a world-market site whose visibility is
@@ -370,7 +391,7 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
                    "this is a domestic site wearing an international domain"
                    if share >= 0.4 else
                    f"spread across {len(geo)} countries, top is {top.country_name} at {share:.0%}"),
-        **fa_note,
+        **measures, **fa_note,
     }
 
 
@@ -469,9 +490,54 @@ def scout_site(site: config.Site, gsc: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def reading_for(gap: float | None, *, impressions: int = 0) -> str:
+    """One phrase for what a script-minus-country gap means. Sign matters."""
+    if gap is None:
+        return "not measured"
+    if impressions and impressions < MIN_IMPRESSIONS_FOR_VERDICT:
+        return "too thin to read"
+    if gap >= 0.15:
+        return "tunnelled — Persians behind VPNs"
+    if gap <= -0.15:
+        return "Iranian IPs searching in another language"
+    return "measures agree"
+
+
+def render_script_table(reports: list[dict[str, Any]]) -> list[str]:
+    """
+    Script share beside country share, every site, one table.
+
+    This comparison existed in the data from the first run but could not be read
+    off any single report: IR sites printed it as prose, non-IR sites printed
+    only half of it, and nothing put the estate side by side. Whether a site's
+    foreign traffic is really Iranians on VPNs is a portfolio question, and it
+    needs a portfolio view.
+    """
+    L = ["## Persian script vs country attribution", "",
+         "`Persian` is the share of impressions whose QUERY is Perso-Arabic. "
+         "`Iran` is the share Search Console attributes to Iranian IPs. A wide "
+         "positive gap is VPN tunnelling; a wide negative one is Iranians "
+         "searching in another language. They are different findings.", "",
+         "| Site | Market | Impressions | Persian | Iran | Gap | Reading |",
+         "|---|---|---:|---:|---:|---:|---|"]
+    pct = lambda v: "—" if v is None else f"{v:.0%}"
+    for r in sorted(reports, key=lambda x: -(x.get("total_impressions") or 0)):
+        ma = r.get("market_alignment", {})
+        gap = ma.get("script_vs_country_gap")
+        imp = r.get("total_impressions") or 0
+        L.append(f"| {r['domain']} | {r['market']} | {imp:,} | "
+                 f"{pct(ma.get('persian_query_share'))} | "
+                 f"{pct(ma.get('iran_country_share'))} | "
+                 f"{('+' if (gap or 0) > 0 else '')}{pct(gap)} | "
+                 f"{reading_for(gap, impressions=imp)} |")
+    L.append("")
+    return L
+
+
 def render_markdown(reports: list[dict[str, Any]]) -> str:
     L: list[str] = ["# Agent 7 — where each site is actually found", "",
                     f"Architecture credit: **{ARCHITECTURE_CREDIT}**", ""]
+    L += render_script_table(reports)
     for r in reports:
         L.append(f"## {r['domain']}  ·  market {r['market']}")
         ma = r["market_alignment"]
