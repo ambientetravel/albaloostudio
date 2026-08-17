@@ -2016,6 +2016,43 @@ _pins = {_m for _w in pathlib.Path("../.github/workflows").glob("*.yml")
                                _w.read_text(encoding="utf-8"))}
 ok("and the workflows all pin that version", _pins == {"3.11"}, _pins)
 
+print("\n=== a market verdict needs enough impressions to be a verdict ===")
+# Agent 7 called cruise24.ir MISALIGNED on FOURTEEN impressions and
+# ambientetravel.com on 43. Both were arithmetically right and both were
+# misleading: "the wrong people find you" and "almost nobody finds you" are
+# different diagnoses with opposite fixes, and the second was being reported as
+# the first. That sends someone to rewrite a site that is simply too small to
+# measure.
+import agent7_keyword_scout as _a7
+from types import SimpleNamespace as _NS
+_CV = _a7.CountryVisibility
+def _rows(pairs):
+    return [_CV(country=c, country_name=c.upper(), impressions=i, clicks=0, ctr=0.0,
+                avg_position=20.0, best_position=10.0, queries=1, band="weak", advice="")
+            for c, i in pairs]
+_site = lambda m: _NS(market=m, domain="x")
+
+_thin_ir = _a7.market_alignment(_site("IR"), _rows([("deu", 6), ("usa", 3), ("prt", 2),
+                                                    ("aze", 1), ("svn", 1), ("nld", 1)]))
+ok("14 impressions is not a misalignment verdict",
+   _thin_ir["verdict"] == "too little data", _thin_ir["verdict"])
+ok("and it says visibility is the problem, not positioning",
+   "visibility, not positioning" in _thin_ir["detail"])
+_thin_dach = _a7.market_alignment(_site("DACH"), _rows([("usa", 9), ("can", 8), ("phl", 7),
+                                                        ("svn", 7), ("irl", 6), ("deu", 2)]))
+ok("43 impressions is not one either", _thin_dach["verdict"] == "too little data")
+# The verdicts that DO have data must be untouched.
+_real_ir = _a7.market_alignment(_site("IR"), _rows([("irn", 279), ("deu", 25), ("are", 21),
+                                                    ("usa", 18), ("oth", 93)]))
+ok("436 impressions still gives a real verdict", _real_ir["verdict"] == "aligned")
+_mis = _a7.market_alignment(_site("IR"), _rows([("deu", 400), ("irn", 20)]))
+ok("and a genuine misalignment with real data still fires",
+   _mis["verdict"] == "MISALIGNED", _mis["verdict"])
+ok("the floor is a named constant, not a literal",
+   _a7.MIN_IMPRESSIONS_FOR_VERDICT >= 100)
+ok("the dashboard does not colour 'too little data' as a pass",
+   '"too little data": "warn"' in pathlib.Path("tools/build_dashboard.py").read_text(encoding="utf-8"))
+
 print("\n=== agent 6's strategy must survive being written as JSON ===")
 # topic_map() put Opportunity OBJECTS in each cluster's `keywords`, so the whole
 # payload was unserialisable and `--format json` had never once worked. Nobody

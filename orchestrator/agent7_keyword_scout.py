@@ -83,6 +83,12 @@ KEYWORD_PLANNER_REALITY = "see the module docstring and the comment block above"
 # these and the geo plane carries the work.
 ADS_UNAVAILABLE_MARKETS = frozenset({"IR"})
 
+# Impressions a site needs across the whole window before market_alignment()
+# will call it aligned or misaligned. Five times the per-country opportunity
+# floor, because a whole-site verdict is a much stronger claim than "this one
+# country is worth working on". See the comment in market_alignment().
+MIN_IMPRESSIONS_FOR_VERDICT = 100
+
 # ISO-3166 alpha-3 as Search Console returns it, to something readable.
 COUNTRY_NAMES = {
     "irn": "Iran", "usa": "United States", "deu": "Germany", "gbr": "United Kingdom",
@@ -199,8 +205,28 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility]) -> dict[st
         return {"verdict": "no data", "detail": "no country rows returned"}
 
     total = sum(c.impressions for c in geo)
-    home = {"IR": "irn", "DACH": "deu", "INT": None}.get(site.market)
     top = geo[0]
+
+    # A verdict needs enough impressions to be a signal rather than noise.
+    # Without this, cruise24.ir was reported MISALIGNED on FOURTEEN impressions
+    # and ambientetravel.com on 43 — and the two diagnoses point opposite ways:
+    # "the wrong people find you" is fixed by positioning, hreflang and language,
+    # "almost nobody finds you" is fixed by having more indexed pages. Calling
+    # the second one the first sends someone to rewrite a site that is simply
+    # too small to measure.
+    #
+    # 100 is the floor for a WHOLE-SITE verdict, five times the per-country
+    # opportunity floor of 20. It is a judgement, not a derived constant, and it
+    # is deliberately blunt: below it this check should say nothing at all.
+    if total < MIN_IMPRESSIONS_FOR_VERDICT:
+        return {
+            "verdict": "too little data",
+            "home_share": None,
+            "impressions": total,
+            "detail": (f"only {total} impressions in the window — too few to judge "
+                       f"which market this site reaches. That is itself the finding: "
+                       f"the problem here is visibility, not positioning."),
+        }
 
     if site.market == "IR":
         share = next((c.impressions for c in geo if c.country == "irn"), 0) / total

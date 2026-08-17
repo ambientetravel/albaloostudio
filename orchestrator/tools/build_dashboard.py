@@ -368,7 +368,12 @@ def render(scout: dict | None, writer: dict | None,
         for r in rows:
             ma = r.get("market_alignment", {})
             verdict = str(ma.get("verdict", ""))
-            cls = "bad" if verdict == "MISALIGNED" else "ok"
+            # Three states, not two. "too little data" is not good news and must
+            # not render green just because it is not MISALIGNED — the site with
+            # fourteen impressions has a worse problem than the one serving the
+            # wrong country, and colouring it like a pass hides that.
+            cls = {"MISALIGNED": "bad", "concentrated": "warn",
+                   "too little data": "warn", "no data": "hold"}.get(verdict, "ok")
             out.append(f'<div class="panel"><strong>{_esc(r.get("domain","?"))}</strong> '
                        f'<span class="pill {cls}">{_esc(verdict or "—")}</span>'
                        f'<p class="note">{_esc(ma.get("detail",""))}</p>')
