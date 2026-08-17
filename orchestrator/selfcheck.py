@@ -2717,6 +2717,38 @@ ok("the totals line adds up across sites",
 _nosm = ic.render_markdown([_icrow(declared=0, declared_and_surfaced=0,
                                    declared_never_surfaced=0, coverage=None)])
 ok("no sitemap renders an em dash, not 0% coverage", "| — |" in _nosm)
+
+# ── unreadable is not empty ─────────────────────────────────────────────────
+# Run #2 reported exploreorient.com as `declared 0, coverage —` when the site
+# declares 70 URLs: its sitemap came back as an HTML error page and "could not
+# read" was rendered as "has nothing". That understated the portfolio by 70
+# pages and would have sent someone to write content a site already has.
+_bad = _icrow(domain="exploreorient.com", declared=None, declared_and_surfaced=None,
+              declared_never_surfaced=None, robots_blocked=None, coverage=None,
+              surfaced=13, surfaced_never_declared=13,
+              sitemap_error="served text/html, not XML — begins '<!DOCTYPE html>'")
+_bmd = ic.render_markdown([_bad, _icrow(declared=100, declared_never_surfaced=40,
+                                        declared_and_surfaced=60, coverage=0.6)])
+ok("an unreadable sitemap renders '?', never 0", "| ? |" in _bmd, _bmd)
+ok("and says so in the coverage column", "sitemap unreadable" in _bmd)
+ok("the reason is reported, not just the failure",
+   "not XML" in _bmd and "DOCTYPE" in _bmd)
+ok("unreadable sites are excluded from the totals, and the totals say so",
+   "40 of 100 declared pages" in _bmd and "whose sitemap could be read" in _bmd, _bmd)
+ok("'?' is explicitly distinguished from zero for the reader",
+   "`?` is not zero" in _bmd)
+# The one column an unreadable sitemap does NOT poison: every surfaced URL
+# really is undeclared when nothing could be read.
+ok("undeclared-but-ranking still counts for an unreadable sitemap",
+   "13 pages rank without being declared" in
+   ic.render_markdown([_bad]).replace("**", ""), ic.render_markdown([_bad]))
+ok("an unreadable site gets no per-site 'never surfaced' section",
+   "## exploreorient.com" not in _bmd)
+# A genuine empty sitemap and an unreadable one must not look alike.
+ok("a readable-but-empty sitemap is still 0, not '?'",
+   "| 0 |" in ic.render_markdown([_icrow(declared=0, declared_and_surfaced=0,
+                                         declared_never_surfaced=0, robots_blocked=0,
+                                         coverage=None)]))
 ok("a genuine zero-coverage site still renders 0%",
    "| 0% |" in ic.render_markdown([_icrow(declared=73, surfaced=0,
                                           declared_and_surfaced=0,

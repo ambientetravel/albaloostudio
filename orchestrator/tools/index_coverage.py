@@ -72,6 +72,43 @@ ARCHITECTURE_CREDIT = config.ARCHITECTURE_CREDIT
 DEFAULT_INSPECT_SAMPLE = 25
 
 
+def fetch_declared(site: config.Site, session: requests.Session
+                   ) -> tuple[set[str], str | None]:
+    """
+    The sitemap, and WHY it is empty when it is empty.
+
+    agent1.fetch_sitemap_urls() swallows every failure into an empty set, which
+    is right for its purpose — it degrades to "unknown supply" and lets the LLM
+    judge. It is wrong for this one. Run #2 reported exploreorient.com as
+    `declared 0, coverage —` when the site declares 70 URLs; the sitemap had
+    come back as an HTML error page and "could not read" was rendered as "has
+    nothing". That understated the portfolio by 70 pages and would have sent
+    someone to write content for a site that already has it.
+
+    So this returns the reason alongside, and reports the shape of what actually
+    arrived. `mismatched tag: line 93, column 2` is what ElementTree says when
+    it is handed a web page; it is not a diagnosis anyone can act on.
+    """
+    try:
+        resp = session.get(site.sitemap, timeout=20,
+                           headers={"User-Agent": config.USER_AGENT})
+    except requests.RequestException as exc:
+        return set(), f"request failed: {str(exc)[:120]}"
+    if resp.status_code >= 400:
+        return set(), f"HTTP {resp.status_code}"
+
+    ctype = (resp.headers.get("Content-Type") or "").split(";")[0].strip()
+    head = resp.content[:200].lstrip()[:80].decode("utf-8", "replace")
+    if not head.startswith("<?xml") and "<urlset" not in head and "<sitemapindex" not in head:
+        return set(), (f"served {ctype or 'unknown type'}, not XML — begins "
+                       f"{head[:60]!r}")
+
+    urls = a1.fetch_sitemap_urls(site, session)
+    if not urls:
+        return set(), f"parsed as {ctype or 'XML'} but listed no URLs"
+    return urls, None
+
+
 def surfaced_urls(service, site: config.Site) -> tuple[set[str], int]:
     """
     Every URL Search Console showed at least once, over the long window.
@@ -163,7 +200,7 @@ def inspect_urls(service, site: config.Site, urls: list[str]) -> dict[str, Any]:
 
 def assess(service, site: config.Site, session: requests.Session,
            *, inspect: int = 0) -> dict[str, Any]:
-    declared_raw = a1.fetch_sitemap_urls(site, session)
+    declared_raw, sitemap_error = fetch_declared(site, session)
     declared = {a1._canon_url(u) for u in declared_raw}
     try:
         surfaced, impressions = surfaced_urls(service, site)
@@ -179,19 +216,28 @@ def assess(service, site: config.Site, session: requests.Session,
         "domain": site.domain,
         "market": site.market,
         "on_hold": bool(getattr(site, "on_hold", False)),
-        "declared": len(declared),
+        # None when the sitemap could not be READ, 0 only when it genuinely
+        # declares nothing. Every count derived from it is None too — a site
+        # whose supply is unknown has an unknown gap, not a gap of zero, and
+        # summing it into a portfolio total silently understates the total.
+        "sitemap_error": sitemap_error,
+        "declared": None if sitemap_error else len(declared),
         "surfaced": len(surfaced),
-        "declared_and_surfaced": len(declared & surfaced),
-        "declared_never_surfaced": len(never),
+        "declared_and_surfaced": None if sitemap_error else len(declared & surfaced),
+        "declared_never_surfaced": None if sitemap_error else len(never),
+        # This one stays a real number either way: every surfaced URL genuinely
+        # is undeclared when nothing could be read from the sitemap. It is the
+        # only column an unreadable sitemap does not poison.
         "surfaced_never_declared": len(undeclared),
-        "robots_blocked": len(blocked_canon),
+        "robots_blocked": None if sitemap_error else len(blocked_canon),
         "robots_available": robots["available"],
         "impressions": impressions,
         # Share of what the site DECLARES that Google has shown at least once.
         # None, not 0.0, when nothing is declared — a site with no sitemap has
         # no coverage ratio, and printing 0% would read as a failing site
         # rather than an unmeasurable one.
-        "coverage": round(len(declared & surfaced) / len(declared), 3) if declared else None,
+        "coverage": (None if sitemap_error or not declared
+                     else round(len(declared & surfaced) / len(declared), 3)),
         "sample_never_surfaced": never[:15],
         "sample_undeclared": undeclared[:15],
     }
@@ -211,26 +257,45 @@ def render_markdown(rows: list[dict[str, Any]]) -> str:
          "this report.", "",
          "| Site | Declared | Surfaced | Never surfaced | Undeclared but ranking | Robots-blocked | Coverage |",
          "|---|---:|---:|---:|---:|---:|---:|"]
+    num = lambda v: "?" if v is None else f"{v:,}"
     for r in sorted(rows, key=lambda x: -(x.get("declared") or 0)):
         if r.get("error"):
             L.append(f"| {r['domain']} | — | — | — | — | — | not readable |")
             continue
         cov = "—" if r["coverage"] is None else f"{r['coverage']:.0%}"
+        if r.get("sitemap_error"):
+            cov = "sitemap unreadable"
         hold = " *(on hold)*" if r["on_hold"] else ""
-        L.append(f"| {r['domain']}{hold} | {r['declared']:,} | {r['surfaced']:,} | "
-                 f"{r['declared_never_surfaced']:,} | {r['surfaced_never_declared']:,} | "
-                 f"{r['robots_blocked']:,} | {cov} |")
+        L.append(f"| {r['domain']}{hold} | {num(r['declared'])} | {num(r['surfaced'])} | "
+                 f"{num(r['declared_never_surfaced'])} | {num(r['surfaced_never_declared'])} | "
+                 f"{num(r['robots_blocked'])} | {cov} |")
     L.append("")
 
-    totals_declared = sum(r.get("declared") or 0 for r in rows)
-    totals_never = sum(r.get("declared_never_surfaced") or 0 for r in rows)
+    # Totals over the sites that could actually be measured, and an explicit
+    # count of the ones that could not. A total that quietly drops the
+    # unreadable sites reads as a complete portfolio figure and is not one.
+    unreadable = [r for r in rows if r.get("sitemap_error")]
+    measured = [r for r in rows if not r.get("sitemap_error") and not r.get("error")]
+    totals_declared = sum(r["declared"] for r in measured)
+    totals_never = sum(r["declared_never_surfaced"] for r in measured)
     totals_undeclared = sum(r.get("surfaced_never_declared") or 0 for r in rows)
+    scope = (f" across the {len(measured)} propert(ies) whose sitemap could be read"
+             if unreadable else "")
     L.append(f"**{totals_never:,} of {totals_declared:,} declared pages have never been "
-             f"surfaced**, and **{totals_undeclared:,} pages rank without being declared.**")
+             f"surfaced**{scope}, and **{totals_undeclared:,} pages rank without being "
+             f"declared.**")
     L.append("")
+    if unreadable:
+        L.append(f"### {len(unreadable)} sitemap(s) could not be read")
+        L.append("These sites are counted in NEITHER total above. `?` is not zero — "
+                 "their declared pages are unknown, so their gap is unknown too.")
+        L.append("")
+        for r in unreadable:
+            L.append(f"- **{r['domain']}** — {r['sitemap_error']}")
+        L.append("")
 
     for r in sorted(rows, key=lambda x: -(x.get("declared_never_surfaced") or 0)):
-        if r.get("error") or not r.get("declared_never_surfaced"):
+        if r.get("error") or r.get("sitemap_error") or not r.get("declared_never_surfaced"):
             continue
         L.append(f"## {r['domain']} — {r['declared_never_surfaced']:,} declared, never surfaced")
         if r["robots_blocked"]:
@@ -289,9 +354,13 @@ def main(argv: list[str] | None = None) -> int:
         else:
             r = rows[-1]
             if not r.get("error"):
-                log.info("%s — declared %d, surfaced %d, never surfaced %d",
-                         r["domain"], r["declared"], r["surfaced"],
-                         r["declared_never_surfaced"])
+                if r.get("sitemap_error"):
+                    log.warning("%s — sitemap UNREADABLE (%s); declared count is "
+                                "unknown, not zero", r["domain"], r["sitemap_error"])
+                else:
+                    log.info("%s — declared %d, surfaced %d, never surfaced %d",
+                             r["domain"], r["declared"], r["surfaced"],
+                             r["declared_never_surfaced"])
     if not rows:
         log.error("no readable properties")
         return 1
