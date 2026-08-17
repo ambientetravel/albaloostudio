@@ -2016,6 +2016,41 @@ _pins = {_m for _w in pathlib.Path("../.github/workflows").glob("*.yml")
                                _w.read_text(encoding="utf-8"))}
 ok("and the workflows all pin that version", _pins == {"3.11"}, _pins)
 
+print("\n=== pages that rank and are not in the sitemap ===")
+# Alireza noticed boutimar.com has pages that are not listed. Agent 1 had been
+# fetching BOTH halves of that comparison since it was written — page_rows from
+# Search Console and the sitemap URLs — and never subtracted one from the other.
+# 481 page rows against 270 sitemap entries on boutimar.com.
+_gsc = {"page_rows": [
+    {"keys": ["q1", "https://x.com/hidden"], "impressions": 140, "clicks": 3},
+    {"keys": ["q2", "https://x.com/hidden"], "impressions": 60, "clicks": 0},
+    {"keys": ["q3", "https://www.x.com/about/"], "impressions": 900, "clicks": 40},
+]}
+_unl = _a1sp.find_unlisted_pages(_gsc, {"https://x.com/about"})
+ok("a page that ranks and is not listed is found",
+   len(_unl) == 1 and _unl[0]["url"].endswith("/hidden"))
+ok("rows for the same page are summed, not repeated",
+   _unl[0]["impressions"] == 200 and _unl[0]["queries"] == 2)
+# The cosmetic disagreements that would otherwise fill this list with noise.
+_c = _a1sp._canon_url
+ok("www and a trailing slash are not a missing page",
+   _c("https://x.com/about/") == _c("http://www.x.com/about"))
+ok("the site root is one page however it is written",
+   _c("https://x.com/") == _c("https://www.x.com"))
+# ...and the one that must NOT collapse.
+ok("query strings are kept, so ?a= articles stay distinct",
+   _c("https://boutimar.ir/article.html?a=one") != _c("https://boutimar.ir/article.html?a=two"),
+   "boutimar.ir addresses every article that way — collapsing them hides the lot")
+ok("an impression floor is available", len(
+    _a1sp.find_unlisted_pages(_gsc, {"https://x.com/about"}, min_impressions=500)) == 0)
+_a1wf = pathlib.Path("../.github/workflows/agent1-seo-scout.yml").read_text(encoding="utf-8")
+ok("the run summary reports them", "not in a sitemap" in _a1wf)
+ok("and says plainly that nothing needs writing",
+   "Nothing needs writing" in _a1wf or "nothing needs writing" in _a1wf)
+ok("the dashboard has a section for them",
+   "Ranking, but not in any sitemap" in pathlib.Path(
+       "tools/build_dashboard.py").read_text(encoding="utf-8"))
+
 print("\n=== a market verdict needs enough impressions to be a verdict ===")
 # Agent 7 called cruise24.ir MISALIGNED on FOURTEEN impressions and
 # ambientetravel.com on 43. Both were arithmetically right and both were

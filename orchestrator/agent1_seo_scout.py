@@ -326,6 +326,59 @@ def _slug_tokens(url: str) -> set[str]:
 # ══════════════════════════════════════════════════════════════════════════════
 
 
+def _canon_url(url: str) -> str:
+    """
+    One spelling per page, so a sitemap and Search Console can be compared.
+
+    They disagree about cosmetics constantly — www or not, http or https, a
+    trailing slash or none — and every disagreement would otherwise read as a
+    missing page. The QUERY STRING is deliberately kept: boutimar.ir addresses
+    every article as article.html?a=<slug>, so dropping it would collapse the
+    whole دریانامه into one URL and hide exactly the pages worth finding.
+    """
+    p = urlparse(url.strip())
+    host = (p.netloc or "").lower().removeprefix("www.")
+    path = (p.path or "/").rstrip("/") or "/"
+    return f"{host}{path}" + (f"?{p.query}" if p.query else "")
+
+
+def find_unlisted_pages(gsc: dict[str, Any], sitemap_urls: set[str],
+                        *, min_impressions: int = 1) -> list[dict[str, Any]]:
+    """
+    Pages Google already knows about that the sitemap never mentions.
+
+    Agent 1 has fetched both of these since it was written and never compared
+    them: `page_rows` is every page Search Console recorded an impression for,
+    and `sitemap_urls` is what the site declares. The difference is real pages,
+    earning real impressions, that the site is not telling anyone exist.
+
+    boutimar.com is the case that prompted this — 481 page rows against 270
+    sitemap entries. That gap is not a content problem and no amount of writing
+    fixes it; the pages are already written.
+
+    Sorted by impressions, because an unlisted page nobody reaches is a
+    curiosity and an unlisted page with traffic is a bug.
+    """
+    listed = {_canon_url(u) for u in sitemap_urls}
+    seen: dict[str, dict[str, Any]] = {}
+    for row in gsc.get("page_rows") or []:
+        keys = row.get("keys") or []
+        if len(keys) < 2:
+            continue
+        url = keys[1]
+        canon = _canon_url(url)
+        if canon in listed:
+            continue
+        e = seen.setdefault(canon, {"url": url, "impressions": 0.0, "clicks": 0.0,
+                                    "queries": 0})
+        e["impressions"] += float(row.get("impressions") or 0)
+        e["clicks"] += float(row.get("clicks") or 0)
+        e["queries"] += 1
+    out = [{**v, "impressions": int(v["impressions"]), "clicks": int(v["clicks"])}
+           for v in seen.values() if v["impressions"] >= min_impressions]
+    return sorted(out, key=lambda r: -r["impressions"])
+
+
 def _agg(rows: Iterable[dict[str, Any]], key_index: int = 0) -> dict[str, dict[str, float]]:
     """Aggregate GSC rows on one dimension. Position is impression-weighted."""
     acc: dict[str, dict[str, float]] = defaultdict(
@@ -1433,6 +1486,9 @@ def process_site(
         # the run state that hides best, so it gets its own counter rather than
         # living only in a log line nobody scrolls to.
         "degraded_briefs": 0, "degraded_reason": "", "error": None,
+        # Pages that rank and are not in the sitemap. Nothing to write — the
+        # words already exist and the site is simply not declaring them.
+        "unlisted_pages": 0, "unlisted_impressions": 0, "unlisted_top": [],
     }
     try:
         gsc = collect_gsc(service, site)
@@ -1441,6 +1497,21 @@ def process_site(
         sitemap_urls = fetch_sitemap_urls(site, session)
         candidates = find_gaps(site, gsc, sitemap_urls)
         stat["candidates"] = len(candidates)
+
+        # Pages Google already ranks that the sitemap never mentions. Both
+        # inputs were already here and had never been compared — and this is a
+        # different kind of finding from everything else the scout produces:
+        # nothing needs writing. The pages exist and earn impressions; the site
+        # simply does not declare them.
+        unlisted = find_unlisted_pages(gsc, sitemap_urls)
+        stat["unlisted_pages"] = len(unlisted)
+        stat["unlisted_impressions"] = sum(u["impressions"] for u in unlisted)
+        stat["unlisted_top"] = unlisted[:15]
+        if unlisted:
+            log.warning(
+                "%s — %d page(s) rank but are NOT in the sitemap (%d impressions). "
+                "Top: %s", site.domain, len(unlisted), stat["unlisted_impressions"],
+                ", ".join(u["url"] for u in unlisted[:3]))
 
         # A held site is not live. Keep gathering its demand — knowing what
         # people already search for is exactly what you want on launch day —
@@ -1644,7 +1715,8 @@ def main(argv: list[str] | None = None) -> int:
         "totals": {
             key: sum(s.get(key, 0) for s in stats)
             for key in ("gsc_rows", "candidates", "briefs_emitted", "delivered",
-                        "dlq", "blocked", "degraded_briefs")
+                        "dlq", "blocked", "degraded_briefs",
+                        "unlisted_pages", "unlisted_impressions")
         },
         "usage": _usage_summary(),
     }

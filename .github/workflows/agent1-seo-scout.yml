@@ -172,6 +172,23 @@ jobs:
                   out.append(f"> **Why:** `{head}`\n")
           if m.get("not_granted"):
               out.append(f"> Not granted: {', '.join(m['not_granted'])}\n")
+          # Pages that already rank and are not declared. Distinct from every
+          # other finding here because nothing needs writing — the words exist.
+          unl = [d for d in m.get("domains", []) if d.get("unlisted_pages")]
+          if unl:
+              tot = t.get("unlisted_pages", 0)
+              imp = t.get("unlisted_impressions", 0)
+              out.append(f"\n### {tot} page(s) rank but are not in a sitemap\n")
+              out.append(f"Between them they earn **{imp:,} impressions**. Nothing needs "
+                         f"writing — these pages exist. They are simply not declared, so "
+                         f"Google found them despite the site rather than because of it.\n")
+              for d in sorted(unl, key=lambda x: -x["unlisted_impressions"]):
+                  out.append(f"\n**{d['domain']}** — {d['unlisted_pages']} unlisted, "
+                             f"{d['unlisted_impressions']:,} impressions\n")
+                  rows = ["| Page | Impressions | Clicks |", "|---|---:|---:|"]
+                  for u in d.get("unlisted_top", [])[:10]:
+                      rows.append(f"| {u['url']} | {u['impressions']:,} | {u['clicks']:,} |")
+                  out.append("\n".join(rows))
           u = m.get("usage") or {}
           if u.get("calls"):
               cost = u.get("estimated_cost_usd")

@@ -245,6 +245,32 @@ def render(scout: dict | None, writer: dict | None,
             out.append("</table>")
         out.append("</div>")
 
+    # ── pages that exist and are not declared ───────────────────────────────
+    # The cheapest win in the whole report: no writing, no model call, no cost.
+    # These pages already rank; the sitemap just does not mention them.
+    unl = [d for d in (scout or {}).get("domains", []) if d.get("unlisted_pages")]
+    if unl:
+        tot = (scout or {}).get("totals", {})
+        out.append("<h2>Ranking, but not in any sitemap</h2>")
+        out.append(f'<div class="panel"><p class="sub">'
+                   f'<strong>{tot.get("unlisted_pages", 0)}</strong> page(s) earning '
+                   f'<strong>{tot.get("unlisted_impressions", 0):,}</strong> impressions '
+                   f'that the sitemaps never mention. Nothing here needs writing — the '
+                   f'pages exist. Google found them despite the site rather than because '
+                   f'of it.</p>')
+        for d in sorted(unl, key=lambda x: -x.get("unlisted_impressions", 0)):
+            out.append(f'<p><strong>{_esc(d["domain"])}</strong> — '
+                       f'{d["unlisted_pages"]} unlisted, '
+                       f'{d["unlisted_impressions"]:,} impressions</p>')
+            out.append('<table><tr><th>Page</th><th class="n">Impressions</th>'
+                       '<th class="n">Clicks</th></tr>')
+            for u in d.get("unlisted_top", [])[:10]:
+                out.append(f'<tr><td>{_esc(u["url"])}</td>'
+                           f'<td class="n">{u["impressions"]:,}</td>'
+                           f'<td class="n">{u["clicks"]:,}</td></tr>')
+            out.append("</table>")
+        out.append("</div>")
+
     # ── where the words went ────────────────────────────────────────────────
     out.append("<h2>Where the words went</h2>")
     if not writer:
