@@ -1,0 +1,111 @@
+# Albaloo Orchestration Pipeline — index coverage assessment.
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+
+name: Index coverage — what Google actually shows
+
+on:
+  schedule:
+    # 06:30 UTC on Mondays. After the Sunday scout has run, so the two reports
+    # describe the same week, and after the Monday audits rather than beside
+    # them — this reads sitemaps over the network for ten domains and there is
+    # no reason for it to contend with anything.
+    - cron: "30 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Restrict to one domain (blank = all)"
+        required: false
+        type: string
+      include_hold:
+        description: "Include the on-hold sites (cruiseshop.ir, dmciran.ir)"
+        required: false
+        default: true
+        type: boolean
+      inspect:
+        description: "URLs per site to read REAL index status for (0 = off; needs Full user)"
+        required: false
+        default: "0"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: index-coverage
+  cancel-in-progress: false
+
+jobs:
+  assess:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: orchestrator
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Assess coverage
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          STAMP=$(date -u +%Y-%m-%d)
+          ARGS=""
+          if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
+          if [ "${{ inputs.include_hold }}" != "false" ]; then ARGS="$ARGS --include-hold"; fi
+          if [ "${{ inputs.inspect || '0' }}" != "0" ]; then ARGS="$ARGS --inspect ${{ inputs.inspect }}"; fi
+
+          python3 tools/index_coverage.py $ARGS --format md \
+            --out "reports/index-coverage-$STAMP.md"
+          python3 tools/index_coverage.py $ARGS --format json \
+            --out "reports/index-coverage-$STAMP.json"
+
+          # The report is the deliverable, so it goes where it is read without a
+          # download rather than only into the artifact.
+          cat "reports/index-coverage-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Flag the sites carrying the most dead weight
+        if: always()
+        run: |
+          set -euo pipefail
+          latest=$(ls -t reports/index-coverage-*.json 2>/dev/null | head -1 || true)
+          [ -n "$latest" ] || exit 0
+          python3 - "$latest" <<'PY'
+          import json, sys
+          rows = json.load(open(sys.argv[1], encoding="utf-8"))
+          # Warn, never fail. A site whose pages do not surface is a content and
+          # linking problem for a human to decide on, not a broken build.
+          for r in sorted(rows, key=lambda x: -(x.get("declared_never_surfaced") or 0))[:5]:
+              if r.get("error") or not r.get("declared_never_surfaced"):
+                  continue
+              cov = r.get("coverage")
+              shown = "unmeasurable" if cov is None else f"{cov:.0%} of declared pages shown"
+              print(f"::warning title=Coverage::{r['domain']} — "
+                    f"{r['declared_never_surfaced']} declared page(s) have never surfaced "
+                    f"({shown})")
+          blocked = [r for r in rows if (r.get("robots_blocked") or 0) > 0]
+          for r in blocked:
+              print(f"::warning title=robots.txt::{r['domain']} — {r['robots_blocked']} "
+                    f"declared page(s) are disallowed by the site's own robots.txt")
+          PY
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: index-coverage
+          path: orchestrator/reports/
+          retention-days: 90
+          if-no-files-found: warn

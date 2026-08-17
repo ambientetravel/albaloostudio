@@ -2682,5 +2682,85 @@ ok("Agent 2 consults the ceiling between articles",
 ok("Agent 2 defers the remainder by loop index, not by len(outcomes)",
    "for i, payload in enumerate(selected)" in _src2 and "selected[i:]" in _src2)
 
+print("\n=== index coverage — declared vs surfaced ===")
+# The trap this whole tool is built around: Search Analytics reports
+# IMPRESSIONS, not index membership. A page can be indexed, healthy, and simply
+# never have ranked well enough to be shown to anyone. Calling that "not
+# indexed" sends someone to debug a crawler problem that does not exist.
+sys.path.insert(0, "tools")
+import index_coverage as ic  # noqa: E402
+
+_ICSRC = pathlib.Path("tools/index_coverage.py").read_text(encoding="utf-8")
+ok("the tool never claims an unsurfaced page is unindexed",
+   "IS NOT \"NOT INDEXED\"" in _ICSRC)
+ok("and the report itself carries the caveat, not just the source",
+   "not the same as `not indexed`" in ic.render_markdown([]))
+
+def _icrow(**kw):
+    base = dict(domain="x.com", market="INT", on_hold=False, declared=10, surfaced=4,
+                declared_and_surfaced=4, declared_never_surfaced=6,
+                surfaced_never_declared=1, robots_blocked=0, robots_available=True,
+                impressions=100, coverage=0.4, sample_never_surfaced=["x.com/a"],
+                sample_undeclared=[])
+    base.update(kw)
+    return base
+
+_md = ic.render_markdown([_icrow()])
+ok("the table reports declared and surfaced as separate numbers",
+   "| 10 | 4 |" in _md, _md.splitlines()[8] if len(_md.splitlines()) > 8 else _md)
+ok("the totals line adds up across sites",
+   "6 of 10 declared pages have never been surfaced" in ic.render_markdown([_icrow()]))
+
+# A site with no sitemap has NO coverage ratio. Rendering 0% would read as a
+# failing site rather than an unmeasurable one — albaloostudio.com's sitemap
+# 404s today, so this is a live case and not a hypothetical.
+_nosm = ic.render_markdown([_icrow(declared=0, declared_and_surfaced=0,
+                                   declared_never_surfaced=0, coverage=None)])
+ok("no sitemap renders an em dash, not 0% coverage", "| — |" in _nosm)
+ok("a genuine zero-coverage site still renders 0%",
+   "| 0% |" in ic.render_markdown([_icrow(declared=73, surfaced=0,
+                                          declared_and_surfaced=0,
+                                          declared_never_surfaced=73, coverage=0.0)]))
+
+# robots.txt is the one cause of "never surfaced" that no amount of writing
+# fixes, so it gets its own column and its own sentence.
+ok("robots-blocked pages are named as unfixable by writing",
+   "cannot surface however much is written" in
+   ic.render_markdown([_icrow(robots_blocked=3)]))
+# Unreadable robots.txt must not be reported as zero blocked pages.
+ok("an unreadable robots.txt is unknown, not zero",
+   "unknown rather than zero" in
+   ic.render_markdown([_icrow(robots_available=False)]))
+
+# URL Inspection needs OWNER or FULL; this service account is Restricted on all
+# ten properties. That is a permission fact, not a failed run, and the report
+# has to say which one it is.
+_denied = ic.render_markdown([_icrow(
+    inspection={"permitted": False,
+                "reason": "needs OWNER or FULL; Restricted on this property",
+                "results": []})])
+ok("a Restricted grant is reported as a permission fact, not a failure",
+   "Index status not read" in _denied and "Restricted" in _denied, _denied)
+ok("a permitted inspection renders its verdicts instead",
+   "Coverage state" in ic.render_markdown([_icrow(
+       inspection={"permitted": True, "reason": None,
+                   "results": [{"url": "x.com/a", "verdict": "PASS",
+                                "coverage_state": "Submitted and indexed",
+                                "indexing_state": "INDEXING_ALLOWED",
+                                "last_crawl": "2026-08-10", "robots_state": "ALLOWED"}]})]))
+ok("inspection is off by default", ic.DEFAULT_INSPECT_SAMPLE > 0 and
+   "default=0" in _ICSRC)
+ok("the 403 path returns rather than raising",
+   '"permitted": False' in _ICSRC and "status in (403, 401)" in _ICSRC)
+
+# Coverage counts pages by ONE spelling. www/non-www and trailing slashes are
+# the same page and comparing raw strings would report every page twice.
+ok("both sides of the comparison are canonicalised",
+   _ICSRC.count("_canon_url") >= 3)
+# ["query","page"] is capped per request, so a page ranking for many low-volume
+# queries can fall off the end of it and be miscounted as never surfaced.
+ok("the surfaced set uses the page dimension alone, not query+page",
+   '["page"])' in _ICSRC and '["query", "page"]' not in _ICSRC)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
