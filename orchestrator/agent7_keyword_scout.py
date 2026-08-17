@@ -193,7 +193,61 @@ def geo_visibility(country_rows: list[dict[str, Any]], *, top_n_queries: int = 3
     return out
 
 
-def market_alignment(site: config.Site, geo: list[CountryVisibility]) -> dict[str, Any]:
+# Perso-Arabic script. Iranian searchers are overwhelmingly behind VPNs, so
+# Search Console records the EXIT NODE's country and an Iranian audience shows
+# up as Germany, the Netherlands, Portugal, Azerbaijan. The query's script does
+# not travel through the tunnel — a Persian query from a Frankfurt IP is a
+# Persian speaker, wherever the packet came out.
+#
+# Ranges: Arabic (0600–06FF), Arabic Supplement (0750–077F), and the two
+# Presentation Forms blocks that older systems still emit (FB50–FDFF,
+# FE70–FEFF).
+_PERSO_ARABIC = (
+    (0x0600, 0x06FF), (0x0750, 0x077F), (0xFB50, 0xFDFF), (0xFE70, 0xFEFF),
+)
+# Letters that exist in Persian and not in Arabic. Their presence raises a
+# "Perso-Arabic" reading to a confident "Persian" one; their absence does not
+# lower it, because plenty of ordinary Persian queries contain none of them.
+#
+# پچژگ are the four extra consonants. ک (U+06A9) and ی (U+06CC) are included
+# because they are the PERSIAN codepoints for kaf and yeh — Arabic writes those
+# same two letters as U+0643 and U+064A. Without them the signal was almost
+# always false: «تور کشتی کروز», the site's own head term, contains none of
+# پچژگ and would have been reported as merely "Perso-Arabic".
+_PERSIAN_ONLY = set("پچژگکی")
+
+
+def is_perso_arabic(text: str) -> bool:
+    return any(any(lo <= ord(ch) <= hi for lo, hi in _PERSO_ARABIC) for ch in text or "")
+
+
+def script_share(country_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """
+    What share of impressions come from Perso-Arabic queries, ignoring country.
+
+    This is the honest measure of an Iranian audience. The country column is
+    measuring VPN exit geography for this market and nothing else.
+    """
+    fa = total = 0.0
+    persian_marked = False
+    for r in country_rows:
+        keys = r.get("keys") or []
+        if not keys:
+            continue
+        imp = float(r.get("impressions") or 0)
+        total += imp
+        q = keys[0]
+        if is_perso_arabic(q):
+            fa += imp
+            if any(ch in _PERSIAN_ONLY for ch in q):
+                persian_marked = True
+    return {"share": (fa / total) if total else 0.0,
+            "impressions": int(fa), "total": int(total),
+            "persian_letters_seen": persian_marked}
+
+
+def market_alignment(site: config.Site, geo: list[CountryVisibility],
+                     country_rows: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     """
     Does the site surface where its market actually is?
 
@@ -229,16 +283,54 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility]) -> dict[st
         }
 
     if site.market == "IR":
-        share = next((c.impressions for c in geo if c.country == "irn"), 0) / total
+        # Judged on the query's SCRIPT, not the country. Iranian searchers are
+        # overwhelmingly on VPNs, so Search Console attributes them to the exit
+        # node — cruise24.ir's audience read as Germany, the United States,
+        # Portugal and Azerbaijan, and was reported MISALIGNED for it. The
+        # country column measures VPN geography for this market, nothing else.
+        by_country = next((c.impressions for c in geo if c.country == "irn"), 0) / total
+        if country_rows is None:
+            # No rows to read the script from. Say so rather than falling back
+            # to the country number, which is the measurement being rejected.
+            return {"verdict": "no data", "home_share": None,
+                    "detail": ("cannot judge an Iranian audience without the query "
+                               "rows — country attribution is VPN geography here")}
+        s = script_share(country_rows)
+        share = s["share"]
         aligned = share >= 0.5
+        confidence = ("Persian-specific letters present"
+                      if s["persian_letters_seen"] else
+                      "Perso-Arabic script, no Persian-only letters seen")
         return {
             "verdict": "aligned" if aligned else "MISALIGNED",
             "home_share": round(share, 3),
-            "detail": (f"{share:.0%} of impressions come from Iran"
-                       if aligned else
-                       f"only {share:.0%} of impressions come from Iran, "
-                       "the market this site is written for"),
+            "by_country_share": round(by_country, 3),
+            "measured_by": "query script",
+            "detail": (
+                f"{share:.0%} of impressions come from Perso-Arabic queries "
+                f"({s['impressions']:,} of {s['total']:,}) — {confidence}. "
+                f"Only {by_country:.0%} are attributed to Iran by country, and that "
+                f"gap is VPN exit geography, not audience."),
         }
+
+    # Non-IR markets are still read by country — that is the right measure for
+    # them. But the VPN distortion does not stop at the .ir boundary: boutimar.com
+    # is an INT site that also serves Iranians, and any of them behind a tunnel
+    # lands in the German or Dutch column. So carry the script reading alongside
+    # as a NOTE, never as the verdict, whenever it is large enough to change how
+    # the country numbers should be read.
+    fa_note: dict[str, Any] = {}
+    if country_rows:
+        s = script_share(country_rows)
+        if s["share"] >= 0.15:
+            fa_note = {
+                "persian_query_share": round(s["share"], 3),
+                "script_note": (
+                    f"{s['share']:.0%} of impressions come from Perso-Arabic queries "
+                    f"({s['impressions']:,} of {s['total']:,}). Wherever those land by "
+                    f"country, they are Persian speakers — read the country split below "
+                    f"knowing part of it is VPN exit geography."),
+            }
 
     if site.market == "DACH":
         share = sum(c.impressions for c in geo if c.country in ("deu", "aut", "che")) / total
@@ -246,6 +338,7 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility]) -> dict[st
             "verdict": "aligned" if share >= 0.4 else "MISALIGNED",
             "home_share": round(share, 3),
             "detail": f"{share:.0%} of impressions come from DACH",
+            **fa_note,
         }
 
     # INT: no single home market, but a world-market site whose visibility is
@@ -259,6 +352,7 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility]) -> dict[st
                    "this is a domestic site wearing an international domain"
                    if share >= 0.4 else
                    f"spread across {len(geo)} countries, top is {top.country_name} at {share:.0%}"),
+        **fa_note,
     }
 
 
@@ -340,7 +434,8 @@ def keyword_planner_status(site: config.Site) -> dict[str, Any]:
 
 
 def scout_site(site: config.Site, gsc: dict[str, Any]) -> dict[str, Any]:
-    geo = geo_visibility(gsc.get("country_rows") or [])
+    rows = gsc.get("country_rows") or []
+    geo = geo_visibility(rows)
     return {
         "domain": site.domain,
         "market": site.market,
@@ -348,7 +443,7 @@ def scout_site(site: config.Site, gsc: dict[str, Any]) -> dict[str, Any]:
         "date_range": gsc.get("date_range"),
         "countries_seen": len(geo),
         "total_impressions": sum(c.impressions for c in geo),
-        "market_alignment": market_alignment(site, geo),
+        "market_alignment": market_alignment(site, geo, rows),
         "geo": [c.as_dict() for c in geo],
         "opportunities": opportunities(geo),
         "keyword_planner": keyword_planner_status(site),
@@ -363,8 +458,17 @@ def render_markdown(reports: list[dict[str, Any]]) -> str:
         L.append(f"## {r['domain']}  ·  market {r['market']}")
         ma = r["market_alignment"]
         L.append(f"**{ma['verdict']}** — {ma['detail']}")
+        if ma.get("script_note"):
+            L.append("")
+            L.append(f"> {ma['script_note']}")
         L.append("")
         L.append(f"{r['total_impressions']} impressions across {r['countries_seen']} countries.")
+        # The heading has to carry the caveat, because the table underneath is
+        # the thing that misleads: for an Iranian audience these are exit nodes.
+        if ma.get("measured_by") == "query script":
+            L.append("")
+            L.append("*Countries below are where the traffic EXITS, not where it "
+                     "comes from. The verdict above is measured on the query script.*")
         L.append("")
         L.append("| Country | Impressions | Clicks | Avg pos | Band |")
         L.append("|---|---:|---:|---:|---|")

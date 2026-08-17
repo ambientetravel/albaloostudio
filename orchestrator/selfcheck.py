@@ -1043,12 +1043,74 @@ ok("zero-impression rows ignored", a7.geo_visibility([crow("x", "deu", 0, 3.0)])
 ok("malformed rows ignored", a7.geo_visibility([{"keys": ["only-one"]}]) == [])
 
 # An IR site whose traffic is not Iranian is misaligned — the check that catches
-# a site quietly serving the wrong audience.
+# a site quietly serving the wrong audience. For an IR site "Iranian" is decided
+# by the QUERY'S SCRIPT, not the country column: see the VPN block below.
 _ir = [s for s in config.load_sites() if s.market == "IR"][0]
-ok("IR site with Iranian traffic is aligned",
-   a7.market_alignment(_ir, a7.geo_visibility([crow("q", "irn", 90, 10.0), crow("q", "usa", 10, 10.0)]))["verdict"] == "aligned")
-ok("IR site without Iranian traffic is MISALIGNED",
-   a7.market_alignment(_ir, a7.geo_visibility([crow("q", "usa", 90, 10.0), crow("q", "irn", 10, 10.0)]))["verdict"] == "MISALIGNED")
+
+def _align_ir(rows):
+    return a7.market_alignment(_ir, a7.geo_visibility(rows), rows)
+
+_fa, _en = "تور کشتی کروز", "cruise tour"
+ok("IR site with Persian queries is aligned",
+   _align_ir([crow(_fa, "irn", 90, 10.0), crow(_fa, "usa", 10, 10.0)])["verdict"] == "aligned")
+ok("IR site whose queries are not Persian is MISALIGNED",
+   _align_ir([crow(_en, "usa", 90, 10.0), crow(_en, "irn", 10, 10.0)])["verdict"] == "MISALIGNED")
+
+# ── the VPN correction ──────────────────────────────────────────────────────
+# Iranian searchers are overwhelmingly behind VPNs, so Search Console records
+# the EXIT NODE. cruise24.ir's audience read as Germany / United States /
+# Portugal and was reported MISALIGNED for it. The script does not travel
+# through the tunnel.
+_vpn = [crow(_fa, "deu", 60, 12.0), crow("کروز خلیج فارس", "prt", 40, 14.0),
+        crow(_fa, "irn", 20, 9.0)]
+_v = _align_ir(_vpn)
+ok("a Persian audience behind a VPN is ALIGNED, not misaligned",
+   _v["verdict"] == "aligned", _v)
+ok("the country column alone would have called it misaligned",
+   _v["by_country_share"] < 0.5 <= _v["home_share"], (_v["by_country_share"], _v["home_share"]))
+ok("the verdict says which instrument produced it",
+   _v["measured_by"] == "query script", _v.get("measured_by"))
+ok("the detail names the VPN gap rather than leaving it unexplained",
+   "VPN exit geography" in _v["detail"], _v["detail"])
+ok("Persian-only letters are detected when present",
+   a7.script_share(_vpn)["persian_letters_seen"] is True)
+# The head term the whole site is built on must itself read as confidently
+# Persian. It contains none of پچژگ — it was the case that exposed the need for
+# the Persian kaf and yeh codepoints in the set.
+ok("«تور کشتی کروز» is confidently Persian, not merely Perso-Arabic",
+   a7.script_share([crow(_fa, "deu", 10, 12.0)])["persian_letters_seen"] is True)
+# Arabic without any Persian-specific letter is still Perso-Arabic, and must not
+# be silently upgraded to "confidently Persian".
+_ar = [crow("رحلات بحرية", "are", 120, 11.0)]
+ok("Arabic script counts as Perso-Arabic",
+   a7.script_share(_ar)["share"] == 1.0)
+ok("but is not claimed as confidently Persian",
+   a7.script_share(_ar)["persian_letters_seen"] is False)
+ok("mixed Latin/Persian query counts as Perso-Arabic",
+   a7.is_perso_arabic("MSC کروز") is True)
+ok("a Latin-only query does not", a7.is_perso_arabic("msc cruise") is False)
+ok("empty text is not Perso-Arabic", a7.is_perso_arabic("") is False)
+
+# Without the rows there is nothing to read the script from, and falling back to
+# the country number would be falling back to the measurement being rejected.
+ok("no rows means no verdict, not a country-based one",
+   a7.market_alignment(_ir, a7.geo_visibility(_vpn))["verdict"] == "no data")
+
+# The distortion does not stop at the .ir boundary — boutimar.com is INT and
+# also serves Iranians. There the script reading is a NOTE on the country split,
+# never the verdict.
+_int = [s for s in config.load_sites() if s.market == "INT"][0]
+_mixed = [crow(_fa, "deu", 50, 12.0), crow("cruise from istanbul", "usa", 50, 20.0),
+          crow("gulf cruise", "gbr", 40, 18.0)]
+_i = a7.market_alignment(_int, a7.geo_visibility(_mixed), _mixed)
+ok("INT market is still judged by country", _i["verdict"] in ("concentrated", "distributed"))
+ok("INT report carries the Persian share as a caveat",
+   _i.get("persian_query_share") == 0.357, _i.get("persian_query_share"))
+_i_latin = a7.market_alignment(
+    _int, a7.geo_visibility([crow("cruise", "usa", 200, 12.0)]),
+    [crow("cruise", "usa", 200, 12.0)])
+ok("no caveat when there is no Perso-Arabic traffic to caveat",
+   "script_note" not in _i_latin)
 
 # Opportunities must exclude what is not worth working on.
 _opps = a7.opportunities(a7.geo_visibility([
@@ -2073,14 +2135,23 @@ ok("14 impressions is not a misalignment verdict",
    _thin_ir["verdict"] == "too little data", _thin_ir["verdict"])
 ok("and it says visibility is the problem, not positioning",
    "visibility, not positioning" in _thin_ir["detail"])
+ok("the floor is checked BEFORE the script branch, so thin data never gets a "
+   "verdict from either instrument",
+   _a7.market_alignment(_site("IR"), _rows([("deu", 14)]),
+                        [crow("تور کروز", "deu", 14, 12.0)])["verdict"] == "too little data")
 _thin_dach = _a7.market_alignment(_site("DACH"), _rows([("usa", 9), ("can", 8), ("phl", 7),
                                                         ("svn", 7), ("irl", 6), ("deu", 2)]))
 ok("43 impressions is not one either", _thin_dach["verdict"] == "too little data")
-# The verdicts that DO have data must be untouched.
-_real_ir = _a7.market_alignment(_site("IR"), _rows([("irn", 279), ("deu", 25), ("are", 21),
-                                                    ("usa", 18), ("oth", 93)]))
+# The verdicts that DO have data must be untouched. IR sites are judged on the
+# query script, so these carry real rows — the country split alone no longer
+# decides anything for this market.
+_real_rows = [crow("تور کشتی کروز", "irn", 279, 9.0), crow("کروز دبی", "deu", 25, 12.0),
+              crow("کشتی کروز قیمت", "are", 21, 14.0), crow("کروز خلیج فارس", "usa", 18, 16.0),
+              crow("بوتیمار کروز", "nld", 93, 18.0)]
+_real_ir = _a7.market_alignment(_site("IR"), _a7.geo_visibility(_real_rows), _real_rows)
 ok("436 impressions still gives a real verdict", _real_ir["verdict"] == "aligned")
-_mis = _a7.market_alignment(_site("IR"), _rows([("deu", 400), ("irn", 20)]))
+_mis_rows = [crow("cruise deals germany", "deu", 400, 12.0), crow("cruise", "irn", 20, 30.0)]
+_mis = _a7.market_alignment(_site("IR"), _a7.geo_visibility(_mis_rows), _mis_rows)
 ok("and a genuine misalignment with real data still fires",
    _mis["verdict"] == "MISALIGNED", _mis["verdict"])
 ok("the floor is a named constant, not a literal",

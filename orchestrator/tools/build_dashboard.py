@@ -403,9 +403,17 @@ def render(scout: dict | None, writer: dict | None,
             out.append(f'<div class="panel"><strong>{_esc(r.get("domain","?"))}</strong> '
                        f'<span class="pill {cls}">{_esc(verdict or "—")}</span>'
                        f'<p class="note">{_esc(ma.get("detail",""))}</p>')
+            # The Perso-Arabic reading, on whichever plane it applies. For an IR
+            # site it IS the verdict; for the others it is a caveat on the table.
+            if ma.get("script_note"):
+                out.append(f'<p class="note">{_esc(ma["script_note"])}</p>')
             opps_g = r.get("opportunities", [])[:6]
             if opps_g:
-                out.append('<table><tr><th>Country</th><th class="n">Impressions</th>'
+                # Named "exit" for IR sites on purpose. Labelling a VPN exit node
+                # "Country" is what produced "cruise24.ir's audience is German".
+                head = ("Exit country (VPN)" if ma.get("measured_by") == "query script"
+                        else "Country")
+                out.append(f'<table><tr><th>{head}</th><th class="n">Impressions</th>'
                            '<th class="n">Position</th></tr>')
                 for o in opps_g:
                     out.append(f'<tr><td>{_esc(o.get("country",""))}</td>'
