@@ -1115,6 +1115,11 @@ ok("empty text is not Perso-Arabic", a7.is_perso_arabic("") is False)
 # the country number would be falling back to the measurement being rejected.
 ok("no rows means no verdict, not a country-based one",
    a7.market_alignment(_ir, a7.geo_visibility(_vpn))["verdict"] == "no data")
+# scout_site passes `gsc.get("country_rows") or []`, so the EMPTY LIST is the
+# shape this actually arrives in — testing only for None left the IR branch
+# reading a measures dict that is populated solely when the rows are truthy.
+ok("an empty list is treated as no rows, not as a name error",
+   a7.market_alignment(_ir, a7.geo_visibility(_vpn), [])["verdict"] == "no data")
 
 # The distortion does not stop at the .ir boundary — boutimar.com is INT and
 # also serves Iranians. There the script reading is a NOTE on the country split,

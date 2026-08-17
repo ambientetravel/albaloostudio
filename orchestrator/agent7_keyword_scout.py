@@ -309,15 +309,23 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
         # node — cruise24.ir's audience read as Germany, the United States,
         # Portugal and Azerbaijan, and was reported MISALIGNED for it. The
         # country column measures VPN geography for this market, nothing else.
-        by_country = next((c.impressions for c in geo if c.country == "irn"), 0) / total
-        if country_rows is None:
+        # `not country_rows`, not `is None`: scout_site passes
+        # `gsc.get("country_rows") or []`, so an empty LIST is the shape this
+        # actually arrives in when Search Console returns nothing. Testing for
+        # None alone would fall through to the measures dict, which is only
+        # populated when the rows are truthy.
+        if not country_rows:
             # No rows to read the script from. Say so rather than falling back
             # to the country number, which is the measurement being rejected.
             return {"verdict": "no data", "home_share": None,
                     "detail": ("cannot judge an Iranian audience without the query "
                                "rows — country attribution is VPN geography here")}
-        s = script_share(country_rows)
-        share = s["share"]
+        # Reused, not recomputed. Two code paths deriving "the Iran share" from
+        # the same rows is how the report and the dashboard came to disagree in
+        # the first place; there is no reason to reintroduce it one scope down.
+        s, share = _fa, measures["persian_query_share"]
+        by_country = measures["iran_country_share"]
+        gap = measures["script_vs_country_gap"]
         aligned = share >= 0.5
         confidence = ("Persian-specific letters present"
                       if s["persian_letters_seen"] else
@@ -327,7 +335,6 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
         # "Only 94% are attributed to Iran" — which is nonsense about a number
         # that high, and worse, it implied a VPN problem where there is barely
         # one. Five points is a rounding difference; sixty is the finding.
-        gap = share - by_country
         if gap >= 0.15:
             second = (f"Only {by_country:.0%} are attributed to Iran by country — "
                       f"that {gap:.0%}-point gap is VPN exit geography, not audience.")
@@ -362,7 +369,7 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
     # is large enough to change how the country split should be read.
     fa_note: dict[str, Any] = {}
     if country_rows:
-        s = script_share(country_rows)
+        s = _fa
         if s["share"] >= 0.15:
             fa_note["script_note"] = (
                 f"{s['share']:.0%} of impressions come from Perso-Arabic queries "
