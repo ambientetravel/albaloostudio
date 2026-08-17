@@ -160,7 +160,7 @@ jobs:
       # 90 days is right for a build artifact and wrong for correspondence.
       - name: Upload drafts and escalations
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: agent4-closed
           path: orchestrator/closed/

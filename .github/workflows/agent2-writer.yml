@@ -297,7 +297,7 @@ jobs:
 
       - name: Upload drafts and events
         if: always() && steps.locate.outputs.found != ''
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: agent2-written
           # bundles/ holds the files the CMS adapters staged rather than

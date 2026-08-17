@@ -172,7 +172,7 @@ jobs:
 
       - name: Upload campaigns and queued posts
         if: always() && steps.locate.outputs.found != ''
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: agent3-broadcast
           path: |
