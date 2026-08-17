@@ -86,7 +86,7 @@ jobs:
           echo "run_id=$RUN" >> "$GITHUB_OUTPUT"
 
       - name: Fetch the publishing events Agent 2 produced
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: agent2-written
           path: orchestrator/inbox
@@ -172,7 +172,7 @@ jobs:
 
       - name: Upload campaigns and queued posts
         if: always() && steps.locate.outputs.found != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: agent3-broadcast
           path: |

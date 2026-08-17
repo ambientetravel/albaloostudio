@@ -1072,6 +1072,26 @@ ok("the verdict says which instrument produced it",
    _v["measured_by"] == "query script", _v.get("measured_by"))
 ok("the detail names the VPN gap rather than leaving it unexplained",
    "VPN exit geography" in _v["detail"], _v["detail"])
+
+# The second sentence has to match the SIZE of the gap. Run #4 reported
+# boutimar.ir at 99% by script and 94% by country, and the fixed wording said
+# "Only 94% are attributed to Iran" — nonsense about a number that high, and it
+# implied a VPN problem where there is barely one.
+_close = [crow(_fa, "irn", 155, 9.0), crow(_fa, "deu", 1, 12.0)]
+_c = _align_ir(_close)
+ok("a 5-point gap is not described as a VPN finding",
+   "VPN exit geography" not in _c["detail"], _c["detail"])
+ok("it says the two measures agree instead",
+   "the two measures agree" in _c["detail"], _c["detail"])
+ok("and never says 'Only 94%'", "Only 9" not in _c["detail"], _c["detail"])
+ok("a wide gap still reads as the VPN finding",
+   "VPN exit geography" in _v["detail"] and "-point gap" in _v["detail"], _v["detail"])
+# The inverse gap is a different finding, not the same one backwards: Iranian
+# IPs searching in another language is not a tunnel.
+_inv = [crow("cruise iran", "irn", 180, 12.0), crow(_fa, "irn", 20, 9.0)]
+_iv = _align_ir(_inv)
+ok("country far above script is called out as its own finding",
+   "different finding from a VPN" in _iv["detail"], _iv["detail"])
 ok("Persian-only letters are detected when present",
    a7.script_share(_vpn)["persian_letters_seen"] is True)
 # The head term the whole site is built on must itself read as confidently
@@ -1109,8 +1129,15 @@ ok("INT report carries the Persian share as a caveat",
 _i_latin = a7.market_alignment(
     _int, a7.geo_visibility([crow("cruise", "usa", 200, 12.0)]),
     [crow("cruise", "usa", 200, 12.0)])
-ok("no caveat when there is no Perso-Arabic traffic to caveat",
+ok("no PROSE caveat when there is no Perso-Arabic traffic to caveat",
    "script_note" not in _i_latin)
+# But the FIGURE is always carried. Run #4 reported boutimar.com as 18% Iran by
+# country and the report gave no way to tell whether its Persian share was small
+# or simply never measured — "0%" and "absent" must not look the same.
+ok("the figure is reported even when it is zero",
+   _i_latin.get("persian_query_share") == 0.0, _i_latin.get("persian_query_share"))
+ok("and is absent, not zero, when there were no rows to measure",
+   "persian_query_share" not in a7.market_alignment(_int, a7.geo_visibility(_mixed)))
 
 # Opportunities must exclude what is not worth working on.
 _opps = a7.opportunities(a7.geo_visibility([

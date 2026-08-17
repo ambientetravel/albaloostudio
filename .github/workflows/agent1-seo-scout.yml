@@ -229,7 +229,7 @@ jobs:
 
       - name: Upload run artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: seo-scout-run
           path: orchestrator/runs/

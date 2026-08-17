@@ -101,7 +101,7 @@ jobs:
       - name: Fetch campaign logs
         if: steps.b.outputs.run_id != ''
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: agent3-broadcast
           path: orchestrator/inbox
@@ -160,7 +160,7 @@ jobs:
       # 90 days is right for a build artifact and wrong for correspondence.
       - name: Upload drafts and escalations
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: agent4-closed
           path: orchestrator/closed/

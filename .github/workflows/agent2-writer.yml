@@ -107,7 +107,7 @@ jobs:
           echo "run_id=$RUN" >> "$GITHUB_OUTPUT"
 
       - name: Fetch the briefs Agent 1 produced
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: seo-scout-run
           path: orchestrator/inbox
@@ -297,7 +297,7 @@ jobs:
 
       - name: Upload drafts and events
         if: always() && steps.locate.outputs.found != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: agent2-written
           # bundles/ holds the files the CMS adapters staged rather than

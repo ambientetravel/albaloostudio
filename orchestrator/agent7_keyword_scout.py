@@ -301,6 +301,22 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
         confidence = ("Persian-specific letters present"
                       if s["persian_letters_seen"] else
                       "Perso-Arabic script, no Persian-only letters seen")
+        # The second sentence has to fit the size of the gap. boutimar.ir came
+        # back 99% by script and 94% by country, and the fixed wording read
+        # "Only 94% are attributed to Iran" — which is nonsense about a number
+        # that high, and worse, it implied a VPN problem where there is barely
+        # one. Five points is a rounding difference; sixty is the finding.
+        gap = share - by_country
+        if gap >= 0.15:
+            second = (f"Only {by_country:.0%} are attributed to Iran by country — "
+                      f"that {gap:.0%}-point gap is VPN exit geography, not audience.")
+        elif gap <= -0.15:
+            second = (f"{by_country:.0%} are attributed to Iran by country, well above "
+                      f"the script share — worth a look: Iranian IPs searching in "
+                      f"another language is a different finding from a VPN.")
+        else:
+            second = (f"{by_country:.0%} are attributed to Iran by country too, so for "
+                      f"this site the two measures agree and little traffic is tunnelled.")
         return {
             "verdict": "aligned" if aligned else "MISALIGNED",
             "home_share": round(share, 3),
@@ -308,9 +324,7 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
             "measured_by": "query script",
             "detail": (
                 f"{share:.0%} of impressions come from Perso-Arabic queries "
-                f"({s['impressions']:,} of {s['total']:,}) — {confidence}. "
-                f"Only {by_country:.0%} are attributed to Iran by country, and that "
-                f"gap is VPN exit geography, not audience."),
+                f"({s['impressions']:,} of {s['total']:,}) — {confidence}. {second}"),
         }
 
     # Non-IR markets are still read by country — that is the right measure for
@@ -319,18 +333,22 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
     # lands in the German or Dutch column. So carry the script reading alongside
     # as a NOTE, never as the verdict, whenever it is large enough to change how
     # the country numbers should be read.
+    # The FIGURE is always carried, so "no Persian traffic" and "nobody measured
+    # it" stay distinguishable — run #4 reported boutimar.com as 18% Iran by
+    # country and there was no way to tell from the report whether the script
+    # share was small or simply absent. The PROSE only appears when the number
+    # is large enough to change how the country split should be read.
     fa_note: dict[str, Any] = {}
     if country_rows:
         s = script_share(country_rows)
+        fa_note = {"persian_query_share": round(s["share"], 3)}
         if s["share"] >= 0.15:
-            fa_note = {
-                "persian_query_share": round(s["share"], 3),
-                "script_note": (
-                    f"{s['share']:.0%} of impressions come from Perso-Arabic queries "
-                    f"({s['impressions']:,} of {s['total']:,}). Wherever those land by "
-                    f"country, they are Persian speakers — read the country split below "
-                    f"knowing part of it is VPN exit geography."),
-            }
+            fa_note["script_note"] = (
+                f"{s['share']:.0%} of impressions come from Perso-Arabic queries "
+                f"({s['impressions']:,} of {s['total']:,}), against {top.impressions / total:.0%} "
+                f"from {top.country_name} by country. Wherever those queries land, they "
+                f"are Persian speakers — read the country split below knowing part of "
+                f"it is VPN exit geography.")
 
     if site.market == "DACH":
         share = sum(c.impressions for c in geo if c.country in ("deu", "aut", "che")) / total
@@ -461,6 +479,11 @@ def render_markdown(reports: list[dict[str, Any]]) -> str:
         if ma.get("script_note"):
             L.append("")
             L.append(f"> {ma['script_note']}")
+        elif ma.get("persian_query_share") is not None:
+            # Printed even at 0%, because "measured, and it is nearly none" is a
+            # different fact from "nobody looked".
+            L.append("")
+            L.append(f"*Perso-Arabic queries: {ma['persian_query_share']:.0%} of impressions.*")
         L.append("")
         L.append(f"{r['total_impressions']} impressions across {r['countries_seen']} countries.")
         # The heading has to carry the caveat, because the table underneath is

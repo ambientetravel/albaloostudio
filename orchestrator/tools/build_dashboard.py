@@ -407,6 +407,9 @@ def render(scout: dict | None, writer: dict | None,
             # site it IS the verdict; for the others it is a caveat on the table.
             if ma.get("script_note"):
                 out.append(f'<p class="note">{_esc(ma["script_note"])}</p>')
+            elif ma.get("persian_query_share") is not None:
+                out.append(f'<p class="note">Perso-Arabic queries: '
+                           f'{ma["persian_query_share"]:.0%} of impressions.</p>')
             opps_g = r.get("opportunities", [])[:6]
             if opps_g:
                 # Named "exit" for IR sites on purpose. Labelling a VPN exit node
