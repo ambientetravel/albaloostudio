@@ -2762,5 +2762,27 @@ ok("both sides of the comparison are canonicalised",
 ok("the surfaced set uses the page dimension alone, not query+page",
    '["page"])' in _ICSRC and '["query", "page"]' not in _ICSRC)
 
+print("\n=== the dashboard is read on a phone ===")
+# Hosting it at dashboard.boutimar.com exists so it can be checked from a phone
+# during the day. The widest tables here are seven columns; without their own
+# scroll box they push the DOCUMENT sideways at 375px, dragging the headings and
+# stat cards off-screen. A page that does that reads as broken, not as wide.
+import build_dashboard as _bd  # noqa: E402  (tools/ is already on the path)
+_CSSD = _bd._CSS
+ok("wide tables scroll inside themselves, not the page",
+   "display:block" in _CSSD and "overflow-x:auto" in _CSSD)
+ok("the scroll box is inside the phone breakpoint, not global",
+   _CSSD.index("max-width:640px") < _CSSD.index("overflow-x:auto"))
+ok("prose is exempt from nowrap so long details still wrap",
+   ".note,.sub{white-space:normal}" in _CSSD)
+# The generator emits a FRAGMENT — index.php supplies the document around it.
+# If that ever changes, the viewport meta has to come with it or a phone renders
+# the page at 980px and zooms out.
+_frag = _bd.render(None, None, None, None, None)
+ok("the generator still emits a fragment, not a document",
+   "<!doctype" not in _frag.lower() and "<html" not in _frag.lower())
+ok("so the hosting page is what carries the viewport meta",
+   'name="viewport"' in pathlib.Path("../dashboard-site/index.php").read_text(encoding="utf-8"))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

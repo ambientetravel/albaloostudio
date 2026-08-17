@@ -157,8 +157,25 @@ a{color:var(--accent)}
 .note{color:var(--dim);font-size:13px;margin-top:8px}
 footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
 color:var(--dim);font-size:13px}
-@media(max-width:640px){table{font-size:13px}th,td{padding:7px 6px}
-.wrap{padding:20px 12px 56px}}
+/* Phone. This page is read on a phone more than anywhere else — it is the
+   whole point of hosting it — and the widest tables here are seven columns
+   (site, market, impressions, Persian, Iran, gap, reading). At 375px those
+   force the DOCUMENT to scroll sideways, which drags the headings and stat
+   cards off-screen with them and makes the page feel broken rather than wide.
+   display:block turns each table into its own scroll box, so a wide table
+   scrolls inside itself and the page body never moves. nowrap keeps a row on
+   one line while it does. */
+@media(max-width:640px){
+table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;
+white-space:nowrap;font-size:13px}
+th,td{padding:7px 6px}
+.wrap{padding:20px 12px 56px}
+h1{font-size:22px}
+.stat .v{font-size:20px}
+/* The prose under a verdict is the opposite case: it must wrap, or a long
+   detail sentence becomes a horizontal scroll of its own. */
+.note,.sub{white-space:normal}
+}
 """
 
 
