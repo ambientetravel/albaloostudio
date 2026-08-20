@@ -12,6 +12,21 @@
 
 RewriteEngine On
 
+# ---- One canonical origin: https://albaloostudio.com/ ----
+#
+# On 20 Aug all FOUR variants — http/https x apex/www — returned 200 with no
+# redirect, serving the same single page at four URLs, and the homepage carried
+# no canonical tag either. Duplicate content with nothing to break the tie, on a
+# site with one impression in ninety days.
+#
+# The X-Forwarded-Proto check is not decoration: where TLS is terminated by a
+# proxy in front of Apache, %{HTTPS} reads "off" on an already-secure request,
+# and a rule testing it alone redirects https to itself forever. Redirect only
+# when BOTH signals say the request was not secure.
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule ^(.*)$ https://albaloostudio.com/$1 [R=301,L]
+
 # ---- Canonical host: force www -> apex ----
 RewriteCond %{HTTP_HOST} ^www\.albaloostudio\.com$ [NC]
 RewriteRule ^(.*)$ https://albaloostudio.com/$1 [R=301,L]
