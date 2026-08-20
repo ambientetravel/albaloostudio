@@ -150,6 +150,32 @@ _INTERROGATIVE = re.compile(
 )
 
 
+# Citation grammar with nothing behind it. All three Agent 2 drafts reviewed on
+# 20 Aug carried one, and the shape is identical every time: a claim, a comma,
+# and an official-sounding body that was never consulted.
+#
+#   "as verified by Yazd Cultural Heritage and Tourism Department lodging records"
+#   "as documented in official Iran International Exhibitions Company (IIEC)…"
+#   "documented by the Geological & Heritage Survey of Iran"
+#
+# The third names an organisation that does not exist — a hybrid of the
+# Geological Survey of Iran and a cultural-heritage authority. This is worse
+# than an unsourced claim: it manufactures the appearance of verification, and
+# a reader who trusts it has been given a reason to that we invented.
+#
+# The pipeline has no research tool and reads no registry, so a model asserting
+# it checked one is asserting something that could not have happened. There is
+# no legitimate use of this phrasing in Agent 2's output, which is why it
+# BLOCKS rather than warns.
+_FAKE_CITATION = re.compile(
+    r"\b(?:as\s+)?(?:verified|documented|confirmed|recorded|certified|registered|"
+    r"published|listed)\s+(?:by|in|with|per)\s+"
+    r"(?:the\s+|an?\s+|official\s+)*"
+    r"[A-Z][\w&'’-]*(?:\s+(?:of|and|for|&)?\s*[A-Z][\w&'’-]*){1,7}",
+    re.UNICODE,
+)
+
+
 def _clause_bounds(text: str, match: re.Match[str]) -> tuple[int, int]:
     """Offsets of the single clause containing `match`, never spilling into its neighbours."""
     before = text[:match.start()]
@@ -408,6 +434,19 @@ def check(
                     "Price guarantee language is a commercial commitment nobody signed off.",
                 )
             )
+        for m in _FAKE_CITATION.finditer(text):
+            out.append(
+                Violation(
+                    "no_invented_facts",
+                    BLOCK,
+                    _excerpt(text, m),
+                    "This cites an authority as having verified the claim. Nothing "
+                    "in this pipeline reads a registry, an archive or a records "
+                    "office, so that verification did not happen. State the fact "
+                    "plainly or leave it out — an invented source is worse than "
+                    "no source, because it manufactures a reason to be believed.",
+                )
+            )
         for m in _PHOTO_CREDIT_GUESS.finditer(text):
             out.append(
                 Violation(
@@ -465,6 +504,12 @@ def prompt_constraints(profile: str = "boutimar_v1") -> str:
             "itinerary Schengen — even when it sails from Istanbul."
         )
     if rules["no_invented_facts"]:
+        lines.append(
+            "- NEVER write that a fact was verified, documented, confirmed or "
+            "recorded by any organisation, ministry, department, survey or "
+            "records office. You have not consulted one and cannot. State the "
+            "fact on its own or omit it."
+        )
         lines.append(
             "3. Never invent a rate, a departure date, an inclusion or a photo "
             "credit. Use only the figures supplied in the brief's data. If the data "

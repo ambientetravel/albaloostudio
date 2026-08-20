@@ -2975,5 +2975,41 @@ ok("and it does not flag ordinary nested f-strings that ARE 3.11-legal",
    not _guard.scan(pathlib.Path("config.py")))
 
 
+print("\n=== invented authorities ===")
+# All three Agent 2 drafts reviewed on 20 Aug cited a body that had never been
+# consulted, and one of them — "the Geological & Heritage Survey of Iran" — does
+# not exist. This pipeline reads no registry, archive or records office, so a
+# model claiming it verified against one is claiming something that could not
+# have happened. Worse than an unsourced claim: it manufactures a reason to be
+# believed.
+_REAL = [
+    "an intimate Qajar-era heritage property featuring exactly 7 restored guest "
+    "rooms, as verified by Yazd Cultural Heritage and Tourism Department lodging records",
+    "an annual 4-day trade fair, as documented in official Iran International "
+    "Exhibitions Company (IIEC) and NIOC public schedules",
+    "at an elevation of approximately 2,163 meters above sea level, documented by "
+    "the Geological & Heritage Survey of Iran",
+]
+for _t in _REAL:
+    ok("a fabricated citation is blocked: " + _t[:40],
+       any(v.rule == "no_invented_facts" and v.severity == compliance.BLOCK
+           for v in compliance.check(_t, "boutimar_v1")),
+       _t[:70])
+
+# It must not fire on ordinary prose, or writers route around the gate.
+_FINE = [
+    "The fortress sits at roughly 2,163 metres above sea level.",
+    "Boutimar files Iranian business-visa authorization codes for your delegation.",
+    "Rooms are verified by our reservations desk before confirmation.",
+    "Dates are confirmed by the organiser six to eight months ahead.",
+]
+for _t in _FINE:
+    ok("ordinary prose is not blocked: " + _t[:38],
+       not compliance._FAKE_CITATION.search(_t), _t)
+
+ok("the model is told the rule up front, not only at the gate",
+   "NEVER write that a fact was verified" in compliance.prompt_constraints("boutimar_v1"))
+
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
