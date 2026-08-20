@@ -407,11 +407,17 @@ def render(scout: dict | None, writer: dict | None,
     if not strategy or not strategy.get("portfolio"):
         out.append(_missing("agent 5 audit"))
     else:
+        # Built outside the f-string. The previous version nested an f-string
+        # using the SAME quote character inside its own expression, which PEP
+        # 701 made legal in 3.12 and which is a hard SyntaxError on the 3.11
+        # runner — the whole dashboard has failed to build since it was added.
+        _ph = strategy.get("placeholders")
+        _ph_txt = f", {_ph} still on placeholder content" if _ph else ""
         out.append(f'<div class="panel"><p class="sub">Mean score '
                    f'<strong>{strategy.get("mean_score","—")}</strong> across '
                    f'{strategy.get("sites_audited",0)} audited '
                    f'{"site" if strategy.get("sites_audited")==1 else "sites"}'
-                   f'{f", {strategy['placeholders']} still on placeholder content" if strategy.get("placeholders") else ""}.</p>'
+                   f'{_ph_txt}.</p>'
                    '<table><tr><th>Site</th><th class="n">Score</th>'
                    '<th class="n">Findings</th><th>State</th></tr>')
         for s in strategy["portfolio"]:

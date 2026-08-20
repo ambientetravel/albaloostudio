@@ -2937,5 +2937,43 @@ ok("and says the build still has to be uploaded",
    "still has to be" in _src2 and "days apart" in _src2)
 
 
+print("\n=== code that compiles here and not on the runner ===")
+# This machine is 3.14; every runner pins 3.11. PEP 701 legalised reusing a
+# quote character, and backslashes, inside an f-string expression — both are a
+# hard SyntaxError on 3.11.
+#
+# ast.parse(feature_version=(3, 11)) does NOT catch either. feature_version
+# constrains the AST, not the TOKENIZER, so an f-string only 3.12+ can tokenize
+# passes it. That false pass cost three consecutive dashboard builds: line 414
+# of build_dashboard.py nested a single-quoted f-string inside a single-quoted
+# one, and the page meant to be read on a phone had not been generated since.
+import py311_guard as _guard  # noqa: E402  (tools/ is on sys.path)
+
+_ROOT = pathlib.Path(".")
+_offenders = []
+for _f in sorted(_ROOT.rglob("*.py")):
+    if "__pycache__" in _f.parts:
+        continue
+    _offenders += [(str(_f), ln, why) for ln, why in _guard.scan(_f)]
+ok("no file uses a construct the 3.11 runner cannot parse",
+   not _offenders, _offenders[:4])
+
+# The guard must actually detect the shape that shipped, or it is decoration.
+_tmp = pathlib.Path("_guard_probe.py")
+_tmp.write_text(
+    "d = {'k': 1}\n"
+    "x = f'{f\", {d['k']} tail\" if d.get(\"k\") else \"\"}'\n",
+    encoding="utf-8")
+try:
+    _hits = _guard.scan(_tmp)
+    ok("the guard catches the exact nesting that broke the dashboard",
+       any("SyntaxError on 3.11" in why for _, why in _hits), _hits)
+finally:
+    _tmp.unlink(missing_ok=True)
+
+ok("and it does not flag ordinary nested f-strings that ARE 3.11-legal",
+   not _guard.scan(pathlib.Path("config.py")))
+
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
