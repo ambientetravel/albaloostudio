@@ -65,9 +65,15 @@ sites:
     # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
     # written for a GoDaddy site. Hosting is NOT the CMS — the two
     # differ on every property here.
-    hosting: netafraz_directadmin
+    hosting: axspace_directadmin
     hosting_note: >-
-      nginx serves static directly; PHP is interpreted. .htaccess cannot touch static files here.
+      DirectAdmin on server22gr.axspace.com — recorded as Netafraz on 20 Aug and
+      corrected the same day; Netafraz appears to resell axspace, and the panel
+      is what a deploy actually touches. nginx serves static directly and PHP is
+      interpreted, so .htaccess never reaches a static file here. boutimar.com
+      and boutimar.ir are SEPARATE docroots on this one account —
+      /domains/<domain>/public_html — and a bundle extracted into the wrong one
+      overwrites the other site with no undo.
     sitemap: "https://boutimar.com/sitemap.xml"    # verified 2026-08-06; not sitemap_index.xml
     min_impressions: 20        # 361 queries / 1,233 impressions in 90d — 20 yields ~10 candidates
     # Inbound Iran DMCs selling the same thing to the same buyer: international
@@ -142,9 +148,15 @@ sites:
     # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
     # written for a GoDaddy site. Hosting is NOT the CMS — the two
     # differ on every property here.
-    hosting: netafraz_directadmin
+    hosting: axspace_directadmin
     hosting_note: >-
-      nginx serves static directly; PHP is interpreted. .htaccess cannot touch static files here.
+      DirectAdmin on server22gr.axspace.com — recorded as Netafraz on 20 Aug and
+      corrected the same day; Netafraz appears to resell axspace, and the panel
+      is what a deploy actually touches. nginx serves static directly and PHP is
+      interpreted, so .htaccess never reaches a static file here. boutimar.com
+      and boutimar.ir are SEPARATE docroots on this one account —
+      /domains/<domain>/public_html — and a bundle extracted into the wrong one
+      overwrites the other site with no undo.
     sitemap: "https://boutimar.ir/sitemap.xml"
     cms:
       type: static

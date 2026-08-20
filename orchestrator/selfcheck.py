@@ -2917,9 +2917,18 @@ _H = {s.domain: s for s in config.load_sites(include_hold=True)}
 ok("every site declares where it is hosted",
    all(s.hosting != "unknown" for s in _H.values()),
    [d for d, s in _H.items() if s.hosting == "unknown"])
-ok("the Netafraz sites are the nginx ones",
-   {d for d, s in _H.items() if s.hosting == "netafraz_directadmin"} ==
+ok("the DirectAdmin sites are the nginx ones",
+   {d for d, s in _H.items() if s.hosting.endswith("_directadmin")} ==
    {"boutimar.com", "boutimar.ir", "cruise24.ir", "cruiseshop.ir", "dmciran.ir"})
+# boutimar.com and boutimar.ir share ONE DirectAdmin account as separate
+# docroots. On 20 Aug a .com bundle was about to be extracted into
+# /domains/boutimar.ir/public_html, which would have overwritten the Farsi site
+# with English pages and no undo. The record has to name the account, not just
+# the company reselling it.
+ok("the shared-account hazard is written down where a deploy step would read it",
+   all("SEPARATE docroots" in _H[d].hosting_note for d in ("boutimar.com", "boutimar.ir")))
+ok("and both are on the same panel",
+   _H["boutimar.com"].hosting == _H["boutimar.ir"].hosting == "axspace_directadmin")
 ok("albaloostudio and exploreorient are GoDaddy cPanel, not DirectAdmin",
    _H["albaloostudio.com"].hosting == _H["exploreorient.com"].hosting == "godaddy_cpanel")
 ok("the base44 pair is recorded as base44",
