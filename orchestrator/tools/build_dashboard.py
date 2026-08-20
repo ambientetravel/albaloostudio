@@ -124,6 +124,9 @@ def _coverage() -> list[dict[str, str]]:
         rows.append({"domain": s.domain, "brand": s.brand, "locale": s.locale,
                      "adapter": adapter, "verdict": verdict, "cls": cls,
                      "unsupported_reason": unsupported,
+                     # Shown because the deploy step differs per host and the
+                     # wrong procedure was written once already.
+                     "hosting": s.hosting,
                      "competitors": str(len(getattr(s, "competitors", None) or []))})
     return rows
 
@@ -233,11 +236,13 @@ def render(scout: dict | None, writer: dict | None,
     # ── coverage ────────────────────────────────────────────────────────────
     out.append("<h2>Can each site receive an article?</h2>")
     out.append('<div class="panel"><table><tr><th>Site</th><th>Brand</th>'
-               '<th>Adapter</th><th>Publishing</th><th class="n">Rivals tracked</th></tr>')
+               '<th>Adapter</th><th>Hosting</th><th>Publishing</th>'
+               '<th class="n">Rivals tracked</th></tr>')
     for r in cov:
         out.append(
             f'<tr><td>{_esc(r["domain"])}</td><td>{_esc(r["brand"])}</td>'
             f'<td><code>{_esc(r["adapter"])}</code></td>'
+            f'<td><code>{_esc(r.get("hosting","unknown"))}</code></td>'
             f'<td><span class="pill {r["cls"]}">{_esc(r["verdict"])}</span>'
             # The reason a site cannot receive an article, shown next to the
             # verdict rather than buried in sites.yml. Without it "not a

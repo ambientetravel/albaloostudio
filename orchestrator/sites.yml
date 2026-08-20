@@ -61,6 +61,13 @@ sites:
     locale: en
     market: INT
     base_url: "https://boutimar.com"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: netafraz_directadmin
+    hosting_note: >-
+      nginx serves static directly; PHP is interpreted. .htaccess cannot touch static files here.
     sitemap: "https://boutimar.com/sitemap.xml"    # verified 2026-08-06; not sitemap_index.xml
     min_impressions: 20        # 361 queries / 1,233 impressions in 90d — 20 yields ~10 candidates
     # Inbound Iran DMCs selling the same thing to the same buyer: international
@@ -131,6 +138,13 @@ sites:
     locale: fa-IR
     market: IR
     base_url: "https://boutimar.ir"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: netafraz_directadmin
+    hosting_note: >-
+      nginx serves static directly; PHP is interpreted. .htaccess cannot touch static files here.
     sitemap: "https://boutimar.ir/sitemap.xml"
     cms:
       type: static
@@ -186,6 +200,13 @@ sites:
     locale: en
     market: INT
     base_url: "https://exploreorient.com"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: godaddy_cpanel
+    hosting_note: >-
+      Apache on GoDaddy. Merging the PR does NOT deploy: the Astro build still has to be uploaded.
     sitemap: "https://exploreorient.com/sitemap-index.xml"
     # A different competitive set from boutimar.com, and deliberately so.
     # exploreorient sells MULTI-COUNTRY ground handling across Turkey, the
@@ -273,6 +294,13 @@ sites:
     locale: en
     market: DACH
     base_url: "https://ambientetravel.com"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: base44
+    hosting_note: >-
+      base44 app behind Cloudflare. No file system; content lives in base44 entities.
     sitemap: "https://ambientetravel.com/sitemap.xml"
     cms:
       type: base44
@@ -299,6 +327,13 @@ sites:
     locale: fa-IR
     market: IR
     base_url: "https://cruisebaz.com"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: base44
+    hosting_note: >-
+      base44 app behind Cloudflare. No file system; content lives in base44 entities.
     sitemap: "https://cruisebaz.com/sitemap.xml"
     cms:
       type: base44
@@ -333,6 +368,13 @@ sites:
     market: IR
     status: active
     base_url: "https://cruise24.ir"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: netafraz_directadmin
+    hosting_note: >-
+      nginx. Same host and same constraints as the other two.
     sitemap: "https://cruise24.ir/sitemap.xml"   # 404 as of 2026-08-09 — see below
     cms:
       type: static
@@ -355,6 +397,13 @@ sites:
     locale: en
     market: INT                # the world-audience twin of cruise24.ir
     base_url: "https://cruise24.me"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: godaddy_website_builder
+    hosting_note: >-
+      GoDaddy's DPS builder. No file access, no API, nothing to deploy to.
     sitemap: "https://cruise24.me/sitemap.xml"   # a sitemap INDEX, not a urlset
     cms:
       type: godaddy_builder
@@ -388,6 +437,13 @@ sites:
     locale: en
     market: INT
     base_url: "https://albaloostudio.com"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: godaddy_cpanel
+    hosting_note: >-
+      Apache on GoDaddy. deploy-albaloostudio.yml mirrors _site/ over FTP and has never yet succeeded.
     sitemap: "https://albaloostudio.com/sitemap.xml"   # 404 as of 2026-08-09
     # The studio this whole pipeline is credited to, now watched by it. A few
     # static pages on GoDaddy/Apache: music, AI video, and the sites it builds.
@@ -422,6 +478,13 @@ sites:
     locale: fa-IR
     market: IR
     base_url: "https://cruiseshop.ir"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: netafraz_directadmin
+    hosting_note: >-
+      nginx.
     sitemap: "https://cruiseshop.ir/sitemap.xml"
     cms:
       # Also being rebuilt as JSON-driven static (11 Aug 2026). static_bundle
@@ -448,6 +511,13 @@ sites:
     locale: fa-IR
     market: IR
     base_url: "https://dmciran.ir"
+    # Where the bytes actually live. Recorded because it was tribal
+    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
+    # written for a GoDaddy site. Hosting is NOT the CMS — the two
+    # differ on every property here.
+    hosting: netafraz_directadmin
+    hosting_note: >-
+      nginx. The only WordPress install in the portfolio.
     sitemap: "https://dmciran.ir/sitemap.xml"
     cms:
       # WordPress TODAY (/wp-admin and /wp-json/wp/v2 both answer 200), but

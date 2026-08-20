@@ -2909,5 +2909,33 @@ ok("on-hold still reads as on hold, not as a decision",
    _by["dmciran.ir"]["verdict"] == "on hold")
 
 
+print("\n=== hosting is not the CMS ===")
+# 20 Aug: a DirectAdmin upload procedure was written for albaloostudio.com,
+# which is on GoDaddy. The portfolio spans four hosts with four different
+# deploy steps, and none of that was recorded anywhere a tool could read.
+_H = {s.domain: s for s in config.load_sites(include_hold=True)}
+ok("every site declares where it is hosted",
+   all(s.hosting != "unknown" for s in _H.values()),
+   [d for d, s in _H.items() if s.hosting == "unknown"])
+ok("the Netafraz sites are the nginx ones",
+   {d for d, s in _H.items() if s.hosting == "netafraz_directadmin"} ==
+   {"boutimar.com", "boutimar.ir", "cruise24.ir", "cruiseshop.ir", "dmciran.ir"})
+ok("albaloostudio and exploreorient are GoDaddy cPanel, not DirectAdmin",
+   _H["albaloostudio.com"].hosting == _H["exploreorient.com"].hosting == "godaddy_cpanel")
+ok("the base44 pair is recorded as base44",
+   _H["ambientetravel.com"].hosting == _H["cruisebaz.com"].hosting == "base44")
+ok("hosting and CMS adapter are separate facts",
+   _H["exploreorient.com"].hosting == "godaddy_cpanel"
+   and _H["exploreorient.com"].cms.get("adapter") == "astro_pr")
+ok("the dashboard shows hosting, so the wrong procedure is harder to write",
+   "<th>Hosting</th>" in _bd.render(None, None, None, None, None))
+# The correction that merge_watch exists for.
+_src2 = pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("astro_pr no longer implies that merging deploys",
+   "MERGING IS NOT DEPLOYING" in _src2)
+ok("and says the build still has to be uploaded",
+   "still has to be" in _src2 and "days apart" in _src2)
+
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

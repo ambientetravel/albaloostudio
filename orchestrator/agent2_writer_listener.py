@@ -908,9 +908,16 @@ def _push_astro_pr(
 
     Used by boutimar.com and exploreorient.com — both static Astro builds with
     no CMS able to hold a draft. A pull request IS the draft: it is reviewable,
-    diffable, revertible, and nothing reaches the live site until a human
-    merges it. For a site generated from files, that is a better review surface
-    than a CMS admin.
+    diffable, revertible, and nothing reaches the live site without a human.
+    For a site generated from files, that is a better review surface than a CMS
+    admin.
+
+    MERGING IS NOT DEPLOYING, and this docstring used to imply it was. boutimar
+    .com is on Netafraz and exploreorient.com on GoDaddy cPanel; in both cases a
+    merge only puts markdown in the repo, and the Astro build still has to be
+    made and uploaded. The two events can be days apart. That is precisely why
+    tools/merge_watch.py asks the SERVER whether a page is there rather than
+    trusting the merge, and why live_url stays None here.
 
     Needs a token with `contents: write` and `pull_requests: write` on the
     TARGET repository — the default GITHUB_TOKEN is scoped to the repo the

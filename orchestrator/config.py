@@ -391,6 +391,18 @@ class Site:
     max_position: float = 40.0
     max_briefs_per_run: int = 5
     compliance_profile: str = "boutimar_v1"
+    # WHERE THE BYTES LIVE, which is not the same question as which CMS holds
+    # them. Recorded on 20 Aug after a DirectAdmin upload procedure was written
+    # for a GoDaddy-hosted site: the portfolio spans Netafraz/DirectAdmin
+    # (nginx), GoDaddy cPanel (Apache), GoDaddy's DPS builder and base44 behind
+    # Cloudflare, and the deploy step is different on every one of them.
+    #
+    # It also decides whether a merged pull request is live. On GoDaddy cPanel
+    # the Astro build still has to be uploaded after the merge, so merge and
+    # deploy are separate events — which is why merge_watch checks the server
+    # rather than trusting GitHub.
+    hosting: str = "unknown"
+    hosting_note: str = ""
     status: str = "active"          # active | hold
     audit_sample_pages: int = 10    # pinned in sites.yml — see the note there
     # Named rivals for Agent 8. A list, never discovered: who you actually
@@ -456,6 +468,8 @@ def load_sites(
                 max_position=float(merged.get("max_position", 40)),
                 max_briefs_per_run=int(merged.get("max_briefs_per_run", 5)),
                 compliance_profile=merged.get("compliance_profile", "boutimar_v1"),
+                hosting=str(merged.get("hosting", "unknown")),
+                hosting_note=str(merged.get("hosting_note", "") or "").strip(),
                 status=str(merged.get("status", "active")).lower(),
                 audit_sample_pages=int(merged.get("audit_sample_pages", 10)),
                 competitors=[str(u).rstrip("/") for u in (merged.get("competitors") or [])],
