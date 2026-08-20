@@ -1194,6 +1194,13 @@ def _push_boutimar_ir_article(
         str(getattr(brief.brief, "content_type", "") or "").lower(), "راهنما")
 
     slug = brief.brief.target_url_path.strip("/").split("/")[-1] or "article"
+    # Where the article will ACTUALLY live once _articles.py has run, which is
+    # not what push_to_cms computed from target_url_path. Since 18 Aug every
+    # دریانامه piece is a real file at daryanameh/<slug>.html; article.html?a=
+    # is retired and redirects. Reporting the generic path here would hand the
+    # merge watcher a URL that 404s and make every merged article look
+    # undeployed.
+    url = f"{site.base_url}/daryanameh/{slug}.html"
     body = _markdown_to_daryanameh_blocks(draft.get("body_markdown", ""))
     words = len(str(draft.get("body_markdown", "")).split())
     article = {

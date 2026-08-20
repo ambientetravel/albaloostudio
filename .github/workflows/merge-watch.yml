@@ -1,0 +1,122 @@
+# Albaloo Orchestration Pipeline — merge watch.
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Agent 2 opens a pull request and reports live_url: None, which is correct — a
+# PR is not a page. Agents 3 and 4 both dereference live_url, so until something
+# fills it in, two finished agents have never had a single real input.
+#
+# This runs DAILY rather than on merge, on purpose. A webhook would fire the
+# moment the branch lands, and on these properties that is the wrong moment:
+# boutimarfarsi merges do not reach Netafraz until a human uploads them. The
+# question "is it live?" is answered by the server, and the server's answer
+# changes hours or days after the merge. A daily poll costs nothing and asks at
+# a time the answer might have changed.
+
+name: Merge watch — which drafts went live
+
+on:
+  schedule:
+    # 07:00 UTC daily. After the Monday dashboard at 06:00 so a promotion made
+    # today appears on next week's page, and clear of every agent's window.
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read      # to download Agent 2's latest output
+
+concurrency:
+  group: merge-watch
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: orchestrator
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch Agent 2's latest output
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          run=$(gh run list --workflow agent2-writer.yml --status success --limit 1 \
+                  --json databaseId --jq '.[0].databaseId' \
+                  --repo "${{ github.repository }}" 2>/dev/null || true)
+          if [ -z "${run:-}" ] || [ "$run" = "null" ]; then
+            echo "::notice title=Nothing to watch::Agent 2 has no successful run yet, so there are no drafts whose pull requests could have merged."
+            exit 0
+          fi
+          mkdir -p _dl
+          gh run download "$run" --name agent2-written --dir _dl \
+             --repo "${{ github.repository }}" 2>/dev/null \
+            || echo "::notice title=Artifact missing::agent2-written not present on run $run."
+          mkdir -p written
+          [ -d _dl/written ] && cp -R _dl/written/. written/ 2>/dev/null || true
+          ls written/events 2>/dev/null | head -5 || echo "no events/ — nothing to watch"
+
+      - name: Watch for merges that actually reached the server
+        env:
+          # The same token Agent 2 pushes with: it is the one scoped to the
+          # content repositories whose pull requests are being read. The default
+          # GITHUB_TOKEN can only see this repository.
+          ASTRO_GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          [ -d written/events ] || exit 0
+          mkdir -p reports promoted
+          STAMP=$(date -u +%Y-%m-%d)
+          python3 tools/merge_watch.py --written written --emit promoted \
+            --format md   --out "reports/merge-watch-$STAMP.md"
+          python3 tools/merge_watch.py --written written --emit promoted \
+            --format json --out "reports/merge-watch-$STAMP.json"
+          cat "reports/merge-watch-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Say what is stuck between merge and server
+        if: always()
+        run: |
+          set -euo pipefail
+          latest=$(ls -t reports/merge-watch-*.json 2>/dev/null | head -1 || true)
+          [ -n "$latest" ] || exit 0
+          python3 - "$latest" <<'PY'
+          import json, sys
+          rows = json.load(open(sys.argv[1], encoding="utf-8"))
+          live = [r for r in rows if r.get("state") == "live"]
+          stuck = [r for r in rows if r.get("state") == "MERGED, NOT DEPLOYED"]
+          for r in stuck:
+              print(f"::warning title=Merged but not deployed::{r.get('title') or r['name']} "
+                    f"— {r.get('intended_url')} : {r.get('detail')}")
+          # Never a failure. An article waiting on an upload is a queue, not a
+          # broken build, and failing here would make the daily run red for as
+          # long as a human takes to deploy.
+          print(f"{len(live)} newly live, {len(stuck)} merged but not deployed, "
+                f"{len(rows)} watched")
+          PY
+
+      - name: Upload promoted events and the report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          # Agent 3 reads `promoted/` — these are publishing.event.v1 files that
+          # now carry a verified live_url, which is the input it has never had.
+          name: merge-watch
+          path: |
+            orchestrator/reports/
+            orchestrator/promoted/
+          retention-days: 90
+          if-no-files-found: warn

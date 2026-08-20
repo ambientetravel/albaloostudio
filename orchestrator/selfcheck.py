@@ -2816,5 +2816,73 @@ ok("the generator still emits a fragment, not a document",
 ok("so the hosting page is what carries the viewport meta",
    'name="viewport"' in pathlib.Path("../dashboard-site/index.php").read_text(encoding="utf-8"))
 
+print("\n=== merge watch — merged is not deployed ===")
+# Agents 3 and 4 both dereference publication.live_url, and every adapter
+# returns None because a pull request is not a page. Nothing had ever been
+# broadcast because nothing had ever been marked live. merge_watch fills that
+# field — but only when the SERVER says the page is there, not when GitHub says
+# the branch is in. On 18 Aug the دریانامه migration merged into boutimarfarsi
+# and the pages went live only after a human uploaded them.
+import merge_watch as mw  # noqa: E402  (tools/ is already on sys.path)
+
+_MWSRC = pathlib.Path("tools/merge_watch.py").read_text(encoding="utf-8")
+ok("promotion requires a merge AND a 200 AND the article's own words",
+   "MERGED IS NOT DEPLOYED" in _MWSRC)
+
+class _Resp:
+    def __init__(self, code, text=""):
+        self.status_code, self.text = code, text
+        self.content = text.encode("utf-8")
+class _Sess:
+    def __init__(self, resp): self._r = resp
+    def get(self, *a, **k): return self._r
+
+_TITLE = "ویزا برای کروز: چه چیزی لازم است و چه چیزی نه"
+ok("a real page with the article's title is live",
+   mw.page_is_live("u", _TITLE, _Sess(_Resp(200, f"<h1>{_TITLE}</h1> body")))["live"] is True)
+ok("a 404 is not deployed yet",
+   "not deployed yet" in mw.page_is_live("u", _TITLE, _Sess(_Resp(404, "")))["reason"])
+# The one that would actually have broadcast a broken page: article.html and
+# journey.html answer 200 for ANY slug, so a missing record is a soft 404.
+ok("a 200 that says 'not found' is a soft 404, not a page",
+   "soft 404" in mw.page_is_live("u", _TITLE,
+       _Sess(_Resp(200, "<p>این نوشته پیدا نشد</p>")))["reason"])
+ok("a shell that never resolved is caught too",
+   "soft 404" in mw.page_is_live("u", _TITLE,
+       _Sess(_Resp(200, "<p>در حال بارگذاری…</p>")))["reason"])
+ok("the right URL serving the WRONG article is not live",
+   "does not contain this article" in mw.page_is_live("u", _TITLE,
+       _Sess(_Resp(200, "<h1>مدیترانه، ماه به ماه</h1>")))["reason"])
+
+# promote() must not mutate what Agent 2 recorded — that file is the evidence
+# the article was a draft when it was written.
+_ev = {"publication": {"status": "draft", "live_url": None, "canonical_url": None,
+                       "indexation": {"sitemap_updated": False}},
+       "content_summary": {"title": "t"}}
+_pr = mw.promote(_ev, "https://x.test/a.html", "2026-08-18T10:00:00Z")
+ok("promotion fills live_url and canonical together",
+   _pr["publication"]["live_url"] == _pr["publication"]["canonical_url"] == "https://x.test/a.html")
+ok("status becomes published", _pr["publication"]["status"] == "published")
+ok("published_at is the merge time, not now",
+   _pr["publication"]["published_at"] == "2026-08-18T10:00:00Z")
+ok("the check is recorded as verified, not assumed",
+   "verified_live_at" in _pr["publication"]["indexation"])
+ok("the original event is untouched",
+   _ev["publication"]["live_url"] is None and _ev["publication"]["status"] == "draft")
+ok("and shares no nested dict with the promotion",
+   _ev["publication"]["indexation"] is not _pr["publication"]["indexation"])
+
+# Sitemap and GSC state are somebody else's job; promotion must not claim them.
+ok("promotion does not invent sitemap or GSC submission",
+   _pr["publication"]["indexation"].get("sitemap_updated") is False
+   and "submitted_to_gsc" not in _pr["publication"]["indexation"])
+
+ok("a merged PR whose page is absent is a finding, not a failure",
+   "MERGED, NOT DEPLOYED" in _MWSRC and "waiting for a human upload" in _MWSRC)
+ok("boutimar.ir reports the URL the article will really have",
+   'daryanameh/{slug}.html' in
+   pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8"))
+
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
