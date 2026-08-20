@@ -364,6 +364,12 @@ sites:
       # falls through to the generic branch, which returns a live_url for a page
       # it never created, and an adapter must never report a URL it did not make.
       adapter: unimplemented
+      # Machine-readable so the dashboard can tell a SETTLED "cannot" apart from
+      # a "nobody has built it yet". Both rendered identically in red, which put
+      # two resolved decisions on the todo list every week.
+      unsupported_reason: >-
+        GoDaddy Website Builder has no publishing API. Not buildable — this site
+        would have to move off the builder to join the pipeline.
       content_root: "/"
       publish_mode: draft
     channels:
@@ -392,6 +398,9 @@ sites:
     cms:
       type: static
       adapter: unimplemented     # hand-built; no push target
+      unsupported_reason: >-
+        A single-page site with no blog. Publishing articles here means adding
+        one, which is a product decision rather than a missing adapter.
       content_root: "/"
       publish_mode: draft
     channels: []

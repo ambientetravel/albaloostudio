@@ -106,16 +106,24 @@ def _coverage() -> list[dict[str, str]]:
     for s in config.load_sites(include_hold=True):
         adapter = str(s.cms.get("adapter") or "unimplemented")
         held = bool(getattr(s, "on_hold", False))
+        # A settled "cannot" is not the same as "not built yet", and rendering
+        # both as a red gap put two closed decisions back on the list every
+        # week. cruise24.me is on a builder with no API; albaloostudio.com is a
+        # one-page site with no blog. Neither is waiting on anyone.
+        unsupported = str(s.cms.get("unsupported_reason") or "").strip()
         if held:
             verdict, cls = "on hold", "hold"
         elif adapter in _LIVE_ADAPTERS:
             verdict, cls = "opens a pull request", "ok"
         elif adapter in _STAGE_ADAPTERS:
             verdict, cls = "stages a bundle — manual deploy", "warn"
+        elif unsupported:
+            verdict, cls = "not a publishing target — by decision", "hold"
         else:
             verdict, cls = "no adapter — staged only", "bad"
         rows.append({"domain": s.domain, "brand": s.brand, "locale": s.locale,
                      "adapter": adapter, "verdict": verdict, "cls": cls,
+                     "unsupported_reason": unsupported,
                      "competitors": str(len(getattr(s, "competitors", None) or []))})
     return rows
 
@@ -230,7 +238,13 @@ def render(scout: dict | None, writer: dict | None,
         out.append(
             f'<tr><td>{_esc(r["domain"])}</td><td>{_esc(r["brand"])}</td>'
             f'<td><code>{_esc(r["adapter"])}</code></td>'
-            f'<td><span class="pill {r["cls"]}">{_esc(r["verdict"])}</span></td>'
+            f'<td><span class="pill {r["cls"]}">{_esc(r["verdict"])}</span>'
+            # The reason a site cannot receive an article, shown next to the
+            # verdict rather than buried in sites.yml. Without it "not a
+            # publishing target" invites the same question every week.
+            + (f'<br><span class="note">{_esc(r["unsupported_reason"])}</span>'
+               if r.get("unsupported_reason") else "")
+            + '</td>'
             f'<td class="n">{_esc(r["competitors"]) if r["competitors"] != "0" else "—"}</td></tr>')
     out.append("</table>"
                f'<p class="note">{can_publish} of {active} active sites can open a '

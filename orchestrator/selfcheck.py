@@ -2884,5 +2884,30 @@ ok("boutimar.ir reports the URL the article will really have",
    pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8"))
 
 
+print("\n=== a settled 'cannot' is not an unfinished 'todo' ===")
+# cruise24.me is on GoDaddy Website Builder, which has no publishing API, and
+# albaloostudio.com is a single-page site with no blog. Both rendered as a red
+# "no adapter — staged only", identical to work nobody had got round to, which
+# put two closed decisions back on the backlog every week.
+_cov = _bd._coverage()
+_by = {r["domain"]: r for r in _cov}
+for _d in ("cruise24.me", "albaloostudio.com"):
+    ok(f"{_d} is a decision, not a gap",
+       _by[_d]["cls"] == "hold" and "by decision" in _by[_d]["verdict"], _by[_d])
+    ok(f"{_d} says WHY, in the registry not a comment",
+       len(_by[_d]["unsupported_reason"]) > 30, _by[_d]["unsupported_reason"])
+ok("the reason reaches the rendered page",
+   "GoDaddy Website Builder has no publishing API" in _bd.render(None, None, None, None, None))
+# The count that matters must now be the genuinely missing ones only.
+_gaps = [r["domain"] for r in _cov if r["cls"] == "bad"]
+ok("only genuinely missing adapters are still red",
+   sorted(_gaps) == ["ambientetravel.com", "cruisebaz.com"], _gaps)
+ok("and those two are the base44 pair, blocked on one credential",
+   all(_by[d]["adapter"] == "base44_entity" for d in _gaps), _gaps)
+# on_hold must still outrank an unsupported_reason: a held site is held.
+ok("on-hold still reads as on hold, not as a decision",
+   _by["dmciran.ir"]["verdict"] == "on hold")
+
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
