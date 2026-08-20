@@ -2929,6 +2929,15 @@ ok("the shared-account hazard is written down where a deploy step would read it"
    all("SEPARATE docroots" in _H[d].hosting_note for d in ("boutimar.com", "boutimar.ir")))
 ok("and both are on the same panel",
    _H["boutimar.com"].hosting == _H["boutimar.ir"].hosting == "axspace_directadmin")
+# Where the metal actually is. Netafraz sells it in Iran, axspace runs the
+# panel, and the server is Hetzner in Germany — verified by whois on 20 Aug,
+# not inferred from the reseller's country. It matters twice: boutimar.ir's
+# ~94%-Iranian audience is served across the international links, and the
+# corporate entity that invoices in EUR is German too.
+ok("the record says where the server is, not who sold it",
+   "HETZNER, IN GERMANY" in _H["boutimar.ir"].hosting_note)
+ok("and notes what that costs the Iranian audience",
+   "international links" in _H["boutimar.ir"].hosting_note)
 ok("albaloostudio and exploreorient are GoDaddy cPanel, not DirectAdmin",
    _H["albaloostudio.com"].hosting == _H["exploreorient.com"].hosting == "godaddy_cpanel")
 ok("the base44 pair is recorded as base44",

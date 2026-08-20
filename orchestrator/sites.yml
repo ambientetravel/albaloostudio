@@ -67,13 +67,17 @@ sites:
     # differ on every property here.
     hosting: axspace_directadmin
     hosting_note: >-
-      DirectAdmin on server22gr.axspace.com — recorded as Netafraz on 20 Aug and
-      corrected the same day; Netafraz appears to resell axspace, and the panel
-      is what a deploy actually touches. nginx serves static directly and PHP is
-      interpreted, so .htaccess never reaches a static file here. boutimar.com
-      and boutimar.ir are SEPARATE docroots on this one account —
-      /domains/<domain>/public_html — and a bundle extracted into the wrong one
-      overwrites the other site with no undo.
+      DirectAdmin on server22gr.axspace.com. Netafraz is the Iranian reseller;
+      axspace is the panel; the metal is HETZNER, IN GERMANY — verified 20 Aug,
+      195.201.186.154 and 116.202.139.162 both resolve into Hetzner Online GmbH,
+      country DE, rDNS fwx.srv22.axspace.com. Not France.
+      boutimar.com and boutimar.ir resolve to the SAME IP and are SEPARATE
+      docroots on one account — /domains/<domain>/public_html — so a bundle
+      extracted into the wrong one overwrites the other site with no undo.
+      nginx serves static directly and PHP is interpreted, so .htaccess never
+      reaches a static file here.
+      CONSEQUENCE WORTH REMEMBERING: boutimar.ir's audience is ~94% inside Iran
+      and every byte of it crosses the international links from Germany.
     sitemap: "https://boutimar.com/sitemap.xml"    # verified 2026-08-06; not sitemap_index.xml
     min_impressions: 20        # 361 queries / 1,233 impressions in 90d — 20 yields ~10 candidates
     # Inbound Iran DMCs selling the same thing to the same buyer: international
@@ -150,13 +154,17 @@ sites:
     # differ on every property here.
     hosting: axspace_directadmin
     hosting_note: >-
-      DirectAdmin on server22gr.axspace.com — recorded as Netafraz on 20 Aug and
-      corrected the same day; Netafraz appears to resell axspace, and the panel
-      is what a deploy actually touches. nginx serves static directly and PHP is
-      interpreted, so .htaccess never reaches a static file here. boutimar.com
-      and boutimar.ir are SEPARATE docroots on this one account —
-      /domains/<domain>/public_html — and a bundle extracted into the wrong one
-      overwrites the other site with no undo.
+      DirectAdmin on server22gr.axspace.com. Netafraz is the Iranian reseller;
+      axspace is the panel; the metal is HETZNER, IN GERMANY — verified 20 Aug,
+      195.201.186.154 and 116.202.139.162 both resolve into Hetzner Online GmbH,
+      country DE, rDNS fwx.srv22.axspace.com. Not France.
+      boutimar.com and boutimar.ir resolve to the SAME IP and are SEPARATE
+      docroots on one account — /domains/<domain>/public_html — so a bundle
+      extracted into the wrong one overwrites the other site with no undo.
+      nginx serves static directly and PHP is interpreted, so .htaccess never
+      reaches a static file here.
+      CONSEQUENCE WORTH REMEMBERING: boutimar.ir's audience is ~94% inside Iran
+      and every byte of it crosses the international links from Germany.
     sitemap: "https://boutimar.ir/sitemap.xml"
     cms:
       type: static
