@@ -299,6 +299,27 @@ sites:
         autopost: false
         account_ref: null          # not connected to the scheduler yet
 
+    # 20 Aug: why 57 of 70 declared pages have never surfaced. Recorded so the
+    # technical audit is not run a second time — it was run and it came back
+    # clean.
+    notes:
+      - >-
+        Checked and RULED OUT as causes: pages return 200, carry correct
+        self-canonicals, have no noindex, run 577-715 words of unique copy under
+        distinct titles, are linked from the homepage rather than orphaned, and
+        hreflang for en/de/fr is reciprocal with all three alternates live and
+        declared. Nothing is broken.
+      - >-
+        What is left is authority. Positions sit at 54-63 — agent 7's "absent"
+        band, whose own advice is to decide whether to compete rather than to
+        optimise. The site aims at head terms (Armenia, Jordan, Georgia as
+        travel destinations) from a domain nothing links to. More destination
+        pages will not move that; the levers are long-tail targeting or links,
+        and choosing between them is a strategy call, not an audit finding.
+      - >-
+        The German section is half-built. /de/ exists, and its destination links
+        point at the ENGLISH pages — /de/destination/armenia/ is a 404 — so a
+        German reader who clicks through lands in English.
   - domain: ambientetravel.com
     # Kept as sc-domain: DELIBERATELY, even though a property already exists.
     # The existing one is https://www.ambientetravel.com/ — the www host, which
