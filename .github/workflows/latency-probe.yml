@@ -1,0 +1,76 @@
+# Albaloo Orchestration Pipeline — latency from outside Iran.
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# One half of a two-vantage measurement. A GitHub runner sits on well-peered
+# infrastructure well outside Iran, which makes it a clean "best case" baseline
+# for sites served from Hetzner Germany.
+#
+# It is NOT the number that matters on its own. boutimar.ir takes ~94% of its
+# impressions from Iranian IPs, and none of that traffic looks like this. The
+# useful figure is the DIFFERENCE between this run and the same tool run from a
+# Tehran connection — which is why the tool prints where it ran.
+
+name: Latency — from outside Iran
+
+on:
+  schedule:
+    # Mondays 07:30 UTC, after merge-watch, so a week's baseline accumulates
+    # without anyone remembering to ask for it.
+    - cron: "30 7 * * 1"
+  workflow_dispatch:
+    inputs:
+      samples:
+        description: "Samples per site (median is reported)"
+        required: false
+        default: "5"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: latency-probe
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Probe
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          STAMP=$(date -u +%Y-%m-%d)
+          python3 tools/latency_probe.py --samples "${{ inputs.samples || '5' }}" \
+            --format md   > "reports/latency-$STAMP.md"
+          python3 tools/latency_probe.py --samples "${{ inputs.samples || '5' }}" \
+            --format json > "reports/latency-$STAMP.json"
+          cat "reports/latency-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo
+            echo "> This is the OUTSIDE-IRAN half of the comparison. Run"
+            echo "> \`python3 tools/latency_probe.py\` from a Tehran connection and"
+            echo "> compare the TTFB column; the gap is what the audience pays for"
+            echo "> hosting in Germany."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: latency
+          path: orchestrator/reports/
+          retention-days: 90
+          if-no-files-found: warn
