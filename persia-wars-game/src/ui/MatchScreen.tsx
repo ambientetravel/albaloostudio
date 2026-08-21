@@ -23,6 +23,17 @@ import { UnitCard } from './UnitCard';
 import { UnitGlyph } from './UnitGlyph';
 
 const SPEEDS = [1, 2, 4];
+/**
+ * How long the call to arms holds before the round is fought.
+ *
+ * The offer used to cut straight to fighting, so the moment a card was taken
+ * the units were already moving and nothing said "here it comes". The reference
+ * game spends one to two seconds on it — round number, then the shout — and
+ * that beat is most of why its clash lands. Split in two: the number, then the
+ * call.
+ */
+const CALL_NUMBER_MS = 620;
+const CALL_TOTAL_MS = 1240;
 const ROMAN = ['I', 'II', 'III', 'IV'] as const;
 /** How long the round banner holds before the next offer opens. */
 const BANNER_MS = 2200;
@@ -62,6 +73,8 @@ export function MatchScreen() {
 
   const [speed, setSpeed] = useState(1);
   const [introDone, setIntroDone] = useState(false);
+  /** null = not calling. 'number' shows the round, 'fight' shows the shout. */
+  const [call, setCall] = useState<'number' | 'fight' | null>(null);
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
 
   const online = mode === 'online';
@@ -77,6 +90,21 @@ export function MatchScreen() {
     const timer = setTimeout(runAiPick, delay);
     return () => clearTimeout(timer);
   }, [mode, matchState, phase, aiOpponent, runAiPick]);
+
+  // The call to arms, before the round is fought rather than after it.
+  useEffect(() => {
+    if (phase !== 'battle') {
+      setCall(null);
+      return;
+    }
+    setCall('number');
+    const toFight = setTimeout(() => setCall('fight'), CALL_NUMBER_MS);
+    const done = setTimeout(() => setCall(null), CALL_TOTAL_MS);
+    return () => {
+      clearTimeout(toFight);
+      clearTimeout(done);
+    };
+  }, [phase, matchState?.round]);
 
   // The round banner clears itself, so a match never waits on a tap it does not need.
   useEffect(() => {
@@ -143,7 +171,7 @@ export function MatchScreen() {
 
         <div className="match__ground">
           {phase === 'battle' || phase === 'roundResult' ? (
-            log && introDone ? (
+            log && introDone && call === null ? (
               <BattleCanvas
                 key={matchState.round}
                 log={log}
@@ -153,7 +181,22 @@ export function MatchScreen() {
                 onFinished={finishRound}
               />
             ) : (
-              <div className="battle-canvas" />
+              <div className="battle-canvas">
+                <AnimatePresence mode="wait">
+                  {call && (
+                    <motion.div
+                      key={call}
+                      className={`call-to-arms call-to-arms--${call}`}
+                      initial={{ scale: 0.6, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 1.35, opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+                    >
+                      {call === 'number' ? `ROUND ${matchState.round}` : 'FIGHT!'}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             )
           ) : (
             <Offer

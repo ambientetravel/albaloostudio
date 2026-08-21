@@ -989,6 +989,9 @@ a {
    pinned to a shared bottom row rather than floating after the text. */
 .offer__slot {
   display: grid;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
   grid-template-rows: 1fr auto;
   gap: 4px;
   min-width: 0;
@@ -1164,9 +1167,46 @@ a {
   }
 }
 
+/* The commitment beat.
+   Taking a card used to dim the whole row to half opacity and put a thin ring
+   on the pick — which reads as "nothing is happening now" rather than "you have
+   decided". The reference game holds the chosen card alone for about a second
+   while the others vanish, and that one beat does three jobs: it confirms the
+   tap, it gives the decision weight, and it covers the wait for the opponent.
+   The chosen card does NOT move to the centre — it stays in its column, so the
+   card you are looking at is the card you pressed. */
 .offer.is-waiting {
-  opacity: 0.5;
   pointer-events: none;
+}
+
+.offer.is-waiting .offer__slot:not(.is-chosen) {
+  opacity: 0;
+  transform: scale(0.86) translateY(6px);
+  transition:
+    opacity 240ms ease,
+    transform 280ms cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.offer.is-waiting .offer__slot.is-chosen {
+  transform: scale(1.05);
+  transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+
+.offer.is-waiting .offer__slot.is-chosen .unit-card {
+  border-color: var(--gold-hi);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--gold-hi) 55%, transparent),
+    0 0 30px color-mix(in srgb, var(--gold-hi) 40%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offer.is-waiting .offer__slot:not(.is-chosen) {
+    transform: none;
+  }
+
+  .offer.is-waiting .offer__slot.is-chosen {
+    transform: none;
+  }
 }
 
 .unit-card {
@@ -1391,6 +1431,7 @@ button.unit-card:active:not(:disabled) {
 }
 
 .battle-canvas {
+  position: relative; /* anchors the call to arms */
   width: 100%;
   /* The field is portrait now — the two ranks face each other along the length
      of the phone — so it takes the height the screen can spare rather than a
@@ -4174,6 +4215,34 @@ button.unit-card:active:not(:disabled) {
   line-height: 1.35;
   color: var(--stone-dim);
   font-style: italic;
+}
+
+/* The call to arms. Big, centred, and gone in a second — it is a beat, not a
+   screen, and anything that lingers here costs a round. */
+.call-to-arms {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display, inherit);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-align: center;
+  pointer-events: none;
+}
+
+.call-to-arms--number {
+  font-size: clamp(26px, 8vw, 44px);
+  color: var(--stone);
+  text-shadow: 0 3px 0 rgb(0 0 0 / 45%);
+}
+
+.call-to-arms--fight {
+  font-size: clamp(40px, 13vw, 76px);
+  color: var(--gold-hi);
+  text-shadow:
+    0 0 22px color-mix(in srgb, var(--gold-hi) 60%, transparent),
+    0 4px 0 rgb(0 0 0 / 55%);
 }
 
 .ledger-band {
