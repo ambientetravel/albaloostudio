@@ -503,10 +503,34 @@ function Offer({
         className={`offer${waiting ? ' is-waiting' : ''}${offer.length > 3 ? ' offer--wide' : ''}`}
         data-count={offer.length}
       >
-        {offer.map((card) => (
-          <div
+        {offer.map((card, i) => (
+          /* Dealt one after another rather than appearing as a block. Three
+             cards arriving simultaneously read as a screen; dealt, they read as
+             a hand, and the eye is walked across all three instead of landing
+             on whichever is brightest. 55ms apart is enough to see and short
+             enough that the last card is down before anybody could have
+             decided. */
+          <motion.div
             key={card.id}
             className={`offer__slot${chosen?.id === card.id ? ' is-chosen' : ''}`}
+            initial={{ y: 22, opacity: 0, scale: 0.94 }}
+            /* Deal-in AND the commitment beat live in this one prop on purpose.
+               Framer writes an inline transform, so a CSS rule trying to scale
+               the same element loses silently — which is how a squad once ended
+               up frozen at 0.58. One source of truth for the transform. */
+            animate={
+              !waiting
+                ? { y: 0, opacity: 1, scale: 1 }
+                : chosen?.id === card.id
+                  ? { y: 0, opacity: 1, scale: 1.05 }
+                  : { y: 6, opacity: 0, scale: 0.86 }
+            }
+            transition={{
+              type: 'spring',
+              stiffness: 420,
+              damping: 26,
+              delay: waiting ? 0 : i * 0.055,
+            }}
           >
             {card.kind === 'unit' ? (
               <UnitSlot
@@ -526,7 +550,7 @@ function Offer({
                 wide={offer.length > 3}
               />
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
       {/* Comeback B. Shown only when held, and it costs the whole thing to use —
