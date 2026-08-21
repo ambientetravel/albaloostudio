@@ -1484,3 +1484,49 @@ Still unfixed and now clearer: matches mostly end before the late rounds. Round
 7 was reached by 10 matches of 60, up from 8. First-to-four inside seven rounds
 means the median match is about five. The escalation now exists; most players
 still will not see the top of it.
+
+## Making it vivid: what was added, and what was already there
+
+The battlefield turned out to have more motion than expected — `render/motion.ts`
+already gives every silhouette its own gait, keeps standing units breathing at a
+quarter amplitude so the field never freezes, rectifies the bounce for airborne
+units, and poses an attack with lunge and spin. The gap was not movement in
+general. It was three specific things.
+
+**Nothing happened to the unit being HIT.** The attacker had a swing and the
+strike had a flare, but the victim carried on breathing as though nothing had
+touched it, so an exchange read as decoration rather than damage. A struck unit
+now jolts away from its attacker and squashes for 0.22 seconds.
+
+That squash immediately broke something: the health bar is counter-scaled by
+`1/k` so it stays the same size on an elephant and on an archer, and a
+non-uniform squash made it squash along with the body on every hit. It now
+undoes both axes.
+
+**The floor had no territory.** Nothing said which end was yours except where
+the sprites happened to be standing. Each half now takes an 11% wash of its own
+side's colour — cool at the top, warm at the bottom, matching edge bars that
+were already there. Low enough that the arena's own floor still comes through,
+strong enough to read at a glance.
+
+**The offer arrived as a block.** Three cards appearing simultaneously read as a
+screen. Dealt 55ms apart they read as a hand, and the eye is walked across all
+three rather than landing on whichever is brightest.
+
+**One trap worth writing down.** The card deal is a framer-motion animation and
+the commitment beat was a CSS one, on the same element. Framer writes an inline
+transform, so the CSS transform loses silently — the same failure that left a
+Ledger squad frozen at scale 0.58 earlier in this session. Both now live in a
+single `animate` prop and the stylesheet owns colour only. If a transform is
+animated by framer anywhere, no stylesheet may touch that element's transform.
+
+**And one about verifying animation here.** A 1.2-second beat cannot be sampled
+through a harness with a two-second round trip, and the browser pane reports
+`hidden` while scripts run, which pauses rAF and freezes whatever is mid-flight.
+Two earlier "bugs" were the harness. The technique that works: temporarily
+lengthen the animation to twenty seconds, photograph it, restore the real value.
+That is how the FIGHT! beat was confirmed.
+
+Deliberately NOT added: screen shake and hit-stop. The reference game has
+neither — its punch comes from timing and sound, which is cheaper to build and
+harder to get wrong.
