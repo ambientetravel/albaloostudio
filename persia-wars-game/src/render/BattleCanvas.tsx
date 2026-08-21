@@ -16,6 +16,15 @@ const LANE_COUNT = 4;
 const FLASH_LIFE = 0.2;
 /** Seconds a unit spends in its attack pose. */
 const SWING_LIFE = 0.34;
+/**
+ * How long a struck unit reacts for.
+ *
+ * The attacker had a swing and the hit had a flare, but the VICTIM did nothing —
+ * so a blow landed on a figure that went on breathing as though nothing had
+ * touched it, and the whole exchange read as decoration rather than damage.
+ * Short on purpose: long enough to see, too short to fight the gait.
+ */
+const HURT_LIFE = 0.22;
 
 const hex = (s: string): number => Number.parseInt(s.replace('#', ''), 16);
 /**
@@ -160,6 +169,8 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         phase: number;
         /** Counts down while the unit is mid-swing. */
         swing: number;
+        /** Counts down while the unit is recoiling from a hit. */
+        hurt: number;
         /** True when this unit is commissioned art rather than a placeholder. */
         tall: boolean;
       }
@@ -210,6 +221,7 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
           // Phase-shift per unit so a rank does not move as one body.
           phase: (u.uid * 0.37) % 1,
           swing: 0,
+          hurt: 0,
           tall: Boolean(texture),
         });
       }
@@ -265,6 +277,22 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         // The fighting floor.
         ground.roundRect(fx - 5, fy - 5, fw + 10, fh + 10, r + 4).fill(accent);
         ground.roundRect(fx, fy, fw, fh, r).fill(floor);
+
+        // Territory. Each half carries a wash of its own side's colour, so
+        // "my end" and "their end" read instantly instead of having to be
+        // worked out from where the sprites happen to be standing. Kept very
+        // low so it tints the ground rather than repainting it — the arena's
+        // own floor colour still has to come through.
+        //
+        // Side A holds the BOTTOM of the screen and B the top, which is the
+        // same convention `toScreenY` and `facing` use.
+        const halfAlpha = 0.11;
+        ground
+          .roundRect(fx, fy, fw, fh / 2, r)
+          .fill({ color: SIDE_COLOR.b, alpha: halfAlpha });
+        ground
+          .roundRect(fx, fy + fh / 2, fw, fh / 2, r)
+          .fill({ color: SIDE_COLOR.a, alpha: halfAlpha });
 
         // Tile grid, denser along the axis of advance so distance reads.
         const cols = 6;
@@ -340,6 +368,10 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
             flashes.push({ from: ev.uid, to: ev.target, mult: ev.mult, life: FLASH_LIFE });
             const s = sprites.get(ev.uid);
             if (s) s.swing = SWING_LIFE;
+            // The one being hit reacts too. Without this the blow lands on a
+            // figure that carries on breathing as if nothing touched it.
+            const victim = sprites.get(ev.target);
+            if (victim) victim.hurt = HURT_LIFE;
           }
         }
         lastAppliedFrame = idx;
@@ -374,15 +406,28 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
             spin = pose.spin * facing;
           }
 
+          // Recoil: a short jolt away from whoever hit them, and a squash, so a
+          // landed blow is visible on the body and not only in the flare.
+          let recoil = 0;
+          let squash = 1;
+          if (sprite.hurt > 0) {
+            sprite.hurt = Math.max(0, sprite.hurt - dt);
+            const h = sprite.hurt / HURT_LIFE;
+            recoil = h * 3.4 * -facing;
+            squash = 1 + h * 0.14;
+          }
+
           const x = baseX + g.sway;
-          const y = baseY - Math.abs(g.bob) + lunge;
+          const y = baseY - Math.abs(g.bob) + lunge + recoil;
           screen.set(p.uid, { x, y });
           const k = unitScale(w);
           sprite.root.position.set(x, y);
-          sprite.root.scale.set(k);
+          sprite.root.scale.set(k * squash, k / squash);
           // The health bar is chrome, not anatomy: counter-scale it so it stays
-          // the same size on an elephant and on an archer.
-          sprite.bar.scale.set(1 / k);
+          // the same size on an elephant and on an archer. The recoil squash is
+          // non-uniform, so this has to undo BOTH axes — a plain 1/k would leave
+          // the bar squashing along with the body every time the unit was hit.
+          sprite.bar.scale.set(1 / (k * squash), squash / k);
           sprite.body.rotation = g.tilt + spin;
 
           const hpFrac = meta.maxHp > 0 ? p.hp / meta.maxHp : 0;
