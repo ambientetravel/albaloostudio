@@ -1391,3 +1391,54 @@ the long one. Neither text belongs to an age.
 Renamed across 53 data entries in six files, five type declarations, two screens
 and the content tests. Verified live afterwards: opening Persian Archer still
 gives three paragraphs ending in the daric and the Persepolis reliefs.
+
+## What an afternoon watching the reference game actually taught us
+
+Observed live over iPhone Mirroring rather than from description, so these are
+measurements, not impressions. Three findings changed what we know, one of them
+by correcting a claim made earlier the same day.
+
+**Our escalation is not flat.** That was said here earlier and it was wrong.
+Measured across 60 matches (`sim/escalation.test.ts`), an army goes from 4.0
+power in round 1 to 18.1 in round 7 — **4.52x**. The problem is the SHAPE, not
+the size: ours adds a near-constant +2.3 every round, which is arithmetic. The
+reference game's cards are worth +2 to +5 in its first round and +5 to +8 in its
+last, so each round adds MORE than the one before. Linear growth reads as
+maintenance; accelerating growth reads as a climax. Same 4x, different feeling.
+
+**The climax round almost never happens.** Of 60 measured matches, 42 reached
+round 5 and only 8 reached round 7. The average final army is 4.63 squads
+against a cap of 6 — we never even reach our own ceiling. A seventh round we
+designed as the peak occurs in about one match in seven.
+
+**Picks are alternating there, simultaneous here.** This was the day's biggest
+correction and it came from the person, not the screen: the banner that flies in
+at the opponent's end is them TAKING THEIR TURN, not a simultaneous reveal.
+Alternating means you see their move and answer it; ours holds both picks and
+releases them together, so it is commitment under uncertainty. Both are
+defensible and ours was chosen deliberately in the concept — it is load-bearing
+for the server design, which validates a pick against its own derived offer and
+detects desync from both clients. It must not be changed casually, and it is
+NOT changed here.
+
+Smaller, cheap, and clearly worth taking:
+
+- **A commitment beat on tap.** There, choosing a card freezes it for about a
+  second while the other two vanish, leaving the chosen one alone before play
+  continues. It confirms the input, gives the decision weight, and covers the
+  network wait. We have nothing — our card marks itself and sits.
+- **A pre-battle beat.** There: round number, then "KÄMPFE!", then a battle
+  sound, then the units move — one to two seconds. We cut from offer straight to
+  fighting.
+- **A timer every round, including offline.** Theirs always runs one, and it is
+  where the pressure comes from. Ours runs a clock only in online matches, so
+  most of our matches have no pressure at all.
+
+Explicitly NOT taken: no screen shake (they have none), and no hit-stop that the
+player noticed. Whatever punch the reference game has comes from timing and
+sound, which is cheaper to build than camera effects and easier to get right.
+
+Still unknown, and unknowable through mirroring: the sub-second easing on the
+card freeze, and whether the timer bar is linear or accelerates near the end.
+Frames arrive about a second apart over the mirror, and there is no audio at
+all. That part needs a screen recording.
