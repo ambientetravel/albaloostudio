@@ -1442,3 +1442,45 @@ Still unknown, and unknowable through mirroring: the sub-second easing on the
 card freeze, and whether the timer bar is linear or accelerates near the end.
 Frames arrive about a second apart over the mirror, and there is no audio at
 all. That part needs a screen recording.
+
+## The escalation experiment: a late squad is no longer a raw levy
+
+`addPick` set `tier: card.startTier ?? 1`, so a squad recruited in round 7
+arrived at Levy — worth exactly what one recruited in round 1 was worth. That
+one line was the whole arithmetic curve: every round added the same amount.
+
+New squads now arrive one rank BELOW what the round allows. Measured over 60
+matches:
+
+| | round 1 | round 7 | total | shape |
+|---|---|---|---|---|
+| before | 4.0 | 18.1 | 4.52x | +2.3 flat |
+| after | 4.0 | 21.6 | 5.38x | +2.8, +2.4, +2.5, +2.9, +3.2, +3.8 |
+
+The increments now grow through the back half, which is the point — the
+reference game's late rounds add more than its early ones, and that is what
+makes its round six read as a climax rather than as maintenance.
+
+**Two things broke on the first attempt, and both were worth the trip.**
+
+Arriving AT the round's cap rather than below it gave a squad no headroom: it
+could never be ranked up, every duplicate card became useless, and the rank
+mechanic died in exactly the rounds it exists for. `pickIsUseful` went false for
+a full ledger at round 7 and a test caught it. Arriving one rank below the cap
+keeps headroom at every stage.
+
+The first attempt also pushed Cyrus to 58.8% against a 55% ceiling. That is not
+a coincidence — Cyrus's passive rewards fielding many DIFFERENT squads, and
+making every new squad arrive strong is precisely a buff to breadth, while
+Astyages's head start (one card already Trained in the first two rounds) is
+worth less when late squads arrive Trained anyway. Backing off to cap-1 brought
+it back inside the band without touching either kit.
+
+The full 8.11x version is still on the table, but it needs the commanders
+rebalanced for it rather than nudged, and that is a bigger piece of work than
+one line.
+
+Still unfixed and now clearer: matches mostly end before the late rounds. Round
+7 was reached by 10 matches of 60, up from 8. First-to-four inside seven rounds
+means the median match is about five. The escalation now exists; most players
+still will not see the top of it.

@@ -242,9 +242,22 @@ export function addPick(
     };
   }
   if (ledger.squads.length >= MAX_SQUADS) return ledger;
+  // A new squad arrives one rank BELOW what the round allows, not at Levy.
+  //
+  // It used to arrive at Levy always, so a squad recruited in round 7 was worth
+  // exactly what one recruited in round 1 was worth: every round added the same
+  // amount and the match grew arithmetically, measured at a constant +2.3 power
+  // per round. Men who join a war in its sixth month are not raw levies.
+  //
+  // One rank BELOW the cap rather than at it, because arriving at the cap
+  // leaves a squad no headroom — it can never be ranked up, every duplicate
+  // card becomes useless, and the whole rank mechanic dies in exactly the
+  // rounds it was built for. A test caught that: `pickIsUseful` went false for
+  // a full ledger at round 7.
+  const arrives = Math.max(1, cap - 1) as Tier;
   return {
     ...ledger,
-    squads: [...ledger.squads, { unitId: card.id, tier: card.startTier ?? 1, traits: [] }],
+    squads: [...ledger.squads, { unitId: card.id, tier: card.startTier ?? arrives, traits: [] }],
   };
 }
 
