@@ -354,6 +354,27 @@ sites:
         autopost: false
         account_ref: null          # not connected to the scheduler yet
 
+    # 20 Aug: this site has TWO Search Console properties and the older one
+    # reports bigger numbers. It is not the better one.
+    notes:
+      - >-
+        sc-domain:ambientetravel.com was verified 2026-08-09 and holds 11 days
+        of data (152 impressions). https://www.ambientetravel.com/ has been
+        collecting since at least 2026-02-20 and holds 160 days (712). A domain
+        property does NOT backfill, so the www property is not measuring more —
+        it has been measuring longer. Compare rates, never totals, until the
+        domain property has comparable history.
+      - >-
+        KEEP THE WWW PROPERTY until then. It is the only view of anything before
+        9 Aug 2026; deleting it discards six months of history the domain
+        property can never reconstruct. It becomes genuinely redundant once the
+        domain property has a year behind it.
+      - >-
+        The pipeline reads the DOMAIN property, which is correct: it alone
+        covers apex and www together. In its first 11 days roughly 30% of
+        impressions were still landing on www URLs that 301 to the apex, so
+        Google has not finished consolidating the two hosts. Expect that share
+        to fall; if it does not, check the 301 is still a 301.
   - domain: cruisebaz.com
     # URL-prefix, not sc-domain, because this is the property that ACTUALLY
     # EXISTS (confirmed 9 Aug 2026) and it happens to be on the right host:
