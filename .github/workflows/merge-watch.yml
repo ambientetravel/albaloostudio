@@ -50,25 +50,49 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Fetch Agent 2's latest output
+      - name: Fetch Agent 2's output from the last several runs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          run=$(gh run list --workflow agent2-writer.yml --status success --limit 1 \
-                  --json databaseId --jq '.[0].databaseId' \
-                  --repo "${{ github.repository }}" 2>/dev/null || true)
-          if [ -z "${run:-}" ] || [ "$run" = "null" ]; then
+          # The last N successful runs, NOT just the latest.
+          #
+          # This read only the newest run and it made the whole tool
+          # decorative. On 22 Aug four pull requests were merged and deployed,
+          # and merge-watch reported "nothing to watch": the newest Agent 2 run
+          # was a dry-run dispatch that drafted nothing, while the articles
+          # being watched came from runs six days earlier. A draft becomes
+          # invisible the moment ANY later run succeeds — which is precisely
+          # when its pull request is most likely to be merged.
+          #
+          # Artifacts are kept 90 days, so ten runs is comfortably more history
+          # than a review cycle needs, and each is small.
+          RUNS=$(gh run list --workflow agent2-writer.yml --status success --limit 10                    --json databaseId --jq '.[].databaseId'                    --repo "${{ github.repository }}" 2>/dev/null || true)
+          if [ -z "${RUNS:-}" ]; then
             echo "::notice title=Nothing to watch::Agent 2 has no successful run yet, so there are no drafts whose pull requests could have merged."
             exit 0
           fi
-          mkdir -p _dl
-          gh run download "$run" --name agent2-written --dir _dl \
-             --repo "${{ github.repository }}" 2>/dev/null \
-            || echo "::notice title=Artifact missing::agent2-written not present on run $run."
-          mkdir -p written
-          [ -d _dl/written ] && cp -R _dl/written/. written/ 2>/dev/null || true
-          ls written/events 2>/dev/null | head -5 || echo "no events/ — nothing to watch"
+
+          mkdir -p written/events written/drafts
+          FOUND=0
+          for run in $RUNS; do
+            rm -rf _dl && mkdir -p _dl
+            if ! gh run download "$run" --name agent2-written --dir _dl                  --repo "${{ github.repository }}" 2>/dev/null; then
+              continue          # artifact expired or that run uploaded none
+            fi
+            # Older runs are copied FIRST and newer ones overwrite, so when the
+            # same article appears twice the most recent record wins — it is
+            # the one carrying the pull request that actually exists.
+            [ -d _dl/written/events ] && cp -Rn _dl/written/events/. written/events/ 2>/dev/null || true
+            [ -d _dl/written/drafts ] && cp -Rn _dl/written/drafts/. written/drafts/ 2>/dev/null || true
+            FOUND=$((FOUND+1))
+          done
+
+          COUNT=$(ls written/events 2>/dev/null | wc -l | tr -d ' ')
+          echo "collected $COUNT event file(s) from $FOUND run artifact(s)"
+          if [ "$COUNT" = "0" ]; then
+            echo "::notice title=No drafts in any recent run::Agent 2 has run but produced no publishing events in the last 10 successful runs."
+          fi
 
       - name: Watch for merges that actually reached the server
         env:
