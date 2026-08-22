@@ -3029,5 +3029,28 @@ ok("the model is told the rule up front, not only at the gate",
    "NEVER write that a fact was verified" in compliance.prompt_constraints("boutimar_v1"))
 
 
+print("\n=== deploy bundles must not choose their own destination ===")
+# A bundle was built with every path prefixed "public_html/" and shipped with
+# "extract it into public_html", which nests: .../public_html/public_html/...
+# Nothing overwritten, the site unchanged, every check failing, and the new
+# build publicly fetchable at /public_html/. It shipped that way twice and the
+# person at the panel caught it both times.
+_DB = pathlib.Path("DEPLOY-BUNDLES.md")
+ok("the bundle convention is written down", _DB.exists())
+_dbt = _DB.read_text(encoding="utf-8") if _DB.exists() else ""
+ok("it states the rule as relative-to-destination",
+   "Store paths relative to the directory" in _dbt)
+ok("it names the doubled-path failure explicitly",
+   "public_html/public_html" in _dbt)
+ok("and it says the check to run before shipping one",
+   "REBUILD IT" in _dbt)
+# The trap is not the prefix alone, it is the prefix plus a destination written
+# as though the prefix were absent. Both halves have to be named.
+ok("it explains that either half alone is fine",
+   "Either alone is fine; together they are a trap" in _dbt)
+ok("it requires the full path, not the word public_html",
+   '"public_html" alone is not a location' in _dbt)
+
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
