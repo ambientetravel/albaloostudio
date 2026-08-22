@@ -3049,7 +3049,7 @@ ok("and it says the check to run before shipping one",
 ok("it explains that either half alone is fine",
    "Either alone is fine; together they are a trap" in _dbt)
 ok("it requires the full path, not the word public_html",
-   '"public_html" alone is not a location' in _dbt)
+   "alone is not a location on it" in _dbt and "/domains/<name>/public_html" in _dbt)
 
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
