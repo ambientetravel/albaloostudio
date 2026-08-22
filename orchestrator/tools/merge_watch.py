@@ -53,6 +53,8 @@ from typing import Any
 
 import requests
 
+from urllib.parse import urlparse
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config  # noqa: E402
@@ -142,7 +144,7 @@ def page_is_live(url: str, title: str, session: requests.Session) -> dict[str, A
     return {"live": True, "reason": None, "bytes": len(r.content)}
 
 
-def derived_urls(event: dict[str, Any]) -> list[str]:
+def derived_urls(event: dict[str, Any], intended: str = "") -> list[str]:
     """
     Where this article would be if the recorded intended_url is wrong.
 
@@ -161,7 +163,14 @@ def derived_urls(event: dict[str, Any]) -> list[str]:
     pub = event.get("publication") or {}
     cms = pub.get("cms") or {}
     slug = str(cms.get("record_id") or "").strip("/")
-    domain = ((event.get("site") or {}).get("domain") or "").strip()
+    # The domain comes from the URL the adapter recorded, not from a `site`
+    # block — build_publishing_event does not emit one, so the first version of
+    # this read an absent key, resolved to "", and returned nothing. The
+    # fallback existed and could never fire. intended_url is the only place the
+    # domain is reliably present.
+    domain = (urlparse(intended or "").netloc or "").lower().removeprefix("www.")
+    if not domain:
+        domain = ((event.get("site") or {}).get("domain") or "").strip()
     if not slug or not domain:
         return []
     try:
@@ -237,7 +246,8 @@ def watch(written: Path, token: str | None, *, emit: Path | None = None
         pub = ev.get("publication") or {}
         title = (ev.get("content_summary") or {}).get("title") or ""
         domain = ((ev.get("site") or {}).get("domain")
-                  or (ev.get("source_brief") or {}).get("domain") or "")
+                  or (ev.get("source_brief") or {}).get("domain")
+                  or urlparse(cms.get("intended_url") or "").netloc or "")
         row: dict[str, Any] = {
             "name": item["name"], "domain": domain, "title": title,
             "pr_url": cms.get("pr_url") or "",
@@ -280,7 +290,7 @@ def watch(written: Path, token: str | None, *, emit: Path | None = None
         if not check["live"]:
             # Before calling it undeployed, try where the CMS actually builds.
             # A stale intended_url must not hold a live article hostage.
-            for cand in derived_urls(ev):
+            for cand in derived_urls(ev, row["intended_url"]):
                 if cand == row["intended_url"]:
                     continue
                 alt = page_is_live(cand, title, session)
