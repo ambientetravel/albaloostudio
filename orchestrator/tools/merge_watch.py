@@ -142,6 +142,42 @@ def page_is_live(url: str, title: str, session: requests.Session) -> dict[str, A
     return {"live": True, "reason": None, "bytes": len(r.content)}
 
 
+def derived_urls(event: dict[str, Any]) -> list[str]:
+    """
+    Where this article would be if the recorded intended_url is wrong.
+
+    An adapter that names the wrong URL is worse than one that names none,
+    because the pipeline acts on it. On 22 Aug astro_pr reported the BRIEF's
+    target path — /hotels/yazd-joybar-boutique-hotel-review — while Astro
+    publishes by collection and filename at
+    /journal/hotels-yazd-joybar-boutique-hotel-review/. Both articles were
+    merged and live, and both were reported as merged-but-not-deployed.
+
+    The adapter is fixed, but events already written carry the old value, and
+    an article that is genuinely live should not stay stuck because of a field
+    recorded days ago. So when the recorded URL fails, try the route the site's
+    own registry says its CMS builds. record_id is the slug the adapter wrote.
+    """
+    pub = event.get("publication") or {}
+    cms = pub.get("cms") or {}
+    slug = str(cms.get("record_id") or "").strip("/")
+    domain = ((event.get("site") or {}).get("domain") or "").strip()
+    if not slug or not domain:
+        return []
+    try:
+        site = config.load_sites(only=[domain], include_hold=True)[0]
+    except Exception:
+        return []
+    out = []
+    collection = str((site.cms or {}).get("collection") or "").strip("/")
+    if collection:
+        out.append(f"{site.base_url}/{collection}/{slug}/")
+    # boutimar.ir's static adapter builds a flat file, not a collection route.
+    if (site.cms or {}).get("adapter") == "boutimar_ir_static":
+        out.append(f"{site.base_url}/daryanameh/{slug}.html")
+    return out
+
+
 def load_articles(written: Path) -> list[dict[str, Any]]:
     """
     Pair each publishing event with the CMS result that carries its PR URL.
@@ -239,6 +275,24 @@ def watch(written: Path, token: str | None, *, emit: Path | None = None
             continue
 
         check = page_is_live(row["intended_url"], title, session)
+        found_at = row["intended_url"]
+
+        if not check["live"]:
+            # Before calling it undeployed, try where the CMS actually builds.
+            # A stale intended_url must not hold a live article hostage.
+            for cand in derived_urls(ev):
+                if cand == row["intended_url"]:
+                    continue
+                alt = page_is_live(cand, title, session)
+                if alt["live"]:
+                    check, found_at = alt, cand
+                    row["url_mismatch"] = (
+                        f"recorded {row['intended_url']} but it is live at {cand} "
+                        f"— the adapter named the wrong route")
+                    log.warning("%s — live at a different URL than recorded: %s",
+                                item["name"], cand)
+                    break
+
         if not check["live"]:
             # The queue of work waiting for a human upload. A finding, not a
             # failure — and the one this pipeline's history says to expect.
@@ -246,11 +300,11 @@ def watch(written: Path, token: str | None, *, emit: Path | None = None
             rows.append(row)
             continue
 
-        row.update(state="live", live_url=row["intended_url"], bytes=check.get("bytes"))
+        row.update(state="live", live_url=found_at, bytes=check.get("bytes"))
         if emit:
             emit.mkdir(parents=True, exist_ok=True)
             (emit / f"{item['name']}.json").write_text(
-                json.dumps(promote(ev, row["intended_url"], pr["merged_at"]),
+                json.dumps(promote(ev, found_at, pr["merged_at"]),
                            ensure_ascii=False, indent=2), encoding="utf-8")
             row["emitted"] = str(emit / f"{item['name']}.json")
         rows.append(row)
@@ -276,6 +330,8 @@ def render_markdown(rows: list[dict[str, Any]]) -> str:
         L.append("")
         for r in live:
             L.append(f"- **{r['title'] or r['name']}** — {r['live_url']}")
+            if r.get("url_mismatch"):
+                L.append(f"  - ⚠ {r['url_mismatch']}")
         L.append("")
     if stuck:
         L.append(f"## {len(stuck)} merged but NOT deployed")

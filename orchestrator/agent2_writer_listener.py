@@ -948,6 +948,18 @@ def _push_astro_pr(
     slug = "-".join(segments) or "post"
     rel_path = f"{site.cms.content_root.strip('/')}/{collection}/{slug}.md"
 
+    # Where the page will ACTUALLY be, which is not what push_to_cms computed.
+    # Astro derives the route from collection + filename, so a brief targeting
+    # /hotels/yazd-joybar-boutique-hotel-review publishes at
+    # /journal/hotels-yazd-joybar-boutique-hotel-review/ — the brief's path is
+    # an SEO intention, not a route.
+    #
+    # Reporting the brief's path made merge_watch check a URL that 404s, so on
+    # 22 Aug two articles that were merged AND live were reported as "merged,
+    # not deployed". An adapter that names the wrong URL is worse than one that
+    # names none: the pipeline acts on it.
+    url = f"{site.base_url}/{collection}/{slug}/"
+
     # Astro validates every entry against the collection's zod schema and
     # refuses to build on a mismatch, so the frontmatter shape belongs to the
     # site, not to this adapter. boutimar.com's `journal` requires title, date,
