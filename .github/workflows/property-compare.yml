@@ -56,4 +56,7 @@ jobs:
           python3 tools/property_compare.py \
             --a "${{ inputs.property_a || 'sc-domain:ambientetravel.com' }}" \
             --b "${{ inputs.property_b || 'https://www.ambientetravel.com/' }}" \
-            --days "${{ inputs.days || '180' }}" >> "$GITHUB_STEP_SUMMARY"
+            --days "${{ inputs.days || '180' }}" | tee -a "$GITHUB_STEP_SUMMARY"
+          # tee, not >>. The first run wrote only to the summary, which the logs
+          # API does not return, so the answer was invisible to anything reading
+          # the run programmatically.
