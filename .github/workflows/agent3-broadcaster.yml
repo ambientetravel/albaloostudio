@@ -93,21 +93,56 @@ jobs:
           run-id: ${{ steps.writer.outputs.run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Fetch the events merge-watch verified as LIVE
+        # These are the ones worth broadcasting. Agent 2's own events carry
+        # live_url: null by design — a pull request is not a page — and Agent 3
+        # correctly skips every one of them. That is why 29 runs "succeeded"
+        # having posted nothing: it was reading drafts and declining to link to
+        # them, exactly as written.
+        #
+        # merge_watch promotes an event only once the SERVER serves the page,
+        # and writes it to promoted/. Nothing consumed that until now, so the
+        # chain stopped one step short of the agent it was built for.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          MW=$(gh run list --workflow merge-watch.yml --status success --limit 1                  --json databaseId --jq '.[0].databaseId'                  --repo "${{ github.repository }}" 2>/dev/null || true)
+          if [ -n "${MW:-}" ] && [ "$MW" != "null" ]; then
+            mkdir -p promoted_dl
+            gh run download "$MW" --name merge-watch --dir promoted_dl                --repo "${{ github.repository }}" 2>/dev/null || true
+          fi
+          ls -R promoted_dl 2>/dev/null | head -12 || echo "no merge-watch artifact yet"
+
       - name: Locate the events
         id: locate
         run: |
           set -euo pipefail
+          # PROMOTED events win. They carry a live_url that was verified against
+          # the server, which is the only kind Agent 3 can act on.
+          DIR=$(find promoted_dl -type d -name promoted 2>/dev/null | head -1 || true)
+          if [ -n "$DIR" ] && [ -n "$(ls -A "$DIR" 2>/dev/null)" ]; then
+            echo "found=$DIR" >> "$GITHUB_OUTPUT"
+            echo "$(ls "$DIR" | wc -l) LIVE event(s) from merge-watch in $DIR"
+            exit 0
+          fi
+
+          # Fall back to Agent 2's raw events. Every one will be skipped for a
+          # null live_url, which is correct and is worth SAYING rather than
+          # reporting as a clean run with nothing in it.
           # A --no-llm writer run produces drafts but no events, and a run where
           # every brief was blocked produces neither. Find the directory rather
           # than assume it exists.
           DIR=$(find inbox -type d -name events | head -1 || true)
           if [ -z "$DIR" ] || [ -z "$(ls -A "$DIR" 2>/dev/null)" ]; then
-            echo "::notice title=Nothing to broadcast::Agent 2 emitted no publishing events in that run."
+            echo "::notice title=Nothing to broadcast::Agent 2 emitted no publishing events in that run, and merge-watch has promoted none."
             echo "found=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          echo "::notice title=Only drafts available::merge-watch has promoted nothing live, so these are Agent 2 drafts and every one will be skipped for a null live_url. That is the gate working, not a failure."
           echo "found=$DIR" >> "$GITHUB_OUTPUT"
-          echo "$(ls "$DIR" | wc -l) event(s) in $DIR"
+          echo "$(ls "$DIR" | wc -l) draft event(s) in $DIR"
 
       - name: Compose, gate and queue
         if: steps.locate.outputs.found != ''
