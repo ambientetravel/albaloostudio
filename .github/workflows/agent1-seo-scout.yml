@@ -92,7 +92,7 @@ jobs:
           # step: it drops to the deterministic fallback, which the run now
           # announces as DEGRADED rather than passing off as a normal result.
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-flash-latest' }}
           # Kept so GAP_ANALYSIS_PROVIDER=anthropic works the moment the balance
           # is topped up — no edit here, just the repository variable.
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

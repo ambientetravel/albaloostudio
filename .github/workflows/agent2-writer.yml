@@ -138,7 +138,7 @@ jobs:
           # request with 429 "limit: 0", which reads as rate-limiting and is
           # not. Set the GEMINI_MODEL repository variable to override once
           # billing is enabled on the key's project.
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-flash-latest' }}
           # astro_pr — boutimar.com and exploreorient.com. The token needs
           # contents:write and pull_requests:write on the TARGET repo; the
           # runner's own GITHUB_TOKEN is scoped to this repo and cannot open a

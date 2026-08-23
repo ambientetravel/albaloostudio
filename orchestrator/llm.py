@@ -102,14 +102,48 @@ def _gemini(system: str, prompt: str, *, max_tokens: int,
     that need a particular envelope must say so in the prompt. Agent 1 learned
     that by getting a bare array where it expected an object.
     """
-    from agent2_writer_listener import resolve_model
+    from agent2_writer_listener import resolve_model, mark_model_unusable
 
-    model_name = resolve_model()
     cfg: dict[str, Any] = {"temperature": 0.4, "top_p": 0.95,
                            "max_output_tokens": max_tokens}
     if schema:
         cfg["response_mime_type"] = "application/json"
 
+    # Retire a withdrawn model HERE, not only in the agents that grew their own
+    # handling. Agents 1 and 2 each call mark_model_unusable() from their own
+    # Gemini paths; Agent 3 goes through this module, which resolved a name and
+    # then never reacted when the API refused it.
+    #
+    # On 23 Aug that cost the first real broadcast run: gemini-2.5-flash now
+    # answers 404 "no longer available to new users", Agent 3 retried the same
+    # dead name three times, and two articles that had just gone live failed to
+    # produce a single post. The resolution machinery existed and this caller
+    # simply never told it anything was wrong.
+    #
+    # One retry, because re-resolution either yields a different name or it
+    # does not; looping past that is how a dead account burns its rate limit.
+    last: Exception | None = None
+    for _try in range(2):
+        model_name = resolve_model()
+        try:
+            return _gemini_once(system, prompt, model_name, cfg)
+        except Exception as exc:                      # SDK-specific, so by text
+            msg = str(exc)
+            retired = ("no longer available" in msg
+                       or ("404" in msg and "models/" in msg)
+                       or "NOT_FOUND" in msg.upper())
+            if not retired:
+                raise
+            log.warning("gemini model %s is retired (%s) — re-resolving",
+                        model_name, msg[:90])
+            mark_model_unusable(model_name)
+            last = exc
+    raise last if last else RuntimeError("gemini call failed with no error recorded")
+
+
+def _gemini_once(system: str, prompt: str, model_name: str,
+                 cfg: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    """One attempt against one named model. Split out so the caller can retire."""
     try:
         from google import genai as new_genai
         from google.genai import types as genai_types
