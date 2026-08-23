@@ -208,3 +208,42 @@ candidates, not one per keyword.
 ---
 
 *Architecture by **Albaloo Studio** — albaloostudio.com. Owner: Alireza Mozaffari.*
+
+---
+
+## Submitting a sitemap by hand — the field differs by property type
+
+Recorded 23 Aug 2026 after an instruction sent someone to a rejection.
+
+**Domain property** (`sc-domain:boutimar.com`) — Indexing → Sitemaps shows an
+EMPTY field labelled "Enter sitemap URL". It needs the **full absolute URL**:
+
+    https://boutimar.com/sitemap.xml
+
+Entering just `sitemap.xml` is refused with *"Invalid sitemap address — Please
+enter a valid path to a sitemap in your site."*
+
+**URL-prefix property** (`https://cruisebaz.com/`) — the same field is
+PREFILLED with the property's own prefix, and takes only the remainder:
+
+    sitemap.xml
+
+Pasting the full URL there produces a doubled path.
+
+The two behave oppositely, and nine of these eleven properties are domain
+properties. Assume the full URL unless you are looking at a URL-prefix one.
+
+### What the verdicts mean before you request indexing
+
+Both of these are normal for a page published the same day, and they are not
+the same state:
+
+* **"URL is unknown to Google"** — never seen it, no referring sitemap. Google
+  has not read a sitemap containing it yet.
+* **"Discovered – currently not indexed"** — found via the sitemap, queued, not
+  yet crawled. Further along, and nothing is wrong.
+
+Requesting indexing is worth doing for either. The quota is roughly 10 URLs per
+property per day. The confirmation on some URLs renders INLINE rather than as a
+dialog, so it is easy to click twice — a duplicate costs a quota slot and does
+not improve queue position.
