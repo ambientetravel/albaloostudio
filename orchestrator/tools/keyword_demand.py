@@ -269,16 +269,29 @@ def overlay(rows: list[dict[str, Any]],
             gsc: dict[str, list[dict[str, Any]]]) -> None:
     """Attach each property's best position for every usable term, in place.
 
-    Substring both ways: a site surfacing for a longer query that CONTAINS the
-    term is present for it, and a site surfacing for the bare head term is
-    present for its long tail. Absent stays absent — that is the finding.
+    MATCHING IS ONE-DIRECTIONAL, and the first version of this was not.
+
+    A site is present for term T if Search Console recorded a query that IS T,
+    or a longer query that CONTAINS T — surfacing for «قیمت تور کشتی کروز دبی»
+    is fair evidence of presence on «کشتی کروز دبی».
+
+    The reverse is NOT true and was the bug. Matching when the QUERY is a
+    substring of the term means a site that surfaces for the bare phrase
+    «کشتی کروز» is scored present for all 769 terms containing it. The first
+    run reported cruisebaz.com present for 768 of 769 — 537 of those rows
+    carrying the identical position 61.5, which is the signature of one short
+    query smeared across the whole corpus. Ranking for a head term is not
+    ranking for its long tail; that is the entire problem being measured.
+
+    The matched queries are recorded so a bad match stays visible instead of
+    hiding inside an aggregate.
     """
     for r in rows:
         if r["reject"]:
             continue
         r["gsc"] = {}
         for d, qs in gsc.items():
-            hits = [x for x in qs if r["term"] in x["q"] or x["q"] in r["term"]]
+            hits = [x for x in qs if r["term"] in x["q"]]
             if not hits:
                 r["gsc"][d] = None
                 continue
@@ -286,7 +299,9 @@ def overlay(rows: list[dict[str, Any]],
             r["gsc"][d] = {"pos": best["pos"],
                            "imp": sum(h["imp"] for h in hits),
                            "clicks": sum(h["clicks"] for h in hits),
-                           "queries": len(hits)}
+                           "queries": len(hits),
+                           "exact": any(x["q"] == r["term"] for x in hits),
+                           "matched": sorted({x["raw"] for x in hits})[:5]}
 
 
 # ── Report ──────────────────────────────────────────────────────────────────
