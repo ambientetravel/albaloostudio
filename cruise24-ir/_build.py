@@ -236,6 +236,11 @@ def visa_block(rows):
     if not c:
         return ""
     parts = []
+    if c["hard"]:
+        parts.append(f"<li><strong>ویزای آمریکا / بریتانیا / کانادا</strong> — "
+                     f"{fa(c['hard'])} حرکت. این‌ها سخت‌ترین ویزاها برای "
+                     "پاسپورتِ ایرانی‌اند و صدورشان قطعی نیست. پیش از هر "
+                     "پرداختی دربارهٔ آن‌ها با ما حرف بزنید.</li>")
     if c["schengen"]:
         parts.append(f"<li><strong>ویزای شنگن لازم است</strong> — {fa(c['schengen'])} "
                      "حرکت. حتی اگر سفر از استانبول آغاز شود، پهلوگرفتن در یک "
