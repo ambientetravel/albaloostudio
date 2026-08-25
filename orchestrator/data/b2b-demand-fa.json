@@ -1,0 +1,51 @@
+{
+ "source": "Google suggest endpoint (suggestqueries.google.com)",
+ "source_kind": "autocomplete expansion — the same method keywordchi resells, with a wider prefix list and no daily cap",
+ "captured": "2026-08-25",
+ "language": "fa-IR",
+ "HAS_SEARCH_VOLUME": false,
+ "note": "Autocomplete proves a phrase is typed often enough to be suggested. It carries no frequency, and none is estimated here. Same limit as keywordchi, which has volume columns wired to DataForSEO and switched off on every tier.",
+ "seeds": [
+  "اژانس مسافرتی کروز",
+  "رزرو گروهی تور",
+  "نمایندگی کشتی کروز",
+  "همکاری با اژانس مسافرتی"
+ ],
+ "terms": [
+  {
+   "term": "اژانس مسافرتی کشتی کروز",
+   "seeds": [
+    "اژانس مسافرتی کروز"
+   ],
+   "via": "google-suggest"
+  },
+  {
+   "term": "رزرو تور گروهی",
+   "seeds": [
+    "رزرو گروهی تور"
+   ],
+   "via": "google-suggest"
+  },
+  {
+   "term": "نمایندگی کشتی کروز",
+   "seeds": [
+    "نمایندگی کشتی کروز"
+   ],
+   "via": "google-suggest"
+  },
+  {
+   "term": "نمایندگی کشتی کروز در ایران",
+   "seeds": [
+    "نمایندگی کشتی کروز"
+   ],
+   "via": "google-suggest"
+  },
+  {
+   "term": "همکاری با اژانس های مسافرتی",
+   "seeds": [
+    "همکاری با اژانس مسافرتی"
+   ],
+   "via": "google-suggest"
+  }
+ ]
+}
