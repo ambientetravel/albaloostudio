@@ -65,6 +65,52 @@ FOOTER = """<footer class="foot">
     </p>
   </div>
 </footer>
+"""
+
+# Everything between </footer> and </body> on a live page. The first version of
+# this file stopped at </footer> and closed the document itself, which silently
+# dropped BOTH scripts from all fifteen generated pages.
+#
+# nav.js is not decoration. Line 165 of it does `el('button','navburger')` — it
+# CREATES the mobile menu button, which appears in no page's static markup. A
+# page without this tag has no mobile navigation at all, on a Farsi site where
+# mobile dominates. It also publishes window.CRUISE24_FLEET, the only written
+# record of the fleet roster, read by the homepage stat and by the booking
+# engine's ship filter. Keep the tag byte-identical rather than trimming it.
+NAV_JS = '<script src="nav.js?v=59c1c9e6" defer></script>'
+
+CLOSE = """
 </body>
 </html>
+"""
+
+# The live-count script the existing line pages already carry. msc.html,
+# aroya.html, celestyal.html and explora.html are being REPLACED, so shipping
+# them without this would be a regression: the figure would freeze at whatever
+# the feed said on build day instead of tracking the booking engine.
+#
+# The static number stays in the markup and is what a reader sees if the fetch
+# fails — the catch is deliberately empty for exactly that reason.
+LIVE_COUNT = """<script>
+/* Persian digits. boutimar.ir sets every figure this way and these pages sit
+   beside it, so Latin numerals would read as a different site. Applied only to
+   elements we fill ourselves — never to .latin, which holds brand names. */
+(function () {
+  var FA = ['\u06f0','\u06f1','\u06f2','\u06f3','\u06f4','\u06f5','\u06f6','\u06f7','\u06f8','\u06f9'];
+  function fa(n) { return String(n).replace(/[0-9]/g, function (d) { return FA[+d]; }).replace(/,/g, '\u066c'); }
+  var P = 'https://book.cruise24.ir/proxy.php';
+  function live(params, key) {
+    fetch(P + '?limit=1&lang=en' + (params ? '&' + params : ''), { headers: { Accept: 'application/json' } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j || !j.meta) return;
+        var el = document.querySelector('[data-live="' + key + '"]');
+        if (el) el.textContent = fa(Number(j.meta.total).toLocaleString('en-GB'));
+      })
+      .catch(function () { /* the static fallback in the markup stands */ });
+  }
+  live('line=%(param)s', '%(key)s');
+
+})();
+</script>
 """

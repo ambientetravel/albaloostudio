@@ -1,0 +1,50 @@
+{
+  "_comment": [
+    "Session routing — which Claude Code session owns which property.",
+    "",
+    "Read by the SESSION ROUTING section of CLAUDE.md. The rule is: work on a",
+    "property is HANDED OFF to its owning session rather than done wherever it",
+    "was asked for, so one session holds the whole history of one property.",
+    "",
+    "MATCH BY TITLE FIRST, id second. Session ids are stable for the life of a",
+    "session but a NEW session for the same property gets a new id, so a",
+    "hardcoded id goes stale silently. mcp__ccd_session_mgmt__list_sessions",
+    "returns titles; find the title, use the id it reports, and update this",
+    "file when it has changed.",
+    "",
+    "A session does NOT need to be running. send_message delivers into a",
+    "stopped session's transcript as a user turn, waiting for the next open.",
+    "ListAgents will NOT show a stopped session — it only lists live peers.",
+    "That difference cost a round trip on 26 Aug 2026."
+  ],
+  "verified": "2026-08-26",
+  "routes": [
+    {
+      "properties": ["cruise24.ir", "cruise24.me", "book.cruise24.ir"],
+      "title": "Cruise24.ir storefront build",
+      "sessionId": "local_dd38a73a-fdf4-4ba3-8ac8-b9dab001294a",
+      "confirmed_by_user": true,
+      "repo_paths": ["cruise24-ir/"]
+    },
+    {
+      "properties": ["boutimar.com"],
+      "title": "Boutimar.com",
+      "sessionId": "local_db802ea1-ad69-48c0-a163-18629c35afa6",
+      "confirmed_by_user": false,
+      "note": "Title match only — confirm with Alireza before the first handoff.",
+      "repo_paths": ["boutimar-com/"]
+    },
+    {
+      "properties": ["exploreorient.com"],
+      "title": "Explore Orient site architecture",
+      "sessionId": "local_1a53860e-66e6-4694-8e82-55f0b6f1b7c6",
+      "confirmed_by_user": false,
+      "note": "Title match only — confirm with Alireza before the first handoff.",
+      "repo_paths": ["exploreorient/"]
+    }
+  ],
+  "unrouted": [
+    "boutimar.ir — no session designated. Two candidates exist and neither is unambiguous: 'boutimar cruise' (pinned) and 'Boutimar Farsi destinations'. Ask before routing.",
+    "cruisebaz.com — 'cruisebaz.com SEO optimization' exists but is not pinned and last ran 7 Aug. Ask before routing."
+  ]
+}

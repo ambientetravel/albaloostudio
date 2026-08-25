@@ -213,15 +213,27 @@ def visa_block(rows):
             "    </div>\n  </section>\n")
 
 
-def render(slug, title, description, h1, lede, body, jsonld=""):
+def render(slug, title, description, h1, lede, body, jsonld="", live_line=None):
+    """Assemble one page.
+
+    The scripts are not optional and were missing from the first fifteen pages
+    this generator wrote — _chrome.FOOTER used to close the document itself,
+    so nav.js never appeared and every page shipped without a mobile menu
+    button, because nav.js is what creates it. --check now diffs this tail
+    against a live page so it cannot drift again silently.
+    """
     head = _chrome.HEAD.format(title=esc(title), description=esc(description),
                                slug=slug, css=_chrome.CSS_VERSION,
                                jsonld=jsonld)
+    tail = ""
+    if live_line:
+        tail = _chrome.LIVE_COUNT % {"param": live_line, "key": live_line.lower()}
     return (head + _chrome.HEADER
             + f'\n  <section class="band">\n    <div class="wrap">\n'
               f'      <h1 class="h-lg">{h1}</h1>\n      <p>{lede}</p>\n'
               f'    </div>\n  </section>\n'
-            + body + _chrome.FOOTER)
+            + body + _chrome.FOOTER + "\n" + tail
+            + _chrome.NAV_JS + _chrome.CLOSE)
 
 
 def build_destination(feed, spec):
@@ -395,7 +407,8 @@ def build_line(feed, line):
     nights = [s.get("nights", 0) for s in rows if s.get("nights")]
     deps = sorted({d for s in rows for d in (s.get("dates") or [])})
 
-    facts = [f"{fa(len(rows))} کروزِ فعال در تقویمِ ما",
+    facts = [f'<span data-live="{line.lower()}">{fa(len(rows))}</span> '
+             f"کروزِ فعال در تقویمِ ما",
              f"{fa(len(ships))} کشتی"]
     if deps:
         facts.append(f"{fa(len(deps))} تاریخِ حرکت، از {deps[0]} تا {deps[-1]}")
@@ -447,7 +460,8 @@ def build_line(feed, line):
             + ". تاریخ‌های واقعیِ حرکت و وضعیتِ ویزا برای پاسپورتِ ایرانی.")[:158]
     return (LINE_SLUG[line],
             render(LINE_SLUG[line], f"{h1} | کروز۲۴", desc, h1,
-                   LINE_LEDE.get(line, ""), "".join(body)), len(rows))
+                   LINE_LEDE.get(line, ""), "".join(body),
+                   live_line=line), len(rows))
 
 
 def build_prices(feed):
@@ -568,6 +582,22 @@ def main(argv=None):
 
     if args.check:
         bad = []
+        # Chrome drift is silent and expensive: the first build of these pages
+        # dropped nav.js because the chrome was eyeballed off a live page
+        # rather than diffed against one.
+        try:
+            live = subprocess.run(
+                ["curl", "-sS", "--max-time", "30", "-A", "Mozilla/5.0",
+                 "https://cruise24.ir/msc.html"],
+                capture_output=True, timeout=45).stdout.decode("utf-8")
+            for needle, what in ((_chrome.NAV_JS, "nav.js tag"),
+                                 (_chrome.CSS_VERSION, "stylesheet version")):
+                if needle not in live:
+                    bad.append(f"CHROME DRIFT: {what} in _chrome.py no longer "
+                               f"matches the live page — re-lift it")
+        except Exception as exc:
+            print(f"  (could not reach the live site to diff chrome: "
+                  f"{type(exc).__name__})")
         for slug, doc, n in pages:
             p = args.out / slug
             if not p.exists():
