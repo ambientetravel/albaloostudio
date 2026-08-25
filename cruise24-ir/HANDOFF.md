@@ -72,6 +72,32 @@ one.** Persian Gulf and Dubai are 199 keyword terms against **18 sailings**
 sailings** against 6 terms. Iranians search the Gulf; the company sells the
 Western Med. No amount of page-building fixes that.
 
+## OPEN: two visa counts disagree — reconcile before quoting either
+
+Session `claude-websitebuilder-45` and this one measured the Nowruz 1406 window
+(2027-03-15 → 2027-04-10) and got different numbers:
+
+| | sailings | need US/UK/Canada visa |
+|---|---:|---:|
+| this session (`_visa.py`) | 255 | 53 (20%) |
+| session 45 (boutimar.ir API) | 245 | 58 (24%) |
+
+Both say roughly a fifth of the window is unsellable to a client who cannot get
+a US, UK or Canadian visa, so the conclusion holds either way. The inputs do
+not match. Likely causes: `HARD_VISA_PORTS` here and `national_visa_countries()`
+there do not cover the same ports, and this session counts a sailing once if
+ANY of its dates falls in range. **Quote one figure, not two.** That session has
+since exited; the reconciliation was never finished.
+
+Related, and fixed on their side not ours: boutimar.ir's `port-countries.json`
+mapped فور-دو-فرانس (Martinique) and پوانت-آ-پیتر (Guadeloupe) to «فرانسه» and
+reported plain Schengen. Both are French OVERSEAS departments, outside
+Schengen. These pages never had that bug — `_visa.py` keeps its own explicit
+port list instead of reusing that table, so both ports fell to «نیازمند بررسی».
+Their fix bundle is `~/Downloads/FIX-26aug-boutimar.ir-visa-dom-2files.zip`.
+**Run `python3 _build.py --check` after it deploys**, so these pages and the
+feed cannot disagree about a visa.
+
 ## What is NOT done
 
 - **Not deployed.** The zip is built; DirectAdmin upload is a hand-off.
