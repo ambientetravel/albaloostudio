@@ -59,6 +59,19 @@ absent everywhere, so there is nothing to fight over.
    says Schengen despite Türkiye itself being visa-free. Port matching is by
    explicit list, never substring: «رم» sits inside «مارماریس».
 
+## Two findings that look like data gaps and are not
+
+**celestyal.html and explora.html have ZERO Farsi demand terms.** Not missing
+data — nobody searches those brand names in Persian. They belong in the
+sitemap and on cruise-lines.html; do not "fix" the zero by hunting for
+keywords that do not exist.
+
+**Demand and inventory are inverted, and it is a sourcing signal, not an SEO
+one.** Persian Gulf and Dubai are 199 keyword terms against **18 sailings**
+(0.5% of the catalogue, and they are the same 18). Mediterranean is **2,445
+sailings** against 6 terms. Iranians search the Gulf; the company sells the
+Western Med. No amount of page-building fixes that.
+
 ## What is NOT done
 
 - **Not deployed.** The zip is built; DirectAdmin upload is a hand-off.

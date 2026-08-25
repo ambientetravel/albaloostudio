@@ -130,12 +130,13 @@ DESTINATIONS = [
     {"slug": "cruise-persian-gulf.html", "name": "خلیج فارس",
      "h1": "تور کشتی کروز خلیج فارس",
      "regions": ["خلیج فارس"], "ports": ["دبی", "ابوظبی", "دوحه", "مسقط"],
+     "iran_departure_note": True,
      "lede": ("کروزهای خلیج فارس کوتاه‌ترین راهِ دریا برای مسافرِ ایرانی‌اند: "
               "پروازِ کوتاه، بندرِ نزدیک، و کشتی‌هایی که زمستان را در همین آب‌ها "
               "می‌گذرانند.")},
     {"slug": "cruise-dubai.html", "name": "دبی",
      "h1": "تور کشتی کروز دبی",
-     "regions": [], "ports": ["دبی"],
+     "regions": [], "ports": ["دبی"], "iran_departure_note": True,
      "lede": ("دبی بندرِ خانگیِ کروزهای خلیج فارس است — از همان‌جا سوار می‌شوید "
               "و به همان‌جا برمی‌گردید.")},
     {"slug": "cruise-istanbul.html", "name": "استانبول",
@@ -317,6 +318,32 @@ def build_destination(feed, spec):
                                 for r, n in regions.most_common(8)) + "</p>\n")
     body.append("    </div>\n  </section>\n")
     body.append(visa_block(rows))
+
+    # 14 terms in the corpus ask for a sailing FROM an Iranian port —
+    # «کشتی کروز بندرعباس به دبی», «کشتی کروز ایران به دبی», «از بندر لنگه».
+    # That product does not exist: zero sailings in the feed call at any
+    # Iranian port. Without this block a searcher lands here, sees eighteen
+    # Gulf sailings, and reasonably concludes one of them leaves from Iran.
+    # Ranking for a query we answer wrongly is worse than not ranking for it.
+    if spec.get("iran_departure_note"):
+        iranian = sum(1 for s in feed
+                      if any(p in (s.get("ports") or [])
+                             for p in ("کیش", "قشم", "بندرعباس", "بندر لنگه",
+                                       "چابهار", "بوشهر", "انزلی")))
+        body.append(f"""  <section class="band">
+    <div class="wrap">
+      <h2 class="h">آیا کشتی از ایران حرکت می‌کند؟ نه.</h2>
+      <p>در تقویمِ {fa(len(feed))} کروزیِ ما، شمارِ حرکت‌هایی که از بندری در
+      ایران آغاز می‌شوند یا به آن پهلو می‌گیرند: <strong>{fa(iranian)}</strong>.
+      این عدد شمرده شده است، نه به‌خاطر سپرده.</p>
+      <p>کروزهای این صفحه از بندرهای آن‌سویِ خلیج فارس — دبی، ابوظبی، دوحه —
+      حرکت می‌کنند. مسافرِ ایرانی با پرواز به بندرِ مبدأ می‌رسد و از آنجا سوار
+      می‌شود. جستجوهایی مانند «کشتی کروز بندرعباس به دبی» محصولی ندارند و هر
+      جا چنین چیزی تبلیغ شود، وجود ندارد.</p>
+      <p><a class="btn" href="cruise-kish.html">چرا هیچ کروزی در ایران پهلو نمی‌گیرد</a></p>
+    </div>
+  </section>
+""")
 
     show = sorted(rows, key=lambda s: (s.get("priceFrom") or 10**9))[:24]
     if show:
