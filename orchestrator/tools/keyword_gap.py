@@ -8,9 +8,16 @@ Owner: Alireza Mozaffari
 WHAT THIS CAN AND CANNOT KNOW — read before quoting any number from it
 ─────────────────────────────────────────────────────────────────────
 There is NO SEARCH VOLUME here, and none is invented. Google Ads does not
-operate in Iran, so Keyword Planner cannot report on this market at all, and no
-third-party keyword tool is wired into this pipeline. Anyone who hands you a
-Farsi cruise volume figure without naming its source is guessing.
+operate in Iran, so Keyword Planner cannot report on this market at all.
+Anyone who hands you a Farsi cruise volume figure without naming its source is
+guessing.
+
+That much is unchanged. What DID change on 25 Aug 2026 is narrower and worth
+stating precisely, because the two are easy to conflate: a keywordchi export
+now gives us a DEMAND LIST — 500 real query strings, in
+data/keywordchi-cruise-2026-08.json, read by tools/keyword_demand.py. It says
+which phrases exist as searches. It still carries no numbers of any kind, so it
+cannot rank them, and this tool's ordering stays what it always was.
 
 What IS knowable, and what this uses:
 
@@ -286,10 +293,11 @@ def _report(studies_public: list[dict[str, Any]], rows: list[dict[str, Any]],
             mine: list[str]) -> None:
     print("# Cruise keyword map — competitor consensus, and where we stand\n")
     print("**No search volume appears here and none is estimated.** Google Ads "
-          "does not operate in Iran and no keyword tool is wired in, so the "
-          "ranking is by how many rivals independently build pages around a "
-          "phrase — a statement of what the market is built on, not of what "
-          "gets searched most.\n")
+          "does not operate in Iran, so the ranking is by how many rivals "
+          "independently build pages around a phrase — a statement of what the "
+          "market is built on, not of what gets searched most. For what "
+          "searchers actually type, see tools/keyword_demand.py, which reads a "
+          "keywordchi export; that list is also volume-free.\n")
     print("| Rival | Sitemap URLs | Pages read |")
     print("|---|---:|---:|")
     for s in studies_public:

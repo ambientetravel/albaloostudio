@@ -1,0 +1,78 @@
+# Albaloo Orchestration Pipeline — Farsi cruise demand, filtered, against our positions.
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Dispatch-only. keyword-gap.yml reads what RIVALS target; this reads what
+# SEARCHERS type, from a keywordchi export committed at
+# orchestrator/data/keywordchi-cruise-2026-08.json.
+#
+# It runs here rather than on a laptop for one reason: the Search Console
+# service account is a repository secret and nowhere else. Without it the tool
+# still classifies demand, it just cannot say whether we surface for any of it —
+# and "we are absent for all 13 route-pair queries" is the whole point.
+
+name: Keyword demand — Farsi cruise, filtered
+
+on:
+  workflow_dispatch:
+    inputs:
+      show:
+        description: "summary | terms | rejects | all"
+        required: false
+        default: "terms"
+        type: choice
+        options: [summary, terms, rejects, all]
+      gsc:
+        description: "Overlay live Search Console positions"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  demand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # The runner pins 3.11 and the laptop is on 3.12+. PEP 701 legalised
+      # f-string constructs in 3.12 that are a hard SyntaxError here, and a
+      # scheduled job died for four days on exactly that once already.
+      - name: Nothing here uses syntax the 3.11 runner cannot parse
+        run: python3 tools/py311_guard.py tools/keyword_demand.py
+
+      - name: Demand report
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          ARGS="--show ${{ inputs.show || 'terms' }}"
+          if [ "${{ inputs.gsc }}" != "false" ]; then ARGS="$ARGS --gsc"; fi
+          python3 tools/keyword_demand.py $ARGS | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Machine-readable copy
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          python3 tools/keyword_demand.py --gsc --format json > keyword-demand.json
+          echo "rows: $(python3 -c "import json;print(len(json.load(open('keyword-demand.json'))['terms']))")"
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: keyword-demand
+          path: orchestrator/keyword-demand.json
+          retention-days: 30
