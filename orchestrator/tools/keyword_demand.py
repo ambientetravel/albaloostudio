@@ -51,6 +51,7 @@ import collections
 import json
 import re
 import sys
+import unicodedata
 from datetime import timedelta
 from pathlib import Path
 from typing import Any
@@ -63,6 +64,35 @@ DATA = Path(__file__).resolve().parent.parent / "data" / "keywordchi-cruise-2026
 # English-language and is included only to prove it is not competing here.
 CRUISE_SITES = ["boutimar.ir", "cruisebaz.com", "cruise24.ir", "cruiseshop.ir",
                 "boutimar.com"]
+
+# ── Persian normalisation ───────────────────────────────────────────────────
+# Load-bearing, and it has bitten this pipeline before. Farsi text arrives with
+# Arabic yeh (ي) and kaf (ك) mixed into Persian yeh (ی) and kaf (ک) — visually
+# near-identical, different code points. «كشتي كروز» and «کشتی کروز» are the
+# same query to a reader and two different strings to Python.
+#
+# The keywordchi data file is stored already normalised. Search Console is NOT:
+# it returns whatever the searcher typed. Comparing one against the other
+# without folding both is how a term that ranks gets reported as ABSENT — the
+# most damaging way this tool can be wrong, because absent is the finding
+# people act on.
+_AR2FA = {"ي": "ی", "ى": "ی", "ك": "ک", "ۀ": "ه", "ة": "ه",
+          "أ": "ا", "إ": "ا", "آ": "ا"}
+_DIAC = "".join(chr(c) for c in range(0x064B, 0x0653)) + "\u0670\u0640"
+
+
+def norm(s: str) -> str:
+    """Fold Arabic forms, strip diacritics/ZWNJ, Persian digits to ASCII."""
+    s = unicodedata.normalize("NFC", str(s))
+    s = "".join(_AR2FA.get(c, c) for c in s)
+    s = "".join(c for c in s if c not in _DIAC)
+    s = s.replace("\u200c", " ").replace("\u200f", "").replace("\u200e", "")
+    s = re.sub(r"[\u06F0-\u06F9]",
+               lambda m: str(ord(m.group()) - 0x06F0), s)
+    s = re.sub(r"[\u0660-\u0669]",
+               lambda m: str(ord(m.group()) - 0x0660), s)
+    return re.sub(r"\s+", " ", s).strip()
+
 
 # ── Reject classes ──────────────────────────────────────────────────────────
 # Wrong entity, wrong product, or seed bleed. Ordered by how badly a page built
@@ -222,7 +252,10 @@ def gsc_positions(domains: list[str]) -> dict[str, list[dict[str, Any]]]:
         start = end - timedelta(days=site.lookback_days)
         rows = a1._search_analytics(svc, site.property_uri, start.isoformat(),
                                     end.isoformat(), ["query"])
-        out[d] = [{"q": (r.get("keys") or [""])[0],
+        # norm() here, not at compare time: the data file is already
+        # normalised, so folding both sides is what makes the match honest.
+        out[d] = [{"q": norm((r.get("keys") or [""])[0]),
+                   "raw": (r.get("keys") or [""])[0],
                    "imp": int(r.get("impressions", 0) or 0),
                    "clicks": int(r.get("clicks", 0) or 0),
                    "pos": round(float(r.get("position", 0) or 0), 1)}
