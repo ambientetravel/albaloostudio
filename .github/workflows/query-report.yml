@@ -1,0 +1,57 @@
+# Albaloo Orchestration Pipeline — what a site actually ranks for.
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Dispatch-only. Answers "we are not on page one for our own keywords, why?"
+# — which splits into two very different findings that a ranking table hides:
+# the query is ABSENT (no listing exists) versus the query sits at position 40
+# (a listing exists and is losing).
+
+name: Query report — positions and absences
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Domain to report on"
+        required: true
+        type: string
+      watch:
+        description: "Comma-separated terms to check for presence"
+        required: false
+        default: ""
+        type: string
+      top:
+        description: "How many queries to list"
+        required: false
+        default: "30"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Report
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          python3 tools/query_report.py \
+            --domain "${{ inputs.domain }}" \
+            --top "${{ inputs.top || '30' }}" \
+            --watch "${{ inputs.watch }}" | tee -a "$GITHUB_STEP_SUMMARY"
