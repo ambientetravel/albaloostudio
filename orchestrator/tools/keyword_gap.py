@@ -225,12 +225,28 @@ def stand(term: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--rivals", required=True)
+    ap.add_argument("--rivals", default="",
+                    help="comma-separated competitor domains (omit with --render)")
+    ap.add_argument("--render", type=Path,
+                    help="re-render a saved JSON study as markdown, crawling nothing")
     ap.add_argument("--mine", default="boutimar.ir,cruise24.ir,cruisebaz.com")
     ap.add_argument("--sample", type=int, default=40)
     ap.add_argument("--top", type=int, default=50)
     ap.add_argument("--format", choices=["md", "json"], default="md")
     args = ap.parse_args(argv)
+
+    # Re-render mode: the crawl already happened, the answer is on disk, and
+    # fetching four sites again to print the same table differently is waste
+    # paid for by someone else's bandwidth.
+    if args.render:
+        saved = json.loads(args.render.read_text(encoding="utf-8"))
+        _report(saved["rivals"], saved["terms"],
+                [d.strip() for d in args.mine.split(",") if d.strip()])
+        return 0
+
+    if not args.rivals:
+        print("--rivals is required unless --render is given", file=sys.stderr)
+        return 2
 
     session = requests.Session()
     rivals = [d.strip() for d in args.rivals.split(",") if d.strip()]
@@ -256,12 +272,18 @@ def main(argv: list[str] | None = None) -> int:
         rows.append({"term": term, "rivals": breadth[term], "uses": depth[term],
                      "mine": {d: stand(term, pos.get(d, [])) for d in mine}})
 
+    studies_public = [{k: v for k, v in s.items() if k != "grams"} for s in studies]
     if args.format == "json":
-        print(json.dumps({"rivals": [{k: v for k, v in s.items() if k != "grams"}
-                                     for s in studies], "terms": rows},
+        print(json.dumps({"rivals": studies_public, "terms": rows},
                          ensure_ascii=False, indent=2))
         return 0
 
+    _report(studies_public, rows, mine)
+    return 0
+
+
+def _report(studies_public: list[dict[str, Any]], rows: list[dict[str, Any]],
+            mine: list[str]) -> None:
     print("# Cruise keyword map — competitor consensus, and where we stand\n")
     print("**No search volume appears here and none is estimated.** Google Ads "
           "does not operate in Iran and no keyword tool is wired in, so the "
@@ -270,7 +292,7 @@ def main(argv: list[str] | None = None) -> int:
           "gets searched most.\n")
     print("| Rival | Sitemap URLs | Pages read |")
     print("|---|---:|---:|")
-    for s in studies:
+    for s in studies_public:
         print(f"| {s['domain']} | {s['sitemap_urls']:,} | {s['pages_read']} |")
     print()
     head = " | ".join(mine)
@@ -288,7 +310,6 @@ def main(argv: list[str] | None = None) -> int:
           "containing the term: there is no position to improve and no listing "
           "to optimise. A number is our best position across every query "
           "containing it.\n")
-    return 0
 
 
 if __name__ == "__main__":

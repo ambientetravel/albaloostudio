@@ -67,13 +67,13 @@ jobs:
             --mine "${{ inputs.mine || 'boutimar.ir,cruise24.ir,cruisebaz.com' }}" \
             --sample "${{ inputs.sample || '40' }}" \
             --top "${{ inputs.top || '50' }}" \
-            --format md | tee "reports/keyword-gap-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
-          python3 tools/keyword_gap.py \
-            --rivals "${{ inputs.rivals }}" \
-            --mine "${{ inputs.mine || 'boutimar.ir,cruise24.ir,cruisebaz.com' }}" \
-            --sample "${{ inputs.sample || '40' }}" \
-            --top "${{ inputs.top || '50' }}" \
             --format json > "reports/keyword-gap-$STAMP.json"
+          # ONE crawl, both formats. Running the tool twice re-fetched every
+          # rival page and took the first study to 23 minutes against a 30
+          # minute timeout — for a second copy of data already in hand, and a
+          # second round of load on sites that did nothing to deserve it.
+          python3 tools/keyword_gap.py --render "reports/keyword-gap-$STAMP.json" \
+            | tee "reports/keyword-gap-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload
         if: always()
         uses: actions/upload-artifact@v6
