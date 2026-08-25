@@ -69,11 +69,20 @@ absent everywhere, so there is nothing to fight over.
   worse than 15 linked ones.
 - **`cruise-prices.html` is 379 words** and `cruise-kish.html` is 202. Both are
   intentionally short but both are thin; prose would help.
-- **Ship pages already exist — 23 of them**, and this was wrong in the first
-  version of this handoff. `msc-*.html` (19), `celestyal-*.html` (2) and
-  `explora-*.html` (3) are live, well-built, and reachable ONLY from the line
-  pages. They are not new work; they are orphans. The fleet tables this
-  generator writes now link into them.
+- **Ship pages already exist — 29 of them.** `msc-*.html` (24),
+  `celestyal-*.html` (2), `explora-*.html` (3). Live, well-built, and NOT new
+  work. Do not build them.
+- **The internal link layer does not exist.** Not weak — absent. Every internal
+  href across all 38 pages was parsed: `index.html` reaches 4 pages,
+  `cruise-lines.html` reaches the 4 line pages, and the line pages link ZERO
+  ship pages. **29 of 38 pages have no inbound link from anywhere**, so a
+  crawler reaches 9. The sitemap is currently the only way in, and until
+  26 Aug it declared four URLs.
+- The generated fleet tables now fix most of this: `msc.html` links its 24
+  ships, `celestyal.html` its 2, `explora.html` its 3. 29 pages go from
+  unreachable to one hop from a hub. `aroya.html` links none, correctly — the
+  AROYA ship shares the line's name and would link to itself; `ship_href()`
+  refuses any slug that is a line page.
 - **None of the 38 pre-existing pages has `rel=canonical`.** The 15 generated
   ones do. Adding it to the hand-written pages is a cheap follow-up.
 

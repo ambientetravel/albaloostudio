@@ -432,8 +432,10 @@ def build_line(feed, line):
         p = [s["priceFrom"] for s in sh if s.get("priceFrom")]
         reg = Counter(s.get("region") for s in sh if s.get("region"))
         nl = [s.get("nights", 0) for s in sh if s.get("nights")]
+        href = ship_href(ship)
+        cell = (f'<a href="{href}">{latin(ship)}</a>' if href else latin(ship))
         rowsh.append(
-            f"        <tr><td>{latin(ship)}</td><td>{fa(n)}</td>"
+            f"        <tr><td>{cell}</td><td>{fa(n)}</td>"
             f"<td>{fa(min(nl)) + '–' + fa(max(nl)) if nl else '—'}</td>"
             f"<td>{latin(str(min(p)) + ' EUR') if p else '—'}</td>"
             f"<td>{esc(reg.most_common(1)[0][0]) if reg else '—'}</td></tr>")
@@ -549,6 +551,41 @@ EXISTING = [
     "msc-sinfonia.html", "msc-splendida.html", "msc-virtuosa.html",
     "msc-world-america.html", "msc-world-asia.html", "msc-world-europa.html",
 ]
+
+
+# The 29 ship pages, derived from EXISTING rather than typed twice. They are
+# the reason internal linking is the biggest job on this site: a peer session
+# parsed every internal href across all 38 pages and found that NOT ONE of
+# these has an inbound link — not from the homepage, not from cruise-lines,
+# and not from the line pages either. 29 of 38 pages are unreachable by
+# crawling, which is why the sitemap was the only way in.
+#
+# The name→page rule is lower-case, spaces to hyphens. Verified both ways
+# against the live feed: 29 of the 30 distinct ships resolve to a page that
+# exists, and every one of the 29 pages has sailings in the feed. No misses in
+# either direction.
+#
+# The 30th is AROYA, whose ship carries the line's own name and resolves to
+# aroya.html — the LINE page. Linking that would point the page at itself, so
+# ship_href() refuses any slug that is a line page. That is a real exception,
+# not a gap.
+SHIP_PAGES = {e[:-5] for e in EXISTING
+              if e not in ("index.html", "blog.html", "cruiseletter.html",
+                           "events.html", "cruise-lines.html",
+                           "msc.html", "aroya.html", "celestyal.html",
+                           "explora.html")}
+
+
+def ship_href(name: str) -> str | None:
+    """The ship's own page, or None — never a guess.
+
+    Returns None rather than a constructed URL when the page does not exist,
+    because a link to a 404 is worse than no link.
+    """
+    slug = (name or "").lower().replace(" ", "-")
+    if slug in SHIP_PAGES:
+        return slug + ".html"
+    return None
 
 
 def write_sitemap(slugs: list[str]) -> str:
