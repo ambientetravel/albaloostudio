@@ -58,7 +58,9 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-DATA = Path(__file__).resolve().parent.parent / "data" / "keywordchi-cruise-2026-08.json"
+# The merged corpus: keywordchi's paid export plus the free suggest harvest.
+# Either source alone is readable with --data.
+DATA = Path(__file__).resolve().parent.parent / "data" / "cruise-demand-fa.json"
 
 # Properties that could plausibly own a Farsi cruise query. boutimar.com is
 # English-language and is included only to prove it is not competing here.
@@ -293,14 +295,15 @@ def report(doc: dict[str, Any], rows: list[dict[str, Any]],
     rej = [r for r in rows if r["reject"]]
     use = [r for r in rows if not r["reject"]]
 
-    print("# Farsi cruise demand — keywordchi, filtered\n")
-    print(f"Source: **{doc['source']}** · captured {doc['captured']} · "
-          f"seeds «{'» و «'.join(doc['seeds'])}»\n")
+    print("# Farsi cruise demand — filtered\n")
+    seeds = doc.get("seeds", [])
+    print(f"Source: **{doc.get('source', 'unknown')}**"
+          + (f" · captured {doc['captured']}" if doc.get("captured") else "")
+          + (f" · {len(seeds)} seeds" if seeds else "") + "\n")
     print("**This file carries no search volume and none is estimated here.** "
-          "keywordchi exports the query strings Google expands a seed into; "
-          "both workbooks contain zero numeric cells. A term below exists as a "
-          "query. Nothing in the source says how often it is typed, so nothing "
-          "below is ordered by popularity.\n")
+          + doc.get("note", "") + " A term below exists as a query. Nothing in "
+          "the source says how often it is typed, so nothing below is ordered "
+          "by popularity.\n")
 
     print(f"| | Terms |\n|---|---:|")
     print(f"| Unique after normalisation | {len(rows)} |")
