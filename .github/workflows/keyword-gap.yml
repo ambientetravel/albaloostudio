@@ -1,0 +1,84 @@
+# Albaloo Orchestration Pipeline — cruise keyword map.
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Reads what rivals target from their own titles, h1s and meta descriptions,
+# ranks by how many of them independently build pages around each phrase, and
+# puts our real Search Console position beside it.
+#
+# NO SEARCH VOLUME. Google Ads does not operate in Iran and no keyword tool is
+# wired in. This is competitor consensus, which is knowable, rather than demand,
+# which is not.
+
+name: Keyword gap — cruise segment
+
+on:
+  workflow_dispatch:
+    inputs:
+      rivals:
+        description: "Comma-separated competitor domains"
+        required: true
+        default: "nilfamtravel.com,gotosafar.com,eavar.com,flytoday.ir"
+        type: string
+      mine:
+        description: "Our properties to place against them"
+        required: false
+        default: "boutimar.ir,cruise24.ir,cruisebaz.com"
+        type: string
+      sample:
+        description: "Pages to read per rival"
+        required: false
+        default: "40"
+        type: string
+      top:
+        description: "How many terms to report"
+        required: false
+        default: "50"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  gap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Map the segment
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          STAMP=$(date -u +%Y-%m-%d)
+          python3 tools/keyword_gap.py \
+            --rivals "${{ inputs.rivals }}" \
+            --mine "${{ inputs.mine || 'boutimar.ir,cruise24.ir,cruisebaz.com' }}" \
+            --sample "${{ inputs.sample || '40' }}" \
+            --top "${{ inputs.top || '50' }}" \
+            --format md | tee "reports/keyword-gap-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
+          python3 tools/keyword_gap.py \
+            --rivals "${{ inputs.rivals }}" \
+            --mine "${{ inputs.mine || 'boutimar.ir,cruise24.ir,cruisebaz.com' }}" \
+            --sample "${{ inputs.sample || '40' }}" \
+            --top "${{ inputs.top || '50' }}" \
+            --format json > "reports/keyword-gap-$STAMP.json"
+      - name: Upload
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: keyword-gap
+          path: orchestrator/reports/
+          retention-days: 90
+          if-no-files-found: warn
