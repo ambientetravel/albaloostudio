@@ -59,8 +59,13 @@ BOOK = "https://book.cruise24.ir/"
 FA_DIGITS = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
 
 
-def fa(n) -> str:
-    return f"{n:,}".translate(FA_DIGITS)
+def fa(n, group: bool = True) -> str:
+    """Persian numerals. Grouped with «٬», the separator this site uses.
+
+    group=False for years — «۲٬۰۲۷» is not a year.
+    """
+    txt = f"{n:,}" if group else str(n)
+    return txt.translate(FA_DIGITS).replace(",", "\u066c")
 
 
 def esc(s) -> str:
@@ -70,6 +75,45 @@ def esc(s) -> str:
 def latin(s) -> str:
     """Latin runs inside Farsi prose break mid-word without this wrapper."""
     return f'<span class="latin">{esc(s)}</span>'
+
+
+# Months as book.cruise24.ir writes them. Copied from its MONTHS array rather
+# than translated, so a date on a generated page and the same date in the
+# booking engine read identically.
+MONTHS_FA = ["ژانویه", "فوریه", "مارس", "آوریل", "مه", "ژوئن",
+             "ژوئیه", "اوت", "سپتامبر", "اکتبر", "نوامبر", "دسامبر"]
+
+
+def money(n) -> str:
+    """A price the way this site writes prices.
+
+    The first fifteen pages emitted 342 strings like «۲۵۵ کروز ... 154 EUR» —
+    Persian numerals for counts sitting beside Latin numerals for money, in the
+    same sentence. On pages whose whole argument is "these are real figures
+    from the feed", the figures were the part that read machine-generated.
+
+    index.html already had the answer:
+        eur(n) = '<span dir="ltr">€' + num(n) + '</span>'
+    The dir="ltr" is load-bearing, not decoration. Without it the currency sign
+    floats to whichever side the surrounding Farsi run decides, and «۱۵۴€» is
+    not how a price is written in Farsi.
+    """
+    return f'<span dir="ltr">€{fa(int(n))}</span>'
+
+
+def date_fa(iso: str) -> str:
+    """«۱۵ مارس ۲۰۲۷», not «2027-03-15».
+
+    227 ISO dates shipped in visible prose. ISO is a machine format; it is not
+    how a date is written to a reader in Farsi, and book.cruise24.ir never
+    does it. Falls back to the raw string rather than guessing if the value is
+    not a date — a wrong date is worse than an ugly one.
+    """
+    try:
+        y, m, d = (int(x) for x in str(iso).split("-"))
+        return f"{fa(d, False)} {MONTHS_FA[m - 1]} {fa(y, False)}"
+    except Exception:
+        return esc(iso)
 
 
 def fetch_feed() -> list[dict]:
@@ -166,11 +210,11 @@ def sailing_card(s):
     v = _visa.classify(s.get("ports"))
     ports = [p for p in (s.get("ports") or [])
              if not any(m in p for m in _visa.SEA_DAY_MARKERS)]
-    price = (f'از {latin(str(s["priceFrom"]) + " EUR")} برای هر نفر'
+    price = (f'از {money(s["priceFrom"])} برای هر نفر'
              if s.get("priceFrom") else "قیمت را بپرسید")
     deps = s.get("dates") or []
     dep = (f'{fa(len(deps))} تاریخِ حرکت' if len(deps) > 1
-           else (deps[0] if deps else "—"))
+           else (date_fa(deps[0]) if deps else "—"))
     return f"""      <article class="card">
         <div class="card__body">
           <h3 class="h-sm">{esc(s.get('title') or s.get('ship'))}</h3>
@@ -248,11 +292,12 @@ def build_destination(feed, spec):
 
     facts = [f"{fa(len(rows))} کروزِ فعال در تقویمِ ما"]
     if deps:
-        facts.append(f"{fa(len(deps))} تاریخِ حرکت، از {deps[0]} تا {deps[-1]}")
+        facts.append(f"{fa(len(deps))} تاریخِ حرکت، از {date_fa(deps[0])} "
+                     f"تا {date_fa(deps[-1])}")
     if nights:
         facts.append(f"از {fa(min(nights))} تا {fa(max(nights))} شب")
     if lo:
-        facts.append(f"ارزان‌ترین نقطهٔ شروع: {latin(str(lo) + ' EUR')} برای هر نفر"
+        facts.append(f"ارزان‌ترین نقطهٔ شروع: {money(lo)} برای هر نفر"
                      f" (بر پایهٔ {fa(npriced)} کروزِ قیمت‌دار)")
     if ships:
         facts.append(f"{fa(len(ships))} کشتی، پرتکرارترین: "
@@ -302,9 +347,9 @@ def build_season(feed):
             count += len(d)
     lo, npriced = price_line(rows)
     facts = [f"{fa(len(rows))} کروز با {fa(count)} تاریخِ حرکت در بازهٔ "
-             f"{SEASON['start']} تا {SEASON['end']}"]
+             f"{date_fa(SEASON['start'])} تا {date_fa(SEASON['end'])}"]
     if lo:
-        facts.append(f"ارزان‌ترین نقطهٔ شروع: {latin(str(lo) + ' EUR')} برای هر نفر")
+        facts.append(f"ارزان‌ترین نقطهٔ شروع: {money(lo)} برای هر نفر")
     reg = Counter(s.get("region") for s in rows if s.get("region"))
     if reg:
         facts.append("مناطق: " + "، ".join(f"{esc(r)} ({fa(n)})"
@@ -324,7 +369,7 @@ def build_season(feed):
                 '      <div class="grid grid--3" style="margin-block-start:40px">\n'
                 + "\n".join(sailing_card(s) for s in show)
                 + "\n      </div>\n    </div>\n  </section>\n")
-    desc = (f"نوروز ۱۴۰۶ ({SEASON['start']} تا {SEASON['end']}): {len(rows)} کروز، "
+    desc = (f"نوروز ۱۴۰۶: {len(rows)} کروز، "
             f"{count} تاریخِ حرکتِ واقعی. وضعیتِ ویزا برای پاسپورتِ ایرانی.")[:158]
     return (SEASON["slug"],
             render(SEASON["slug"], f"{SEASON['h1']} | کروز۲۴", desc,
@@ -363,7 +408,7 @@ def build_kish(feed):
     <div class="wrap">
       <h2 class="h">پس نزدیک‌ترین کروزِ واقعی کجاست؟</h2>
       <p>خلیج فارس — با {fa(len(gulf))} کروزِ فعال که از بندرهای آن‌سویِ آب
-      حرکت می‌کنند{f'، از {latin(str(lo) + " EUR")} برای هر نفر' if lo else ''}.
+      حرکت می‌کنند{f'، از {money(lo)} برای هر نفر' if lo else ''}.
       این مسیرها <strong>ویزای آسان</strong> می‌خواهند، نه اینکه بدونِ ویزا
       باشند؛ هر جا «بدونِ ویزا» خوانده شوند، نادرست است.</p>
       <p><a class="btn" href="cruise-persian-gulf.html">کروزهای خلیج فارس</a></p>
@@ -411,11 +456,12 @@ def build_line(feed, line):
              f"کروزِ فعال در تقویمِ ما",
              f"{fa(len(ships))} کشتی"]
     if deps:
-        facts.append(f"{fa(len(deps))} تاریخِ حرکت، از {deps[0]} تا {deps[-1]}")
+        facts.append(f"{fa(len(deps))} تاریخِ حرکت، از {date_fa(deps[0])} "
+                     f"تا {date_fa(deps[-1])}")
     if nights:
         facts.append(f"از {fa(min(nights))} تا {fa(max(nights))} شب")
     if lo:
-        facts.append(f"ارزان‌ترین نقطهٔ شروع: {latin(str(lo) + ' EUR')} برای هر نفر")
+        facts.append(f"ارزان‌ترین نقطهٔ شروع: {money(lo)} برای هر نفر")
     if regions:
         facts.append("مناطق: " + "، ".join(f"{esc(r)} ({fa(n)})"
                                            for r, n in regions.most_common(8)))
@@ -437,7 +483,7 @@ def build_line(feed, line):
         rowsh.append(
             f"        <tr><td>{cell}</td><td>{fa(n)}</td>"
             f"<td>{fa(min(nl)) + '–' + fa(max(nl)) if nl else '—'}</td>"
-            f"<td>{latin(str(min(p)) + ' EUR') if p else '—'}</td>"
+            f"<td>{money(min(p)) if p else '—'}</td>"
             f"<td>{esc(reg.most_common(1)[0][0]) if reg else '—'}</td></tr>")
     body.append('  <section class="band">\n    <div class="wrap">\n'
                 f'      <h2 class="h">ناوگانِ {latin(line)} — {fa(len(ships))} کشتی</h2>\n'
@@ -478,16 +524,16 @@ def build_prices(feed):
         nl = [s.get("nights", 0) for s in sh if s.get("nights")]
         mid = p[len(p) // 2]
         rows.append(f"        <tr><td>{esc(region)}</td><td>{fa(len(sh))}</td>"
-                    f"<td>{latin(str(p[0]) + ' EUR')}</td>"
-                    f"<td>{latin(str(mid) + ' EUR')}</td>"
+                    f"<td>{money(p[0])}</td>"
+                    f"<td>{money(mid)}</td>"
                     f"<td>{fa(min(nl)) + '–' + fa(max(nl)) if nl else '—'}</td></tr>")
     allp = sorted(s["priceFrom"] for s in feed if s.get("priceFrom"))
     body = [f"""  <section class="band band--white">
     <div class="wrap">
       <h2 class="h-lg">قیمت‌ها، شمرده از تقویمِ زنده</h2>
       <p>{fa(len(allp))} کروز از {fa(len(feed))} کروزِ تقویمِ ما قیمتِ شروع دارند.
-      ارزان‌ترین {latin(str(allp[0]) + ' EUR')} و میانهٔ همهٔ آن‌ها
-      {latin(str(allp[len(allp) // 2]) + ' EUR')} برای هر نفر است.</p>
+      ارزان‌ترین {money(allp[0])} و میانهٔ همهٔ آن‌ها
+      {money(allp[len(allp) // 2])} برای هر نفر است.</p>
       <p>این عددها نقطهٔ شروع‌اند: ارزان‌ترین کابینِ موجود، دو نفر در کابین،
       به یورو، بدونِ سرویس‌شارژِ خطِ کروز. هیچ‌کدام تخمین نیستند.</p>
     </div>
