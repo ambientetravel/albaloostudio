@@ -12,10 +12,11 @@ Fifteen generated pages for cruise24.ir, built from the live sailing feed at
 
 ## Why, in one paragraph
 
-cruise24.ir had nine real pages and surfaced in Search Console for exactly one
-keyword. Five of the nine — `cruise-lines`, `msc`, `aroya`, `celestyal`,
-`explora` — were live but absent from `sitemap.xml`, so they could not be
-found. `/msc.html` carried 242 words while MSC is 3,237 of the 3,485 sailings.
+cruise24.ir surfaced in Search Console for exactly one keyword. `sitemap.xml`
+declared FOUR URLs while **38 pages were live and returning 200** — including
+23 ship pages reachable only from the line pages, which were themselves
+undeclared. Crawling from the homepage finds 12 of the 38, which is why the
+first count here said nine; every URL was later verified by request. `/msc.html` carried 242 words while MSC is 3,237 of the 3,485 sailings.
 Separately, a 769-term Farsi demand corpus lives in
 `orchestrator/data/cruise-demand-fa.json`, and 752 of those terms return
 nothing from any property we own.
@@ -39,7 +40,8 @@ absent everywhere, so there is nothing to fight over.
   `--check` verifies what is on disk still matches the feed.
 - `_visa.py` — visa truth per sailing, from its real ports.
 - `_chrome.py` — nav/footer/head lifted verbatim from the live site 26 Aug.
-- `public/` — 15 pages + `sitemap.xml` (20 URLs: 5 existing + 15 generated).
+- `public/` — 15 pages + `sitemap.xml` (**49 URLs**: 38 existing + 15 generated,
+  minus 4 line pages that appear in both).
 
 ## Rules the generator enforces, not suggests
 
@@ -67,8 +69,13 @@ absent everywhere, so there is nothing to fight over.
   worse than 15 linked ones.
 - **`cruise-prices.html` is 379 words** and `cruise-kish.html` is 202. Both are
   intentionally short but both are thin; prose would help.
-- **No ship-level pages yet.** 30 distinct ships, 21 brand-ship keyword terms.
-  The fleet table on each line page is the placeholder.
+- **Ship pages already exist — 23 of them**, and this was wrong in the first
+  version of this handoff. `msc-*.html` (19), `celestyal-*.html` (2) and
+  `explora-*.html` (3) are live, well-built, and reachable ONLY from the line
+  pages. They are not new work; they are orphans. The fleet tables this
+  generator writes now link into them.
+- **None of the 38 pre-existing pages has `rel=canonical`.** The 15 generated
+  ones do. Adding it to the hand-written pages is a cheap follow-up.
 
 ## Regenerating
 
