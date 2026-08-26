@@ -149,8 +149,18 @@ CLUSTERS: list[tuple[str, str, list[str]]] = [
      [r"140[4-9]", r"نوروز", r"عید", r"بهترین زمان", r"تابستان", r"زمستان"]),
     ("persian-gulf", "Persian Gulf and Iranian islands",
      [r"خلیج فارس", r"خلیج ", r"کیش", r"قشم", r"بندرعباس", r"بندر لنگه", r"جزایر جنوب"]),
+    # «یورو بیا» is NOT here, and that was a real error worth naming. It was
+    # classified as a rival brand and reported to the owner twice as evidence
+    # that "seven Iranian rivals have branded demand and you have none". It is
+    # a Persian transliteration of MSC EURIBIA — a ship, not a company. There
+    # are 242 Euribia sailings in the feed, 312 departures from €183, and
+    # cruise24.ir/msc-euribia.html has been live and in the sitemap since the
+    # 26 Aug deploy. The term is demand for our own product, misfiled as a
+    # threat. A browsing agent found it by looking the name up; a pattern list
+    # never could.
     ("competitor", "names a rival brand or the forum they are discussed on",
-     [r"فلای تودی", r"علی بابا", r"یورو بیا", r"نی نی سایت"]),
+     [r"فلای تودی", r"علی بابا", r"نی نی سایت", r"الی گشت", r"طاها ?گشت",
+      r"نیلفام", r"ژیوار", r"ایوار", r"eavar"]),
     ("what-country", "a single mass misconception — that «کشتی کروز» is one ship "
                      "belonging to one country",
      [r"برای کدام کشور", r"برای چه کشور", r"برای کجا", r"مال کجا", r"مال کدام",
@@ -173,7 +183,9 @@ CLUSTERS: list[tuple[str, str, list[str]]] = [
     ("brand-ship", "names a line or a named ship",
      [r"msc", r"ام اس سی", r"aroya", r"اروی", r"کاستا", r"رویال", r"پرنسس",
       r"ویرجین", r"نروژی", r"فانتاسیا", r"ورتوسا", r"سیمفونی", r"شگفتی دریاها",
-      r"نماد دریاها", r"رویای دریا", r"کارینا", r"رافائل", r"سانی"]),
+      r"نماد دریاها", r"رویای دریا", r"کارینا", r"رافائل", r"سانی",
+      # MSC Euribia, as Persian actually writes it. Four spellings in the wild.
+      r"یورو ?بیا", r"یوری ?بیا", r"یوریبیا", r"euribia"]),
     ("iran-supply", "asks whether Iran itself has cruise ships — it effectively "
                     "does not, and saying so plainly is the answer",
      [r"کشتی کروز ایران", r"کروز ایرانی", r"کروز در ایران", r"ساخت ایران",
