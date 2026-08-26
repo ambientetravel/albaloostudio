@@ -20,31 +20,57 @@
   "verified": "2026-08-26",
   "routes": [
     {
-      "properties": ["cruise24.ir", "cruise24.me", "book.cruise24.ir"],
+      "properties": [
+        "cruise24.ir",
+        "cruise24.me",
+        "book.cruise24.ir"
+      ],
       "title": "Cruise24.ir storefront build",
       "sessionId": "local_dd38a73a-fdf4-4ba3-8ac8-b9dab001294a",
       "confirmed_by_user": true,
-      "repo_paths": ["cruise24-ir/"]
+      "repo_paths": [
+        "cruise24-ir/"
+      ]
     },
     {
-      "properties": ["boutimar.com"],
+      "properties": [
+        "boutimar.com"
+      ],
       "title": "Boutimar.com",
       "sessionId": "local_db802ea1-ad69-48c0-a163-18629c35afa6",
       "confirmed_by_user": false,
       "note": "Title match only — confirm with Alireza before the first handoff.",
-      "repo_paths": ["boutimar-com/"]
+      "repo_paths": [
+        "boutimar-com/"
+      ]
     },
     {
-      "properties": ["exploreorient.com"],
+      "properties": [
+        "exploreorient.com"
+      ],
       "title": "Explore Orient site architecture",
       "sessionId": "local_1a53860e-66e6-4694-8e82-55f0b6f1b7c6",
       "confirmed_by_user": false,
       "note": "Title match only — confirm with Alireza before the first handoff.",
-      "repo_paths": ["exploreorient/"]
+      "repo_paths": [
+        "exploreorient/"
+      ]
+    },
+    {
+      "properties": [
+        "cruisebaz.com"
+      ],
+      "title": "cruisebaz.com SEO optimization",
+      "sessionId": "local_34615874-532e-49ab-975a-141247f99e19",
+      "confirmed_by_user": false,
+      "note": "Chosen over 'SEO audit for cruisebaz.com Farsi market' (3 Jul) as the more recent and more general of two candidates. Alireza directed the handoff but did not name the session — confirm which he means.",
+      "platform": "base44",
+      "repo_paths": [
+        "cruisebaz-seo/"
+      ]
     }
   ],
   "unrouted": [
-    "boutimar.ir — no session designated. Two candidates exist and neither is unambiguous: 'boutimar cruise' (pinned) and 'Boutimar Farsi destinations'. Ask before routing.",
-    "cruisebaz.com — 'cruisebaz.com SEO optimization' exists but is not pinned and last ran 7 Aug. Ask before routing."
+    "boutimar.ir — no session designated. Two candidates exist and neither is unambiguous: 'boutimar cruise' (pinned) and 'Boutimar Farsi destinations'. Ask before routing."
   ]
 }
