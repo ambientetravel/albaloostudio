@@ -36,6 +36,29 @@ if the agent wants to write prose. Every file MUST carry:
 }
 ```
 
+### Quotes and judgements are different things — keep them apart
+
+The first job here proved the split. Its verbatim quotes were accurate and
+independently confirmed; its *assessment* of what they meant was wrong. It read
+«نرخ بدون ویزا 950 دلار» sitting beside a higher price of $1070 as a competitor
+falsely advertising a visa-free trip, when it is a price line meaning "rate
+excluding visa" — and the higher tier is the one bundling the UAE visa service,
+which supports that reading rather than contradicting it.
+
+That is not a failure. Browsing and quoting is what this agent is for; judging
+Persian pricing idiom against a visa rule is not. So the contract separates them:
+
+* **`*_verbatim` fields are findings.** Quote exactly, name the URL each quote
+  came from, and never paraphrase a claim into something stronger.
+* **`*_assessment` fields are HYPOTHESES and must say so.** Every assessment
+  carries `"status": "unverified"` until a human or a second pass confirms it.
+  Nothing downstream may act on an unverified assessment, and no assessment may
+  be published, quoted publicly, or used to make a claim about a competitor.
+
+An accusation that a named company is misleading customers is the highest-cost
+thing that can be written here. It gets confirmed against the live page before
+it is called a finding, or it does not get called one.
+
 `sources_read` and `could_not_read` are not optional. A finding whose source
 cannot be named is not a finding, and a site the agent failed to reach must be
 declared rather than silently missing — the whole portfolio's tooling already
