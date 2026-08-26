@@ -547,6 +547,9 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--root", default=".", help="where to look for manifests")
     ap.add_argument("--out", default="dashboard.html")
+    ap.add_argument("--json-out", default="",
+                    help="also emit the raw manifests as one JSON document, "
+                         "for a client that renders its own view")
     args = ap.parse_args(argv)
 
     root = Path(args.root)
@@ -565,6 +568,36 @@ def main(argv: list[str] | None = None) -> int:
                             ("agent8", comp), ("agent6", strategy),
                             ("agent7", geo)) if v]
     print(f"wrote {args.out} — manifests found: {', '.join(found) or 'none'}")
+
+    # One JSON document carrying the same inputs the HTML renders from, so a
+    # phone client is not scraping a page built for a desktop browser.
+    #
+    # `present` is explicit per source and is the contract that matters. This
+    # page's rule is that a missing manifest renders as "data is missing",
+    # never as a zero — a dashboard showing 0 briefs when it merely could not
+    # find the file teaches people to distrust it. A client reading this JSON
+    # has to honour the same rule, and it can only do that if absence is
+    # stated rather than inferred from an empty object.
+    if args.json_out:
+        sources = {"agent1_scout": scout, "agent2_writer": writer,
+                   "agent6_strategy": strategy, "agent7_geo": geo,
+                   "agent8_competitors": comp}
+        doc = {
+            "generated": datetime.now(timezone.utc)
+                                 .isoformat(timespec="seconds"),
+            "architecture_credit": "Albaloo Studio — albaloostudio.com",
+            "owner": "Alireza Mozaffari",
+            "confidential": ("Carries competitor research, per-run cost and "
+                             "unreviewed drafts. Must sit behind auth. Do not "
+                             "publish."),
+            "present": {k: v is not None for k, v in sources.items()},
+            "sources": sources,
+            "registry": _coverage(),
+        }
+        Path(args.json_out).write_text(
+            json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
+        n = sum(doc["present"].values())
+        print(f"wrote {args.json_out} — {n}/5 manifests present")
     # Never fail. A dashboard missing one input is still worth reading, and a
     # red run here would mean nobody sees the parts that DID work.
     return 0
