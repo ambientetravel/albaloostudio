@@ -543,10 +543,36 @@ def render(scout: dict | None, writer: dict | None,
     return "\n".join(out)
 
 
+def _cap_lists(obj: Any, limit: int) -> Any:
+    """Trim every list to `limit`, recording what was dropped IN the data.
+
+    The full CI document is 266KB — a per-country geography breakdown with
+    per-country top queries — which is far past what anyone pastes into a
+    textarea. Trimming is fine; trimming SILENTLY is not. This page's whole
+    contract is that a number means what it says, so a shortened list carries
+    a marker saying it was shortened and by how much. A reader seeing five
+    countries must not conclude there were five.
+    """
+    if isinstance(obj, dict):
+        return {k: _cap_lists(v, limit) for k, v in obj.items()}
+    if isinstance(obj, list):
+        kept = [_cap_lists(v, limit) for v in obj[:limit]]
+        dropped = len(obj) - len(kept)
+        if dropped > 0:
+            kept.append({"_truncated": f"{dropped} more not shown "
+                                       f"(showing {len(kept)} of {len(obj)})"})
+        return kept
+    return obj
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--root", default=".", help="where to look for manifests")
     ap.add_argument("--out", default="dashboard.html")
+    ap.add_argument("--json-max-list", type=int, default=0,
+                    help="cap every list in --json-out at this many items, so "
+                         "the document stays small enough to paste by hand. "
+                         "0 means no cap.")
     ap.add_argument("--json-out", default="",
                     help="also emit the raw manifests as one JSON document, "
                          "for a client that renders its own view")
@@ -594,10 +620,14 @@ def main(argv: list[str] | None = None) -> int:
             "sources": sources,
             "registry": _coverage(),
         }
+        if args.json_max_list:
+            doc = _cap_lists(doc, args.json_max_list)
         Path(args.json_out).write_text(
             json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
         n = sum(doc["present"].values())
-        print(f"wrote {args.json_out} — {n}/5 manifests present")
+        size = Path(args.json_out).stat().st_size
+        print(f"wrote {args.json_out} — {n}/5 manifests present, "
+              f"{size:,} bytes")
     # Never fail. A dashboard missing one input is still worth reading, and a
     # red run here would mean nobody sees the parts that DID work.
     return 0
