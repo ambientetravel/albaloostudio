@@ -1,0 +1,207 @@
+{
+  "job": "competitor-browse",
+  "agent": "base44-superagent",
+  "generated_at": "2026-08-26T02:50:00Z",
+  "sources_read": [
+    "https://www.alibaba.ir/tour",
+    "https://www.alibaba.ir/mag/world-tourism/travel-by-cruise-ship/",
+    "https://www.alibaba.ir/mag/news/iranian-cruise-ship/",
+    "https://www.alibaba.ir/gtour/international/asia/pdp/gti0703-vietnam",
+    "https://www.alibaba.ir/gtour/norouz1404/asia/pdp/gti107-vietnam",
+    "https://www.alibaba.ir/mag/turkiye/antalya/antalya-water-entertainment/",
+    "https://www.alibaba.ir/mag/uae/dubai/fun-activities-in-palm-jumeirah/",
+    "https://adeliasafar.com/ship/%DA%A9%D8%B4%D8%AA%DB%8C-%DA%A9%D8%B1%D9%88%D8%B2-%DB%8C%D9%88%D8%B1%D9%88%D8%A8%DB%8C%D8%A7-msc-euribia",
+    "https://lastsecond.ir/blog/11185-persian-gulf-cruise-ship",
+    "https://karsansafar.com/cruise-ship-blog/"
+  ],
+  "could_not_read": [
+    {
+      "url": "یورو بیا / Eurobia — no dedicated website",
+      "reason": "«یورو بیا» is not a travel agency or website. It is the Persian transliteration of «Euribia» — specifically the MSC Euribia cruise ship. Multiple Persian spellings exist (یوروبیا، یوری بیا، یوریبیا), all referring to the same vessel. Evidence: adeliasafar.com uses the URL path /ship/کشتی-کروز-یوروبیا-msc-euribia; lastsecond.ir writes «انواع اتاق های کشتی کروز یوروبیا و ورلد یوروپا (Euribia & World Europa) از شرکت MSC»; karsansafar.com writes «یوروبیا از بندر رشید دبی حرکت می‌کند»; multiple Instagram posts write «کروز بزرگ MSC یوری بیا ساخت کشور ایتالیا که در ژوئن ۲۰۲۳ به آب انداخته شد». The branded search term «کشتی کروز یورو بیا» in the keyword data means «cruise ship Euribia» — Iranians searching for the MSC Euribia vessel by its Persian name, not for a company. No dedicated «یورو بیا» domain or travel agency website exists to browse."
+    }
+  ],
+  "findings": [
+    {
+      "site": "alibaba.ir",
+      "site_name": "علی‌بابا (Alibaba)",
+      "cruise_product_status": {
+        "is_genuine_product": false,
+        "evidence_verbatim": [
+          {
+            "url": "https://www.alibaba.ir/tour",
+            "quote": "خرید آنلاین بلیط هواپیما، قطار و اتوبوس",
+            "context": "H1 of the tour booking page — the page's own heading is about flights, trains, and buses, with no mention of cruises"
+          },
+          {
+            "url": "https://www.alibaba.ir/mag/world-tourism/travel-by-cruise-ship/",
+            "quote": "سلام ایا شما تور کشتی هم دارید هر چی‌گشتم‌پیدا نکردم",
+            "context": "User comment (حمید شیرازی, 10 months ago) on the cruise blog post, asking whether Alibaba has cruise tours and stating they could not find any"
+          },
+          {
+            "url": "https://www.alibaba.ir/gtour/international/asia/pdp/gti0703-vietnam",
+            "quote": "8 شب اقامت در هتل 4 ستاره و 1 شب اقامت در کشتی کروز",
+            "context": "Vietnam tour that includes 1 night on a cruise ship as part of a broader Vietnam itinerary — not a standalone cruise product"
+          },
+          {
+            "url": "https://www.alibaba.ir/gtour/norouz1404/asia/pdp/gti107-vietnam",
+            "quote": "هتل 4 و 5 ستاره و کروز 5 ستاره",
+            "context": "Norouz Vietnam tour listing — cruise is mentioned as one night of accommodation within a Vietnam tour, not as a bookable cruise product"
+          }
+        ],
+        "assessment": {
+          "status": "unverified",
+          "hypothesis": "Alibaba does not sell cruise as a product line. Cruise appears only as (a) informational blog/magazine content and (b) one night of accommodation within Vietnam tour packages. The tour booking page has no cruise category, and a user comment on the cruise blog post confirms a customer searched for cruise tours and could not find any. The tour page H1 mentions flights, trains, and buses but not cruises. Alibaba likely ranks for cruise-related search terms due to its authority as Iran's largest OTA, not because it has a cruise product."
+        }
+      },
+      "cruise_pages": [
+        {
+          "url": "https://www.alibaba.ir/mag/world-tourism/travel-by-cruise-ship/",
+          "page_type": "blog/magazine — informational, not bookable",
+          "title": "10 دليل برای سفر با كشتی کروز | مجله علی بابا",
+          "h1": "۱۰ دلیل برای سفر با کشتی کروز",
+          "meta_description": "امروزه صنعت گردشگری دريايي به‌سرعت رو به رشد است. چون این نوع سفر، ديگر محدوديت‌هايي گذشته را ندارد و پیشرفت زیادی کرده است. از سفرهای اكتشافي دسته‌جمعي به"
+        },
+        {
+          "url": "https://www.alibaba.ir/tour",
+          "page_type": "tour booking platform — no cruise category",
+          "title": "تور خارجی و داخلی - ‌تور های مسافرتی خارجی و داخلی - آژانس علی‌بابا",
+          "h1": "خرید آنلاین بلیط هواپیما، قطار و اتوبوس",
+          "meta_description": "رزرو تور لحظه آخری - تور خارجی و داخلی با پشتیبانی 24 ساعته، گارانتی بهترین قیمت تور مسافرتی و گردشگری در ایران با علی‌بابا"
+        },
+        {
+          "url": "https://www.alibaba.ir/mag/news/iranian-cruise-ship/",
+          "page_type": "blog/magazine — news article",
+          "title": "کشتی کروز ایران از جام جهانی قطر باز می‌ماند؟ | مجله علی بابا",
+          "h1": "کشتی کروز ایران از جام جهانی قطر باز می‌ماند؟",
+          "meta_description": "هرچند تا آغاز بازی‌های جام‌جهانی قطر حدودا دو هفته زمان باقی‌مانده است؛ اما متاسفانه کشتی مسافربری کروز که قرار بود حمل‌ونقل مسافران جام‌جهانی ۲۰۲۲ را انجام بدهد، هنوز آماده حرکت نیست."
+        },
+        {
+          "url": "https://www.alibaba.ir/gtour/international/asia/pdp/gti0703-vietnam",
+          "page_type": "tour product — Vietnam tour, includes 1 night on cruise",
+          "title": "تور ۱۱ روزه ویتنام",
+          "h1": "تور ۱۱ روزه ویتنام",
+          "meta_description": "not present in HTML source"
+        },
+        {
+          "url": "https://www.alibaba.ir/gtour/norouz1404/asia/pdp/gti107-vietnam",
+          "page_type": "tour product — Vietnam Norouz tour, includes 1 night on cruise",
+          "title": "تور ویتنام ویژه نوروز ۱۴۰۵",
+          "h1": "تور ویتنام ویژه نوروز ۱۴۰۵",
+          "meta_description": "تور 10 روزه - پرواز - هتل4 و 5 ستاره و کروز 5 ستاره"
+        },
+        {
+          "url": "https://www.alibaba.ir/mag/turkiye/antalya/antalya-water-entertainment/",
+          "page_type": "blog/magazine — destination guide, mentions cruise as water activity",
+          "title": "تفریحات آبی آنتالیا را پیش از سفر بشناسید | مجله علی بابا",
+          "h1": "تفریحات آبی آنتالیا؛ تفریح در آغوش آب‌های آرام",
+          "meta_description": "تفریحات آبی آنتالیا یکی از بهترین جاذبه ها و تجربه های این شهر هستند. غواصی فلای بورد پارک آبی پاراسل قایق سواری و... از این تفریحات هستند"
+        },
+        {
+          "url": "https://www.alibaba.ir/mag/uae/dubai/fun-activities-in-palm-jumeirah/",
+          "page_type": "blog/magazine — destination guide, mentions cruise as activity",
+          "title": "پالم جمیرا دبی؛ معرفی کامل، تفریحات و امکانات| مجله علی‌بابا",
+          "h1": "پالم جمیرا دبی؛ جایی که رویاها به حقیقت می‌پیوندند",
+          "meta_description": "پالم جمیرا، یکی از سه جزیره مصنوعی معروف به جزایر پالم در دبی است و به‌عنوان یکی از نمادهای مدرن این شهر شناخته می‌شود."
+        }
+      ],
+      "destinations": {
+        "sold_as_cruise_tours": "none — no standalone cruise tours found",
+        "mentioned_in_blog_content": [
+          "Mediterranean (blog post mentions «۱۰ مقصد جذاب مدیترانه‌ای» as a reading suggestion)",
+          "Alaska, Polynesia, Galapagos, Antarctica (blog post — general travel inspiration, not sold)",
+          "Vietnam (Halong Bay — 1 night on cruise as part of Vietnam tour package)",
+          "Türkiye/Antalya (blog post about water activities, mentions «تور کشتی‌های کروز بین تفریحات دریایی آنتالیا»)",
+          "Dubai/Persian Gulf (blog post about Palm Jumeirah, mentions «تور کشتی کروز: این تورها فرصتی عالی برای تجربه یک سفر آرام و لوکس در آب‌های خلیج فارس»)"
+        ]
+      },
+      "cruise_lines": {
+        "named_on_product_pages": "none — no cruise line named on any product page",
+        "named_in_blog_content": "none — the blog post about cruise travel does not name any specific cruise line"
+      },
+      "prices": {
+        "cruise_specific_prices": "none — no cruise prices published on any page",
+        "tour_prices_including_cruise": "not extracted — the Vietnam tour pages require date selection to show pricing; no price was visible on the page HTML"
+      },
+      "visa_claims_verbatim": [
+        {
+          "url": "https://www.alibaba.ir/mag/news/iranian-cruise-ship/",
+          "quote": "نخواستن ویزا، امکانات رفاهی و",
+          "context": "This appears in a news article about Iran as a destination for World Cup 2022 visitors, not about cruise visa requirements. The phrase is about Iran's general visa policy for tourists, not about cruise-specific visa claims."
+        }
+      ],
+      "visa_assessment": {
+        "status": "unverified",
+        "hypothesis": "Alibaba does not make any cruise-specific visa claims. The only visa mention found is in a news article about Iran as a World Cup destination, unrelated to cruise tours. No «بدون ویزا» claims were found on any cruise-related page."
+      },
+      "notes": "Alibaba.ir is Iran's largest OTA (online travel agency), primarily selling flights, trains, buses, hotels, and general tours. The tour booking page (alibaba.ir/tour) is a search-based system with categories for flights, trains, buses, hotels, and tours — there is no cruise category, filter, or search option. The page was also browsed via Browserbase (rendered screenshot) confirming no cruise category in the UI. All cruise-related content lives in the /mag/ (magazine) section as informational articles, not as bookable products."
+    },
+    {
+      "site": "یورو بیا / Eurobia — not a website",
+      "site_name": "N/A — this is a cruise ship name, not a company",
+      "finding": {
+        "identification_verbatim": [
+          {
+            "url": "https://adeliasafar.com/ship/%DA%A9%D8%B4%D8%AA%DB%8C-%DA%A9%D8%B1%D9%88%D8%B2-%DB%8C%D9%88%D8%B1%D9%88%D8%A8%DB%8C%D8%A7-msc-euribia",
+            "quote": "معرفی تور کشتی کروز یوریبیا (MSC Euribia Cruise)",
+            "context": "URL path contains «کشتی-کروز-یوروبیا-msc-euribia», and the page title equates «یوریبیا» with «MSC Euribia»"
+          },
+          {
+            "url": "https://lastsecond.ir/blog/11185-persian-gulf-cruise-ship",
+            "quote": "انواع اتاق های کشتی کروز یوروبیا و ورلد یوروپا (Euribia & World Europa) از شرکت MSC",
+            "context": "Explicitly equates «یوروبیا» with «Euribia» and names MSC as the company"
+          },
+          {
+            "url": "https://karsansafar.com/cruise-ship-blog/",
+            "quote": "یوروبیا از بندر رشید دبی حرکت می‌کند",
+            "context": "Describes the MSC Euribia ship departing from Dubai port"
+          },
+          {
+            "url": "https://www.instagram.com/p/DU1bNO-jec6/",
+            "quote": "کروز بزرگ MSC یوری بیا ساخت کشور ایتالیا که در ژوئن ۲۰۲۳ به آب انداخته شد",
+            "context": "Instagram post equating «یوری بیا» with MSC Euribia, built in Italy, launched June 2023"
+          },
+          {
+            "url": "https://www.instagram.com/reel/DQ391LekdjW/",
+            "quote": "کروز بزرگ MSC یوری بیا ساخت کشور ایتالیا که در ژوئن ۲۰۲۳ به آب انداخته شد",
+            "context": "Another Instagram post with the same identification"
+          }
+        ],
+        "assessment": {
+          "status": "unverified",
+          "hypothesis": "«یورو بیا» (also spelled یوروبیا، یوری بیا، یوریبیا) is the Persian transliteration of «Euribia» — the MSC Euribia cruise ship — not a travel agency or website. The branded keyword «کشتی کروز یورو بیا» means «cruise ship Euribia»: Iranians searching for the MSC Euribia vessel by its Persian name. Multiple third-party travel sites (adeliasafar.com, lastsecond.ir, karsansafar.com) and Instagram posts confirm this identification. There is no dedicated «یورو بیا» domain or company to browse. The search volume for this term likely reflects interest in the MSC Euribia ship specifically, which is relevant to cruise market analysis but does not represent a competitor company."
+        }
+      },
+      "persian_spellings_found": [
+        "یورو بیا",
+        "یوروبیا",
+        "یوری بیا",
+        "یوریبیا"
+      ],
+      "notes": "This finding was placed in could_not_read with a full explanation, as instructed. The identification is supported by 5 independent sources across 3 different website types (travel agency, hotel review site, Instagram). No travel agency named «یورو بیا» was found in any search. The user's keyword data shows «کشتی کروز یورو بیا» — this is a ship name search, not a company brand search."
+    }
+  ],
+  "summary": {
+    "sites_requested": 2,
+    "sites_browsed": 1,
+    "sites_not_found": 1,
+    "alibaba_cruise_product_assessment": {
+      "status": "unverified",
+      "hypothesis": "Cruise is NOT a genuine product at alibaba.ir. It is informational blog content with no bookable cruise product behind it. The strongest evidence is a user comment on the cruise blog post asking «سلام ایا شما تور کشتی هم دارید هر چی‌گشتم‌پیدا نکردم» (do you have cruise tours? I searched and couldn't find any), combined with the absence of any cruise category on the tour booking page. The only tour products that include cruise accommodation are Vietnam tours where 1 night is spent on a cruise ship as part of a broader Vietnam itinerary. Alibaba appears to rank for cruise-related keywords due to its domain authority as Iran's largest OTA, not because it sells cruise products.",
+      "evidence_count": 4,
+      "key_evidence_url": "https://www.alibaba.ir/mag/world-tourism/travel-by-cruise-ship/",
+      "key_evidence_quote": "سلام ایا شما تور کشتی هم دارید هر چی‌گشتم‌پیدا نکردم"
+    },
+    "eurobia_identification": {
+      "status": "unverified",
+      "hypothesis": "«یورو بیا» is the Persian name for the MSC Euribia cruise ship, not a travel agency. The branded search term «کشتی کروز یورو بیا» means Iranians are searching for the MSC Euribia vessel, not for a competitor company.",
+      "evidence_count": 5,
+      "supporting_sources": [
+        "adeliasafar.com/ship/.../کشتی-کروز-یوروبیا-msc-euribia",
+        "lastsecond.ir/blog/11185-persian-gulf-cruise-ship",
+        "karsansafar.com/cruise-ship-blog/",
+        "instagram.com/p/DU1bNO-jec6/",
+        "instagram.com/reel/DQ391LekdjW/"
+      ]
+    }
+  }
+}
