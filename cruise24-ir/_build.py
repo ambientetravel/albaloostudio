@@ -615,6 +615,12 @@ def build_prices(feed):
 EXISTING = [
     "index.html", "blog.html", "cruiseletter.html", "events.html",
     "cruise-lines.html",
+    # destinations.html was added to the site AFTER this list was enumerated
+    # on 26 Aug, and the live sitemap carried it while a regenerated one would
+    # not have. A hand-written page appearing between enumerations is normal;
+    # silently dropping it from the sitemap on the next build is not. Anything
+    # added here by hand needs adding to this list too.
+    "destinations.html",
     # line pages — also written by this generator, deduped in write_sitemap()
     "msc.html", "aroya.html", "celestyal.html", "explora.html",
     # ship pages, 23 of them, orphaned behind the line pages
