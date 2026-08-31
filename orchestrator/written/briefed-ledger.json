@@ -1,0 +1,87 @@
+{
+ "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
+ "cooldown_days": 45,
+ "updated_at": null,
+ "entries": [
+  {
+   "domain": "boutimar.com",
+   "query": "hanna boutique hotel",
+   "first_briefed": "2026-08-08T14:10:00Z",
+   "last_briefed": "2026-08-09T07:35:19Z",
+   "times_briefed": 4,
+   "target_url_path": "/hanna-boutique-hotel"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "iran oil show",
+   "first_briefed": "2026-08-08T14:10:00Z",
+   "last_briefed": "2026-08-09T07:35:18Z",
+   "times_briefed": 5,
+   "target_url_path": "/iran-oil-show"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "iranoilshow",
+   "first_briefed": "2026-08-08T14:10:00Z",
+   "last_briefed": "2026-08-09T07:35:19Z",
+   "times_briefed": 3,
+   "target_url_path": "/iranoilshow"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "joybar boutique hotel",
+   "first_briefed": "2026-08-08T14:10:00Z",
+   "last_briefed": "2026-08-09T07:35:19Z",
+   "times_briefed": 5,
+   "target_url_path": "/joybar-boutique-hotel"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "tehran boutique hotel",
+   "first_briefed": "2026-08-08T20:36:52Z",
+   "last_briefed": "2026-08-08T23:11:27Z",
+   "times_briefed": 2,
+   "target_url_path": "/hotels/tehran-boutique-hotels-guide/"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "toranj marine hotel",
+   "first_briefed": "2026-08-08T14:10:00Z",
+   "last_briefed": "2026-08-09T07:35:19Z",
+   "times_briefed": 4,
+   "target_url_path": "/toranj-marine-hotel"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "united arab emirates stag",
+   "first_briefed": "2026-08-08T14:10:03Z",
+   "last_briefed": "2026-08-09T07:35:21Z",
+   "times_briefed": 6,
+   "target_url_path": "/united-arab-emirates-stag"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "لانزاروته",
+   "first_briefed": "2026-08-08T14:10:02Z",
+   "last_briefed": "2026-08-11T19:34:22Z",
+   "times_briefed": 10,
+   "target_url_path": "/opportunity"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "کشتی aroya",
+   "first_briefed": "2026-08-08T14:10:02Z",
+   "last_briefed": "2026-08-11T19:34:22Z",
+   "times_briefed": 8,
+   "target_url_path": "/aroya"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "کشتی کروز aroya",
+   "first_briefed": "2026-08-08T14:10:02Z",
+   "last_briefed": "2026-08-09T07:35:20Z",
+   "times_briefed": 6,
+   "target_url_path": "/aroya"
+  }
+ ]
+}

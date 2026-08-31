@@ -77,7 +77,10 @@ __pycache__/
 # Agent 3 scheduler file-backend queue and Agent 3 batch output
 orchestrator/queue/
 orchestrator/broadcast/
-orchestrator/written/
+orchestrator/written/*
+# except the briefed-keyword ledger, which is state the pipeline must keep
+# across CI runs so Agent 1 stops re-proposing keywords it already briefed.
+!orchestrator/written/briefed-ledger.json
 
 # Agent 4 batch output — holds redacted customer messages
 orchestrator/closed/

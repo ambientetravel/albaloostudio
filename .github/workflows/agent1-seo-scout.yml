@@ -42,7 +42,9 @@ on:
         type: boolean
 
 permissions:
-  contents: read
+  # write, not read: the briefed-keyword ledger is committed back after a
+  # live run so the next scheduled run knows what has already been asked for.
+  contents: write
 
 concurrency:
   # Never let two scouts run at once — at-least-once delivery plus a second
@@ -226,6 +228,31 @@ jobs:
               print(f"::warning title=Degraded run::{deg} of {tot} briefs were built "
                     f"without the LLM step ({doms}). Cause: {why}")
           PY
+
+      - name: Commit the updated ledger
+        # Only on a real (non-dry) run on main, and only if the ledger actually
+        # changed. This is the state that stops the pipeline re-proposing the
+        # same ten keywords every week; it has to persist across runs, and an
+        # artifact would not survive into the next scheduled checkout.
+        if: >
+          success() &&
+          github.ref == 'refs/heads/main' &&
+          inputs.dry_run != true
+        run: |
+          set -euo pipefail
+          cd "${GITHUB_WORKSPACE}"
+          if git diff --quiet -- orchestrator/written/briefed-ledger.json; then
+            echo "ledger unchanged — nothing to commit"
+            exit 0
+          fi
+          git config user.name  "albaloo-agent1"
+          git config user.email "agent1@albaloostudio.com"
+          git add orchestrator/written/briefed-ledger.json
+          git commit -m "Agent 1: record briefed keywords (run ${GITHUB_RUN_ID})"
+          # Rebase onto any concurrent change rather than failing the run on a
+          # push race with another agent's commit.
+          git pull --rebase --autostash origin main || true
+          git push origin HEAD:main
 
       - name: Upload run artifact
         if: always()

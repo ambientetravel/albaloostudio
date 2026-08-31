@@ -39,6 +39,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 import compliance
+import _ledger
 import config
 from config import (
     ARCHITECTURE_CREDIT,
@@ -1477,6 +1478,7 @@ def process_site(
     webhook_url: str,
     callback_url: str,
     secret: str,
+    ledger: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     started = time.time()
     stat: dict[str, Any] = {
@@ -1489,6 +1491,9 @@ def process_site(
         # Pages that rank and are not in the sitemap. Nothing to write — the
         # words already exist and the site is simply not declaring them.
         "unlisted_pages": 0, "unlisted_impressions": 0, "unlisted_top": [],
+        # Candidates dropped because a brief for them is still inside the
+        # ledger cooldown — already asked for, not yet given time to rank.
+        "skipped_recent": 0, "skipped_queries": [],
     }
     try:
         gsc = collect_gsc(service, site)
@@ -1536,6 +1541,22 @@ def process_site(
         if not candidates:
             return stat
 
+        # Drop anything already briefed within the cooldown. This is what makes
+        # the run move to NEW gaps instead of re-proposing the same keywords it
+        # proposed last week — the loop that had «لانزاروته» briefed ten times.
+        if ledger is not None:
+            kept, skipped = _ledger.filter_candidates(candidates, ledger, site.domain)
+            stat["skipped_recent"] = len(skipped)
+            stat["skipped_queries"] = skipped[:20]
+            if skipped:
+                log.info("%s — %d candidate(s) skipped, still in cooldown: %s",
+                         site.domain, len(skipped), ", ".join(skipped[:5]))
+            candidates = kept
+            if not candidates:
+                stat["note"] = ("all gap candidates are within the briefing "
+                                "cooldown; nothing new to write this run")
+                return stat
+
         by_query = {c["query"]: c for c in candidates}
         analyses = (
             analyse_gaps(site, candidates, limit)
@@ -1566,6 +1587,9 @@ def process_site(
                 violations, payload["compliance"]["profile"]
             )
             stat["briefs_emitted"] += 1
+            if ledger is not None:
+                _ledger.record(ledger, site.domain, analysis["primary_keyword"],
+                               payload["brief"].get("target_url_path"))
             if analysis.get("_degraded"):
                 stat["degraded_briefs"] += 1
                 stat["degraded_reason"] = (stat.get("degraded_reason")
@@ -1689,6 +1713,13 @@ def main(argv: list[str] | None = None) -> int:
     session = requests.Session()
     stats: list[dict[str, Any]] = []
     started = utc_now()
+
+    # One ledger for the whole run. Loaded from the committed file so it
+    # survives across scheduled CI runs, updated in place as briefs are
+    # emitted, and written back once at the end. A dry run reads it — so the
+    # skip logic can be seen working — but does not write, because a dry run
+    # emitted nothing to remember.
+    ledger = _ledger.load()
     for site in sites:
         stats.append(
             process_site(
@@ -1699,8 +1730,13 @@ def main(argv: list[str] | None = None) -> int:
                 webhook_url=webhook_url,
                 callback_url=callback_url,
                 secret=secret,
+                ledger=ledger,
             )
         )
+    if not args.dry_run:
+        _ledger.save(ledger)
+        log.info("ledger updated — %d keyword(s) now recorded",
+                 len(ledger.get("entries", [])))
 
     manifest = {
         "run_id": run_id,
@@ -1715,7 +1751,7 @@ def main(argv: list[str] | None = None) -> int:
         "totals": {
             key: sum(s.get(key, 0) for s in stats)
             for key in ("gsc_rows", "candidates", "briefs_emitted", "delivered",
-                        "dlq", "blocked", "degraded_briefs",
+                        "dlq", "blocked", "degraded_briefs", "skipped_recent",
                         "unlisted_pages", "unlisted_impressions")
         },
         "usage": _usage_summary(),
