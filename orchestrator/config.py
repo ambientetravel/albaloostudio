@@ -144,6 +144,13 @@ def terminal_provider_error(msg: str) -> str:
 # easier of the two jobs. Putting the nightly scout on the free tier and keeping
 # the paid key for the agents that run occasionally is the right way round.
 GAP_ANALYSIS_PROVIDER = os.getenv("GAP_ANALYSIS_PROVIDER", "gemini").lower()
+# When the primary provider hard-fails for the whole account — a credit-empty
+# 400 from Anthropic, a project-denied 403 from Gemini — Agent 1 tries this one
+# before dropping to the mechanical builder. Set to "" to disable the fallback
+# and keep the old behaviour (primary, then mechanical). On 1 Sep 2026 the
+# primary was anthropic with an empty balance, and every brief came out
+# mechanical because nothing caught the primary and tried a second model.
+GAP_ANALYSIS_FALLBACK = os.getenv("GAP_ANALYSIS_FALLBACK", "gemini").lower()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 # Flash, not Pro, and the reason is not preference. Gemini 2.5 Pro is not on
 # the free tier at all: the API answers a request for it with 429 and

@@ -728,29 +728,60 @@ def analyse_gaps(
     if not candidates:
         return []
 
-    # Checked before the provider-down gate so that the ceiling is recorded as
-    # the reason rather than whatever the next call happens to fail with. Sets
-    # _PROVIDER_DOWN so every remaining property takes the same path and the
-    # cause is stated once — the run does not fail, it stops spending.
-    if not _PROVIDER_DOWN.get("reason"):
+    # The budget ceiling is GLOBAL — it halts every provider, because it is
+    # about spend, not about one account being down. Recorded once so the
+    # summary names the ceiling and not the next call's error.
+    if not _PROVIDER_DOWN.get("__budget__"):
         halt = config.over_budget(_usage_summary()["estimated_cost_usd"])
         if halt:
-            _PROVIDER_DOWN["reason"] = halt
+            _PROVIDER_DOWN["__budget__"] = halt
             log.error("BUDGET: %s", halt)
-
-    if _PROVIDER_DOWN.get("reason"):
-        # Already established, on an earlier site, that this account cannot call
-        # the model at all. Asking again produces the same 400 and a second
-        # identical line in the summary.
-        return [_fallback_brief(site, c, _PROVIDER_DOWN["reason"])
+    if _PROVIDER_DOWN.get("__budget__"):
+        return [_fallback_brief(site, c, _PROVIDER_DOWN["__budget__"])
                 for c in candidates[:limit]]
 
-    if config.GAP_ANALYSIS_PROVIDER == "gemini":
+    # Provider chain: primary, then the configured fallback, then the
+    # deterministic builder. Before this, GAP_ANALYSIS_PROVIDER picked exactly
+    # one model and any failure dropped straight to the mechanical stub — so on
+    # 1 Sep an empty Anthropic balance turned every brief mechanical while a
+    # working Gemini sat unused. Now a hard failure of the primary hands off to
+    # the fallback, and only if BOTH are down does the mechanical builder run.
+    #
+    # A provider marked down on an earlier site is skipped, not retried: the
+    # credit-400 or project-403 does not change within a run.
+    chain: list[str] = [config.GAP_ANALYSIS_PROVIDER]
+    if config.GAP_ANALYSIS_FALLBACK and config.GAP_ANALYSIS_FALLBACK not in chain:
+        chain.append(config.GAP_ANALYSIS_FALLBACK)
+
+    last: list[dict[str, Any]] | None = None
+    for provider in chain:
+        if provider in _PROVIDER_DOWN:
+            continue
+        result = _run_provider(provider, site, candidates, limit)
+        # An all-degraded result means the provider fell to its own mechanical
+        # stub. Try the next provider instead of accepting it, but keep it as
+        # `last` in case the whole chain is exhausted.
+        if result and not all(b.get("_degraded") for b in result):
+            if provider != chain[0]:
+                log.warning("%s — primary provider unusable; %s wrote the briefs",
+                            site.domain, provider)
+            return result
+        last = result
+
+    if last is not None:
+        return last
+    reason = "; ".join(f"{p}: {_PROVIDER_DOWN.get(p, 'down')}" for p in chain) \
+             or "no analysis provider available"
+    return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
+
+
+def _run_provider(provider: str, site: Site, candidates: list[dict[str, Any]],
+                  limit: int) -> list[dict[str, Any]]:
+    """Dispatch one provider, with Gemini's free-tier pacing applied here."""
+    if provider == "gemini":
         # Free-tier limits are per minute and the scout fires one call per
-        # property with nothing in between. Run #14 answered two properties and
-        # 429'd the next two. A few seconds of spacing costs a run that already
-        # takes minutes almost nothing, and is cheaper than burning two of the
-        # three retries per site to discover the same ceiling.
+        # property with nothing in between. A few seconds of spacing is cheaper
+        # than burning retries rediscovering the same 429.
         if _GEMINI_LAST_CALL["at"]:
             gap = config.GEMINI_MIN_INTERVAL_S - (time.time() - _GEMINI_LAST_CALL["at"])
             if gap > 0:
@@ -758,14 +789,23 @@ def analyse_gaps(
                 time.sleep(gap)
         _GEMINI_LAST_CALL["at"] = time.time()
         return _analyse_with_gemini(site, candidates, limit)
-
-    if config.GAP_ANALYSIS_PROVIDER == "anthropic":
+    if provider == "anthropic":
         return _analyse_with_anthropic(site, candidates, limit)
+    if provider == "openai":
+        return _analyse_with_openai(site, candidates, limit)
+    log.error("%s — unknown analysis provider %r; using deterministic fallback",
+              site.domain, provider)
+    return [_fallback_brief(site, c, f"unknown provider {provider!r}")
+            for c in candidates[:limit]]
 
+
+def _analyse_with_openai(site: Site, candidates: list[dict[str, Any]],
+                         limit: int) -> list[dict[str, Any]]:
+    """Same contract as the Gemini and Anthropic paths, same schema, same
+    fallback on failure."""
     # Import and client construction sit inside the guarded path on purpose. A
     # missing `openai` package or an unset key is precisely the "provider
-    # unavailable" case the fallback exists for — letting either crash the run
-    # would lose every other domain's work too.
+    # unavailable" case the fallback exists for.
     try:
         from openai import OpenAI
 
@@ -811,7 +851,7 @@ def analyse_gaps(
         log.error("%s — OpenAI step failed (%s); using deterministic fallback", site.domain, exc)
         reason = f"OpenAI call failed: {exc}"
         if config.terminal_provider_error(str(exc)):
-            _PROVIDER_DOWN["reason"] = reason
+            _PROVIDER_DOWN["openai"] = reason
             log.error("This is an account-level failure — skipping the model for "
                       "every remaining site rather than repeating the same call.")
         return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
@@ -932,7 +972,7 @@ def _analyse_with_gemini(
               site.domain, last_error)
     reason = f"Gemini call failed: {last_error}"
     if config.terminal_provider_error(str(last_error)):
-        _PROVIDER_DOWN["reason"] = reason
+        _PROVIDER_DOWN["gemini"] = reason
         log.error("This is an account-level failure — skipping the model for "
                   "every remaining site rather than repeating the same call.")
     return [_fallback_brief(site, c, reason) for c in candidates[:limit]]
@@ -1077,7 +1117,7 @@ def _analyse_with_anthropic(
                   site.domain, exc)
         reason = f"Claude call failed: {exc}"
         if config.terminal_provider_error(str(exc)):
-            _PROVIDER_DOWN["reason"] = reason
+            _PROVIDER_DOWN["anthropic"] = reason
             log.error("This is an account-level failure — skipping the model for "
                       "every remaining site rather than repeating the same call.")
         return [_fallback_brief(site, c, reason) for c in candidates[:limit]]

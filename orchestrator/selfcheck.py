@@ -254,9 +254,15 @@ ok("and Gemini defaults to a model the free tier actually allows",
    config.GEMINI_MODEL)
 ok("the scout has a real Gemini path, not just a config value",
    "def _analyse_with_gemini" in _a1src and "def _gemini_generate" in _a1src)
-ok("all three providers stay reachable by env var",
-   all(f'GAP_ANALYSIS_PROVIDER == "{p}"' in _a1src for p in ("gemini", "anthropic")),
+ok("all three providers stay reachable through the dispatcher",
+   all(f'provider == "{p}"' in _a1src for p in ("gemini", "anthropic", "openai")),
    "topping the balance up is a repository variable, not an edit")
+ok("a primary failure falls back to a second model, not straight to mechanical",
+   "config.GAP_ANALYSIS_FALLBACK" in _a1src
+   and "GAP_ANALYSIS_FALLBACK = os.getenv" in open("config.py", encoding="utf-8").read(),
+   "an empty Anthropic balance must hand off to Gemini before the stub")
+ok("a provider already known down is skipped, not retried",
+   "if provider in _PROVIDER_DOWN" in _a1src)
 # Agent 2 drafts prose at 0.85; ranking the same candidates twice should not
 # produce two different rankings.
 ok("analysis samples tighter than drafting does",
@@ -378,8 +384,8 @@ ok("a timeout is NOT — the next site may well succeed",
    not config.terminal_provider_error("Request timed out after 60s"))
 ok("nor is a 503",
    not config.terminal_provider_error("503 service unavailable"))
-ok("and once it is known, the model is skipped for every remaining site",
-   '_PROVIDER_DOWN.get("reason")' in _a1src)
+ok("and once it is known, the budget ceiling halts every remaining site",
+   '_PROVIDER_DOWN.get("__budget__")' in _a1src)
 ok("the run summary collapses one cause repeated per domain",
    'r.split("\'request_id\'")[0]' in _wf1,
    "four request_ids made one exhausted balance look like four faults")
