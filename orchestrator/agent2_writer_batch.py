@@ -60,6 +60,7 @@ from agent2_writer_listener import (
     ContentBrief,
     TransientUpstreamError,
     _call_gemini,
+    _generate_draft,
     _resolve_data_dependencies,
     build_publishing_event,
     push_to_cms,
@@ -215,7 +216,7 @@ def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
         # Resolved ONCE and reused. The gate must judge against the same data
         # snapshot the model saw, or it is checking a different article.
         data = _resolve_data_dependencies(brief)
-        draft, gen_meta = _stub_draft(brief) if no_llm else _call_gemini(brief, data)
+        draft, gen_meta = _stub_draft(brief) if no_llm else _generate_draft(brief, data)
         # Captured here rather than after the compliance gate: a draft that is
         # blocked downstream was still generated and still billed.
         oc.model = gen_meta.get("model", "") or ""

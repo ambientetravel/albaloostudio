@@ -661,6 +661,10 @@ _wf3 = (pathlib.Path(__file__).resolve().parents[1]
         / ".github" / "workflows" / "agent3-broadcaster.yml").read_text(encoding="utf-8")
 _wf5 = (pathlib.Path(__file__).resolve().parents[1]
         / ".github" / "workflows" / "agent5-site-audit.yml").read_text(encoding="utf-8")
+ok("the batch runner drafts through the provider chain, not bare Gemini",
+   "_generate_draft(brief, data)" in open("agent2_writer_batch.py", encoding="utf-8").read()
+   and "else _call_gemini(brief, data)" not in open("agent2_writer_batch.py", encoding="utf-8").read(),
+   "the workflow runs the BATCH; wiring only the listener does nothing")
 ok("Agent 2 can actually write on Anthropic, not just name it in a config",
    "_call_anthropic" in _a2lsrc and "_generate_draft" in _a2lsrc
    and "PROSE_MODEL" in open("config.py", encoding="utf-8").read(),
