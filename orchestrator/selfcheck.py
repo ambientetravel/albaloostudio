@@ -79,19 +79,19 @@ ok("defaults merged into each site", all(s.min_impressions == 5 for s in sites
 # exactly how the `?e=` bug shipped in August.
 _wf = (pathlib.Path(__file__).resolve().parents[1]
        / ".github" / "workflows" / "agent1-seo-scout.yml").read_text(encoding="utf-8")
-ok("the cron degrades to brief-only when Agent 2 has no endpoint",
-   'if [ -z "$AGENT2_WEBHOOK_URL" ]' in _wf,
-   "a scheduled run with no delivery target must still scout, not fail")
+ok("a run with no webhook still hands off via the artifact, not by failing",
+   'if [ -z "$AGENT2_WEBHOOK_URL" ]' in _wf and "$ARGS --dry-run\n          fi" not in _wf,
+   "the artifact is the handoff; a missing webhook must not force dry-run")
 ok("the guard does not override an explicit dry-run request",
    'inputs.dry_run }}" != "true"' in _wf)
 ok("AGENT2_WEBHOOK_URL is passed to the scout step",
    "AGENT2_WEBHOOK_URL: ${{ secrets.AGENT2_WEBHOOK_URL }}" in _wf,
    "the guard tests an env var that must actually be populated")
 _scout_src = pathlib.Path(__file__).with_name("agent1_seo_scout.py").read_text(encoding="utf-8")
-_tail = _scout_src.split('require_env("AGENT2_WEBHOOK_URL")', 1)[1][:600]
-ok("a missing delivery endpoint is exit 2, not a traceback",
-   "except ConfigError" in _tail and "return 2" in _tail,
-   "exit 1 reads as 'a brief was dead-lettered' and misdirects the search")
+ok("a missing delivery endpoint is optional, not fatal — the artifact is the handoff",
+   'optional_env("AGENT2_WEBHOOK_URL")' in _scout_src
+   and 'require_env("AGENT2_WEBHOOK_URL")' not in _scout_src,
+   "the signed-webhook path was retired; a live run must not exit 2 on its absence")
 ok("boutimar.com overrides the impression floor",
    next(s.min_impressions for s in sites if s.domain == "boutimar.com") == 20)
 ok("domain filter works", len(config.load_sites(only=["boutimar.ir"])) == 1)

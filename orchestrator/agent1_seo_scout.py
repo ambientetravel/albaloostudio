@@ -1681,12 +1681,18 @@ def process_site(
                 )
                 continue
 
-            ok, reason = deliver(session, webhook_url, payload, secret)
-            if ok:
+            if not webhook_url:
+                # No webhook configured: the brief is already written under
+                # run_dir/briefs/ above, and that artifact is what Agent 2
+                # reads. Nothing to POST, nothing to dead-letter.
                 stat["delivered"] += 1
             else:
-                stat["dlq"] += 1
-                write_dead_letter(run_dir, payload, reason)
+                ok, reason = deliver(session, webhook_url, payload, secret)
+                if ok:
+                    stat["delivered"] += 1
+                else:
+                    stat["dlq"] += 1
+                    write_dead_letter(run_dir, payload, reason)
 
     except PermissionError as exc:
         # A property nobody has granted yet is a configuration gap, not a run
@@ -1765,21 +1771,15 @@ def main(argv: list[str] | None = None) -> int:
     run_dir.mkdir(parents=True, exist_ok=True)
     log.info("run %s — %d site(s) — credit: %s", run_id, len(sites), ARCHITECTURE_CREDIT)
 
-    # A delivering run needs somewhere to deliver and something to sign with.
-    # Missing either is an environment problem, not a run failure — exit 2, with
-    # the name of the thing to set. It used to escape as a raw traceback and
-    # exit 1, which reads as "a brief was dead-lettered" and sends the wrong
-    # person looking in the wrong place.
-    try:
-        webhook_url = "" if args.dry_run else config.require_env("AGENT2_WEBHOOK_URL")
-        secret = "" if args.dry_run else config.require_env("WEBHOOK_SIGNING_SECRET")
-    except ConfigError as exc:
-        log.error("%s", exc)
-        log.error(
-            "A live run delivers to Agent 2. Until that endpoint exists, run with "
-            "--dry-run: the briefs are still built and archived under runs/."
-        )
-        return 2
+    # Delivery is now the briefs ARTIFACT, not a webhook. Agent 2 chains off
+    # this workflow via workflow_run and reads run_dir/briefs/ directly. The
+    # signed-webhook path was retired on 9 Aug 2026, and until now a live run
+    # still hard-required the AGENT2 webhook secret and exited 2 on its absence
+    # the redesign had deleted — so the pipeline could only ever run --dry-run.
+    # Both are optional: if a webhook IS configured the POST still fires, and
+    # if it is not, the artifact stands on its own.
+    webhook_url = config.optional_env("AGENT2_WEBHOOK_URL")
+    secret = config.optional_env("WEBHOOK_SIGNING_SECRET")
     callback_url = config.optional_env("AGENT3_WEBHOOK_URL")
 
     session = requests.Session()

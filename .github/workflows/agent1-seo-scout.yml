@@ -124,8 +124,7 @@ jobs:
           # consumer; when it is unset, which is the normal state, the scout
           # skips the POST rather than failing on a missing secret.
           if [ -z "$AGENT2_WEBHOOK_URL" ] && [ "${{ inputs.dry_run }}" != "true" ]; then
-            echo "::notice title=Briefs hand off via artifact::No external webhook configured. Briefs are archived as seo-scout-run and Agent 2 picks them up on workflow_run — this is the designed path, not a gap."
-            ARGS="$ARGS --dry-run"
+            echo "::notice title=Briefs hand off via artifact::No external webhook configured. Briefs are archived as seo-scout-run and Agent 2 picks them up on workflow_run — this is the designed path, not a gap. Running LIVE (briefs built, ledger saved); only the obsolete POST is skipped."
           fi
 
           python agent1_seo_scout.py $ARGS
