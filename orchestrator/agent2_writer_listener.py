@@ -638,6 +638,121 @@ def _gemini_once(system: str, prompt: str) -> tuple[str, Any]:
     return (resp.text or "").strip(), getattr(resp, "usage_metadata", None)
 
 
+# Draft shape, shared by both providers. Anthropic enforces it as a JSON
+# schema; Gemini gets it through the system prompt and response_mime_type.
+_DRAFT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "title": {"type": "string"},
+        "meta_description": {"type": "string"},
+        "body_markdown": {"type": "string"},
+        "key_points": {"type": "array", "items": {"type": "string"}},
+        "quotable_lines": {"type": "array", "items": {"type": "string"}},
+        "faq": {"type": "array", "items": {
+            "type": "object",
+            "properties": {"q": {"type": "string"}, "a": {"type": "string"}},
+            "required": ["q", "a"]}},
+        "internal_link_suggestions": {"type": "array", "items": {
+            "type": "object",
+            "properties": {"path": {"type": "string"}, "anchor": {"type": "string"}},
+            "required": ["path", "anchor"]}},
+    },
+    "required": ["title", "meta_description", "body_markdown"],
+}
+
+
+def _call_anthropic(
+    brief: ContentBrief, data: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Write the draft on Anthropic. Same (draft, meta) contract as _call_gemini.
+
+    Exists because PROSE_PROVIDER=anthropic was set months ago but Agent 2 had
+    only a Gemini path, so the setting did nothing and every article waited on
+    Gemini's free tier — which on 1 Sep 2026 answered 429 RESOURCE_EXHAUSTED on
+    all three attempts and wrote nothing, while a funded Anthropic balance sat
+    unused. Now the writer can spend the money that is actually there.
+    """
+    from anthropic import Anthropic
+
+    client = Anthropic(api_key=config.require_env("ANTHROPIC_API_KEY"))
+    started = time.time()
+    system = _system_instruction(brief)
+    prompt = _user_prompt(brief, data)
+
+    kwargs: dict[str, Any] = {
+        "model": config.PROSE_MODEL,
+        "max_tokens": 12000,
+        "system": system,
+        "messages": [{"role": "user", "content": prompt}],
+        "output_config": {
+            "effort": config.ANTHROPIC_EFFORT,
+            "format": {"type": "json_schema", "schema": _DRAFT_SCHEMA},
+        },
+    }
+    if config.ANTHROPIC_FALLBACKS.lower() not in {"", "off", "false", "0"}:
+        kwargs["betas"] = [config.ANTHROPIC_FALLBACK_BETA]
+        kwargs["fallbacks"] = config.ANTHROPIC_FALLBACKS
+        create = client.beta.messages.create
+    else:
+        create = client.messages.create
+
+    try:
+        resp = create(**kwargs)
+    except Exception as beta_exc:
+        # Newer models reject the server-side-fallback beta with a 400; the
+        # feature is optional, writing is not. Retry once on the plain endpoint.
+        if "fallbacks" in str(beta_exc).lower() and "betas" in kwargs:
+            log.warning("%s rejects the fallbacks beta; retrying without it",
+                        config.PROSE_MODEL)
+            kwargs.pop("betas", None)
+            kwargs.pop("fallbacks", None)
+            resp = client.messages.create(**kwargs)
+        else:
+            raise
+
+    if getattr(resp, "stop_reason", None) == "refusal":
+        raise RuntimeError("draft declined by safety classifiers")
+    text = "".join(b.text for b in resp.content
+                   if getattr(b, "type", "") == "text").strip()
+    draft = json.loads(text)
+    if not draft.get("body_markdown"):
+        raise ValueError("model returned no body_markdown")
+    usage = getattr(resp, "usage", None)
+    meta = {
+        "provider": "anthropic",
+        "model": getattr(resp, "model", config.PROSE_MODEL),
+        "input_tokens": getattr(usage, "input_tokens", None),
+        "output_tokens": getattr(usage, "output_tokens", None),
+        "attempts": 1,
+        "duration_ms": int((time.time() - started) * 1000),
+    }
+    return draft, meta
+
+
+def _generate_draft(
+    brief: ContentBrief, data: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Write the draft through the provider chain: PROSE_PROVIDER first, then
+    the other model, then give up. One empty balance or exhausted quota must
+    not stall the writer when the other provider can answer.
+    """
+    providers = [config.PROSE_PROVIDER]
+    other = "gemini" if config.PROSE_PROVIDER == "anthropic" else "anthropic"
+    providers.append(other)
+
+    last: Exception | None = None
+    for prov in providers:
+        try:
+            if prov == "anthropic":
+                return _call_anthropic(brief, data)
+            return _call_gemini(brief, data)
+        except Exception as exc:
+            last = exc
+            log.warning("prose provider %s failed (%s); trying next",
+                        prov, str(exc)[:120])
+    raise RuntimeError(f"all prose providers failed; last: {last}")
+
+
 def _call_gemini(
     brief: ContentBrief, data: dict[str, Any]
 ) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -1416,7 +1531,7 @@ def run_writing_job(brief: ContentBrief, raw_payload: dict[str, Any]) -> None:
         # the compliance context, or the gate would judge against different data
         # than the model saw.
         data = _resolve_data_dependencies(brief)
-        draft, gen_meta = _call_gemini(brief, data)
+        draft, gen_meta = _generate_draft(brief, data)
 
         # The compliance gate on the OUTPUT. The prompt already carried these
         # rules; this is the half that is enforcement rather than instruction.

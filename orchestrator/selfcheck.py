@@ -136,8 +136,9 @@ ok("Agent 2 is chained off Agent 1, not woken by a webhook",
 ok("it does not run when the scout failed",
    "workflow_run.conclusion == 'success'" in _wf2,
    "a failed scout emits no briefs; running anyway reports an empty success")
-ok("it degrades to --no-llm instead of failing on a missing key",
-   'if [ "${{ inputs.no_llm }}" = "true" ] || [ -z "${GEMINI_API_KEY:-}" ]' in _wf2)
+ok("it degrades to --no-llm only when NEITHER model key is present",
+   '[ -z "${GEMINI_API_KEY:-}" ] && [ -z "${ANTHROPIC_API_KEY:-}" ]' in _wf2,
+   "an empty Gemini key alone must not force structural mode when Anthropic is funded")
 ok("AGENT2_WEBHOOK_URL is no longer a secret this workflow consumes",
    "secrets.AGENT2_WEBHOOK_URL" not in _wf2,
    "the secret whose absence killed the nightly cron is not part of the new path")
@@ -660,6 +661,14 @@ _wf3 = (pathlib.Path(__file__).resolve().parents[1]
         / ".github" / "workflows" / "agent3-broadcaster.yml").read_text(encoding="utf-8")
 _wf5 = (pathlib.Path(__file__).resolve().parents[1]
         / ".github" / "workflows" / "agent5-site-audit.yml").read_text(encoding="utf-8")
+ok("Agent 2 can actually write on Anthropic, not just name it in a config",
+   "_call_anthropic" in _a2lsrc and "_generate_draft" in _a2lsrc
+   and "PROSE_MODEL" in open("config.py", encoding="utf-8").read(),
+   "PROSE_PROVIDER=anthropic did nothing while the writer was Gemini-only")
+ok("Agent 2's workflow passes the Anthropic key and prose provider",
+   "ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}" in _wf2
+   and "PROSE_PROVIDER:" in _wf2,
+   "the anthropic path cannot authenticate without the key in its env")
 ok("prose has a provider setting, and it is not the unfunded one",
    config.PROSE_PROVIDER == "gemini" or "PROSE_PROVIDER" in os.environ,
    config.PROSE_PROVIDER)
@@ -2589,11 +2598,10 @@ for _py in sorted(pathlib.Path(".").glob("*.py")):
 ok("no loop binds a variable named like a credential",
    not _shadowed, "; ".join(_shadowed[:4]))
 # And specifically the line that caused it, so the fix cannot be reverted quietly.
-_a2l_src = pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8")
 ok("the frontmatter renderer uses `placeholder`, not `token`",
-   "for placeholder, repl in fields.items()" in _a2l_src)
+   "for placeholder, repl in fields.items()" in _a2lsrc)
 ok("and `token` is never rebound after the credential is read",
-   "for token, repl in fields.items()" not in _a2l_src)
+   "for token, repl in fields.items()" not in _a2lsrc)
 
 print("\n=== 'drafted' is not the same as 'published' ===")
 # Run #25, 14 Aug 2026: "2 drafted · 0 blocked · 0 deferred · 0 failed", zero

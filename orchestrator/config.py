@@ -317,6 +317,10 @@ ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-5")
 #     Haiku 4.5  $1/$5            →  ~$0.26
 #     Gemini flash (free tier)    →   $0.00   ← the current default
 GAP_ANALYSIS_MODEL = os.getenv("GAP_ANALYSIS_MODEL", "claude-sonnet-5")
+# The Anthropic model Agent 2 drafts prose with when PROSE_PROVIDER=anthropic.
+# Same default as gap analysis; prose is longer, so this is the bigger spend of
+# the two. Drop to a cheaper tier with PROSE_MODEL if the bill matters.
+PROSE_MODEL = os.getenv("PROSE_MODEL", "claude-sonnet-5")
 ANTHROPIC_EFFORT = os.getenv("ANTHROPIC_EFFORT", "medium")
 # Safety classifiers can decline a request (HTTP 200 + stop_reason "refusal").
 # Server-side fallbacks re-run it on Anthropic's recommended model instead of
