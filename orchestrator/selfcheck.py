@@ -217,6 +217,11 @@ _fb = _a1sp._fallback_brief(
 _a1src = pathlib.Path(__file__).with_name("agent1_seo_scout.py").read_text(encoding="utf-8")
 _wf1 = (pathlib.Path(__file__).resolve().parents[1]
         / ".github" / "workflows" / "agent1-seo-scout.yml").read_text(encoding="utf-8")
+ok("a compliance rule restated in must_include is relocated, not fatal",
+   __import__("compliance").mentions_prohibition("never use 'Arabian Gulf'")
+   and not __import__("compliance").mentions_prohibition("describe the courtyard")
+   and "compliance.mentions_prohibition(t)" in _a1src,
+   "the model echoing the Gulf rule into must_include must not dead-letter its own brief")
 ok("a fallback brief marks itself as degraded", _fb.get("_degraded") is True)
 ok("and it genuinely has none of what the GEO rules require",
    _fb["must_include"] == [], "no consensus figure, no proprietary fact")

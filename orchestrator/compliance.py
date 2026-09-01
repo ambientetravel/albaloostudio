@@ -265,6 +265,20 @@ PROFILES: dict[str, dict[str, bool]] = {
 PROHIBITION_FIELDS = frozenset({"must_avoid", "avoid", "banned_terms", "do_not"})
 
 
+def mentions_prohibition(text: str) -> bool:
+    """True if `text` names a banned Gulf label or makes a no-visa claim.
+
+    Used to spot the compliance rules restated in the WRONG field. The model,
+    told the Persian Gulf and visa rules in its system prompt, sometimes echoes
+    them into must_include as a reminder — "...never 'Arabian Gulf', easy visa
+    not visa-free...". That names the banned terms in a scanned field and
+    dead-letters an otherwise-clean brief. The builder relocates such items to
+    must_avoid, which is where prohibitions belong and which the gate skips.
+    """
+    t = text if isinstance(text, str) else str(text)
+    return bool(_ARABIAN_GULF.search(t) or _NO_VISA_CLAIM.search(t))
+
+
 def assertive_surface(obj: Any) -> str:
     """
     Flatten a brief/draft into the text the gate should judge: every assertion,

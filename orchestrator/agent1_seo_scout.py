@@ -1302,7 +1302,21 @@ def build_brief_payload(
     if not path.startswith("/"):
         path = "/" + path
 
-    must_avoid = list(dict.fromkeys(list(analysis.get("must_avoid", [])) + _HARD_AVOID))
+    # A must_include item that names a banned term is the model restating a
+    # prohibition in the wrong field — "...never 'Arabian Gulf', easy visa not
+    # visa-free..." — and it dead-letters its own brief because must_include is
+    # scanned while must_avoid is not. Relocate those to must_avoid rather than
+    # let a clean brief (a castle, a tech expo) die on a rule it was trying to
+    # honour. This cannot smuggle a real violation past the gate: Agent 2's own
+    # prose is compliance-checked before anything publishes.
+    raw_include = list(analysis.get("must_include", []))
+    relocated = [t for t in raw_include if compliance.mentions_prohibition(t)]
+    must_include = [t for t in raw_include if t not in relocated]
+    if relocated:
+        log.info("relocated %d compliance reminder(s) from must_include to "
+                 "must_avoid", len(relocated))
+    must_avoid = list(dict.fromkeys(
+        list(analysis.get("must_avoid", [])) + relocated + _HARD_AVOID))
 
     return {
         "schema_version": config.SCHEMA_VERSION,
@@ -1374,7 +1388,7 @@ def build_brief_payload(
             "reading_level": "general",
             "tone": "poetic-luxury",
             "outline": analysis["outline"],
-            "must_include": analysis.get("must_include", []),
+            "must_include": must_include,
             "must_avoid": must_avoid,
             "internal_links": [],
             "external_sources": [],
