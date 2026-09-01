@@ -1088,7 +1088,25 @@ def _analyse_with_anthropic(
         create = client.messages.create
 
     try:
-        resp = create(**kwargs)
+        try:
+            resp = create(**kwargs)
+        except Exception as beta_exc:
+            # claude-sonnet-5 and newer reject the server-side-fallback beta
+            # with a 400 "does not support the `fallbacks` parameter". That beta
+            # is only a nice-to-have — Anthropic substituting a model when the
+            # primary is overloaded — and on 1 Sep 2026 it made a freshly funded
+            # Sonnet look as dead as an empty balance: every call 400'd, fell
+            # through to Gemini, and produced mechanical briefs. Losing the beta
+            # is fine; losing every call is not. Retry once on the plain
+            # endpoint, and only for THIS error so a real failure still raises.
+            if "fallbacks" in str(beta_exc).lower() and "betas" in kwargs:
+                log.warning("%s — %s rejects the fallbacks beta; retrying "
+                            "without it", site.domain, config.GAP_ANALYSIS_MODEL)
+                kwargs.pop("betas", None)
+                kwargs.pop("fallbacks", None)
+                resp = client.messages.create(**kwargs)
+            else:
+                raise
         # Check stop_reason before touching content — a refusal leaves it empty.
         if getattr(resp, "stop_reason", None) == "refusal":
             detail = getattr(resp, "stop_details", None)
