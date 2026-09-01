@@ -641,7 +641,12 @@ def _gemini_once(system: str, prompt: str) -> tuple[str, Any]:
 # Draft shape, shared by both providers. Anthropic enforces it as a JSON
 # schema; Gemini gets it through the system prompt and response_mime_type.
 _DRAFT_SCHEMA = {
+    # additionalProperties:false on every object and every property in
+    # `required` — Anthropic's structured-output validator demands both, and
+    # the first cut (loose objects, three required keys) was rejected with a
+    # 400 on output_config.format.schema while Agent 1's strict schema worked.
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "title": {"type": "string"},
         "meta_description": {"type": "string"},
@@ -650,14 +655,17 @@ _DRAFT_SCHEMA = {
         "quotable_lines": {"type": "array", "items": {"type": "string"}},
         "faq": {"type": "array", "items": {
             "type": "object",
+            "additionalProperties": False,
             "properties": {"q": {"type": "string"}, "a": {"type": "string"}},
             "required": ["q", "a"]}},
         "internal_link_suggestions": {"type": "array", "items": {
             "type": "object",
+            "additionalProperties": False,
             "properties": {"path": {"type": "string"}, "anchor": {"type": "string"}},
             "required": ["path", "anchor"]}},
     },
-    "required": ["title", "meta_description", "body_markdown"],
+    "required": ["title", "meta_description", "body_markdown", "key_points",
+                 "quotable_lines", "faq", "internal_link_suggestions"],
 }
 
 
