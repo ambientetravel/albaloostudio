@@ -1,0 +1,65 @@
+# Agent 9 — AI Visibility (GEO)
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# The one method worth adopting from the SearchFit SEO skills. Every other skill
+# there maps onto an agent that already exists (audit→5, competitors→8,
+# briefs→1/6, writing→2). AI visibility did not: nothing measured whether an
+# assistant, asked a buying question, names the property. This does.
+#
+# Monthly, not weekly: base-model recall changes on the scale of model releases,
+# not days, and every prompt is a paid call. Dispatch any time for a fresh read.
+
+name: Agent 9 — AI Visibility
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Restrict to one domain (blank = all configured)"
+        required: false
+        type: string
+      provider:
+        description: "anthropic | gemini"
+        required: false
+        default: "anthropic"
+        type: string
+  schedule:
+    - cron: "0 8 1 * *"   # 08:00 UTC on the 1st of each month
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Nothing here uses 3.12-only syntax
+        run: python3 tools/py311_guard.py tools/ai_visibility.py
+      - name: Probe
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+          ARGS="--provider ${{ inputs.provider || 'anthropic' }}"
+          if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
+          python3 tools/ai_visibility.py $ARGS \
+            --out "reports/ai-visibility-$(date +%Y-%m-%d).json" | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ai-visibility
+          path: orchestrator/reports/ai-visibility-*.json
+          retention-days: 90
