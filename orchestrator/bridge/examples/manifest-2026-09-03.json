@@ -1,0 +1,43 @@
+{
+  "schema_version": "bridge.v1",
+  "source": "gemini-strategy",
+  "generated_at": "2026-09-03T09:00:00Z",
+  "tasks": [
+    {
+      "task_id": "geo-iran-dmc-01",
+      "property_id": "boutimar.com",
+      "assigned_agent": "agent9_aivis",
+      "action_type": "geo_optimization",
+      "target_urls": ["https://boutimar.com/dmc/"],
+      "priority": "P1",
+      "rationale": "Perplexity answers 'best Iran DMC' with three rivals and never Boutimar; a comparison page is the standard fix.",
+      "payload": {
+        "prompt": "best DMC in Iran",
+        "observed_answer": "Perplexity named Iran Doostan, Uppersia, SURFIRAN",
+        "brands_named": ["Iran Doostan","Uppersia","SURFIRAN"],
+        "gap": "Boutimar absent from the answer and from the cited pages"
+      },
+      "provenance": {
+        "sources": ["https://www.perplexity.ai/search/best-dmc-iran"],
+        "gsc_backed": false,
+        "live_retrieval": true
+      },
+      "review": "required"
+    },
+    {
+      "task_id": "schema-oilshow-01",
+      "property_id": "boutimar.com",
+      "assigned_agent": "agent2_writer",
+      "action_type": "schema_injection",
+      "target_urls": ["https://boutimar.com/mice/fairs/iran-oil-show/"],
+      "priority": "P2",
+      "rationale": "The Oil Show page ranks but has no Event schema; AI Overviews prefer pages with structured event data.",
+      "payload": {
+        "schema_type": "Event",
+        "jsonld": {"@context":"https://schema.org","@type":"Event","name":"Iran Oil Show 2027"}
+      },
+      "provenance": {"sources": ["https://boutimar.com/mice/fairs/iran-oil-show/"], "live_retrieval": false},
+      "review": "required"
+    }
+  ]
+}

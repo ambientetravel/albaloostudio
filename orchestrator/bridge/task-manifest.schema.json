@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Albaloo strategy task manifest (bridge.v1)",
+  "description": "The shape Gemini (or any external strategist) fills so a directive is machine-checkable and routable to the nine agents. A manifest is a PROPOSAL, never an execution: it is validated, compliance-prescreened, and reviewed before any agent acts on it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source", "generated_at", "tasks"],
+  "properties": {
+    "schema_version": {"const": "bridge.v1"},
+    "source": {"type": "string", "description": "who authored it, e.g. gemini-strategy"},
+    "generated_at": {"type": "string", "description": "RFC3339"},
+    "tasks": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["task_id", "property_id", "assigned_agent", "action_type", "rationale", "provenance"],
+        "properties": {
+          "task_id": {"type": "string"},
+          "property_id": {"type": "string",
+            "enum": ["boutimar.com","boutimar.ir","cruisebaz.com","cruise24.ir","cruise24.me",
+                     "ambientetravel.com","exploreorient.com","albaloostudio.com"]},
+          "assigned_agent": {"type": "string",
+            "enum": ["agent1_scout","agent2_writer","agent3_broadcaster","agent4_closer",
+                     "agent5_auditor","agent6_analyst","agent7_geo","agent8_competitor","agent9_aivis"]},
+          "action_type": {"type": "string",
+            "enum": ["keyword_gap","content_brief","schema_injection","geo_optimization",
+                     "competitor_watch","audit_fix","broadcast_copy","analytics_note"]},
+          "target_urls": {"type": "array", "items": {"type": "string"}},
+          "priority": {"type": "string", "enum": ["P1","P2","P3"]},
+          "rationale": {"type": "string", "description": "why this task, in one or two sentences"},
+          "payload": {"type": "object", "description": "action-specific; see README for per-action shape"},
+          "provenance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sources"],
+            "properties": {
+              "sources": {"type": "array", "items": {"type": "string"},
+                "description": "URLs or named datasets the directive rests on. A task with no source is a suggestion, not a directive, and is rejected."},
+              "gsc_backed": {"type": "boolean",
+                "description": "true only if a Search Console figure backs it. The pipeline reads GSC itself via Agent 1; a manifest that merely restates GSC duplicates work — reserve manifests for what the pipeline cannot see."},
+              "live_retrieval": {"type": "boolean",
+                "description": "true if this rests on a live web/AI-answer read (Perplexity, AI Overviews). This is Gemini's unique lane — the surface Agent 9 cannot measure from the base model."}
+            }
+          },
+          "review": {"const": "required"}
+        }
+      }
+    }
+  }
+}
