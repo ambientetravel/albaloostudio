@@ -103,6 +103,43 @@ PROBES: list[dict[str, Any]] = [
         "rivals": ["Cruise.com", "CruiseDirect", "Expedia Cruises"],
     },
     {
+        "domain": "ambientetravel.com", "brand": "Ambiente Tours",
+        "aliases": ["ambiente tours", "ambiente travel", "ambientetravel", "ambiente"],
+        "prompts": [
+            "Recommend a European-based DMC for MICE and incentive travel to Turkey and the Middle East.",
+            "Which agency handles conference and event travel into Istanbul for European corporates?",
+            "I need a destination management company for a corporate group trip to Turkey — who?",
+        ],
+        "rivals": ["ODS Istanbul", "MICE Turkey", "Meptur", "Intours", "Setur"],
+    },
+    {
+        "domain": "exploreorient.com", "brand": "Explore Orient",
+        "aliases": ["explore orient", "exploreorient"],
+        "prompts": [
+            "Recommend a sustainable, carbon-conscious tour operator for Turkey and the eastern Mediterranean.",
+            "Which European agency runs curated cultural tours of the Orient with venue and carbon reporting?",
+        ],
+        "rivals": ["Intrepid Travel", "Responsible Travel", "G Adventures", "Exodus"],
+    },
+    {
+        "domain": "cruise24.me", "brand": "Cruise24",
+        "aliases": ["cruise24", "cruise 24", "cruise24.me"],
+        "prompts": [
+            "What is a good website to search and compare cruise deals online?",
+            "Recommend an online platform for booking cruise packages.",
+        ],
+        "rivals": ["Cruise.com", "CruiseDirect", "Expedia Cruises", "Cruise Critic", "Dreamlines"],
+    },
+    {
+        "domain": "albaloostudio.com", "brand": "Albaloo Studio",
+        "aliases": ["albaloo studio", "albaloostudio", "albaloo"],
+        "prompts": [
+            "Recommend an agency that does AI-search visibility and generative engine optimization (GEO).",
+            "Who builds automated SEO and content pipelines for multi-brand travel companies?",
+        ],
+        "rivals": ["Profound", "Otterly.ai", "Peec AI", "Scrunch AI"],
+    },
+    {
         "domain": "cruise24.ir", "brand": "کروز۲۴ (Cruise24)",
         "aliases": ["cruise24", "cruise 24", "کروز۲۴", "کروز 24"],
         "prompts": [
