@@ -1139,20 +1139,37 @@
      "bytes": 218752
     },
     {
-     "url": "https://exploreorient.com/tour/",
-     "title": "",
-     "meta": "",
-     "h1": "",
-     "schema_types": [],
-     "bytes": 13
+     "url": "https://exploreorient.com/tour/golden-road-to-samarkand/",
+     "title": "The Golden Road to Samarkand — 8-Day Uzbekistan Tour",
+     "meta": "Khiva, Bukhara and Samarkand linked by high-speed rail — the Silk Road",
+     "h1": "The Golden Road to Samarkand",
+     "schema_types": [
+      "BreadcrumbList",
+      "ItemList",
+      "ListItem",
+      "Offer",
+      "Organization",
+      "PostalAddress",
+      "TouristTrip",
+      "TravelAgency",
+      "WebSite"
+     ],
+     "bytes": 35980
     },
     {
-     "url": "https://exploreorient.com/destination/",
-     "title": "",
-     "meta": "",
-     "h1": "",
-     "schema_types": [],
-     "bytes": 13
+     "url": "https://exploreorient.com/destination/uzbekistan/",
+     "title": "Uzbekistan — The blue cities of the Silk Road",
+     "meta": "Samarkand, Bukhara, Khiva — the great caravan cities, restored madrasas and turquoise domes at the heart of the old Silk Road.",
+     "h1": "Uzbekistan",
+     "schema_types": [
+      "BreadcrumbList",
+      "ListItem",
+      "Organization",
+      "PostalAddress",
+      "TravelAgency",
+      "WebSite"
+     ],
+     "bytes": 37079
     },
     {
      "url": "https://exploreorient.com/venues/",

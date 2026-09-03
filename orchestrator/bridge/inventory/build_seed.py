@@ -24,7 +24,10 @@ LANDMARKS = {
                     "/cruise-lines.html", "/aroya.html", "/cruise-dubai.html"],
     "cruise24.me": ["/"],
     "cruisebaz.com": ["/"],
-    "exploreorient.com": ["/", "/tour/", "/destination/", "/venues/", "/mice/", "/carbon/"],
+    # Section INDEX pages (/tour/, /destination/) are empty shells here — sample a
+    # real product page so the schema reading reflects what the pages actually carry.
+    "exploreorient.com": ["/", "/tour/golden-road-to-samarkand/", "/destination/uzbekistan/",
+                          "/venues/", "/mice/", "/carbon/"],
     "ambientetravel.com": ["/"],
     "albaloostudio.com": ["/"],
 }
