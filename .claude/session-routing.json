@@ -1,87 +1,98 @@
 {
-  "_comment": [
-    "Session routing — which Claude Code session owns which property.",
-    "",
-    "Read by the SESSION ROUTING section of CLAUDE.md. The rule is: work on a",
-    "property is HANDED OFF to its owning session rather than done wherever it",
-    "was asked for, so one session holds the whole history of one property.",
-    "",
-    "MATCH BY TITLE FIRST, id second. Session ids are stable for the life of a",
-    "session but a NEW session for the same property gets a new id, so a",
-    "hardcoded id goes stale silently. mcp__ccd_session_mgmt__list_sessions",
-    "returns titles; find the title, use the id it reports, and update this",
-    "file when it has changed.",
-    "",
-    "A session does NOT need to be running. send_message delivers into a",
-    "stopped session's transcript as a user turn, waiting for the next open.",
-    "ListAgents will NOT show a stopped session — it only lists live peers.",
-    "That difference cost a round trip on 26 Aug 2026."
-  ],
-  "verified": "2026-08-26",
-  "routes": [
-    {
-      "properties": [
-        "cruise24.ir",
-        "cruise24.me",
-        "book.cruise24.ir"
-      ],
-      "title": "Cruise24.ir storefront build",
-      "sessionId": "local_dd38a73a-fdf4-4ba3-8ac8-b9dab001294a",
-      "confirmed_by_user": true,
-      "repo_paths": [
-        "cruise24-ir/"
-      ]
-    },
-    {
-      "properties": [
-        "boutimar.com"
-      ],
-      "title": "Boutimar.com",
-      "sessionId": "local_db802ea1-ad69-48c0-a163-18629c35afa6",
-      "confirmed_by_user": true,
-      "note": "Confirmed by Alireza 2026-08-29 ('boutimar.com is building my site'). Haft Paykar hotel work handed off via boutimar-com/HANDOFF-haft-paykar.md (send_message was blocked — originating session was unattended/dispatched).",
-      "repo_paths": [
-        "boutimar-com/"
-      ]
-    },
-    {
-      "properties": [
-        "exploreorient.com"
-      ],
-      "title": "Explore Orient site architecture",
-      "sessionId": "local_1a53860e-66e6-4694-8e82-55f0b6f1b7c6",
-      "confirmed_by_user": false,
-      "note": "Title match only — confirm with Alireza before the first handoff.",
-      "repo_paths": [
-        "exploreorient/"
-      ]
-    },
-    {
-      "properties": [
-        "cruisebaz.com"
-      ],
-      "title": "cruisebaz.com SEO optimization",
-      "sessionId": "local_34615874-532e-49ab-975a-141247f99e19",
-      "confirmed_by_user": true,
-      "note": "Confirmed by Alireza 31 Aug 2026 as the owning session for all cruisebaz.com work.",
-      "platform": "base44",
-      "repo_paths": [
-        "cruisebaz-seo/"
-      ]
-    },
-    {
-      "properties": [
-        "ambientetravel.com",
-        "ambientetravel.base44.app"
-      ],
-      "title": "Ambiente Travel website setup",
-      "sessionId": "local_f54ac9ca-c41c-44cb-bdca-f5e00115b7ac",
-      "confirmed_by_user": true,
-      "platform": "base44 (client-rendered SPA); DNS zone on Wix nameservers, apex A -> 216.24.57.1",
-      "repo_paths": []
-    }
-  ],
-  "unrouted": [
-    "boutimar.ir — no session designated. Two candidates exist and neither is unambiguous: 'boutimar cruise' (pinned) and 'Boutimar Farsi destinations'. Ask before routing."
-  ]
+ "_comment": [
+  "Session routing — which Claude Code session owns which property.",
+  "",
+  "Read by the SESSION ROUTING section of CLAUDE.md. The rule is: work on a",
+  "property is HANDED OFF to its owning session rather than done wherever it",
+  "was asked for, so one session holds the whole history of one property.",
+  "",
+  "MATCH BY TITLE FIRST, id second. Session ids are stable for the life of a",
+  "session but a NEW session for the same property gets a new id, so a",
+  "hardcoded id goes stale silently. mcp__ccd_session_mgmt__list_sessions",
+  "returns titles; find the title, use the id it reports, and update this",
+  "file when it has changed.",
+  "",
+  "A session does NOT need to be running. send_message delivers into a",
+  "stopped session's transcript as a user turn, waiting for the next open.",
+  "ListAgents will NOT show a stopped session — it only lists live peers.",
+  "That difference cost a round trip on 26 Aug 2026."
+ ],
+ "verified": "2026-08-31",
+ "routes": [
+  {
+   "properties": [
+    "cruise24.ir",
+    "cruise24.me",
+    "book.cruise24.ir"
+   ],
+   "title": "Cruise24.ir storefront build",
+   "sessionId": "local_dd38a73a-fdf4-4ba3-8ac8-b9dab001294a",
+   "confirmed_by_user": true,
+   "repo_paths": [
+    "cruise24-ir/"
+   ]
+  },
+  {
+   "properties": [
+    "boutimar.com"
+   ],
+   "title": "Boutimar.com",
+   "sessionId": "local_db802ea1-ad69-48c0-a163-18629c35afa6",
+   "confirmed_by_user": true,
+   "note": "Confirmed by Alireza 2026-08-29 ('boutimar.com is building my site'). Haft Paykar hotel work handed off via boutimar-com/HANDOFF-haft-paykar.md (send_message was blocked — originating session was unattended/dispatched).",
+   "repo_paths": [
+    "boutimar-com/"
+   ]
+  },
+  {
+   "properties": [
+    "exploreorient.com"
+   ],
+   "title": "Explore Orient site architecture",
+   "sessionId": "local_1a53860e-66e6-4694-8e82-55f0b6f1b7c6",
+   "confirmed_by_user": true,
+   "note": "Confirmed by Alireza 2026-09-03 when he approved the first bridge handoff (exploreorient Silk Road GEO task) to this session.",
+   "repo_paths": [
+    "exploreorient/"
+   ]
+  },
+  {
+   "properties": [
+    "cruisebaz.com"
+   ],
+   "title": "cruisebaz.com SEO optimization",
+   "sessionId": "local_34615874-532e-49ab-975a-141247f99e19",
+   "confirmed_by_user": true,
+   "note": "Confirmed by Alireza 31 Aug 2026 as the owning session for all cruisebaz.com work.",
+   "platform": "base44",
+   "repo_paths": [
+    "cruisebaz-seo/"
+   ]
+  },
+  {
+   "properties": [
+    "ambientetravel.com",
+    "ambientetravel.base44.app"
+   ],
+   "title": "Ambiente Travel website setup",
+   "sessionId": "local_f54ac9ca-c41c-44cb-bdca-f5e00115b7ac",
+   "confirmed_by_user": true,
+   "platform": "base44 (client-rendered SPA); DNS zone on Wix nameservers, apex A -> 216.24.57.1",
+   "repo_paths": []
+  },
+  {
+   "properties": [
+    "boutimar.ir",
+    "res.boutimar.ir"
+   ],
+   "title": "boutimar cruise",
+   "sessionId": "local_2679454b-218f-4cd5-b247-a536126ee55d",
+   "confirmed_by_user": true,
+   "note": "Confirmed by Alireza 2026-08-31 — he named 'boutimar cruise' explicitly, resolving the two-candidate ambiguity that had kept boutimar.ir in unrouted. The other candidate, 'Boutimar Farsi destinations' (local_7000dbcd), is NOT the owner.",
+   "repo_paths": [
+    "boutimar-ir/"
+   ]
+  }
+ ],
+ "unrouted": []
 }
