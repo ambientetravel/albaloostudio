@@ -64,6 +64,22 @@ def _basic_validate(doc: dict[str, Any], schema: dict[str, Any]) -> list[str]:
     return errs
 
 
+# Which agent each action_type actually belongs to. The schema's enum accepts
+# any valid agent name, so a geo task can be addressed to Agent 7 (country
+# geography) or a schema WRITE to Agent 5 (which only audits) and still parse.
+# Gemini's first manifest did exactly that on all five tasks. This catches it.
+EXPECTED_AGENTS = {
+    "keyword_gap": {"agent1_scout"},
+    "content_brief": {"agent1_scout", "agent2_writer"},
+    "schema_injection": {"agent2_writer"},          # a write, not an audit
+    "geo_optimization": {"agent9_aivis", "agent2_writer"},  # not agent7 (geography)
+    "competitor_watch": {"agent8_competitor"},
+    "audit_fix": {"agent5_auditor"},
+    "broadcast_copy": {"agent3_broadcaster"},
+    "analytics_note": {"agent6_analyst", "agent7_geo"},
+}
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("manifest", type=Path)
@@ -95,11 +111,17 @@ def main(argv: list[str] | None = None) -> int:
         if prov.get("gsc_backed") and not prov.get("live_retrieval"):
             flag = "  ⚠ GSC-only — Agent 1 likely finds this itself; low bridge value"
             redundant += 1
+        exp = EXPECTED_AGENTS.get(t["action_type"], set())
+        misroute = (f"  ↳ mis-routed: {t['action_type']} belongs to "
+                    f"{' or '.join(sorted(exp))}, not {t['assigned_agent']}"
+                    if exp and t["assigned_agent"] not in exp else "")
         star = " ★ live-retrieval (Gemini's unique lane)" if prov.get("live_retrieval") else ""
         print(f"  ✓ {tag} [{t['property_id']}] → {t['assigned_agent']} "
               f"({t['action_type']}, {t.get('priority','P?')}){star}")
         if flag:
             print(flag)
+        if misroute:
+            print(misroute)
 
     print(f"\n{len(doc['tasks'])} task(s): "
           f"{blocked} held on compliance, {redundant} flagged redundant, "
