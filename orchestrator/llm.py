@@ -70,7 +70,22 @@ def _anthropic(system: str, prompt: str, *, max_tokens: int,
     else:
         create = client.messages.create
 
-    resp = create(**kwargs)
+    try:
+        resp = create(**kwargs)
+    except Exception as beta_exc:                       # SDK-specific, so by text
+        # The server-side fallbacks beta is optional; broadcasting is not. Some
+        # models (claude-sonnet-5) reject the parameter with a 400 rather than
+        # ignoring it, and the outer retry loop would otherwise re-send the same
+        # rejected kwargs three times and fail the whole run. Strip the beta and
+        # retry once on the plain endpoint — mirrors Agents 1 and 2, which grew
+        # their own _call_anthropic before this shared helper existed.
+        if "fallbacks" in str(beta_exc).lower() and "betas" in kwargs:
+            log.warning("anthropic rejects the fallbacks beta; retrying without it")
+            kwargs.pop("betas", None)
+            kwargs.pop("fallbacks", None)
+            resp = client.messages.create(**kwargs)
+        else:
+            raise
     # Check stop_reason before touching content — a refusal leaves it empty, so
     # indexing content[0] would raise IndexError and hide the real reason.
     if getattr(resp, "stop_reason", None) == "refusal":
