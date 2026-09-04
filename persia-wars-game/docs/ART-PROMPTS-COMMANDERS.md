@@ -1,4 +1,4 @@
-# Commander portraits — the eight
+# Commander portraits — the nine
 
 **Pipeline:** Midjourney first for the painterly quality, then Nano Banana via
 Gemini for the consistency pass and any fixes. Same combination that produced
@@ -9,26 +9,36 @@ circular badge, and works as a full card.
 
 **Consistency:** generate **Shapur I first** — he has the richest attested
 regalia and a surviving relief. Once one is approved, lock its `--sref` and run
-the remaining seven against it so all eight read as one set.
+the remaining eight against it so all nine read as one set.
 
 ## What "precise" means here, and it is the whole job
 
-**Five of the eight have surviving contemporary images. Three do not.**
+**Four of the nine have a surviving contemporary image. Five do not** — and the
+balance flipping that way when Babak and Yaqub joined is itself a fact about
+Iranian history worth putting in the codex rather than hiding.
 
 | | likeness | from |
 |---|---|---|
 | Darius | **yes** | Bisotun and Persepolis reliefs |
-| Ardashir I | **yes** | Naqsh-e Rostam investiture relief, coins |
 | Shapur I | **yes** | Naqsh-e Rostam and Bishapur reliefs, coins |
 | Shah Ismail I | **yes** | contemporary Italian and Persian painting |
 | Nader Shah | **yes** | contemporary portraits |
 | Cyrus | **no** | period dress only — the Pasargadae winged figure is disputed |
 | Surena | **no** | Parthian sculpture of the period only |
 | Rostam Farrokhzad | **no** | late Sasanian armour only |
+| Babak Khorramdin | **no** | the Khurramites' red clothing is attested; nothing else is |
+| Yaqub ibn al-Layth | **no** | 9th-century Sistani dress only |
 
-The three without a likeness are **reconstructions from period dress, not
+The five without a likeness are **reconstructions from period dress, not
 portraits**, and their codex entries must say so in those words. This is the
 same rule that governs every unit in the game.
+
+**A specific trap for the last two.** Both Babak and Yaqub have famous MODERN
+images — 20th-century nationalist statues and book covers, muscular and
+sword-raised. Those are not likenesses, they are modern art about a memory, and
+a generator asked for "Babak Khorramdin" will reproduce them. The prompts below
+describe period dress and say nothing about heroic posture for exactly this
+reason.
 
 The identifying regalia below is real and specific. It is what makes these
 precise rather than generic — and it is what a generator will get wrong if not
@@ -63,19 +73,7 @@ Subject: An Achaemenid king in middle age. A tall CRENELLATED GOLD CROWN, plain 
 
 ---
 
-## 3. ARDASHIR I  →  `src/assets/commanders/ardashir-i.png`
-
-*Founder of the Sasanian empire, r. 224–242 CE*
-
-Style: hand-painted historical portrait for a children's educational game, Persian/Iranian, matte gouache and oil texture with visible brushwork, warm ochre and oxblood with lapis blue and gold, deep shadow, painterly and dignified — the look of a museum illustration rather than a comic. No photorealism, no anime, no 3D render, no digital airbrush. Respectful and accurate portrayal of a real historical person: no caricature, no exaggerated features, no snarling, no blood, no weapons raised to strike. --ar 3:4
-
-Composition: a single figure, chest-up portrait, facing three-quarters, eyes to the viewer, filling the frame with a little headroom. Plain dark painterly background with a subtle warm vignette — no scenery, no landscape, no throne, no crowd, no border, no frame. No text, no letters, no signature, no watermark, no logo.
-
-Subject: The first Sasanian king, vigorous and in his prime. His crown must be clearly DIFFERENT from Shapur's: a plain DIADEM band with fluttering ribbons, surmounted by the KORYMBOS — the globe of hair bound in silk — but WITHOUT the crenellated battlement band. Thick hair in a bushy mass, a rounded curled beard. Lamellar armour at the shoulders under a plain heavy robe. Harder and less ornate than his son. Reference: the Naqsh-e Rostam investiture relief and his coinage — a real attested likeness.
-
----
-
-## 4. SHAH ISMAIL I  →  `src/assets/commanders/shah-ismail.png`
+## 3. SHAH ISMAIL I  →  `src/assets/commanders/shah-ismail.png`
 
 *Founder of the Safavid dynasty, r. 1501–1524 CE*
 
@@ -87,7 +85,7 @@ Subject: A young Safavid ruler, early twenties, notably youthful for a king. The
 
 ---
 
-## 5. NADER SHAH  →  `src/assets/commanders/nader-shah.png`
+## 4. NADER SHAH  →  `src/assets/commanders/nader-shah.png`
 
 *Afsharid ruler and conqueror, r. 1736–1747 CE*
 
@@ -99,7 +97,7 @@ Subject: An eighteenth-century Persian conqueror in his fifties, weathered and s
 
 ---
 
-## 6. CYRUS THE GREAT  →  `src/assets/commanders/cyrus-the-great.png`
+## 5. CYRUS THE GREAT  →  `src/assets/commanders/cyrus-the-great.png`
 
 *Founder of the Achaemenid empire, r. c. 559–530 BCE — NO SURVIVING LIKENESS*
 
@@ -111,7 +109,7 @@ Subject: RECONSTRUCTION FROM PERIOD DRESS, NOT A PORTRAIT. No image of Cyrus sur
 
 ---
 
-## 7. SURENA  →  `src/assets/commanders/surena.png`
+## 6. SURENA  →  `src/assets/commanders/surena.png`
 
 *Parthian commander at Carrhae, 53 BCE — NO SURVIVING LIKENESS*
 
@@ -123,7 +121,7 @@ Subject: RECONSTRUCTION FROM PARTHIAN SCULPTURE, NOT A PORTRAIT. A Parthian nobl
 
 ---
 
-## 8. ROSTAM FARROKHZAD  →  `src/assets/commanders/rostam-farrokhzad.png`
+## 7. ROSTAM FARROKHZAD  →  `src/assets/commanders/rostam-farrokhzad.png`
 
 *Sasanian commander at Qadisiyya, c. 636 CE — NO SURVIVING LIKENESS. NOT the
 legendary Rostam of the Shahnameh: no lion skin, no leopard-skin helm, no giant
@@ -134,6 +132,34 @@ Style: hand-painted historical portrait for a children's educational game, Persi
 Composition: a single figure, chest-up portrait, facing three-quarters, eyes to the viewer, filling the frame with a little headroom. Plain dark painterly background with a subtle warm vignette — no scenery, no landscape, no throne, no crowd, no border, no frame. No text, no letters, no signature, no watermark, no logo.
 
 Subject: RECONSTRUCTION FROM LATE SASANIAN ARMOUR, NOT A PORTRAIT. A Sasanian general in his forties, near the end of the empire and knowing it. A tall conical HELMET with a mail AVENTAIL falling to the shoulders, framing the face. LAMELLAR armour of small overlapping plates over a mail shirt. A curled beard in the Sasanian manner. No crown — he is a commander, not a king. The expression should be tired and resolute rather than defiant: a competent man in a losing position, which is exactly what he was. Reference: the Taq-e Bostan reliefs and late Sasanian armour finds.
+
+---
+
+## 8. BABAK KHORRAMDIN  →  `src/assets/commanders/babak-khorramdin.png`
+
+*Khurramite leader in Azerbaijan, c. 816–837 CE — **no attested likeness, a reconstruction from period dress***
+
+Style: hand-painted historical portrait for a children's educational game, Persian/Iranian, matte gouache and oil texture with visible brushwork, warm ochre and oxblood with lapis blue and gold, deep shadow, painterly and dignified — the look of a museum illustration rather than a comic. No photorealism, no anime, no 3D render, no digital airbrush. Respectful and accurate portrayal of a real historical person: no caricature, no exaggerated features, no snarling, no blood, no weapons raised to strike. --ar 3:4
+
+Composition: a single figure, chest-up portrait, facing three-quarters, eyes to the viewer, filling the frame with a little headroom. Plain dark painterly background with a subtle warm vignette — no scenery, no landscape, no mountain, no fortress, no crowd, no border, no frame. No text, no letters, no signature, no watermark, no logo.
+
+Subject: A highland Iranian leader of the early ninth century, thirties or forties, weathered by twenty years of mountain campaigning. The single identifying feature is COLOUR: he wears DEEP RED — a red wool coat over a red tunic — because his followers were called the sorkh-jamegan, "the red-wearers", and the red clothing is the one visual fact the sources actually record. A plain wound cloth headwrap, not a crown and not a turban of state: he was never a king and must not be dressed as one. Dark hair, a full beard, plain leather belt, no jewellery, no silk, no gold. Wool and leather, mended and worn, the dress of a mountain province rather than a court.
+
+**Do not** give him a crown, a throne, a sword raised overhead, a bared chest, a heroic bodybuilder physique, or a chained-prisoner pose. Every one of those comes from twentieth-century nationalist imagery, not from any source. He is a man in a red coat who held a mountain, and that is the whole picture.
+
+---
+
+## 9. YAQUB IBN AL-LAYTH AL-SAFFAR  →  `src/assets/commanders/yaqub-saffar.png`
+
+*The coppersmith of Sistan, founder of the Saffarid dynasty, c. 861–879 CE — **no attested likeness, a reconstruction from period dress***
+
+Style: hand-painted historical portrait for a children's educational game, Persian/Iranian, matte gouache and oil texture with visible brushwork, warm ochre and oxblood with lapis blue and gold, deep shadow, painterly and dignified — the look of a museum illustration rather than a comic. No photorealism, no anime, no 3D render, no digital airbrush. Respectful and accurate portrayal of a real historical person: no caricature, no exaggerated features, no snarling, no blood, no weapons raised to strike. --ar 3:4
+
+Composition: a single figure, chest-up portrait, facing three-quarters, eyes to the viewer, filling the frame with a little headroom. Plain dark painterly background with a subtle warm vignette — no scenery, no landscape, no workshop, no crowd, no border, no frame. No text, no letters, no signature, no watermark, no logo.
+
+Subject: A ninth-century ruler from Sistan who began as a coppersmith and never lost the look of one. **This is deliberately the plainest portrait of the nine** — set beside Ismail's twelve-gored red cap and Nader's four-peaked crown he should read instantly as the man who came up from a trade. Undyed or dust-brown wool over a simple tunic, a plain cloth headwrap, a leather belt with a working buckle. Sun-dark skin, a short beard, broad hands and heavy forearms — a craftsman's build rather than a courtier's. The one touch of his trade: a small COPPER ornament at the collar or a copper-inlaid belt fitting, warm reddish metal, unpolished. No silk, no gold, no crown, no jewels.
+
+Sources record him as living hard on campaign — barley bread and leeks, sleeping under his shield — and the portrait should carry that rather than any royal dignity. Reference: ninth-century eastern Iranian dress. There is no likeness of him; this is period clothing on a plausible face, and the codex says so.
 
 ---
 

@@ -52,7 +52,7 @@ The commander also stands ON the field — a figure with real numbers and a
 signature ability — so you meet Nader Shah before you read about him. Today he
 would be invisible: a passive and an order, felt but never seen.
 
-## Deep, not wide: 8 commanders x 3-4 battles
+## Deep, not wide: 9 commanders x 3-4 battles
 
 The alternative was twenty commanders with one battle each. Rejected:
 
@@ -61,7 +61,7 @@ The alternative was twenty commanders with one battle each. Rejected:
 - **Money follows sunk investment, not novelty.** Nobody pays to start something.
 - **We measured that only 10 matches in 60 reach round 7.** Sessions are short;
   short sessions plus shallow attachment is churn.
-- Eight commanders is roughly 60% less launch art than twenty, and the art queue
+- Nine commanders is roughly 55% less launch art than twenty, and the art queue
   is already 36 pieces behind.
 - A child who plays four battles as Shah Ismail learns who he was. One battle is
   a name on a card.
@@ -69,6 +69,18 @@ The alternative was twenty commanders with one battle each. Rejected:
 8 x 3-4 still yields **25-30 battles** — the number originally wanted, reached
 the other way. And arenas stay a separate ladder (§1.10), so PvP keeps its
 thirteen rungs whatever the roster does. New commanders arrive as seasons.
+
+## The cost of the ninth
+
+Balance is pairwise, so it does not grow with the roster — it grows with the
+SQUARE of it. **Eight commanders is 28 mirror-free pairings; nine is 36.** That
+is 8 more matchups to sweep, and the escalation harness already runs both sides
+of every pair to keep side advantage out of the reading, so it is 16 more runs
+per sweep, not 8.
+
+Accepted deliberately: the alternative was shipping a roster that jumps from
+636 CE to 1501 CE with nothing in between, which is the exact stretch where
+Iranian history is most often told as an absence.
 
 ## What is NOT changing
 
@@ -94,5 +106,5 @@ be the first thing a reviewer names.
 ## What this changes in the art queue, effective immediately
 
 Commander art moves from an afterthought (0/2) to **the launch-critical set**.
-Eight commander portraits outrank the 14 mission images and the 5 capital
+Nine commander portraits outrank the 14 mission images and the 5 capital
 pieces. Unit and card art is done or nearly; arenas continue as the ladder.

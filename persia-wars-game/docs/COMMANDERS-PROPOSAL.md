@@ -1,4 +1,9 @@
-# The launch eight — proposal, not decided
+# The launch nine — SETTLED
+
+Superseded in part by `COMMANDER-ROSTER.md`, which carries the kits. This file
+keeps the reasoning. Ardashir I was cut (he duplicated Shapur's era — father and
+son sixteen years apart) and Babak Khorramdin and Yaqub ibn al-Layth were added,
+which closes the thousand-year hole between Qadisiyya and the Safavids.
 
 Every commander below actually led the campaign attached to him. Where personal
 presence is uncertain it says so. Nothing here ships until §10's specialist
@@ -32,20 +37,14 @@ march, the encirclement, the parley.
 *Executed by his own king within a year of the victory. The campaign teaches
 that winning a battle is not the same as surviving a court.*
 
-## 4. Ardashir I — the founding | 224 CE
-Hormozdgan: a vassal king kills the last Parthian ruler in single combat by
-tradition, and four centuries of Sasanian rule begin.
-*The single-combat detail is from later Sasanian sources writing their own
-dynasty's founding myth. Flag it, do not assert it.*
-
-## 5. Shapur I — three Roman emperors | 244–260 CE
+## 4. Shapur I — three Roman emperors | 244–260 CE
 The richest campaign in the set, and all three are attested by Shapur's OWN
 trilingual inscription at Naqsh-e Rostam: Misiche 244 (Gordian III dies),
 Barbalissos 253, **Edessa 260 — the Roman emperor Valerian taken alive.**
 *A rare case where the Persian side's account survives in Persian, carved in
 stone. Compare it with the Roman version and the difference is the lesson.*
 
-## 6. Rostam Farrokhzad — Qadisiyya | c. 636 CE
+## 5. Rostam Farrokhzad — Qadisiyya | c. 636 CE
 **Not the Rostam of the legends** — see the roster note. A real Sasanian general
 of the Ispahbudhan house; the hero with the horse is a different man in a
 different age of the same book, and lives in this game as spell cards.
@@ -56,7 +55,18 @@ lose. Stages: the crossing, the elephants, the dust storm, the collapse.
 *Sources conflict sharply on date and course; the Arabic accounts are written
 later by the winners. §10 already flags this. Teach the disagreement.*
 
-## 7. Shah Ismail I — Chaldoran | 1514 CE
+## 6. Babak Khorramdin — the Qaradagh | c. 816–837 CE
+*Twenty years holding a mountain against the Caliphate, from the fortress at
+Badhdh. Beaten in the end by Afshin, an Iranian prince of Ushrusana serving the
+Abbasids — which is the most interesting fact in the war and the one a
+nationalist retelling always drops.*
+
+## 7. Yaqub ibn al-Layth — Dayr al-Aqul | c. 861–879 CE
+*A coppersmith who became a king and marched on Baghdad. Remembered for asking
+why he should be praised in a language he did not understand — the anecdote is
+probably literary, the return of Persian to court is not.*
+
+## 8. Shah Ismail I — Chaldoran | 1514 CE
 **Gunpowder arrives, and courage does not compensate.** Safavid cavalry against
 Ottoman artillery and janissary muskets. Ismail charges, is wounded, loses, and
 never leads an army again. Stages: Sharur 1501 (the victory that made him),
@@ -64,7 +74,7 @@ the march, Chaldoran.
 *This is where `musketeer` and `artillery` enter — the two unit classes already
 reserved in types.ts for "the later launch eras (Safavid onward)".*
 
-## 8. Nader Shah — Karnal | 1739 CE
+## 9. Nader Shah — Karnal | 1739 CE
 The last great Persian conquest. Mihmandust 1729, Damghan, then Karnal, where a
 much smaller army beats the Mughals in three hours and Delhi is opened.
 *He carried the Peacock Throne home and was assassinated by his own officers

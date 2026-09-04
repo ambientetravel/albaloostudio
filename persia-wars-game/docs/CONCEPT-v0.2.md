@@ -153,7 +153,7 @@ the scenario "Pasargadae" asserts more than the evidence carries.
 forbids a bought commander being "strictly better."
 
 Stat normalisation solves *strictly better*. It does not solve *more options*. In a
-counter-based game, owning eight commanders against someone's two is a real
+counter-based game, owning nine commanders against someone's two is a real
 advantage even when every commander is individually balanced, because you pick the
 one that answers their deck.
 
