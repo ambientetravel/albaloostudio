@@ -56,6 +56,14 @@ built the bridge at Shushtar that still stands.
 - *Plays: grind and convert. Rewards a long, attritional match.*
 
 ### 6 · ROSTAM FARROKHZAD — Qadisiyya · c. 636 CE · **A DEFEAT**
+**NOT the Rostam of the legends.** Two different men share this name and both
+are in Ferdowsi. Rostam son of Zal — Rakhsh, the Seven Labours, the White Div —
+is the hero of the Shahnameh's mythical age and appears in this game as SPELL
+cards. Rostam Farrokhzad is a real Sasanian general of the Ispahbudhan house,
+son of Farrokh Hormizd, attested in al-Tabari and in the Armenian history of
+Sebeos. He is the commander. The codex must say this in the entry itself,
+because a knowledgeable adult conflated them on first reading.
+
 Four days on the Euphrates plain with the larger army, and the empire ended
 anyway. Sources conflict sharply; the Arabic accounts are written later by the
 winners.

@@ -125,7 +125,9 @@ Subject: RECONSTRUCTION FROM PARTHIAN SCULPTURE, NOT A PORTRAIT. A Parthian nobl
 
 ## 8. ROSTAM FARROKHZAD  →  `src/assets/commanders/rostam-farrokhzad.png`
 
-*Sasanian commander at Qadisiyya, c. 636 CE — NO SURVIVING LIKENESS*
+*Sasanian commander at Qadisiyya, c. 636 CE — NO SURVIVING LIKENESS. NOT the
+legendary Rostam of the Shahnameh: no lion skin, no leopard-skin helm, no giant
+stature, no mace. This is a real seventh-century general in real armour.*
 
 Style: hand-painted historical portrait for a children's educational game, Persian/Iranian, matte gouache and oil texture with visible brushwork, warm ochre and oxblood with lapis blue and gold, deep shadow, painterly and dignified — the look of a museum illustration rather than a comic. No photorealism, no anime, no 3D render, no digital airbrush. Respectful and accurate portrayal of a real historical person: no caricature, no exaggerated features, no snarling, no blood, no weapons raised to strike. --ar 3:4
 

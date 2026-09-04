@@ -46,6 +46,10 @@ Barbalissos 253, **Edessa 260 — the Roman emperor Valerian taken alive.**
 stone. Compare it with the Roman version and the difference is the lesson.*
 
 ## 6. Rostam Farrokhzad — Qadisiyya | c. 636 CE
+**Not the Rostam of the legends** — see the roster note. A real Sasanian general
+of the Ispahbudhan house; the hero with the horse is a different man in a
+different age of the same book, and lives in this game as spell cards.
+
 **A defeat, and the empire ends with it.** Four days on the Euphrates plain, an
 army that outnumbered its enemy, and a commander who by tradition knew he would
 lose. Stages: the crossing, the elephants, the dust storm, the collapse.
