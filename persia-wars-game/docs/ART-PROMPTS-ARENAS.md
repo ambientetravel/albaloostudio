@@ -1,7 +1,10 @@
-# Arena prompts — the remaining 12
+# Arena prompts — the remaining 11
 
-Anshan exists (`public/art/arenas/anshan.png` + `.mp4`) and sets the convention.
-These twelve match it. Save each as `public/art/arenas/<slug>.png` — the loader
+Anshan and Ecbatana already exist (`.png` + `.mp4` each); Anshan sets the
+convention. These eleven match it.
+
+Ecbatana was in the first version of this file by mistake — it is built. The
+bridge inventory seed caught it, which is precisely what that seed is for. Save each as `public/art/arenas/<slug>.png` — the loader
 already probes for that path, so art drops in with no code change. An optional
 `<slug>.mp4` plays as the pre-battle intro.
 
@@ -31,18 +34,6 @@ in small caps.
   They are drawn here as a reconstruction, and the codex says so.
 - **The Royal Road is not a city.** It is a relay station on an open road, and
   its composition should differ from the twelve urban views.
-
----
-
-## 2. ECBATANA  →  `public/art/arenas/ecbatana.png`
-
-Style: hand-painted historical game art, Achaemenid Persian, warm sand and ochre stonework against a turquoise sky, lapis blue and gold for the arena itself, matte painterly texture, clean readable shapes, no photorealism, no anime, no 3D render look. Illustrated for a children's educational game — dignified, never cartoonish, never grim. No blood, no bodies, no ruin-porn. No modern objects, no anachronisms.
-
-Composition: an ISOMETRIC BIRD'S-EYE VIEW, portrait orientation, 9:16, roughly 768x1408. At the centre sits a RAISED SQUARE FIGHTING PLATFORM: lapis-blue tiled sides, gold trim and gold stairs on two sides, a patterned floor with a circular medallion at its middle, two small armoured figures duelling on it, and four banner poles at its corners flying one blue flag and two red ones. The setting fills the rest of the frame around and behind the platform. A decorative gold border frames the whole image, with a horizontal strip of cuneiform-like glyphs along the top and bottom edges and a small walking lion in each of the four corners.
-
-Text: the ONLY text in the image is the arena name in small capitals in the bottom-right corner, reading exactly "ECBATANA". No other lettering, no watermark, no signature, no logo, no UI.
-
-Subject: Ecbatana, the Median royal capital in the Zagros highlands, 550 BCE. A mountain city ringed by CONCENTRIC DEFENSIVE WALLS rising in stepped tiers, each ring painted a different colour — white, black, scarlet, blue, orange, then silver and gold on the two innermost — with the royal treasury and palace at the summit. Snow on the peaks behind. Cedar and cypress. The coloured walls are Herodotus' description and are drawn here as a reconstruction, not a record.
 
 ---
 
