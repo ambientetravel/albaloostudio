@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CONFIDENCE_LABEL, content } from '../content';
 import type { Confidence, Silhouette } from '../content/types';
 import { useGame } from '../state/store';
-import { CLASS_LABEL } from './labels';
+import { unitSubtitle } from './labels';
 import { Rules } from './Rules';
 import { UnitGlyph } from './UnitGlyph';
 
@@ -72,7 +72,7 @@ export function Codex() {
               key={u.id}
               unlocked={codex.units.includes(u.id)}
               title={u.name}
-              subtitle={CLASS_LABEL[u.class]}
+              subtitle={unitSubtitle(u)}
               glyph={u.art.silhouette}
               glyphId={u.id}
               onOpen={() => setOpen(`unit:${u.id}`)}
@@ -159,7 +159,7 @@ function CodexDetail({ id, onClose }: { id: string; onClose: () => void }) {
   } else {
     const u = content.units.find((x) => x.id === key)!;
     title = u.name;
-    subtitle = CLASS_LABEL[u.class];
+    subtitle = unitSubtitle(u);
     // Both, always. The sourced paragraph is where Herodotus, the Persepolis
     // reliefs and the daric live — 24 of 25 units cite a source there and 1 of
     // 25 does in the short line. Behind a settings toggle that defaulted to off,

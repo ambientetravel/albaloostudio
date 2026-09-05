@@ -18,7 +18,6 @@ import {
 import { useGame } from '../state/store';
 import { ArenaIntro } from './ArenaIntro';
 import { Avatar } from './Avatar';
-import { shortName } from './labels';
 import { UnitCard } from './UnitCard';
 import { UnitGlyph } from './UnitGlyph';
 
@@ -433,7 +432,7 @@ function LedgerBand({ ledger, side, where }: { ledger: Ledger; side: Side; where
                 )}
               </span>
               <span className="ledger__name">
-                {shortName(entry.unitId, getUnit(entry.unitId).name)}
+                {getUnit(entry.unitId).name}
               </span>
             </motion.li>
           ))}

@@ -1,4 +1,4 @@
-import type { UnitClass } from '../content/types';
+import type { Unit, UnitClass } from '../content/types';
 
 export const CLASS_LABEL: Record<UnitClass, string> = {
   'heavy-infantry': 'Heavy infantry',
@@ -17,53 +17,21 @@ export function listClasses(classes: UnitClass[]): string {
 }
 
 /**
- * One word for a unit, for places too small to hold its name.
+ * The line under a unit's name.
  *
- * The Army Ledger draws squads at 26px, and at 26px six of the plain infantry
- * are the same picture — a brown standing figure ten pixels wide. No amount of
- * redrawing fixes that: the box is smaller than the difference. So identity
- * comes from a word instead, and the art goes back to being flavour.
+ * Since the name became a person ('Zarina'), the contingent is where the
+ * history attaches — dropping it for the bare class loses 'Saka Horse-archer'
+ * entirely, which is the fact, and keeps only the individual, which is the
+ * invention. Four screens did exactly that before this was pulled into one
+ * place, so it lives here and nowhere else.
  *
- * The word chosen is the DISTINGUISHING one, which is usually the people rather
- * than the weapon — 'Bactrian' and 'Colchian' separate where 'Archer' and
- * 'Shieldman' would not. Written out rather than sliced off the name so that
- * 'Shield-bearer' does not become 'Shield' next to 'Shieldman'.
+ * The class is appended only when the contingent does not already say it. The
+ * counter system runs on class, so it cannot simply be dropped: 'Immortal'
+ * gives no hint that it is heavy infantry.
  */
-const SHORT_NAME: Record<string, string> = {
-  'persian-archer': 'Persian',
-  'spara-bearer': 'Spara',
-  'median-spearman': 'Median',
-  'persian-cavalry': 'Noble',
-  'kissian-levy': 'Kissian',
-  immortal: 'Immortal',
-  'bactrian-archer': 'Bactrian',
-  'saka-horse-archer': 'Saka',
-  'caspian-skirmisher': 'Caspian',
-  'assyrian-clubman': 'Assyrian',
-  'paphlagonian-javelineer': 'Paphlag.',
-  'sagartian-lassoer': 'Sagartian',
-  'indian-cane-archer': 'Indian',
-  'arabian-camel-rider': 'Camel',
-  'thracian-peltast': 'Thracian',
-  'lydian-hoplite': 'Lydian',
-  'colchian-shieldman': 'Colchian',
-  'armenian-lancer': 'Armenian',
-  'egyptian-marine': 'Egyptian',
-  'ethiopian-bowman': 'Ethiopian',
-  'greek-mercenary-hoplite': 'Greek',
-  'scythed-chariot': 'Chariot',
-  'chorasmian-rider': 'Chorasm.',
-  'war-elephant': 'Elephant',
-  melophoros: 'Apple',
-};
-
-/**
- * Falls back to the first word of the name, so a unit added without an entry
- * here gets something readable rather than nothing. The test pins the table
- * against the roster, so the fallback should never actually be reached.
- */
-export function shortName(unitId: string, fullName: string): string {
-  return SHORT_NAME[unitId] ?? fullName.split(/[\s-]/)[0];
+export function unitSubtitle(unit: Unit): string {
+  const cls = CLASS_LABEL[unit.class];
+  return unit.contingent.toLowerCase().includes(cls.toLowerCase())
+    ? unit.contingent
+    : `${unit.contingent} \u00b7 ${cls}`;
 }
-
-export const SHORT_NAMES = SHORT_NAME;

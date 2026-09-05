@@ -1,5 +1,5 @@
 import type { Unit } from '../content/types';
-import { CLASS_LABEL, listClasses } from './labels';
+import { unitSubtitle, listClasses } from './labels';
 import { UnitGlyph } from './UnitGlyph';
 
 interface Props {
@@ -46,7 +46,7 @@ export function UnitCard({
       </div>
       <div className="unit-card__text">
         <h3>{unit.name}</h3>
-        <p className="unit-card__class">{CLASS_LABEL[unit.class]}</p>
+        <p className="unit-card__class">{unitSubtitle(unit)}</p>
         <p className="unit-card__blurb">{blurb}</p>
 
         {showStats && (

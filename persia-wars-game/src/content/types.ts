@@ -123,7 +123,21 @@ export interface Unit extends Sourced {
   id: string;
   era: string;
   class: UnitClass;
+  /**
+   * The person on the card — Zarina, Artavazda, Shutruk.
+   *
+   * A fictional individual with a real period-appropriate name, several taken
+   * from ordinary names in the Persepolis Fortification Tablets. Deliberately
+   * NOT a specific historical person: Hydarnes actually commanded the
+   * Immortals, so the Immortal is not called Hydarnes.
+   *
+   * Every one of these fits in nine characters, which is the Army Ledger's
+   * measured ceiling at 26px — so this doubles as the short name and the
+   * SHORT_NAME lookup table it replaced is gone. A test pins the ceiling.
+   */
   name: string;
+  /** The troop type — 'Saka Horse-archer'. Subtitle on the card, and what the history attaches to. */
+  contingent: string;
   /** Arena that unlocks this card for collection and play. */
   arena: number;
 

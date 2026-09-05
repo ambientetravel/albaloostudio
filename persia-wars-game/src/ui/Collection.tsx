@@ -12,7 +12,7 @@ import {
 import { TOTAL_SPELL_CARDS, TOTAL_UNIT_CARDS, useGame } from '../state/store';
 import { CurrencyBar, formatCount } from './Chrome';
 import { SettingsModal } from './SettingsModal';
-import { CLASS_LABEL } from './labels';
+import { unitSubtitle } from './labels';
 import { UnitGlyph } from './UnitGlyph';
 
 export function Collection() {
@@ -233,7 +233,7 @@ function CardDetail({ id, onClose }: { id: string; onClose: () => void }) {
       <div className="modal modal--codex" onClick={(e) => e.stopPropagation()}>
         <h3>{unit.name}</h3>
         <p className="modal__sub">
-          {CLASS_LABEL[unit.class]} · Level {level} · Unlocks in {getArena(unit.arena).name}
+          {unitSubtitle(unit)} · Level {level} · Unlocks in {getArena(unit.arena).name}
         </p>
         <p>{unit.blurb}</p>
         <p className="detail__evidence">{unit.evidence}</p>

@@ -19,7 +19,7 @@ import {
   offerSizeForDeficit,
 } from '../sim/roundCore.ts';
 import { useGame } from '../state/store';
-import { CLASS_LABEL } from './labels';
+import { CLASS_LABEL, unitSubtitle } from './labels';
 import { UnitGlyph } from './UnitGlyph';
 
 /**
@@ -480,7 +480,7 @@ function ArenaRules({ arena, trophies, onClose }: { arena: Arena; trophies: numb
               <li key={u.id}>
                 <UnitGlyph kind={u.art.silhouette} size={26} unitId={u.id} />
                 <span>
-                  <strong>{u.name}</strong> — {CLASS_LABEL[u.class]}
+                  <strong>{u.name}</strong> — {unitSubtitle(u)}
                 </span>
               </li>
             ))}
