@@ -72,6 +72,8 @@ export interface BattleLog {
     tier: Tier;
     /** Taken on a Wildcard round — the renderer draws twice the men. */
     doubled?: boolean;
+    /** Men to draw at Levy rank; the renderer scales it by tier. */
+    count: number;
     traits: string[];
   }[];
   frames: Frame[];

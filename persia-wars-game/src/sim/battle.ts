@@ -427,6 +427,7 @@ export function simulate(
       maxHp: u.maxHp,
       tier: u.tier,
       doubled: u.doubled,
+      count: getUnit(u.defId).count,
       traits: u.traits,
     })),
     frames,

@@ -138,6 +138,15 @@ export interface Unit extends Sourced {
   name: string;
   /** The troop type — 'Saka Horse-archer'. Subtitle on the card, and what the history attaches to. */
   contingent: string;
+  /**
+   * Men this squad puts on the field at Levy rank, before the rank ladder.
+   *
+   * Cheap troops come in numbers and elites do not — a Kissian levy is 8, an
+   * Immortal is 3, a war elephant is 1. This is the axis that actually decides
+   * how a board looks, and it belongs to the UNIT rather than to its rank:
+   * ranking a levy up should give you more levy, not turn it into a bodyguard.
+   */
+  count: number;
   /** Arena that unlocks this card for collection and play. */
   arena: number;
 

@@ -34,37 +34,54 @@ const hex = (s: string): number => Number.parseInt(s.replace('#', ''), 16);
 const SPRITE_HEIGHT = 38;
 
 /**
- * Men drawn per squad, by rank.
+ * Men drawn per squad.
  *
- * The simulation is unchanged: one ledger entry is still ONE SimUnit with one
- * HP pool, and these copies are cosmetic. That is deliberate and it is the
- * whole reason this is cheap. Making rank spawn real entities would multiply
- * the sim by six, invalidate every balance number already measured — the
- * 200-match style sweeps, the 4.52x-to-5.38x escalation curve — and six-fold
- * the desync surface the server checks both clients against.
+ * Head count belongs to the UNIT, not to its rank — a Kissian levy is eight men
+ * and an Immortal is three, whatever rank either has reached. Rank then
+ * multiplies that, so ranking a levy up gives you MORE LEVY rather than turning
+ * it into something else. `count` lives in units.json; this is only the ladder.
  *
- * What it buys instead: **rank becomes visible**. A Levy Rausha is two men, a
- * fully drilled one is six. That is the 'normal, then iron shield, then the
- * strongest version' progression, expressed as mass rather than as three
- * separate paintings — 25 units x 3 upgrade arts would be 75 new images and
- * this is none.
+ * Six squads of the roster's average land near 28 men a side at Levy and about
+ * 40 by rounds six and seven, which is the density the reference game runs at.
  *
- * Six squads at the cap draws 36 a side, which is the density asked for.
+ * The simulation is still one SimUnit per ledger entry with one HP pool. These
+ * are cosmetic, and that is a real limitation rather than a free win: see
+ * DESIGN-MASS.md, where the honest version of this is written down.
  */
-const FILES_BY_TIER = [2, 3, 4, 6] as const;
+const TIER_FILES = [1, 1.2, 1.45, 1.7] as const;
+/** Nothing draws more than this, whatever the arithmetic says. */
+const MAX_FILES = 14;
+const filesFor = (count: number, tier: number, doubled: boolean): number => {
+  const mult = TIER_FILES[Math.max(0, Math.min(TIER_FILES.length - 1, tier - 1))] ?? 1;
+  return Math.max(1, Math.min(MAX_FILES, Math.round(count * mult) * (doubled ? 2 : 1)));
+};
+
 /** Idle sway, in radians. A standing line should never be perfectly still. */
 const WIND_TILT = 0.055;
 const WIND_SPEED = 0.075;
-const filesForTier = (tier: number): number =>
-  FILES_BY_TIER[Math.max(0, Math.min(FILES_BY_TIER.length - 1, tier - 1))] ?? 2;
 
-/** Where each extra man stands relative to the file leader. */
-function filePost(i: number, facing: number): { x: number; y: number } {
+/**
+ * Where each man stands relative to the squad's centre.
+ *
+ * A block wide enough to read as a crowd rather than a column, with a
+ * deterministic jitter per man so it does not look like a spreadsheet. The
+ * jitter is a hash of the index, not a random number — two clients drawing the
+ * same battle must draw the same crowd.
+ */
+function filePost(i: number, n: number, facing: number): { x: number; y: number } {
   if (i === 0) return { x: 0, y: 0 };
-  const col = ((i - 1) % 3) - 1;
-  const row = Math.floor((i - 1) / 3) + 1;
+  const perRow = Math.max(3, Math.min(5, Math.ceil(Math.sqrt(n) + 0.5)));
+  const col = ((i - 1) % perRow) - (perRow - 1) / 2;
+  const row = Math.floor((i - 1) / perRow) + 1;
+  const hash = (k: number): number => {
+    const v = Math.sin(k) * 43758.5453;
+    return v - Math.floor(v) - 0.5;
+  };
   // Ranks fall in BEHIND the leader, which is away from the enemy.
-  return { x: col * 7 + (row % 2) * 3.5, y: row * 5 * -facing };
+  return {
+    x: col * 6.5 + hash(i * 12.9898) * 4.5,
+    y: (row * 4.6 + hash(i * 78.233) * 3) * -facing,
+  };
 }
 
 interface Props {
@@ -214,6 +231,8 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         files: Container[];
         /** Per-man phase, so a rank ripples in the wind instead of tilting as a slab. */
         filePhase: number[];
+        /** Each man's resting post, which his drift oscillates around. */
+        filePost: { x: number; y: number }[];
       }
 
       const sprites = new Map<number, Piece>();
@@ -245,14 +264,16 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         const facing = u.side === 'a' ? 1 : -1;
         const files: Container[] = [];
         const filePhase: number[] = [];
+        const filePosts: { x: number; y: number }[] = [];
         // A Wildcard squad is literally twice the squad, so it is twice the
         // men — the doubling has to be visible on the board or it is just a
         // number the player has to take on trust.
-        const fileCount = filesForTier(u.tier) * (u.doubled ? 2 : 1);
+        const fileCount = filesFor(u.count, u.tier, Boolean(u.doubled));
         for (let i = 0; i < fileCount; i++) {
           const man = makeBody();
-          const post = filePost(i, facing);
+          const post = filePost(i, fileCount, facing);
           man.position.set(post.x, post.y);
+          filePosts.push(post);
           // Rear ranks sit fractionally smaller and dimmer, which reads as depth
           // without needing a second camera or a real z axis.
           const depth = 1 - Math.min(0.18, i * 0.035);
@@ -293,6 +314,7 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
           tall: Boolean(texture),
           files,
           filePhase,
+          filePost: filePosts,
         });
       }
 
@@ -589,8 +611,21 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
            */
           const wind = elapsedTicks * WIND_SPEED;
           for (let f = 0; f < sprite.files.length; f++) {
-            sprite.files[f].rotation =
-              g.tilt + spin + Math.sin(wind + sprite.filePhase[f] * Math.PI * 2) * WIND_TILT;
+            const man = sprite.files[f];
+            const ph = sprite.filePhase[f] * Math.PI * 2;
+            man.rotation = g.tilt + spin + Math.sin(wind + ph) * WIND_TILT;
+            /*
+             * Each man drifts on his own, at his own rate. Without this a squad
+             * moves as a single slab of clones, which is exactly what reads as
+             * primitive — in the reference game every figure in a mass of
+             * fifteen is somewhere slightly different every frame, and that is
+             * most of what makes it look alive rather than diagrammatic.
+             */
+            const home = sprite.filePost[f];
+            man.position.set(
+              home.x + Math.sin(wind * 0.62 + ph) * 1.5,
+              home.y + Math.cos(wind * 0.47 + ph * 1.7) * 1.1,
+            );
           }
 
           const hpFrac = meta.maxHp > 0 ? p.hp / meta.maxHp : 0;
