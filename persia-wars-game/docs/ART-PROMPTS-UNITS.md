@@ -1,9 +1,91 @@
-# Unit prompts — the remaining 21
+# Unit prompts — the twenty-one, now with people in them
 
-Four are done: Persian Archer, Shield-bearer, Median Spearman, Persian Cavalry.
-These are the other twenty-one, each complete and self-contained. Copy one whole
-block; do not trim the first three paragraphs, they are what makes the cut-out
-tool work and what keeps the units apart at thumbnail size.
+Four are done: Persian Archer, Shield-bearer, Median Spearman, Persian Cavalry —
+their names are in the table below. These are the other twenty-one, each complete
+and self-contained. Copy one whole block; do not trim the first three paragraphs,
+they are what makes the cut-out tool work and what keeps the units apart at
+thumbnail size.
+
+## The names, and what they are and are not
+
+**Every unit is now a person, not a category.** "Persian Archer" cannot be
+described in four words because nobody is there; Karkish can.
+
+**The card carries the name; the contingent becomes the subtitle.** The gear, the
+dress and the tactics stay exactly as attested — nothing about the history moves.
+What changes is that somebody is wearing it.
+
+**These individuals are fictional. The names are not.** Each is a real
+period-appropriate name for that people — several are ordinary names out of the
+**Persepolis Fortification Tablets**, the Achaemenid administration's own clay
+records. **No card is named after a specific historical person**, deliberately:
+Hydarnes actually commanded the Immortals, so the Immortal is NOT called Hydarnes.
+The codex line for every unit reads *"a soldier of the X, named for this game."*
+
+*One weak spot, stated: ancient Colchian personal names are barely attested.
+Saulakes comes from Pliny, who names a Colchian king. It is the thinnest of the
+twenty-five and if a better source turns up, change it.*
+
+| # | name | contingent | age band |
+|---|---|---|---|
+| — | **Karkish** | Persian Archer *(done)* | 20s |
+| — | **Rausha** | Shield-bearer *(done)* | 30s |
+| — | **Datama** | Median Spearman *(done)* | 40s |
+| — | **Sataspa** | Persian Cavalry *(done)* | 30s |
+| 1 | Shutruk | Kissian Levy | **17** |
+| 2 | Artavazda | Immortal | 40 |
+| 3 | Oxyartes | Bactrian Archer | 30s |
+| 4 | **Zarina** | Saka Horse-archer | 20s · **woman** |
+| 5 | Vahuka | Caspian Skirmisher | 20s |
+| 6 | Balatu | Assyrian Clubman | 50s |
+| 7 | Korylas | Paphlagonian Javelineer | 20s |
+| 8 | Zamaspa | Sagartian Lassoer | 30s |
+| 9 | Sanjaya | Indian Cane-bow Archer | 20s |
+| 10 | Zabbai | Arabian Camel Rider | 50s |
+| 11 | Bithys | Thracian Peltast | 20s |
+| 12 | Myrsos | Lydian Hoplite | 30s |
+| 13 | Saulakes | Colchian Shieldman | 20s |
+| 14 | Tiridat | Armenian Lancer | 30s |
+| 15 | Psamtik | Egyptian Marine | 40s |
+| 16 | Alara | Ethiopian Bowman | 20s |
+| 17 | Kleon | Greek Mercenary Hoplite | 40s |
+| 18 | Mithradat | Scythed Chariot *(the driver)* | 20s |
+| 19 | Farnah | Chorasmian Rider | 30s |
+| 20 | **Ajita** | War Elephant *(the elephant)* | mahout is **14** |
+| 21 | Ushtana | Apple-bearer | **60s** |
+
+**Four age bands now, from fourteen to sixty**, where before there was one. A
+roster with one age band looks like a toy; this one looks like a people.
+
+## Zarina, and why the Saka archer is a woman
+
+**Because the graves say so.** Across the Eurasian steppe, excavation has
+repeatedly recovered **women buried with weapons** — bows, arrowheads, horse
+gear — and in examined weapon-burials the female share runs to roughly a fifth.
+That is physical evidence, not literature, and it is the archaeology underneath
+Herodotus's Amazon stories. **The Saka were an Achaemenid contingent, so a woman
+on a Saka horse is a grave good, not an invention.**
+
+This is the ONLY unit that changes sex, and it changes on evidence. The Immortals
+stay male, the Lydian phalanx stays male, and they stay that way for the same
+reason Apranik is not in this game.
+
+**Next cheapest, same evidence base:** the **Chorasmian Rider (19)** and the
+**Sagartian Lassoer (8)** come from the same steppe world. Either can be made a
+woman by changing one sentence, whenever you want a second.
+
+## The appeal pass — applies to all twenty-five
+
+The prompts below were written for accuracy and got it. They were not written for
+charm, and charm is what makes a child want the next card. Add to every one:
+
+- **They look at you.** Eye contact. Not one of the current twenty-five does this,
+  and it is the single biggest difference between a troop type and a person.
+- **One feature pushed 30% past life** — the camel rider's absurd saddle height,
+  the Sagartian's oversized coil of rope, Alara's bow taller than he is. One per
+  card, no more.
+- **Warmth, not grimness.** Dignified was right; dour was not. These are
+  children's cards.
 
 Every kit description below is what Herodotus actually records for that people.
 Nothing here is invented. Where a detail is uncertain it has been left out
@@ -27,18 +109,31 @@ prompt below and is the part not to drop.
 
 ## Collision risks to watch
 
-- **Lydian Hoplite vs Greek Mercenary Hoplite** — both in Greek armour. Kept
-  apart by crest direction and shield device only. Generate them side by side
-  and check before accepting either.
-- **Armenian Lancer vs Chorasmian Rider** — both cavalry in soft caps. Kept
-  apart by the level lance versus the bow.
-- **The five archers** — Persian (done), Bactrian, Caspian, Indian, Ethiopian.
-  Hooks are: plain, short-spear-as-well, shaggy goatskin, white cotton, and a
-  bow taller than the man.
+- **Myrsos vs Kleon** — both in Greek armour. Kept apart by crest direction and
+  shield device only. Generate side by side and check before accepting either.
+  **Now also by age and face:** Myrsos is thirty and expensively equipped,
+  Kleon is forty-five and scarred. That difference does more work than the crest.
+- **Tiridat vs Farnah** — both cavalry in soft caps. Kept apart by the level
+  lance versus the bow.
+- **The five archers** — Karkish (done), Oxyartes, Vahuka, Sanjaya, Alara.
+  Hooks: plain, short-spear-as-well, shaggy goatskin, white cotton, and a bow
+  taller than the man. **Zarina is a sixth archer but is mounted**, so she does
+  not compete in this group.
+
+## A side effect worth taking
+
+**All twenty-five names fit in nine characters** — the tested ledger ceiling,
+where 'Chorasmian' needed 49px in a 40px box and ellipsised. The longest is
+**Artavazda**, exactly nine. So when these land in `units.json`, the
+`SHORT_NAME` map in `src/ui/labels.ts` can be **deleted rather than rewritten**:
+the character name IS the short name. That is one fewer thing to keep in sync,
+and it was built to solve a problem the names remove.
 
 ---
 
-## 1. Kissian Levy — infantry
+## 1. Shutruk — *Kissian Levy — infantry*
+
+**Card name: Shutruk. Subtitle: Kissian Levy.** About seventeen. First campaign, gear that does not fit him yet.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -71,7 +166,9 @@ against a capped Persian at thumbnail size.
 
 ---
 
-## 2. Immortal — heavy infantry
+## 2. Artavazda — *Immortal — heavy infantry*
+
+**Card name: Artavazda. Subtitle: Immortal.** Forty. Entirely unhurried — he has done this many times.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -105,7 +202,9 @@ hook. Bearing calm and formal, not aggressive.
 
 ---
 
-## 3. Bactrian Archer — archer
+## 3. Oxyartes — *Bactrian Archer — archer*
+
+**Card name: Oxyartes. Subtitle: Bactrian Archer.** Thirties. Mountain-weathered, eyes narrowed from long distances.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -138,7 +237,10 @@ archer in the set.
 
 ---
 
-## 4. Saka Horse-archer — horse-archer
+## 4. Zarina — *Saka Horse-archer, horse-archer*
+
+**Card name: Zarina. Subtitle: Saka Horse-archer.** **A WOMAN, late twenties.**
+Calm, level, entirely ordinary among her own people — see the evidence note above.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -161,16 +263,13 @@ weapon and item must physically touch the body — nothing floating separately, 
 ARROWS IN FLIGHT, no gaps between hand and weapon. The pose must be readable in
 pure black silhouette at thumbnail size.
 
-Subject: a Saka steppe horse-archer riding to the right but TWISTED BACKWARDS in
-the saddle to shoot over the horse's tail, bow drawn, arrow still on the string
-and touching the bow. He wears the tall stiff POINTED CAP of the Sacae, a belted
-tunic and trousers, with a quiver and a short axe at his belt. The tall pointed
-cap plus the turned-back shooting pose is the silhouette hook. No arrows shown
-flying — the drawn bow alone carries it.
+Subject: a Saka (Scythian) horse-archer — **a woman in her late twenties** — shooting a recurved composite bow from the saddle of a small, shaggy steppe pony. She wears the Saka POINTED CAP: tall, soft, bending forward at the tip, which is the single most recognisable thing about this people and is the silhouette hook together with the horse. Trousers, boots, and a long-sleeved patterned coat belted at the waist, with a gorytos — the combined bow-case and quiver — at her left hip. Hair braided and tucked up under the cap; one small gold animal-style plaque at the collar. She is dressed for cold and for hard riding **exactly as the men of her people are — trousers, coat, boots, everything covered; no skin beyond hands and face.** Composed and level, mid-draw, not fierce and not snarling. She is not posed as an exception; she is a soldier of a people who buried their women with bows.
 
 ---
 
-## 5. Caspian Skirmisher — archer
+## 5. Vahuka — *Caspian Skirmisher — archer*
+
+**Card name: Vahuka. Subtitle: Caspian Skirmisher.** Mid-twenties, lean and restless, already eyeing the next bit of cover.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -202,7 +301,9 @@ other archers read as clean cloth.
 
 ---
 
-## 6. Assyrian Clubman — heavy infantry
+## 6. Balatu — *Assyrian Clubman — heavy infantry*
+
+**Card name: Balatu. Subtitle: Assyrian Clubman.** Fifties. Big, slow-moving, completely calm.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -234,7 +335,9 @@ build, but calm and upright — not snarling, not mid-swing.
 
 ---
 
-## 7. Paphlagonian Javelineer — infantry
+## 7. Korylas — *Paphlagonian Javelineer — infantry*
+
+**Card name: Korylas. Subtitle: Paphlagonian Javelineer.** Early twenties. Bright-eyed and plainly proud of that helmet.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -265,7 +368,9 @@ hand. The tall boots plus the fan of three javelin shafts is the silhouette hook
 
 ---
 
-## 8. Sagartian Lassoer — cavalry
+## 8. Zamaspa — *Sagartian Lassoer — cavalry*
+
+**Card name: Zamaspa. Subtitle: Sagartian Lassoer.** Thirties. Watchful; the hands never stop moving.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -298,7 +403,9 @@ the horse. Nobody is caught in it — the loop is empty.
 
 ---
 
-## 9. Indian Cane-bow Archer — archer
+## 9. Sanjaya — *Indian Cane-bow Archer — archer*
+
+**Card name: Sanjaya. Subtitle: Indian Cane-bow Archer.** Twenties. Precise — the stillest figure in the whole set.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -331,7 +438,9 @@ vertical bow line is the silhouette hook.
 
 ---
 
-## 10. Arabian Camel Rider — cavalry
+## 10. Zabbai — *Arabian Camel Rider — cavalry*
+
+**Card name: Zabbai. Subtitle: Arabian Camel Rider.** Fifties, sun-creased, faintly amused by everyone down at ground level.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -363,7 +472,9 @@ be impossible to mistake for a horse at thumbnail size.
 
 ---
 
-## 11. Thracian Peltast — infantry
+## 11. Bithys — *Thracian Peltast — infantry*
+
+**Card name: Bithys. Subtitle: Thracian Peltast.** Twenties, grinning, wearing the cold-weather cloak like a boast.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -395,7 +506,9 @@ silhouette hook — the notched shield outline must survive at thumbnail size.
 
 ---
 
-## 12. Lydian Hoplite — heavy infantry
+## 12. Myrsos — *Lydian Hoplite — heavy infantry*
+
+**Card name: Myrsos. Subtitle: Lydian Hoplite.** Thirties. Expensive equipment, and he knows exactly what it cost.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -429,7 +542,9 @@ who has a front-to-back crest and a plain hem.
 
 ---
 
-## 13. Colchian Shieldman — infantry
+## 13. Saulakes — *Colchian Shieldman — infantry*
+
+**Card name: Saulakes. Subtitle: Colchian Shieldman.** Twenties. Quiet — from very far away, and aware of it.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -461,7 +576,9 @@ rough hide shield is the silhouette hook.
 
 ---
 
-## 14. Armenian Lancer — cavalry
+## 14. Tiridat — *Armenian Lancer — cavalry*
+
+**Card name: Tiridat. Subtitle: Armenian Lancer.** Thirties, upright. The horse is better cared for than the man.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -494,7 +611,9 @@ and is what keeps him apart from the Chorasmian Rider.
 
 ---
 
-## 15. Egyptian Marine — heavy infantry
+## 15. Psamtik — *Egyptian Marine — heavy infantry*
+
+**Card name: Psamtik. Subtitle: Egyptian Marine.** Forties, seafarer’s build, thoroughly unimpressed.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -526,7 +645,9 @@ silhouette hook. The axe is held at rest, not raised to strike.
 
 ---
 
-## 16. Ethiopian Bowman — archer
+## 16. Alara — *Ethiopian Bowman — archer*
+
+**Card name: Alara. Subtitle: Ethiopian Bowman.** Twenties. Tall — the tallest silhouette in the set, and it should read as such.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -560,7 +681,9 @@ single most important element — it must be unmistakable at 22 pixels.
 
 ---
 
-## 17. Greek Mercenary Hoplite — heavy infantry
+## 17. Kleon — *Greek Mercenary Hoplite — heavy infantry*
+
+**Card name: Kleon. Subtitle: Greek Mercenary Hoplite.** Forties. Scarred kit, in it for the pay, not hiding it.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -593,7 +716,9 @@ with the Lydian Hoplite, whose crest runs sideways and whose shield is edge-on.
 
 ---
 
-## 18. Scythed Chariot — chariot
+## 18. Mithradat — *Scythed Chariot — chariot*
+
+**Card name: Mithradat. Subtitle: Scythed Chariot.** The DRIVER is the character — twenties, braced, leaning into it. He is why this card is not just a machine.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -625,7 +750,9 @@ stands alone.
 
 ---
 
-## 19. Chorasmian Rider — cavalry
+## 19. Farnah — *Chorasmian Rider — cavalry*
+
+**Card name: Farnah. Subtitle: Chorasmian Rider.** Thirties. Oasis country, careful with everything.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -658,7 +785,9 @@ from the Armenian Lancer's horizontal lance.
 
 ---
 
-## 20. War Elephant — elephant
+## 20. Ajita — *War Elephant — elephant*
+
+**Card name: Ajita. Subtitle: War Elephant.** Name the ELEPHANT, not the man — she is Ajita. The mahout behind her ears is a BOY OF ABOUT FOURTEEN, and he is the youngest face in the game.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
@@ -690,7 +819,9 @@ unmistakable elephant profile is the silhouette hook.
 
 ---
 
-## 21. Apple-bearer (Melophoros) — heavy infantry
+## 21. Ushtana — *Apple-bearer (Melophoros) — heavy infantry*
+
+**Card name: Ushtana. Subtitle: Apple-bearer (Melophoros).** Sixties. Palace guard, ceremonial duty, and the oldest face in the set.
 
 Style: hand-painted historical game art, Achaemenid Persian, warm ochre /
 oxblood / lapis / gold palette, matte gouache texture, clean readable shapes, no
