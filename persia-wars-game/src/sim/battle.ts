@@ -8,6 +8,7 @@ import {
   exhaustionMultiplier,
   roundTickLimit,
   type LedgerEntry,
+  type Tier,
 } from './roundCore.ts';
 import {
   FIELD_MAX,
@@ -137,6 +138,40 @@ function terrainMultiplier(battle: Battle, cls: UnitClass): number {
   return GORGE_MOBILITY_PENALTY[cls] ?? 1;
 }
 
+/**
+ * Men this squad puts on the field.
+ *
+ * `count` is the unit's own head count — a Kissian levy is eight, an Immortal
+ * three, a war elephant one — and rank multiplies it, so ranking a levy up
+ * gives you more levy rather than turning it into something else.
+ *
+ * Every man carries the squad's stat line DIVIDED by the head count, so a
+ * squad is worth exactly what it was worth before it became a crowd. Head count
+ * changes how a squad LOOKS and how it comes apart, never how strong it is.
+ *
+ * Giving each man the full stat line was tried first and was badly wrong: army
+ * strength then scaled with head count, so a Kissian levy (8) was eight times
+ * an elephant (1) at the same rank, and a tier-3 archer beat the cavalry that
+ * counters it every time out of forty. The counter triangle is supposed to
+ * outrank the ladder; head count had quietly outranked both.
+ *
+ * Dividing needs one care: armour is a FLAT subtraction, so def must be divided
+ * with atk or a man with atk/8 against full armour does nothing at all. The
+ * damage floor divides too — a squad's minimum volley is still 1, spread over
+ * however many men are throwing it.
+ *
+ * What DOES change, deliberately, is granularity: a squad now loses power
+ * smoothly as men fall instead of fighting at full strength until it pops.
+ */
+export const MEN_TIER_MULT = [1, 1.2, 1.45, 1.7] as const;
+/** Hard ceiling per squad. Targeting is O(n^2) per tick and this bounds it. */
+export const MAX_MEN = 10;
+
+export function menInSquad(count: number, tier: Tier, doubled: boolean): number {
+  const mult = MEN_TIER_MULT[Math.max(0, Math.min(3, tier - 1))] ?? 1;
+  return Math.max(1, Math.min(MAX_MEN, Math.round(count * mult) * (doubled ? 2 : 1)));
+}
+
 function spawn(
   def: Unit,
   uid: number,
@@ -146,6 +181,17 @@ function spawn(
   entry: LedgerEntry,
   doctrines: string[],
   laneCount: number,
+  file = 0,
+  men = 1,
+  /**
+   * The divisor for this man's share of the squad.
+   *
+   * Normally equal to `men`. A Wildcard squad spawns TWICE the men but still
+   * divides by the undoubled count, so the doubling actually doubles the squad
+   * — dividing by the doubled count made ×2 a no-op that only looked like
+   * something, which is exactly the kind of bug a test earns its keep on.
+   */
+  share = men,
 ): SimUnit {
   const terrain = terrainMultiplier(battle, def.class);
   const traits = entry.traits;
@@ -190,12 +236,30 @@ function spawn(
     atk *= battle.field.terrain === 'gorge' ? BROKEN_GROUND_GORGE : BROKEN_GROUND_PLAIN;
   }
 
-  const rounded = Math.round(hp);
+  // Divided among the men. Not rounded — a man may be worth 3.8 hp, and
+  // rounding each of ten men would quietly change what the squad is worth.
+  const rounded = hp / share;
+  /*
+   * Every man of a squad stands at the SAME x. Formation depth is the
+   * renderer's business, exactly as `lane` already is.
+   *
+   * This was tried the other way first and it broke four tests. x is the combat
+   * axis, so a rank stood 1.3 units back is 1.3 units out of the fight — and a
+   * spear's reach is about 1.5, so Long Reach's whole +0.9 advantage was
+   * swamped by the formation it was standing in. Depth that the simulation can
+   * feel is not depth, it is a handicap.
+   */
+  const ABREAST = 4;
   const offset = index * 3;
   return {
     uid,
     defId: def.id,
     side,
+    squad: `${side}:${index}`,
+    file,
+    // Spread across the lane, centred, so the squad reads as a body of men.
+    slot: men <= 1 ? 0 : ((file % ABREAST) / (ABREAST - 1) - 0.5) * 2,
+    men: share,
     tier: entry.tier,
     doubled: entry.doubled,
     traits,
@@ -207,6 +271,16 @@ function spawn(
     maxHp: rounded,
     // Terrain hits a unit's fighting value, not just its speed — a chariot in a
     // defile is not a slow chariot, it is a useless one.
+    /*
+     * atk and def stay at SQUAD scale. Only hp is divided.
+     *
+     * Armour is a flat subtraction, so a divided atk against an undivided def
+     * collapses: six spearmen each swinging for a sixth could not scratch a
+     * chariot, and chariots went from losing a gorge to winning every seed of
+     * it. `strike` therefore computes the whole squad's blow with the original
+     * formula and divides the RESULT by the attacker's head count — identical
+     * total damage, identical armour behaviour, just delivered in more pieces.
+     */
     atk,
     def: armour,
     range,
@@ -237,16 +311,18 @@ export function counterMultiplier(attacker: Pick<SimUnit, 'counters' | 'countere
  * doctrine's whole cost as well as its benefit: while the archers are answering
  * the wings, nothing is answering the centre.
  */
-function nearestEnemy(u: SimUnit, units: SimUnit[], shootHorses: boolean): SimUnit | null {
+function nearestEnemy(u: SimUnit, enemies: SimUnit[], shootHorses: boolean): SimUnit | null {
+  // `enemies` is this side's living opponents, rebuilt once a tick. Scanning
+  // the whole roster per unit was O(n^2) over EVERY unit including the dead and
+  // one's own side, which was survivable at twelve units and is not at ninety.
   const hunting =
-    shootHorses && (u.cls === 'archer' || u.cls === 'horse-archer') && units.some(
-      (o) => o.alive && o.side !== u.side && MOUNTED.includes(o.cls),
+    shootHorses && (u.cls === 'archer' || u.cls === 'horse-archer') && enemies.some(
+      (o) => MOUNTED.includes(o.cls),
     );
 
   let best: SimUnit | null = null;
   let bestD = Infinity;
-  for (const other of units) {
-    if (!other.alive || other.side === u.side) continue;
+  for (const other of enemies) {
     if (hunting && !MOUNTED.includes(other.cls)) continue;
     const d = Math.abs(other.x - u.x);
     // Ties broken by uid so the result never depends on array iteration luck.
@@ -295,12 +371,19 @@ export function simulate(
     const classes = new Set(squad.units.map((e) => getUnit(e.unitId).class));
     cohesion[side] = Math.min(COHESION_CAP, Math.max(0, classes.size - 1) * COHESION_PER_CLASS);
   }
-  squadA.units.forEach((e, i) =>
-    units.push(spawn(getUnit(e.unitId), uid++, 'a', i, battle, e, doctrines.a, lanes)),
-  );
-  squadB.units.forEach((e, i) =>
-    units.push(spawn(getUnit(e.unitId), uid++, 'b', i, battle, e, doctrines.b, lanes)),
-  );
+  // One ledger entry is now a body of men rather than one abstract block.
+  for (const [side, squad] of [['a', squadA], ['b', squadB]] as const) {
+    squad.units.forEach((e, i) => {
+      const def = getUnit(e.unitId);
+      const men = menInSquad(def.count, e.tier, Boolean(e.doubled));
+      // Share is the UNDOUBLED count, so a Wildcard squad is twice the men AND
+      // twice the squad rather than twice the men at half the value each.
+      const share = menInSquad(def.count, e.tier, false);
+      for (let f = 0; f < men; f++) {
+        units.push(spawn(def, uid++, side, i, battle, e, doctrines[side], lanes, f, men, share));
+      }
+    });
+  }
 
   const startHp: Record<Side, number> = {
     a: units.filter((u) => u.side === 'a').reduce((s, u) => s + u.maxHp, 0),
@@ -313,6 +396,9 @@ export function simulate(
 
   for (; tick < tickLimit; tick++) {
     const events: BattleEvent[] = [];
+    // Living enemies per side, in roster order so tie-breaking is unchanged.
+    const living: Record<Side, SimUnit[]> = { a: [], b: [] };
+    for (const u of units) if (u.alive) living[u.side].push(u);
 
     for (const u of units) {
       if (!u.alive) continue;
@@ -321,7 +407,7 @@ export function simulate(
       // Riders that wheel wide are not on the field yet.
       if (tick < u.enterAt) continue;
 
-      const target = nearestEnemy(u, units, doctrines[u.side].includes('shoot-the-horses'));
+      const target = nearestEnemy(u, living[u.side === 'a' ? 'b' : 'a'], doctrines[u.side].includes('shoot-the-horses'));
       if (!target) continue;
       const dx = target.x - u.x;
       const dist = Math.abs(dx);
@@ -355,12 +441,26 @@ export function simulate(
     for (const u of units) {
       if (!u.alive || u.hp > 0) continue;
 
-      // Cyrus — The Line Reforms. The first squad you lose gets back up once.
+      /*
+       * Cyrus — The Line Reforms. The first SQUAD you lose gets back up once.
+       *
+       * Squad, not man. With per-man entities the trigger has to wait until
+       * every man of a squad is down, and then it stands the whole squad up
+       * again — otherwise the order would fire on the first casualty of the
+       * battle and revive one spearman, which is not what the card says.
+       */
       if (order[u.side] === 'the-line-reforms' && !orderUsed[u.side]) {
-        orderUsed[u.side] = true;
-        u.hp = Math.max(1, Math.round(u.maxHp * REFORM_HP));
-        events.push({ t: 'order', uid: u.uid, order: 'the-line-reforms' });
-        continue;
+        const squadmates = units.filter((x) => x.squad === u.squad);
+        const lastStanding = squadmates.every((x) => x === u || !x.alive);
+        if (lastStanding) {
+          orderUsed[u.side] = true;
+          for (const m of squadmates) {
+            m.alive = true;
+            m.hp = Math.max(1, Math.round(m.maxHp * REFORM_HP));
+          }
+          events.push({ t: 'order', uid: u.uid, order: 'the-line-reforms' });
+          continue;
+        }
       }
 
       u.alive = false;
@@ -371,20 +471,34 @@ export function simulate(
       // yours on the spot. It answers a collapse; it does not prevent one.
       for (const side of ['a', 'b'] as Side[]) {
         if (order[side] !== 'muster-again' || orderUsed[side]) continue;
-        const mine = units.filter((x) => x.side === side);
-        const theirs = units.filter((x) => x.side !== side);
-        const lost = mine.filter((x) => !x.alive).length - theirs.filter((x) => !x.alive).length;
-        if (lost < 2) continue;
-        // The healthiest survivor: reinforcing a squad about to fall is a waste.
-        const best = mine
-          .filter((x) => x.alive)
-          .sort((p, q) => q.hp / q.maxHp - p.hp / p.maxHp || p.uid - q.uid)[0];
-        if (!best) continue;
+        // Counted in SQUADS wiped out, not men killed. Two squads behind is a
+        // collapse; two men behind is a skirmish, and the card means the first.
+        const wiped = (s2: Side): number => {
+          const keys = new Set(units.filter((x) => x.side === s2).map((x) => x.squad));
+          let n = 0;
+          for (const k of keys) if (units.every((x) => x.squad !== k || !x.alive)) n += 1;
+          return n;
+        };
+        if (wiped(side) - wiped(side === 'a' ? 'b' : 'a') < 2) continue;
+        // The healthiest surviving SQUAD: reinforcing one about to fall is a waste.
+        const alive = units.filter((x) => x.side === side && x.alive);
+        if (alive.length === 0) continue;
+        const bySquad = new Map<string, SimUnit[]>();
+        for (const m of alive) bySquad.set(m.squad, [...(bySquad.get(m.squad) ?? []), m]);
+        const bestSquad = [...bySquad.entries()].sort(
+          (p, q) =>
+            q[1].reduce((n, x) => n + x.hp / x.maxHp, 0) / q[1].length -
+              p[1].reduce((n, x) => n + x.hp / x.maxHp, 0) / p[1].length ||
+            p[1][0].uid - q[1][0].uid,
+        )[0];
+        if (!bestSquad) continue;
         orderUsed[side] = true;
-        best.maxHp = Math.round(best.maxHp * (1 + MUSTER_HP));
-        best.hp = Math.min(best.maxHp, Math.round(best.hp + best.maxHp * MUSTER_HP));
-        best.atk *= MUSTER_ATK;
-        events.push({ t: 'order', uid: best.uid, order: 'muster-again' });
+        for (const m of bestSquad[1]) {
+          m.maxHp = Math.round(m.maxHp * (1 + MUSTER_HP));
+          m.hp = Math.min(m.maxHp, Math.round(m.hp + m.maxHp * MUSTER_HP));
+          m.atk *= MUSTER_ATK;
+        }
+        events.push({ t: 'order', uid: bestSquad[1][0].uid, order: 'muster-again' });
       }
     }
 
@@ -427,7 +541,9 @@ export function simulate(
       maxHp: u.maxHp,
       tier: u.tier,
       doubled: u.doubled,
-      count: getUnit(u.defId).count,
+      squad: u.squad,
+      file: u.file,
+      slot: u.slot,
       traits: u.traits,
     })),
     frames,
@@ -450,7 +566,10 @@ export function simulate(
     // Cohesion does not reduce damage — it delays the point at which a line
     // starts coming apart. A one-class army feels the full ramp.
     const weary = 1 + (exhaustionMultiplier(tick, tickLimit) - 1) * (1 - cohesion[target.side]);
-    const dmg = Math.max(1, Math.round(u.atk * mult * noise * weary - armour * DEF_SCALE));
+    // The squad's blow, by the original formula, then split among the men
+    // throwing it. Not rounded: at ten men a share can be worth less than a
+    // point, and rounding it away would make big squads harmless.
+    const dmg = Math.max(1, u.atk * mult * noise * weary - armour * DEF_SCALE) / u.men;
     target.hp -= dmg;
     u.cd = u.interval;
     return { t: 'attack', uid: u.uid, target: target.uid, dmg, mult };

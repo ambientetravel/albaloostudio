@@ -16,6 +16,26 @@ export interface SimUnit {
   uid: number;
   defId: string;
   side: Side;
+  /**
+   * Which drafted squad this man belongs to, as `side:index`.
+   *
+   * One ledger entry now spawns SEVERAL men rather than one abstract block, so
+   * anything that reasons about "a squad" — the commander orders, the result
+   * screen — has to group by this instead of counting units.
+   */
+  squad: string;
+  /**
+   * Position within the squad, 0 at the front. Drives the formation offset and
+   * gives the renderer a stable per-man identity for gait phase.
+   */
+  file: number;
+  /** Sub-lane offset in [-1, 1], so a squad spreads across its lane visually. */
+  slot: number;
+  /**
+   * How many men the squad has. Every stat below is the squad's line DIVIDED by
+   * this, so a squad is worth exactly what it was worth before it was a crowd.
+   */
+  men: number;
   /** Levy → Trained → Veteran → Royal. Scales atk, def and hp together. */
   tier: Tier;
   /** Taken on a Wildcard round: this squad counts double. */
@@ -72,8 +92,12 @@ export interface BattleLog {
     tier: Tier;
     /** Taken on a Wildcard round — the renderer draws twice the men. */
     doubled?: boolean;
-    /** Men to draw at Levy rank; the renderer scales it by tier. */
-    count: number;
+    /** Squad key, so the renderer can group a man with his fellows. */
+    squad: string;
+    /** Position in the file, 0 at the front. */
+    file: number;
+    /** Sub-lane offset in [-1, 1]. */
+    slot: number;
     traits: string[];
   }[];
   frames: Frame[];

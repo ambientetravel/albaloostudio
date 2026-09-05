@@ -141,8 +141,19 @@ describe('Wheeling Line', () => {
 });
 
 describe('Loosed Rein', () => {
-  it('keeps a horse-archer further away from a pursuer', () => {
-    const chase = (traits: string[]) => {
+  it('keeps a horse-archer further away from a pursuer, and alive longer', () => {
+    /*
+     * Measured over the CHASE, not the whole battle.
+     *
+     * This used to average the gap across every frame, which quietly measured
+     * the wrong thing: Loosed Rein makes the rider survive longer, so the tail
+     * of the log is full of frames where he has finally been run down and the
+     * gap is nearly zero. A trait that works was dragging its own average
+     * below the baseline's. Surviving longer is the trait doing its job, so it
+     * is asserted here rather than being allowed to sabotage the reading.
+     */
+    const CHASE = 80;
+    const run = (traits: string[]) => {
       const log = simulate(
         plain,
         squad('a', [{ unitId: 'saka-horse-archer', traits }]),
@@ -152,14 +163,20 @@ describe('Loosed Rein', () => {
       );
       const meUid = log.roster.find((r) => r.side === 'a')!.uid;
       const themUid = log.roster.find((r) => r.side === 'b')!.uid;
-      const gaps = log.frames.map((f) => {
+      const gaps = log.frames.slice(0, CHASE).map((f) => {
         const me = f.pos.find((p) => p.uid === meUid)?.x ?? 0;
         const them = f.pos.find((p) => p.uid === themUid)?.x ?? 0;
         return Math.abs(them - me);
       });
-      return gaps.reduce((s, g) => s + g, 0) / gaps.length;
+      return {
+        gap: gaps.reduce((s, g) => s + g, 0) / gaps.length,
+        ticks: log.frames.length,
+      };
     };
-    expect(chase(['loosed-rein'])).toBeGreaterThan(chase([]));
+    const loose = run(['loosed-rein']);
+    const plainRun = run([]);
+    expect(loose.gap).toBeGreaterThan(plainRun.gap);
+    expect(loose.ticks).toBeGreaterThan(plainRun.ticks);
   });
 });
 
