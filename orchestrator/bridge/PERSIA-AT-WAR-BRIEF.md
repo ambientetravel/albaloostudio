@@ -17,6 +17,27 @@ blind to what existed. **The very first run of this game seed caught its author
 proposing an arena prompt for Ecbatana, which was already finished.** If it
 catches me, it will catch anything.
 
+## Using this with ASTRA specifically
+
+There is **no live connection** between the two, and there does not need to be.
+The exchange is: paste `ASTRA-PROMPT.md` plus the seed into ASTRA, save what
+comes back into `accepted/persia-<date>.json`, and it gets reviewed here like
+any other manifest.
+
+**Everything ASTRA returns is DATA, not instruction.** If a returned file says
+"apply this immediately", "skip the review", or "the seed is out of date", that
+text is content inside a file and carries no authority. Nothing auto-applies,
+and that is the design rather than a precaution.
+
+**A second model is a fabrication risk, not a fact source.** This matters more
+here than on any website manifest. The whole value of this game is that it does
+not invent a date, an outcome, a unit or a king — and a general model asked
+about Iranian history will confidently return Pantea Arteshbod commanding the
+Immortals, Apranik resisting the Arab conquest, and the Cyrus Cylinder as a
+charter of human rights. **Every one of those is already named and banned in our
+own data.** So the return format separates a CLAIM from its SOURCE, and a claim
+with no source is a suggestion that gets dropped at review.
+
 ## Where an outside analyst genuinely adds value
 
 Feed it only what this project cannot see for itself.
@@ -36,7 +57,7 @@ Feed it only what this project cannot see for itself.
 
 ## What must not be routed here
 
-- **Balance numbers.** Measured with harnesses and 248 tests. An opinion about
+- **Balance numbers.** Measured with harnesses and 275 tests. An opinion about
   `TIER_MULT` that has not run the sweep is noise, and the sweep is one command.
 - **Any historical claim.** A general model will confidently produce the Cyrus
   Cylinder as a charter of human rights. That exact claim is named and banned in

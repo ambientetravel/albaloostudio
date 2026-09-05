@@ -50,7 +50,11 @@ missions = js('missions.json')
 
 have_units = {p.stem for p in (GAME / 'src/assets/units').glob('*.png')}
 have_cards = {p.stem for p in (GAME / 'src/assets/cards').glob('*.png')}
-have_arenas = {p.stem for p in (GAME / 'public/art/arenas').glob('*.png')}
+have_arenas = {p.stem for p in (GAME / 'public/art/arenas').glob('*')} - {'README.md'}
+# Rigs: a unit is rigged only if it is on the runtime allowlist AND has parts.
+rig_dirs = {p.name for p in (GAME / 'src/assets/rig').glob('*') if (p / 'rig.json').exists()}
+allow = (GAME / 'src/render/unitArt.ts').read_text()
+rigged = sorted(d for d in rig_dirs if f"'{d}'," in allow or f"'{d}'\n" in allow)
 
 seed = {
     'generated': datetime.date.today().isoformat(),
@@ -86,6 +90,49 @@ seed = {
         'honesty_layer': 'Every unit/battle carries evidence text, sources, disputed list and a '
                          'five-level confidence. Shown to everyone, not behind a toggle.',
         'tests_passing': tests(),
+        'per_man_simulation': (
+            'One ledger entry spawns a BODY OF MEN, each his own simulated unit with his '
+            'own position, target and death. The squad stat line is DIVIDED among them, so '
+            'head count changes how a squad looks and how it comes apart, never how strong '
+            'it is. Damage is computed at squad scale by the original formula and the '
+            'RESULT divided by the attacker head count — armour is a flat subtraction, so '
+            'dividing atk alone made six spearmen unable to scratch a chariot. Formation '
+            'depth is RENDER ONLY: x is the combat axis, and a rank standing 1.3 units back '
+            'is 1.3 units out of the fight, which swamped Long Reach entirely when it was '
+            'tried in the sim.'
+        ),
+        'head_count': (
+            'units.json carries `count` per unit — Kissian levy 8, Persian archer 6, '
+            'Immortal 3, war elephant 1 — multiplied by rank. Six squads is about 28 men a '
+            'side at Levy and about 40 by rounds six and seven.'
+        ),
+        'wildcard': (
+            'Some rounds a side pick counts DOUBLE, announced BEFORE the choice so it is a '
+            'decision rather than a surprise. Derived from (seed, round, side, deficit) and '
+            'never Math.random, because the recorder replays byte-identically and the server '
+            'detects desync by comparing clients. Measured: 8.2% level, 25.7% one behind, '
+            '42.5% two behind, capped 46%.'
+        ),
+        'skeletal_rigs': (
+            f'{len(rigged)} of 25 units are cut into parts on pivots and animated: '
+            + ', '.join(rigged) + '. Mounted rigs gallop (Muybridge 1878 — airborne when '
+            'the legs are GATHERED, not extended); foot rigs march. The other 15 draw as '
+            'still sprites on the procedural gait. Not Rive or Spine: Pixi Container is '
+            'already a transform hierarchy. What a real tool would add is MESH deformation '
+            'so a leg bends rather than swinging rigid.'
+        ),
+        'unit_identity': (
+            'Every unit is a PERSON — Zarina, Artavazda, Karkish — with the contingent as '
+            'subtitle. Fictional individuals, real period names, several from the Persepolis '
+            'Fortification Tablets. No card is named after a specific historical person on '
+            'purpose. All 25 fit the 9-character Army Ledger ceiling.'
+        ),
+        'board_is_a_carpet': (
+            'The battle floor carries a Pazyryk-derived border in the surround (5th-4th c. '
+            'BCE, the only carpet contemporary with these arenas). Pattern in the FRAME, '
+            'quiet field, because a carpet is identified by its borders and because units '
+            'draw at 22-85px. The carpet is the BOARD, not terrain — nobody fought on a rug.'
+        ),
     },
 
     'measured_not_guessed': {
@@ -118,6 +165,27 @@ seed = {
         'Dark Achaemenid palette — ochre, oxblood, lapis, gold. Not up for a brightening pass.',
     ],
 
+    'designed_but_not_built': {
+        'commanders_v03': (
+            'NINE commanders agreed with kits and campaigns — Cyrus, Darius, Surena, '
+            'Shapur I, Rostam Farrokhzad, Babak Khorramdin, Yaqub ibn al-Layth, Shah Ismail '
+            'I, Nader Shah. Four of the nine end in DEFEAT. Only Cyrus and Astyages exist in '
+            'code. Balance cost: 36 pairings, and the harness plays both sides, so 72 sweeps.'
+        ),
+        'anjoman': (
+            'انجمن فرزانگان — giants of Persian science and poetry as powers, each derived '
+            'from actual work (Biruni measured, so he SEES; Ferdowsi kept Persian alive, so '
+            'he brings back a lost squad; Hafez rerolls because the fal IS a reroll). The '
+            'PLAYER visits, not the commander, which is what makes the 1,500-year gap honest.'
+        ),
+        'women': (
+            'Artemisia I (real via Herodotus, Carian Greek NOT Persian, kit is refusing a '
+            'round) and Purandokht (Sasanian queen regnant with coins, five years before '
+            'Qadisiyya). Four famous names are EXCLUDED as unsourced modern inventions — '
+            'Pantea Arteshbod, Apranik, Youtab, Artemisia-as-Persian.'
+        ),
+        'festivals': 'Client-computable from the calendar, so no server. Blocked on accounts.',
+    },
     'art_status': {
         'units': f'{len(have_units)}/{len(units)}',
         'cards': f'{len(have_cards)}/{len(cards)}',
