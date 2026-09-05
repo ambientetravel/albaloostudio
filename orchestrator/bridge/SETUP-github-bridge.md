@@ -31,6 +31,51 @@ nobody merges but you.
 - **The manifest lane already takes GPT** — `source:"openai-strategy"` validates,
   with a template and prompt in this folder.
 
+## The game is now on the lane too (5 Sep)
+
+*Persia at War* lives in `ambientetravel/albaloostudio` under `persia-wars-game/`,
+so that repo is now in `REPOS` — and because it holds the orchestrator **and** the
+game, the profile is chosen **per path**, not per repo.
+
+- `persia-wars-game/**` → **`persia_at_war_v1`**
+- everything else in that repo → `boutimar_v1`
+
+That distinction is the point rather than tidiness. The game sells no holiday, so
+the visa and sanctions rules would produce only noise; and the rule that actually
+matters for it — **it never invents a date, an outcome, a unit or a king** — has
+no analogue on the website side. Judged under the travel profile, a PR that
+invented a Persian heroine would pass clean, and that is the one failure this
+product cannot survive.
+
+`fabricated_history` BLOCKs the claims a general model reliably produces in good
+faith: **Pantea Arteshbod** commanding the Immortals, **Apranik** resisting the
+Arab conquest, **Youtab** at the Persian Gate, the **Cyrus Cylinder as a charter
+of human rights**, **Artemisia called Persian** (she was Carian Greek, a vassal),
+and **Rostam Farrokhzad conflated with Rostam son of Zal** — two different men,
+and the most common error in this whole subject. Each violation returns the
+reason, not just a refusal, because the refusal has to survive being argued with
+in six months.
+
+Verified: a clean paragraph about Zarina passes; a paragraph containing all five
+fabrications returns six BLOCKs.
+
+## Connecting ASTRA specifically
+
+ASTRA is a worker on this lane like Codex or Jules, and needs nothing new built:
+
+1. Give it **repo/PR access to `ambientetravel/albaloostudio`** — and only that.
+   Never admin, never merge, never write-to-default.
+2. Point it at `orchestrator/bridge/ASTRA-PROMPT.md` and the seed.
+3. It opens a PR. The gate reads it within 6h, or on demand:
+
+       python3 tools/pr_review.py --repo ambientetravel/albaloostudio --pr <n>
+
+4. **You merge, or nobody does.**
+
+The seed still matters even with a live PR lane: a model that can open a PR can
+open a redundant one just as easily, and the first run of that seed caught its
+own author proposing an arena that was already finished.
+
 ## What only you can do (the clicks)
 
 1. **Add secrets** to the `ambientetravel/albaloostudio` repo → Settings → Secrets:

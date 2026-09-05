@@ -36,7 +36,30 @@ REPOS = {
     "ambientetravel/boutimar": "boutimar_v1",
     "ambientetravel/boutimarfarsi": "boutimar_v1",
     "ambientetravel/exploreorient": "partner_widget_v1",
+    # Holds the orchestrator AND the game, which is why the profile below is
+    # chosen per PATH rather than per repo.
+    "ambientetravel/albaloostudio": "boutimar_v1",
 }
+
+# Paths that are judged under a different profile than their repo's default.
+#
+# Persia at War is not a travel product: nothing in it sells a holiday, so the
+# visa and sanctions rules would only produce noise, and the rule that actually
+# matters — it never invents a date, an outcome, a unit or a king — has no
+# analogue on the website side. Judging the game under boutimar_v1 would pass a
+# PR that invented a Persian heroine, which is the one failure this product
+# cannot survive.
+PATH_PROFILES = (
+    ("persia-wars-game/", "persia_at_war_v1"),
+)
+
+
+def profile_for(filename: str, default: str) -> str:
+    """The compliance profile a single changed file is judged under."""
+    for prefix, profile in PATH_PROFILES:
+        if filename.startswith(prefix):
+            return profile
+    return default
 API = "https://api.github.com"
 # Only lines a person would read as content; skip lockfiles and generated noise.
 TEXT_EXT = (".md", ".mdx", ".astro", ".html", ".htm", ".json", ".js", ".ts",
@@ -84,8 +107,9 @@ def review_pr(repo: str, num: int, profile: str) -> dict:
             continue
         scanned += 1
         text = _added_text(patch)
-        for v in compliance.check(text, profile):
-            row = {"file": name, "rule": v.rule, "excerpt": v.excerpt, "fix": v.message}
+        for v in compliance.check(text, profile_for(name, profile)):
+            row = {"file": name, "rule": v.rule, "excerpt": v.excerpt, "fix": v.message,
+                   "profile": profile_for(name, profile)}
             (blocks if v.severity == compliance.BLOCK else warns).append(row)
     verdict = "BLOCK" if blocks else ("WARN" if warns else "PASS")
     return {"repo": repo, "pr": num, "profile": profile, "files_scanned": scanned,

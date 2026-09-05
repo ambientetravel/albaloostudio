@@ -255,6 +255,20 @@ PROFILES: dict[str, dict[str, bool]] = {
         "brand_neutral_embed": True,   # the embed runs inside partner agency sites
         "sanctions_check": True,
     },
+    # Persia at War — the game. A different product with a different failure
+    # mode: nothing here sells a holiday, so the visa and sanctions rules are
+    # off, and the whole promise instead is that it never invents a date, an
+    # outcome, a unit or a king. That promise is what `fabricated_history`
+    # defends, and it is the rule most likely to be broken by an outside model
+    # asked about Iranian history in good faith.
+    "persia_at_war_v1": {
+        "persian_gulf_only": True,
+        "visa_accuracy": False,
+        "no_invented_facts": True,
+        "brand_neutral_embed": False,
+        "sanctions_check": False,
+        "fabricated_history": True,
+    },
 }
 
 
@@ -263,6 +277,56 @@ PROFILES: dict[str, dict[str, bool]] = {
 # a *correctly written* brief — and the more precisely the model states the
 # rule, the more certainly its own brief is dead-lettered. Never check these.
 PROHIBITION_FIELDS = frozenset({"must_avoid", "avoid", "banned_terms", "do_not"})
+
+
+# --------------------------------------------------------- fabricated history
+#
+# Claims a general model reliably produces about Iranian history, each of which
+# is popular, sincerely believed, and unsupported. They are listed here because
+# the game's whole value is that it does not invent — a fabricated hero inside a
+# product built to teach honestly does more damage than a wrong price.
+#
+# Every entry carries WHY it is refused, because the refusal has to survive
+# somebody pushing back on it in six months.
+_FABRICATED = (
+    (
+        re.compile(r"(?i)پانته[\u200c\s]?آ|\bpante[ah]\b|arteshbod"),
+        "Pantea Arteshbod commanding the Immortals appears in no ancient source. "
+        "Xenophon's Panthea is a captive noblewoman in a philosophical romance.",
+    ),
+    (
+        re.compile(r"(?i)آپرانیک|\bapranik\b"),
+        "Apranik has no primary source in any language — not al-Tabari, not "
+        "Sebeos, no coin, no Pahlavi text. Twentieth century.",
+    ),
+    (
+        re.compile(r"(?i)یوتاب|\byoutab\b|\byutab\b"),
+        "Youtab is in no account of the Persian Gate. Ariobarzanes is real; she "
+        "is not attested with him.",
+    ),
+    (
+        re.compile(
+            r"(?i)(cyrus\s+cylinder|استوانه\s*کوروش)[^.\n]{0,80}"
+            r"(human\s+rights|first\s+charter|منشور\s*حقوق)"
+        ),
+        "The Cyrus Cylinder as a charter of human rights is a 20th-century "
+        "reading, not what the object says. Describe what it records.",
+    ),
+    (
+        re.compile(r"(?i)artemisia[^.\n]{0,40}\bpersian\b(?![^.\n]{0,40}\bvassal\b)"),
+        "Artemisia I was Carian Greek, a vassal of the Great King — real via "
+        "Herodotus, but not Persian.",
+    ),
+    (
+        re.compile(
+            r"(?i)rostam\s+farrokhzad[^.\n]{0,60}"
+            r"(rakhsh|seven\s+labou?rs|white\s+div|son\s+of\s+zal)"
+        ),
+        "Two different men share the name. Rostam Farrokhzad is a Sasanian "
+        "general in al-Tabari and Sebeos; Rostam son of Zal is the Shahnameh's "
+        "hero. Conflating them is the single most common error here.",
+    ),
+)
 
 
 def mentions_prohibition(text: str) -> bool:
@@ -344,6 +408,11 @@ def check(
                     'Use «خلیج فارس» / "Persian Gulf". "Arabian Gulf" is never acceptable.',
                 )
             )
+
+    if rules.get("fabricated_history"):
+        for pattern, why in _FABRICATED:
+            for m in pattern.finditer(text):
+                out.append(Violation("fabricated_history", BLOCK, _excerpt(text, m), why))
 
     if rules["visa_accuracy"]:
         route_ok = ctx.get("route_key") in VISA_FREE_ROUTES
@@ -510,6 +579,11 @@ def prompt_constraints(profile: str = "boutimar_v1") -> str:
             "— in body copy, headings, alt text, meta, schema or relabelled source "
             'data. ("Arabian Sea" is a different body of water; leave it alone.)'
         )
+    if rules.get("fabricated_history"):
+        for pattern, why in _FABRICATED:
+            for m in pattern.finditer(text):
+                out.append(Violation("fabricated_history", BLOCK, _excerpt(text, m), why))
+
     if rules["visa_accuracy"]:
         lines.append(
             "2. Visa accuracy. Only AROYA's Türkiye+Egypt routes and Seychelles are "
