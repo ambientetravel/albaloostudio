@@ -138,9 +138,15 @@ seed = {
     'measured_not_guessed': {
         'escalation': 'Army power 4.0 (round 1) -> 21.6 (round 7) = 5.38x, increments '
                       '+2.8 +2.4 +2.5 +2.9 +3.2 +3.8. Was 4.52x flat before a fix.',
-        'match_length': 'Of 60 measured matches, 42 reached round 5, only 10 reached round 7. '
-                        'Average final army 4.63 squads against a cap of 6. The designed '
-                        'climax round happens in about one match in six.',
+        'match_length': (
+            'RE-MEASURED 5 Sep over 120 matches; the earlier figure was stale. '
+            'Rounds played: 4 -> 25%, 5 -> 22%, 6 -> 25%, 7 -> 28%. Round seven now '
+            'happens in more than a QUARTER of matches, not one in six. The old '
+            '10-of-60 reading predates the escalation fix, the per-man simulation and '
+            'the Wildcard, all of which lengthen a match. Do not hand an analyst the '
+            'old number as a problem statement. Average final army 4.63 squads '
+            'against a cap of 6.'
+        ),
         'reference_game_comparison': 'The mobile game this takes its shape from offers cards '
                                      'worth +2 to +5 units early and +5 to +8 late, with armies '
                                      'reaching 40+. Its picks ALTERNATE; ours are simultaneous.',
@@ -152,6 +158,14 @@ seed = {
         },
     },
 
+    'known_asymmetry': (
+        'In a MIRROR match — same rival style both sides, 120 matches — side A wins '
+        '54%. Mild, but real, and nothing was watching it: the rival-style tests '
+        'deliberately cancel side advantage by playing both ways, which is correct '
+        'for measuring styles and means the side bias itself went unmeasured. Likely '
+        'cause is tick iteration order, since side A units are spawned first and so '
+        'act first within a tick.'
+    ),
     'decided_and_closed': [
         'No age gate. Removed deliberately — the audience is 9-14, so an adult path served '
         'nobody and existed only to grant the one privilege carrying all the risk.',

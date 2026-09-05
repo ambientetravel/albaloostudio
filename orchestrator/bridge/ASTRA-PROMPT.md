@@ -26,9 +26,12 @@ These are the surfaces the project is blind to, in order of value:
    and auto-battler space — progression curves, session length, retention hooks,
    what launched and died and why. This is the single most useful thing you can
    provide, because it is the one thing that cannot be reasoned out from here.
-2. **Adversarial critique of the round loop.** Measured: of 60 matches, 42 reached
-   round 5 and only **10 reached round 7**. The designed climax happens in about
-   one match in six. Why does a ten-year-old stop at round three?
+2. **Adversarial critique of the round loop.** Re-measured over 120 matches:
+   rounds played come out 4 → 25%, 5 → 22%, 6 → 25%, **7 → 28%**. Length is
+   healthy and evenly spread; an earlier reading of one-in-six was taken before
+   several fixes and is stale. **So the question is not "why is it short" — it
+   is why a ten-year-old stops playing at all.** Session length, the reason to
+   open it tomorrow, and what makes round three feel worth finishing.
 3. **Educational-game conventions for ages 9–14.** Reading load, session length,
    how other history games handle uncertainty without being boring.
 4. **Retention and soft launch.** There is no daily loop here worth the name.
