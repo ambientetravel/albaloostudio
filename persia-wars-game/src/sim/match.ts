@@ -14,6 +14,7 @@ import {
   type Ledger,
   type OfferCard,
   type Side,
+  wildcardFor,
 } from './roundCore.ts';
 
 /**
@@ -78,6 +79,19 @@ export interface MatchState {
   winsNeeded: number;
   /** Set when this match is a campaign mission. Null for ranked and practice. */
   missionId: string | null;
+}
+
+/**
+ * Whether this side's pick is doubled this round.
+ *
+ * Recomputed from the match rather than stored, so it cannot drift out of sync
+ * with the score, and so a replay derives the same answer without the recording
+ * having to carry it. Called by the draft screen to announce it BEFORE the
+ * choice — a doubling nobody knew about is not a decision, it is a surprise
+ * bill.
+ */
+export function holdsWildcard(m: MatchState, side: Side): boolean {
+  return wildcardFor(m.seed, m.round, side, deficitOf(m, side));
 }
 
 /** Whether this side is holding a Rally reroll right now. */
@@ -226,8 +240,8 @@ export function commitPicks(m: MatchState): MatchState {
     ...m,
     phase: 'battle',
     ledgers: {
-      a: addPick(m.ledgers.a, m.picked.a!, m.round, m.cards, m.winsNeeded),
-      b: addPick(m.ledgers.b, m.picked.b!, m.round, m.cards, m.winsNeeded),
+      a: addPick(m.ledgers.a, m.picked.a!, m.round, m.cards, m.winsNeeded, holdsWildcard(m, 'a')),
+      b: addPick(m.ledgers.b, m.picked.b!, m.round, m.cards, m.winsNeeded, holdsWildcard(m, 'b')),
     },
   };
 }

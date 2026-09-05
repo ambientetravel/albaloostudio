@@ -67,6 +67,50 @@ export function offerSizeForDeficit(deficit: number): number {
 /** B — rounds lost since your last win. At RALLY_AT you hold a reroll. */
 export const RALLY_AT = 2;
 
+// ------------------------------------------------------------- the wildcard
+/**
+ * The Wildcard.
+ *
+ * Some rounds, whatever you take this round counts DOUBLE. It is announced
+ * before you choose, which is the whole point: you decide what to double, so it
+ * rewards reading the board rather than just handing out a bigger number.
+ *
+ * **It is seeded, never random.** `Math.random()` here would break two things
+ * silently — the recorder replays a match byte-identically from a few hundred
+ * bytes of decisions, and the server detects desync by comparing both clients.
+ * A genuinely random multiplier would surface as players being disconnected
+ * mid-match for no visible reason. Everything below derives from
+ * (seed, round, side, deficit), all of which both clients already agree on.
+ *
+ * The chance rises with how far behind you are, so it pulls the same direction
+ * as the three existing comebacks (wider offer, the Rally, counter-weighting)
+ * instead of against them. It is deliberately non-zero at level pegging — a
+ * comeback you can only ever get by losing is not a surprise, and the surprise
+ * is half of why this exists.
+ */
+export const WILDCARD_MULT = 2;
+export const WILDCARD_BASE = 0.08;
+export const WILDCARD_PER_DEFICIT = 0.17;
+export const WILDCARD_MAX = 0.46;
+/** Never on the opening round — there is no board to read yet, and no deficit. */
+export const WILDCARD_FROM_ROUND = 2;
+
+export function wildcardChance(deficit: number): number {
+  return Math.min(WILDCARD_MAX, WILDCARD_BASE + Math.max(0, deficit) * WILDCARD_PER_DEFICIT);
+}
+
+/**
+ * Whether this side's pick is doubled this round. Pure, and derived only from
+ * values both clients hold — see the note above on why that is not optional.
+ */
+export function wildcardFor(seed: number, round: number, side: Side, deficit: number): boolean {
+  if (round < WILDCARD_FROM_ROUND) return false;
+  // Salted per side, or both players would always roll the wildcard together.
+  const salt = side === 'a' ? 0x9e3779b9 : 0x85ebca6b;
+  const rng = makeRng((roundSeedFor(seed, round) ^ salt) >>> 0);
+  return rng.next() < wildcardChance(deficit);
+}
+
 /** C — how hard slot C leans toward an answer. Capped; never a guarantee. */
 export const COUNTER_WEIGHT = 2;
 export const COUNTER_WEIGHT_TRAILING = 3;
@@ -90,6 +134,12 @@ export interface LedgerEntry {
   tier: Tier;
   /** Trait ids granted by Upgrade cards. Never affects rank. */
   traits: string[];
+  /**
+   * Taken on a Wildcard round, so this squad counts double. Sticky: a doubled
+   * squad stays doubled when it is later ranked up, or the reward would quietly
+   * evaporate the moment you improved it.
+   */
+  doubled?: boolean;
 }
 
 /**
@@ -211,6 +261,7 @@ export function addPick(
   round: number,
   cards: CardIndex,
   wins = WINS_NEEDED,
+  wild = false,
 ): Ledger {
   if (card.kind === 'doctrine') {
     if (ledger.doctrines.includes(card.id)) return ledger;
@@ -237,7 +288,9 @@ export function addPick(
     return {
       ...ledger,
       squads: ledger.squads.map((e) =>
-        e.unitId === card.id ? { ...e, tier: Math.min(cap, e.tier + 1) as Tier } : e,
+        e.unitId === card.id
+          ? { ...e, tier: Math.min(cap, e.tier + 1) as Tier, ...(wild || e.doubled ? { doubled: true } : {}) }
+          : e,
       ),
     };
   }
@@ -257,7 +310,10 @@ export function addPick(
   const arrives = Math.max(1, cap - 1) as Tier;
   return {
     ...ledger,
-    squads: [...ledger.squads, { unitId: card.id, tier: card.startTier ?? arrives, traits: [] }],
+    squads: [
+      ...ledger.squads,
+      { unitId: card.id, tier: card.startTier ?? arrives, traits: [], ...(wild ? { doubled: true } : {}) },
+    ],
   };
 }
 

@@ -4893,3 +4893,21 @@ button.unit-card:active:not(:disabled) {
   object-fit: contain;
   display: block;
 }
+
+/* The Wildcard. Loud on purpose — it is the one thing on the draft sheet the
+   player must not miss, because it changes which card is the right card. */
+.wild-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: var(--ink);
+  background: linear-gradient(100deg, var(--gold), var(--ochre-hi));
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35), 0 0 14px rgb(214 168 74 / 0.55);
+  animation: wild-pulse 1.5s ease-in-out infinite;
+}
+@keyframes wild-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}

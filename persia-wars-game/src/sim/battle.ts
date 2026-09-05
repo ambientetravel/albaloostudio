@@ -4,6 +4,7 @@ import { makeRng } from './rng';
 import {
   ROUNDS_MAX,
   TIER_MULT,
+  WILDCARD_MULT,
   exhaustionMultiplier,
   roundTickLimit,
   type LedgerEntry,
@@ -150,7 +151,12 @@ function spawn(
   const traits = entry.traits;
   // A tier is "more of the same": more men, better kit, the same tactics. It
   // multiplies attack, armour and health alike so the card stays recognisable.
-  const t = TIER_MULT[entry.tier - 1] ?? 1;
+  //
+  // A Wildcard squad rides the SAME multiplier rather than a separate rule, so
+  // it stays "more of the same" too — twice the men, not a different unit with
+  // special powers. That also means it needs no new balance surface: it moves
+  // the one number rank already moves.
+  const t = (TIER_MULT[entry.tier - 1] ?? 1) * (entry.doubled ? WILDCARD_MULT : 1);
 
   // Wheeling Line riders come in wide, so they take the outermost lane rather
   // than their draft position — that is what makes it read as a flank.
@@ -191,6 +197,7 @@ function spawn(
     defId: def.id,
     side,
     tier: entry.tier,
+    doubled: entry.doubled,
     traits,
     cls: def.class,
     silhouette: def.art.silhouette,
@@ -419,6 +426,7 @@ export function simulate(
       lane: u.lane,
       maxHp: u.maxHp,
       tier: u.tier,
+      doubled: u.doubled,
       traits: u.traits,
     })),
     frames,

@@ -4,7 +4,7 @@ import { getArena, getBattle, getCommander, getDoctrine, getUnit, getUpgrade } f
 import { arenaForTrophies } from '../game/progression';
 import { BattleCanvas } from '../render/BattleCanvas';
 import { STYLE_LABEL, thinkTime, type RivalStyle } from '../sim/ai';
-import { deficitOf, finalClash, holdsRally } from '../sim/match';
+import { deficitOf, finalClash, holdsRally, holdsWildcard } from '../sim/match';
 import {
   ROUNDS_MAX,
   TIER_NAME,
@@ -208,6 +208,7 @@ export function MatchScreen() {
               secondsLeft={secondsLeft}
               onPick={makePick}
               rally={holdsRally(matchState, mySide)}
+              wild={holdsWildcard(matchState, mySide)}
               deficit={deficitOf(matchState, mySide)}
               onRally={useRally}
             />
@@ -460,6 +461,7 @@ function Offer({
   secondsLeft,
   onPick,
   rally,
+  wild,
   deficit,
   onRally,
 }: {
@@ -472,6 +474,7 @@ function Offer({
   secondsLeft: number | null;
   onPick: (id: string) => void;
   rally: boolean;
+  wild: boolean;
   deficit: number;
   onRally: () => void;
 }) {
@@ -483,7 +486,13 @@ function Offer({
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
       <div className="offer-sheet__head">
-        <span>{waiting ? 'Waiting for your opponent…' : 'Take one'}</span>
+        <span>
+          {waiting ? 'Waiting for your opponent…' : wild ? 'Take one — it counts DOUBLE' : 'Take one'}
+        </span>
+        {/* Announced BEFORE the choice, deliberately. Doubling whatever the
+            player happened to pick would be a surprise; telling them first
+            makes it a decision about which card is worth doubling. */}
+        {wild && !waiting && <span className="wild-tag">WILDCARD ×2</span>}
         {/* Comeback A, stated rather than slipped in. A wider offer with no
             explanation reads as luck; labelled, it reads as a rule. */}
         {deficit > 0 && offer.length > 3 && (

@@ -18,6 +18,8 @@ export interface SimUnit {
   side: Side;
   /** Levy → Trained → Veteran → Royal. Scales atk, def and hp together. */
   tier: Tier;
+  /** Taken on a Wildcard round: this squad counts double. */
+  doubled?: boolean;
   /** Trait ids from Upgrade cards. Behaviour only — never a rank. */
   traits: string[];
   cls: UnitClass;
@@ -68,6 +70,8 @@ export interface BattleLog {
     lane: number;
     maxHp: number;
     tier: Tier;
+    /** Taken on a Wildcard round — the renderer draws twice the men. */
+    doubled?: boolean;
     traits: string[];
   }[];
   frames: Frame[];

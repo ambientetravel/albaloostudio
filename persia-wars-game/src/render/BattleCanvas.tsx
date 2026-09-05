@@ -245,7 +245,11 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         const facing = u.side === 'a' ? 1 : -1;
         const files: Container[] = [];
         const filePhase: number[] = [];
-        for (let i = 0; i < filesForTier(u.tier); i++) {
+        // A Wildcard squad is literally twice the squad, so it is twice the
+        // men — the doubling has to be visible on the board or it is just a
+        // number the player has to take on trust.
+        const fileCount = filesForTier(u.tier) * (u.doubled ? 2 : 1);
+        for (let i = 0; i < fileCount; i++) {
           const man = makeBody();
           const post = filePost(i, facing);
           man.position.set(post.x, post.y);
