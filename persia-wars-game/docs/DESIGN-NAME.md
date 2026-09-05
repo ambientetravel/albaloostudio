@@ -125,7 +125,33 @@ twelve-year-old.*
 
 ---
 
-## Recommendation
+## DECIDED — 5 Sep 2026: keep *Persia at War* for now
+
+Not a rejection of the analysis, a rejection of the winner. **"Royal ___" is a
+crowded shelf** — Royal Road, Royal Kings, Royal Match, Clash Royale — and a
+title that disappears into a search result solves nothing, however well it fits
+the map. Crossroads of Empires has the same disease and I had already flagged it
+as the least memorable. Both objections are fair and I under-weighted the
+namespace.
+
+So the working title stays, and the list stays open. **Simorgh and Farr are the
+two that survive the crowded-shelf test** — nothing else on a store shelf is
+called either — and are where to look again when this is reopened.
+
+## When it stops being cheap
+
+Renaming is cheap *now* and the cost is not money, it is timing:
+
+| | cost |
+|---|---|
+| **Today** | the `<title>`, the repo folder, a dozen doc mentions, and ONE branch on read to migrate the `persia-at-war/recordings/v1` key |
+| **After the first store listing** | the store slug and URL are effectively permanent on both stores; the old name is what anyone who linked you wrote down |
+| **After players have saves** | the migration branch stops being optional and has to survive uninstall/reinstall |
+
+**The deadline is the first public listing, not launch-readiness.** Everything
+before that is an afternoon.
+
+## Recommendation, as it stood
 
 **THE ROYAL ROAD**, with **SIMORGH** as the alternative if brand
 distinctiveness beats descriptiveness.

@@ -4,6 +4,12 @@
 
 ## What it is
 
+**The name is provisional.** *Persia at War* stays for now — see
+`DESIGN-NAME.md` for seven candidates and why the front-runner was rejected. The
+point of no return is the **first public store listing**, not launch-readiness:
+before that a rename is an afternoon plus one `localStorage` migration branch.
+
+
 A standalone educational draft + auto-battler on real Iranian battles, ages
 9–14, aimed especially at the Iranian diaspora. **Not a Boutimar product.**
 React 19 + Vite 7 + TS 5.7, PixiJS v8 battle canvas, Zustand 5. Node 24 type
