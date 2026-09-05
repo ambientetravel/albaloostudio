@@ -33,7 +33,7 @@
       "ROUNDS_MAX": "7"
     }
   },
-  "known_asymmetry": "In a MIRROR match — same rival style both sides, 120 matches — side A wins 54%. Mild, but real, and nothing was watching it: the rival-style tests deliberately cancel side advantage by playing both ways, which is correct for measuring styles and means the side bias itself went unmeasured. Likely cause is tick iteration order, since side A units are spawned first and so act first within a tick.",
+  "side_bias_NOT_ESTABLISHED": "A 54% win rate for side A was reported and it does NOT replicate. With identical decks on both sides the figure moves to 44% / 53% / 64% across the three rival styles — the direction is not even consistent, so the original reading was one configuration mistaken for a finding. Two confounds were in it: each side drew its deck from a different seed, and the two sides legitimately receive different offers. A real measurement needs both controlled and far more than 120 matches per cell; at n=120 the standard error alone is about 4.5 points. Do not act on the 54% figure and do not ask an analyst to explain it.",
   "decided_and_closed": [
     "No age gate. Removed deliberately — the audience is 9-14, so an adult path served nobody and existed only to grant the one privilege carrying all the risk.",
     "Nobody types a name. All 144 display names come from a closed set the SERVER checks membership against, so no profanity list is needed in any language.",
