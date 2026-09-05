@@ -24,7 +24,18 @@ const SWING_LIFE = 0.34;
  * touched it, and the whole exchange read as decoration rather than damage.
  * Short on purpose: long enough to see, too short to fight the gait.
  */
-const HURT_LIFE = 0.22;
+const HURT_LIFE = 0.34;
+/**
+ * How hard a hit throws a man back, in screen pixels.
+ *
+ * A blow that a body does not answer reads as a number changing, not as a
+ * fight. He gives ground, staggers off his line, and walks back into it — the
+ * recovery is what makes it a stagger rather than a teleport.
+ */
+const KNOCKBACK = 9;
+const STAGGER = 4.5;
+/** How long a man takes to fall over once killed. */
+const FALL_LIFE = 0.55;
 
 const hex = (s: string): number => Number.parseInt(s.replace('#', ''), 16);
 /**
@@ -180,6 +191,10 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         hurt: number;
         /** True when this unit is commissioned art rather than a placeholder. */
         tall: boolean;
+        /** This man's uid, so his swing hand is stable across frames. */
+        uid: number;
+        /** Counts down while he is falling. */
+        fall: number;
 
       }
 
@@ -247,6 +262,8 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
           phase: (u.uid * 0.37 + u.file * 0.29) % 1,
           swing: 0,
           hurt: 0,
+          fall: 0,
+          uid: u.uid,
           tall: Boolean(texture),
         });
       }
@@ -516,30 +533,48 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
           // Side A advances up the screen, side B down it.
           const facing = meta.side === 'a' ? -1 : 1;
 
+          /*
+           * Which hand he swings with. Fixed per man from his uid, so a rank
+           * does not swing in unison like a chorus line — half the line cuts
+           * left and half cuts right, which is most of what makes a melee look
+           * like a melee instead of a machine.
+           */
+          const hand = sprite.uid % 2 === 0 ? 1 : -1;
+
           let lunge = 0;
           let spin = 0;
+          let swipe = 0;
           if (sprite.swing > 0) {
             sprite.swing = Math.max(0, sprite.swing - dt);
             const k = 1 - sprite.swing / SWING_LIFE;
             const pose = attackPose(profile.attack, k);
             lunge = pose.lunge * facing;
-            spin = pose.spin * facing;
+            spin = pose.spin * facing + pose.spin * hand * 0.5;
+            // A swing travels ACROSS the body, not just forward. Cuts and
+            // lashes arc sideways; a thrust and a shot do not.
+            const lateral = profile.attack === 'swing' || profile.attack === 'lash' ? 5 : 0;
+            swipe = Math.sin(k * Math.PI) * lateral * hand;
           }
 
           // Recoil: a short jolt away from whoever hit them, and a squash, so a
           // landed blow is visible on the body and not only in the flare.
           let recoil = 0;
+          let stagger = 0;
           let squash = 1;
           if (sprite.hurt > 0) {
             sprite.hurt = Math.max(0, sprite.hurt - dt);
             const h = sprite.hurt / HURT_LIFE;
-            recoil = h * 3.4 * -facing;
-            squash = 1 + h * 0.14;
+            // Thrown back hard, then walking back onto his line. The lateral
+            // stagger is what stops a struck rank looking like it bounced.
+            const ease = h * h;
+            recoil = ease * KNOCKBACK * -facing;
+            stagger = ease * STAGGER * hand;
+            squash = 1 + h * 0.2;
           }
 
           // `slot` spreads the squad across its lane, so a body of men occupies
           // width rather than standing in single file down one pixel column.
-          const x = baseX + g.sway + meta.slot * laneSpread(w);
+          const x = baseX + g.sway + meta.slot * laneSpread(w) + stagger + swipe;
           /*
            * Formation depth lives HERE and not in the simulation. Rear ranks
            * are drawn behind the front one, but every man of a squad fights
@@ -576,9 +611,22 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
 
           const hpFrac = meta.maxHp > 0 ? p.hp / meta.maxHp : 0;
           if (p.hp <= 0) {
-            sprite.root.alpha = Math.max(0, sprite.root.alpha - dt * 2.5);
-            sprite.body.rotation += dt * 3 * facing;
+            /*
+             * He falls over. The old death was a fade with a slow spin, which
+             * at this size read as a sprite being switched off rather than a
+             * man going down — and with ninety men on the board, deaths are
+             * most of what the eye is actually watching.
+             *
+             * Topple to flat, drop onto the ground line, and only then fade.
+             */
+            sprite.fall = Math.min(FALL_LIFE, sprite.fall + dt);
+            const f = sprite.fall / FALL_LIFE;
+            const ease = 1 - (1 - f) * (1 - f);
+            sprite.body.rotation = ease * (Math.PI / 2) * hand;
+            sprite.root.position.set(x + ease * 3 * hand, y + ease * 5);
+            sprite.root.alpha = f < 0.6 ? 1 : Math.max(0, 1 - (f - 0.6) / 0.4);
             sprite.bar.clear();
+            continue;
           } else {
             sprite.root.alpha = 1;
             sprite.bar.clear();
