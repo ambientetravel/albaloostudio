@@ -121,6 +121,46 @@ side. Any narrowing has to happen in Codex's own repo selection instead.
 `ambientetravel` is a **personal account, not an organisation**, which is why
 `persia-at-war` sits directly under it.
 
+### DONE, 5 Sep — Codex is installed and scoped to one repo
+
+`ChatGPT Codex Connector` → **Only select repositories** → `ambientetravel/persia-at-war`,
+verified after a full reload.
+
+**The route, for when this is done again:** the workspace is
+`chatgpt.com/codex/cloud` — `/codex` is a marketing page with no account state at
+all — and the per-repo selector sits behind **"Configure Repositories on GitHub"**
+in the repository dropdown. That link opens a real GitHub App **installation**
+page, which is exactly why it is the safe route: an installation always shows the
+repository selector and the permission list, where Reconnect on an existing OAuth
+grant completes silently with nothing to decline.
+
+**Two things GitHub will not let you narrow:**
+
+- **`workflows` write cannot be unticked.** It is bundled with code, issues,
+  actions and pull requests on one line. Write to `.github/workflows` is the
+  ability to run code in your Actions runners with that repo's secrets, so
+  **repository scope is the only lever there is** — the argument for the game
+  having its own repo, made concrete.
+- **"Only select repositories" still includes public repositories, read-only**,
+  per GitHub's own wording on the option.
+
+**The radio defaults to "All repositories" and is pre-selected.** It was installed
+on that default and narrowed a few minutes later. Nothing could have used it —
+Codex had no environments and no repositories selected, so there was no task to
+run — but the lesson is that the radio must be changed BEFORE the green button.
+
+## Still open: which account this lives on
+
+`persia-at-war` sits on the `ambientetravel` account beside the travel properties.
+Private, so nothing is publicly associated today. But the game is explicitly **not**
+a Boutimar or Ambiente product, and the moment that repo goes public — or the game
+ships from it — the owner is visible and the association is made for you.
+
+Moving a repo between accounts keeps its history and takes a few clicks. **Same
+deadline as the name: before anything is public.**
+
+## The boundary that keeps it safe
+
 An external agent **opens a PR and nothing more**. No merge, no push to `main`, no
 deploy, no outbound email. The gate reads and reports; you merge. More brains
 proposing is only safe because one brain reviews and one person ships. Do not grant
