@@ -92,7 +92,34 @@ own author proposing an arena that was already finished.
 3. **Fix the `boutimarfarsi` push token** so boutimar.ir joins the PR lane (it's
    been blocked on the PAT).
 
-## The boundary that keeps it safe
+## Correction, 5 Sep — the ChatGPT GitHub PLUGIN is not the lane
+
+Checked on the live account and the instruction above ("connect GitHub in
+ChatGPT") is not sufficient. Two different things carry similar names:
+
+| | what it is | can it open a PR? |
+|---|---|---|
+| **ChatGPT GitHub plugin** | already connected as `contactmozaffari@gmail.com`, permission level **"Allow low-risk actions (DEFAULT)"** — Check repo initialized, Compare commits, Download git tree archive | **No. Read only.** |
+| **ChatGPT Codex Connector** | listed under **Authorized** GitHub Apps, NOT under Installed | this is the one that writes |
+
+**Authorized is not installed, and the difference decides everything here.** A
+per-repository selector — "Only select repositories" — exists only for a GitHub
+App *installation*. An OAuth authorisation is account-scoped by construction, so
+there is no repo picker to find and no way to fence it to one repo from GitHub's
+side. Any narrowing has to happen in Codex's own repo selection instead.
+
+**Two things not to do:**
+
+- **Do not click Reconnect on the plugin.** GitHub skips the consent screen when
+  re-authorising an app that already holds a grant, so it completes silently —
+  there is no button left to decline.
+- **Do not raise the plugin above "low-risk actions".** That setting is
+  account-wide, not per-repository, so it would grant write across every repo on
+  the account. That is precisely the exposure the repo split was done to avoid,
+  and trading it away at the last step would undo the whole exercise.
+
+`ambientetravel` is a **personal account, not an organisation**, which is why
+`persia-at-war` sits directly under it.
 
 An external agent **opens a PR and nothing more**. No merge, no push to `main`, no
 deploy, no outbound email. The gate reads and reports; you merge. More brains
