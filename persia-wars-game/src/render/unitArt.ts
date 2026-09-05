@@ -37,6 +37,24 @@ const cardFiles = import.meta.glob('../assets/cards/*.png', {
   import: 'default',
 }) as Record<string, string>;
 
+/**
+ * Rig parts, cut by `tools/rig/cut_horse.py`.
+ *
+ * Only VERIFIED cuts are listed below. The cutter finds its seams by clustering
+ * the leg columns, and on painted art that is not reliable — on two of the five
+ * mounted sprites it split one hind leg from three forelegs, which animates
+ * like a broken toy. Every rig here has been looked at as a contact sheet
+ * first, and a unit not on the list simply draws as a still sprite, exactly as
+ * it did before.
+ */
+const rigFiles = import.meta.glob('../assets/rig/*/*.png', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
+
+const RIGGED = new Set(['persian-cavalry']);
+
 const index = (files: Record<string, string>): Map<string, string> => {
   const map = new Map<string, string>();
   for (const [path, url] of Object.entries(files)) {
@@ -56,6 +74,18 @@ export function unitArtUrl(unitId: string): string | null {
 
 export function hasUnitArt(unitId: string): boolean {
   return byId.has(unitId);
+}
+
+/** Part URLs for a rigged unit, or null if it draws as a still sprite. */
+export function rigUrls(unitId: string): Record<string, string> | null {
+  if (!RIGGED.has(unitId)) return null;
+  const parts: Record<string, string> = {};
+  for (const [path, url] of Object.entries(rigFiles)) {
+    const bits = path.split('/');
+    const part = bits.pop()?.replace(/\.png$/, '');
+    if (bits.pop() === unitId && part) parts[part] = url;
+  }
+  return Object.keys(parts).length === 4 ? parts : null;
 }
 
 /** The emblem for an Upgrade or Doctrine, or null while it is a placeholder. */

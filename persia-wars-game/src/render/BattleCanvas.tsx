@@ -7,7 +7,16 @@ import { FIELD_MAX, FIELD_MIN, TICK_RATE } from '../sim/types';
 import { themeFor } from '../ui/arenaTheme';
 import { attackPose, gait, motionFor } from './motion';
 import { PALETTE, drawSilhouette } from './silhouettes';
-import { unitArtUrl } from './unitArt';
+import { rigUrls, unitArtUrl } from './unitArt';
+import {
+  HORSE_RIG,
+  RIG_PARTS,
+  applyPose,
+  buildRig,
+  gallop,
+  idle,
+  type RiggedFigure,
+} from './rig';
 
 const SIDE_COLOR = { a: PALETTE.red, b: PALETTE.blue } as const;
 const SIDE_TRIM = { a: PALETTE.gold, b: PALETTE.white } as const;
@@ -170,9 +179,23 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         (u): u is string => u !== null,
       );
       const textures = new Map<string, Texture>();
-      if (artUrls.length > 0) {
-        const loaded = await Promise.all(artUrls.map((u) => Assets.load<Texture>(u)));
+      // Rig parts, keyed `unitId/part`. Loaded with the sprites so a rigged
+      // unit never pops in a frame later than an unrigged one.
+      const rigTex = new Map<string, Texture>();
+      // Rig parts for whichever units on this field are rigged.
+      const rigJobs: { key: string; url: string }[] = [];
+      for (const id of new Set(log.roster.map((u) => u.defId))) {
+        const parts = rigUrls(id);
+        if (!parts) continue;
+        for (const [part, url] of Object.entries(parts)) rigJobs.push({ key: `${id}/${part}`, url });
+      }
+      if (artUrls.length > 0 || rigJobs.length > 0) {
+        const [loaded, rigLoaded] = await Promise.all([
+          Promise.all(artUrls.map((u) => Assets.load<Texture>(u))),
+          Promise.all(rigJobs.map((j) => Assets.load<Texture>(j.url))),
+        ]);
         artUrls.forEach((u, i) => textures.set(u, loaded[i]));
+        rigJobs.forEach((j, i) => rigTex.set(j.key, rigLoaded[i]));
         if (destroyed) {
           instance.destroy(true, { children: true });
           return;
@@ -195,6 +218,8 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         uid: number;
         /** Counts down while he is falling. */
         fall: number;
+        /** Present only for a rigged unit — the parts to pose each frame. */
+        rig: RiggedFigure | null;
 
       }
 
@@ -207,7 +232,33 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         // The ring has to match whatever it sits under: a horseman is half again
         // as wide as an archer, and one fixed ellipse looks wrong beneath both.
         let ringRx = 9;
+        /**
+         * A rigged unit is a container of parts on pivots; everything else is
+         * one sprite. Both are Containers, so the gait, the lunge, the recoil
+         * and the fall downstream do not know or care which they got.
+         */
+        const rigParts = rigUrls(u.defId);
+        let rig: RiggedFigure | null = null;
+
         const makeBody = (): Container => {
+          if (rigParts) {
+            const tex = Object.fromEntries(
+              RIG_PARTS.map((part) => [part, rigTex.get(`${u.defId}/${part}`)]),
+            ) as Record<(typeof RIG_PARTS)[number], Texture>;
+            if (RIG_PARTS.every((part) => tex[part])) {
+              const built = buildRig(HORSE_RIG, tex);
+              rig = built;
+              // The rig is drawn in texture pixels, so scale it to the same
+              // height a plain sprite gets and hang it from the same foot line.
+              const k = SPRITE_HEIGHT / HORSE_RIG.size[1];
+              const holder = new Container();
+              holder.addChild(built.root);
+              holder.scale.set(k);
+              holder.position.set((-HORSE_RIG.size[0] / 2) * k, -SPRITE_HEIGHT * 0.94);
+              ringRx = Math.max(7, HORSE_RIG.size[0] * k * 0.42);
+              return holder;
+            }
+          }
           if (texture) {
             const art = new Sprite(texture);
             // Feet essentially on the origin, with a sliver below so the figure
@@ -263,6 +314,7 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
           swing: 0,
           hurt: 0,
           fall: 0,
+          rig,
           uid: u.uid,
           tall: Boolean(texture),
         });
@@ -604,6 +656,17 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
            * determinism rule: nothing in this file may make two machines
            * disagree about a frame.
            */
+          /*
+           * Pose the rig from the SAME stride clock the procedural gait runs
+           * on, so a rigged horse and an unrigged one stay in step with each
+           * other and with the bob. The rig replaces the leg motion; the bob,
+           * sway and lean stay, because a real gallop has all of it.
+           */
+          if (sprite.rig) {
+            const stride = clock * profile.bobHz + sprite.phase;
+            applyPose(sprite.rig, moving ? gallop(stride % 1) : idle(stride % 1));
+          }
+
           // Idle sway on top of the gait, phased per man so a rank ripples
           // across rather than tilting as one body.
           const wind = elapsedTicks * WIND_SPEED + sprite.phase * Math.PI * 2;
