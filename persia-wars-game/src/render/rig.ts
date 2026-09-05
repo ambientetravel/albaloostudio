@@ -20,8 +20,24 @@ import { Container, Sprite, Texture } from 'pixi.js';
  * canvas so all four share one origin and a pivot is just a coordinate.
  */
 
-export type RigPart = 'body' | 'legs-front' | 'legs-hind' | 'tail';
-export const RIG_PARTS: RigPart[] = ['tail', 'legs-hind', 'body', 'legs-front'];
+/**
+ * Parts a rig can have. Two shapes share the machinery:
+ *   mounted — tail, legs-hind, body, legs-front  (see cut_horse.py)
+ *   foot    — leg-rear, body, leg-lead           (see cut_foot.py)
+ * A rig declares its own parts in `rig.json`; nothing here assumes four.
+ */
+export type RigPart =
+  | 'body'
+  | 'legs-front'
+  | 'legs-hind'
+  | 'tail'
+  | 'leg-lead'
+  | 'leg-rear';
+
+export const MOUNTED_PARTS: RigPart[] = ['tail', 'legs-hind', 'body', 'legs-front'];
+export const FOOT_PARTS: RigPart[] = ['leg-rear', 'body', 'leg-lead'];
+/** Every part name, for iterating without knowing the shape. */
+export const RIG_PARTS: RigPart[] = [...new Set([...MOUNTED_PARTS, ...FOOT_PARTS])];
 
 export interface Joint {
   /** Where this part turns, in texture pixels. */
@@ -33,7 +49,20 @@ export interface Joint {
 export interface RigDef {
   /** Texture dimensions the pivots are measured in. */
   size: [number, number];
-  joints: Record<RigPart, Joint>;
+  /** Only the parts this rig actually has. */
+  joints: Partial<Record<RigPart, Joint>>;
+}
+
+/** The parts a rig declares, back to front. */
+export function partsOf(def: RigDef): RigPart[] {
+  return (Object.keys(def.joints) as RigPart[])
+    .filter((p) => def.joints[p])
+    .sort((a, b) => def.joints[a]!.z - def.joints[b]!.z);
+}
+
+/** True when this rig is a mounted figure rather than a man on foot. */
+export function isMounted(def: RigDef): boolean {
+  return Boolean(def.joints['legs-front']);
 }
 
 /**
@@ -59,7 +88,9 @@ export const HORSE_RIG: RigDef = {
 export function asRigDef(raw: unknown): RigDef {
   const d = raw as Partial<RigDef> | null;
   if (!d || !Array.isArray(d.size) || d.size.length !== 2 || !d.joints) return HORSE_RIG;
-  for (const part of RIG_PARTS) {
+  const names = Object.keys(d.joints) as RigPart[];
+  if (names.length < 2) return HORSE_RIG;
+  for (const part of names) {
     const j = d.joints[part];
     if (!j || !Array.isArray(j.pivot) || j.pivot.length !== 2 || typeof j.z !== 'number') {
       return HORSE_RIG;
@@ -69,8 +100,8 @@ export function asRigDef(raw: unknown): RigDef {
 }
 
 export interface RigPose {
-  /** Rotation per part, radians. */
-  rot: Record<RigPart, number>;
+  /** Rotation per part, radians. Parts the clip does not drive are left alone. */
+  rot: Partial<Record<RigPart, number>>;
   /** Whole-body rise, in texture pixels. Negative is up. */
   lift: number;
 }
@@ -120,27 +151,64 @@ export function gallop(t: number): RigPose {
   };
 }
 
+/**
+ * A march.
+ *
+ * Legs alternate — that is the whole of a walk, and it is what a still sprite
+ * cannot do however hard the bob is pushed. The body rises when the legs PASS
+ * each other and sinks when they are spread, which is twice a stride, and is
+ * why a walking figure bobs at double the leg frequency.
+ *
+ * Deliberately smaller than the gallop: soldiers under shields advance, they do
+ * not bound, and an infantry line pumping its knees looks like a parade.
+ */
+export function march(t: number): RigPose {
+  const tau = Math.PI * 2;
+  const swing = Math.sin(tau * t);
+  return {
+    rot: {
+      'leg-lead': swing * 0.34,
+      'leg-rear': -swing * 0.34,
+      // The torso counter-rotates against the legs, very slightly.
+      body: -swing * 0.03,
+    },
+    lift: -Math.abs(Math.cos(tau * t)) * 2.5,
+  };
+}
+
 /** Standing: a breath, not a freeze. */
 export function idle(t: number): RigPose {
   const s = Math.sin(Math.PI * 2 * t * 0.25);
   return {
-    rot: { 'legs-hind': 0, 'legs-front': 0, body: s * 0.012, tail: s * 0.14 },
+    rot: {
+      'legs-hind': 0,
+      'legs-front': 0,
+      'leg-lead': 0,
+      'leg-rear': 0,
+      body: s * 0.012,
+      tail: s * 0.14,
+    },
     lift: 0,
   };
 }
 
 export interface RiggedFigure {
   root: Container;
-  parts: Record<RigPart, Sprite>;
+  parts: Partial<Record<RigPart, Sprite>>;
 }
 
 /** Builds the display objects. Parts share one origin by construction. */
-export function buildRig(def: RigDef, textures: Record<RigPart, Texture>): RiggedFigure {
+export function buildRig(
+  def: RigDef,
+  textures: Partial<Record<RigPart, Texture>>,
+): RiggedFigure {
   const root = new Container();
-  const parts = {} as Record<RigPart, Sprite>;
-  for (const name of [...RIG_PARTS].sort((a, b) => def.joints[a].z - def.joints[b].z)) {
-    const joint = def.joints[name];
-    const sp = new Sprite(textures[name]);
+  const parts = {} as Partial<Record<RigPart, Sprite>>;
+  for (const name of partsOf(def)) {
+    const joint = def.joints[name]!;
+    const tex = textures[name];
+    if (!tex) continue;
+    const sp = new Sprite(tex);
     // Pivot and position at the same point: the part turns about its joint and
     // still lands exactly where it was painted.
     sp.pivot.set(joint.pivot[0], joint.pivot[1]);
@@ -153,7 +221,7 @@ export function buildRig(def: RigDef, textures: Record<RigPart, Texture>): Rigge
 
 /** Applies a pose. Once a frame, per figure. */
 export function applyPose(fig: RiggedFigure, pose: RigPose): void {
-  for (const name of RIG_PARTS) {
+  for (const name of Object.keys(fig.parts) as RigPart[]) {
     const sp = fig.parts[name];
     if (sp) sp.rotation = pose.rot[name] ?? 0;
   }

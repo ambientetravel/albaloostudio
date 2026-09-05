@@ -9,12 +9,15 @@ import { attackPose, gait, motionFor } from './motion';
 import { PALETTE, drawSilhouette } from './silhouettes';
 import { rigDef, rigUrls, unitArtUrl } from './unitArt';
 import {
-  RIG_PARTS,
   applyPose,
   asRigDef,
   buildRig,
   gallop,
   idle,
+  isMounted,
+  march,
+  partsOf,
+  type RigPart,
   type RiggedFigure,
 } from './rig';
 
@@ -220,6 +223,8 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         fall: number;
         /** Present only for a rigged unit — the parts to pose each frame. */
         rig: RiggedFigure | null;
+        /** Whether this rig gallops or marches. */
+        mounted: boolean;
 
       }
 
@@ -239,15 +244,20 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
          */
         const rigParts = rigUrls(u.defId);
         let rig: RiggedFigure | null = null;
+        // Mounted rigs gallop, men on foot march. Read off the rig's own parts
+        // rather than the silhouette, so a rig and its clip cannot disagree.
+        let mounted = true;
 
         const makeBody = (): Container => {
           if (rigParts) {
+            // Pivots come from this unit's own rig.json — see asRigDef.
+            const def = asRigDef(rigDef(u.defId));
+            const want = partsOf(def);
             const tex = Object.fromEntries(
-              RIG_PARTS.map((part) => [part, rigTex.get(`${u.defId}/${part}`)]),
-            ) as Record<(typeof RIG_PARTS)[number], Texture>;
-            if (RIG_PARTS.every((part) => tex[part])) {
-              // Pivots come from this unit's own rig.json — see asRigDef.
-              const def = asRigDef(rigDef(u.defId));
+              want.map((part) => [part, rigTex.get(`${u.defId}/${part}`)]),
+            ) as Partial<Record<RigPart, Texture>>;
+            if (want.every((part) => tex[part])) {
+              mounted = isMounted(def);
               const built = buildRig(def, tex);
               rig = built;
               // The rig is drawn in texture pixels, so scale it to the same
@@ -317,6 +327,7 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
           hurt: 0,
           fall: 0,
           rig,
+          mounted,
           uid: u.uid,
           tall: Boolean(texture),
         });
@@ -666,7 +677,8 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
            */
           if (sprite.rig) {
             const stride = clock * profile.bobHz + sprite.phase;
-            applyPose(sprite.rig, moving ? gallop(stride % 1) : idle(stride % 1));
+            const clip = sprite.mounted ? gallop : march;
+            applyPose(sprite.rig, moving ? clip(stride % 1) : idle(stride % 1));
           }
 
           // Idle sway on top of the gait, phased per man so a rank ripples

@@ -73,11 +73,22 @@ const rigDefs = import.meta.glob('../assets/rig/*/rig.json', { eager: true, impo
  * list draws as a still sprite, so a bad cut cannot reach the field.
  */
 const RIGGED = new Set([
+  // Mounted — cut_horse.py
   'persian-cavalry',
   'saka-horse-archer',
   'armenian-lancer',
   'chorasmian-rider',
   'sagartian-lassoer',
+  // On foot — cut_foot.py. Only five of seventeen: the Immortal and the
+  // Apple-bearer wear court robes to the ankle with no legs to separate, the
+  // Shield-bearer stands behind a spara taller than he is, and the rest show a
+  // boot below a knee-length tunic rather than a leg. A boot swinging about its
+  // own top is two pixels of movement and reads as a shoe coming off.
+  'assyrian-clubman',
+  'paphlagonian-javelineer',
+  'thracian-peltast',
+  'colchian-shieldman',
+  'egyptian-marine',
 ]);
 
 const index = (files: Record<string, string>): Map<string, string> => {
@@ -101,6 +112,15 @@ export function hasUnitArt(unitId: string): boolean {
   return byId.has(unitId);
 }
 
+/** The pivots for a rigged unit, or null. */
+export function rigDef(unitId: string): unknown | null {
+  if (!RIGGED.has(unitId)) return null;
+  for (const [path, def] of Object.entries(rigDefs)) {
+    if (path.split('/').at(-2) === unitId) return def;
+  }
+  return null;
+}
+
 /** Part URLs for a rigged unit, or null if it draws as a still sprite. */
 export function rigUrls(unitId: string): Record<string, string> | null {
   if (!RIGGED.has(unitId)) return null;
@@ -110,17 +130,13 @@ export function rigUrls(unitId: string): Record<string, string> | null {
     const part = bits.pop()?.replace(/\.png$/, '');
     if (bits.pop() === unitId && part) parts[part] = url;
   }
-  return Object.keys(parts).length === 4 ? parts : null;
+  // A rig declares its own parts — four for a horse, three for a man — so the
+  // count is taken from the definition rather than assumed.
+  const def = rigDef(unitId) as { joints?: Record<string, unknown> } | null;
+  const wanted = def?.joints ? Object.keys(def.joints).length : 0;
+  return wanted > 0 && Object.keys(parts).length === wanted ? parts : null;
 }
 
-/** The pivots for a rigged unit, or null. */
-export function rigDef(unitId: string): unknown | null {
-  if (!RIGGED.has(unitId)) return null;
-  for (const [path, def] of Object.entries(rigDefs)) {
-    if (path.split('/').at(-2) === unitId) return def;
-  }
-  return null;
-}
 
 /** The emblem for an Upgrade or Doctrine, or null while it is a placeholder. */
 export function cardArtUrl(cardId: string): string | null {
