@@ -93,8 +93,11 @@ seed = {
         'per_man_simulation': (
             'One ledger entry spawns a BODY OF MEN, each his own simulated unit with his '
             'own position, target and death. The squad stat line is DIVIDED among them, so '
-            'head count changes how a squad looks and how it comes apart, never how strong '
-            'it is. Damage is computed at squad scale by the original formula and the '
+            'head count changes how a squad LOOKS, how it comes apart, AND how strong it is — the '
+            'last of those was denied here until measured: same unit, same totals, seven '
+            'men win 0 of 60 and one man wins 41 of 60, because one body fights at full '
+            'output until it dies while seven lose a seventh at the first casualty. Every '
+            'unit count is therefore an unintended balance weight. NOT YET FIXED. Damage is computed at squad scale by the original formula and the '
             'RESULT divided by the attacker head count — armour is a flat subtraction, so '
             'dividing atk alone made six spearmen unable to scratch a chariot. Formation '
             'depth is RENDER ONLY: x is the combat axis, and a rank standing 1.3 units back '
