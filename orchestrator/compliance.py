@@ -247,6 +247,12 @@ PROFILES: dict[str, dict[str, bool]] = {
         "no_invented_facts": True,
         "brand_neutral_embed": False,
         "sanctions_check": True,
+        # On for the travel sites too, not only the game. A test showed the
+        # identical fabrication passing clean here while being blocked there,
+        # and destination copy about Pasargadae or Persepolis is exactly where
+        # "the Cyrus Cylinder, the first charter of human rights" turns up. The
+        # rule is "never invent", and it was never meant to be game-specific.
+        "fabricated_history": True,
     },
     "partner_widget_v1": {
         "persian_gulf_only": True,
@@ -254,6 +260,7 @@ PROFILES: dict[str, dict[str, bool]] = {
         "no_invented_facts": True,
         "brand_neutral_embed": True,   # the embed runs inside partner agency sites
         "sanctions_check": True,
+        "fabricated_history": True,
     },
     # Persia at War — the game. A different product with a different failure
     # mode: nothing here sells a holiday, so the visa and sanctions rules are
@@ -580,9 +587,15 @@ def prompt_constraints(profile: str = "boutimar_v1") -> str:
             'data. ("Arabian Sea" is a different body of water; leave it alone.)'
         )
     if rules.get("fabricated_history"):
-        for pattern, why in _FABRICATED:
-            for m in pattern.finditer(text):
-                out.append(Violation("fabricated_history", BLOCK, _excerpt(text, m), why))
+        lines.append(
+            "2. Never assert a historical claim you cannot source. In particular "
+            "these are FALSE and must never appear: Pantea Arteshbod commanding "
+            "the Immortals; Apranik resisting the Arab conquest; Youtab at the "
+            "Persian Gate; the Cyrus Cylinder as a charter of human rights; "
+            "Artemisia of Halicarnassus described as Persian (she was Carian "
+            "Greek, a vassal); Rostam Farrokhzad conflated with Rostam son of "
+            "Zal (two different men)."
+        )
 
     if rules["visa_accuracy"]:
         lines.append(
