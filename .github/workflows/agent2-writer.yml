@@ -140,6 +140,7 @@ jobs:
           # authenticate. Set months ago as a repo var, it did nothing until the
           # writer had an anthropic path AND this env carried the key.
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PROSE_PROVIDER: ${{ vars.PROSE_PROVIDER || 'gemini' }}
           PROSE_MODEL: ${{ vars.PROSE_MODEL || 'claude-sonnet-5' }}
           ANTHROPIC_EFFORT: ${{ vars.ANTHROPIC_EFFORT || 'medium' }}

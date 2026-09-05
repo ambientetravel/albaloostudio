@@ -1,0 +1,63 @@
+name: PR gate — compliance review across the bridge
+
+# Claude's house rules over every open pull request on the git-backed properties,
+# whoever opened it — Codex/GPT, Jules/Gemini or Claude. It reads and reports; it
+# never merges. Posting the verdict as a PR comment is opt-in (post=true) and off
+# by default.
+#
+# Needs a token that can READ the ambientetravel property repos (the default
+# GITHUB_TOKEN only sees this repo). Add a fine-grained PAT as secret
+# BRIDGE_GH_TOKEN with contents:read on the property repos — and issues:write too
+# if you ever run it with post=true.
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"      # every 6h, catch new PRs from any model
+  workflow_dispatch:
+    inputs:
+      post:
+        description: "Post the verdict as a PR comment (write). Default: review only."
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-gate
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Review open PRs against the compliance gate
+        env:
+          GITHUB_TOKEN: ${{ secrets.BRIDGE_GH_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd orchestrator
+          FLAGS="--all"
+          if [ "${{ github.event.inputs.post }}" = "true" ]; then FLAGS="$FLAGS --post"; fi
+          # Exit code is the worst verdict (0 pass / 1 warn / 2 block); tee to the
+          # step summary so the result is visible without opening logs.
+          set +e
+          python3 tools/pr_review.py $FLAGS | tee /tmp/gate.txt
+          code=$?
+          set -e
+          {
+            echo "## PR compliance gate"
+            echo ""
+            echo '```'
+            cat /tmp/gate.txt
+            echo '```'
+            if [ "$code" -ge 2 ]; then echo "> ✗ At least one PR is **BLOCKED** on a house rule.";
+            elif [ "$code" -eq 1 ]; then echo "> ▲ At least one PR has a **WARN**.";
+            else echo "> ✓ All open PRs pass, or there are none."; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          # A block/warn is information for a human, not a failed run.
+          exit 0

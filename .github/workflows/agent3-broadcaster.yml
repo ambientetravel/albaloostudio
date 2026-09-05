@@ -154,6 +154,7 @@ jobs:
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-flash-latest' }}
           PROSE_PROVIDER: ${{ vars.PROSE_PROVIDER || 'gemini' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-5' }}
           # Deliberately NOT set. Live posting requires this to be 1 AND
           # autopost:true on the channel. Leaving it unset is the outer of the

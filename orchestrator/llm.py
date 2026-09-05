@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from typing import Any
 
 import config
@@ -188,7 +189,52 @@ def _gemini_once(system: str, prompt: str, model_name: str,
     }
 
 
-_PROVIDERS = {"anthropic": _anthropic, "gemini": _gemini}
+def _openai(system: str, prompt: str, *, max_tokens: int,
+            schema: dict[str, Any] | None) -> tuple[str, dict[str, Any]]:
+    """
+    The third brain. Mirrors Agent 1's OpenAI call (chat.completions with
+    structured output) so GPT can draft (Agent 2) and compose social copy
+    (Agent 3) through the same PROSE_PROVIDER knob, not just analyse gaps.
+
+    OpenAI's strict json_schema demands additionalProperties:false and every key
+    required — the same shape Anthropic wants. When a caller's schema is not
+    strict-safe the API 400s; drafting matters more than strictness, so we retry
+    once as a plain json_object (the task is still described in the prompt).
+    """
+    from openai import OpenAI
+
+    client = OpenAI(api_key=config.require_env("OPENAI_API_KEY"))
+    kwargs: dict[str, Any] = {
+        "model": config.OPENAI_MODEL,
+        "temperature": 0.4,
+        "max_tokens": max_tokens,
+        "messages": [{"role": "system", "content": system},
+                     {"role": "user", "content": prompt}],
+    }
+    if schema:
+        kwargs["response_format"] = {"type": "json_schema",
+            "json_schema": {"name": "payload", "strict": True, "schema": schema}}
+    try:
+        resp = client.chat.completions.create(**kwargs)
+    except Exception as exc:                             # SDK-specific, so by text
+        if schema and re.search(r"schema|strict|additionalProperties|required|response_format",
+                                str(exc), re.I):
+            log.warning("openai rejected the strict json_schema; retrying as json_object")
+            kwargs["response_format"] = {"type": "json_object"}
+            resp = client.chat.completions.create(**kwargs)
+        else:
+            raise
+    text = (resp.choices[0].message.content or "").strip()
+    usage = getattr(resp, "usage", None)
+    return text, {
+        "provider": "openai",
+        "model": getattr(resp, "model", config.OPENAI_MODEL),
+        "input_tokens": getattr(usage, "prompt_tokens", None),
+        "output_tokens": getattr(usage, "completion_tokens", None),
+    }
+
+
+_PROVIDERS = {"anthropic": _anthropic, "gemini": _gemini, "openai": _openai}
 
 
 def complete(system: str, prompt: str, *, max_tokens: int = 4000,

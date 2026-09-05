@@ -676,8 +676,8 @@ ok("Agent 2's workflow passes the Anthropic key and prose provider",
 ok("prose has a provider setting, and it is not the unfunded one",
    config.PROSE_PROVIDER == "gemini" or "PROSE_PROVIDER" in os.environ,
    config.PROSE_PROVIDER)
-ok("both providers are reachable by that setting",
-   set(_llm._PROVIDERS) == {"anthropic", "gemini"}, sorted(_llm._PROVIDERS))
+ok("all three providers are reachable by that setting",
+   set(_llm._PROVIDERS) == {"anthropic", "gemini", "openai"}, sorted(_llm._PROVIDERS))
 ok("Agent 3 asks the shared layer, not Anthropic directly",
    "llm.complete_json(" in _a3src and "from anthropic import Anthropic" not in _a3src)
 ok("Agent 6 too — it runs unattended every Monday",

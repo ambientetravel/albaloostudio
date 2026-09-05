@@ -171,6 +171,18 @@ def _ask_anthropic(prompt: str, model: str) -> str:
     return "".join(b.text for b in r.content if getattr(b, "type", "") == "text").strip()
 
 
+def _ask_openai(prompt: str, model: str) -> str:
+    from openai import OpenAI
+    c = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    r = c.chat.completions.create(
+        model=model, max_tokens=900,
+        messages=[
+            {"role": "system", "content": ("You are a helpful assistant answering a "
+             "user's question as you normally would. Name specific companies where relevant.")},
+            {"role": "user", "content": prompt}])
+    return (r.choices[0].message.content or "").strip()
+
+
 def _ask_gemini(prompt: str, model: str) -> str:
     from google import genai
     from google.genai import types
@@ -203,7 +215,8 @@ def _score_answer(answer: str, brand_aliases: list[str], rivals: list[str]) -> d
 
 
 def probe(domain_cfg: dict[str, Any], provider: str, model: str) -> dict[str, Any]:
-    ask = _ask_anthropic if provider == "anthropic" else _ask_gemini
+    ask = {"anthropic": _ask_anthropic, "gemini": _ask_gemini,
+           "openai": _ask_openai}[provider]
     results = []
     for p in domain_cfg["prompts"]:
         try:
@@ -229,13 +242,14 @@ def probe(domain_cfg: dict[str, Any], provider: str, model: str) -> dict[str, An
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--domain", help="restrict to one domain")
-    ap.add_argument("--provider", choices=["anthropic", "gemini"], default="anthropic")
+    ap.add_argument("--provider", choices=["anthropic", "gemini", "openai"], default="anthropic")
     ap.add_argument("--model", default=None)
     ap.add_argument("--format", choices=["md", "json"], default="md")
     ap.add_argument("--out", type=Path)
     args = ap.parse_args(argv)
-    model = args.model or ("claude-sonnet-5" if args.provider == "anthropic"
-                           else "gemini-flash-latest")
+    model = args.model or {"anthropic": "claude-sonnet-5",
+                           "gemini": "gemini-flash-latest",
+                           "openai": "gpt-4.1"}[args.provider]
 
     cfgs = [c for c in PROBES if not args.domain or c["domain"] == args.domain]
     if not cfgs:
