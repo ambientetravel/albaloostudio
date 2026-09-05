@@ -49,7 +49,44 @@ than tilting as one slab — that is the whole difference between wind and a
 wobble. It runs off `elapsedTicks`, not a clock, so it stays inside the rule that
 nothing in the render may make two machines disagree.
 
-## The one hard constraint: the sim does not change
+## SUPERSEDED — the sim DID change
+
+*Everything below this line up to the trade-off section was written before the
+per-man simulation was built, and the constraint it defends no longer holds.*
+
+**One ledger entry is now a body of individually simulated men.** Each has his
+own position, his own target and his own death.
+
+**The three attempts it took, because each failure was informative:**
+
+1. **Full stats per man.** Army strength scaled with head count, so a Kissian
+   levy (8 men) was eight times a war elephant (1) at the same rank, and a
+   tier-3 archer beat the cavalry that counters it **forty times out of forty**.
+   Head count had quietly outranked the counter triangle, which is the one thing
+   the game is built to teach.
+2. **Divide atk and def per man.** Armour is a FLAT subtraction, so six spearmen
+   each swinging for a sixth could not scratch a chariot — chariots went from
+   losing a gorge to winning every seed of it. Fixed by computing the squad's
+   whole blow with the original formula and dividing the RESULT by the
+   attacker's head count.
+3. **Formation depth in the sim.** x is the combat axis, so a rank standing 1.3
+   units back is 1.3 units out of the fight — and a spear reaches about 1.5, so
+   **Long Reach's entire advantage was swamped by the formation it stood in.**
+   Depth now lives in the renderer, exactly as `lane` always did.
+
+**Balance after, measured:** massing/planning **52.2%**, drilling/massing
+**40.6%**, drilling/planning **43.3%** — all inside the 35–65% band and barely
+moved from 54.2 / 41.1 / 44.4 before. Escalation 5.38× → 5.77×.
+
+**What it cost:** the suite went from 1.6s to 7.2s, and that is after making the
+targeting scan only living enemies. The sim does roughly seven times the work.
+
+**And one thing I had argued that was simply wrong:** I claimed real entities
+would be too expensive on a phone. Draft Showdown runs about thirty of them
+without trouble. The performance objection did not hold; the balance cost was
+real, and it was a cost rather than a blocker.
+
+## The old constraint, kept for the record: the sim does not change
 
 **A ledger entry is still ONE SimUnit with one HP pool. The extra men are
 cosmetic.** This is not a shortcut, it is the load-bearing decision:

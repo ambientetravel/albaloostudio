@@ -11,7 +11,7 @@ stripping — the socket server loads `src/sim/roundCore.ts` and
 `src/game/playerNames.ts` verbatim, so those need explicit `.ts` import
 extensions.
 
-**249 tests, tsc clean.** `npx vitest run` · `npx tsc --noEmit`.
+**261 tests, tsc clean.** The suite takes ~7s: the per-man sim does roughly seven times the work the squad-level one did. `npx vitest run` · `npx tsc --noEmit`.
 
 ## The rules that are not negotiable
 
@@ -37,6 +37,10 @@ extensions.
 | Rival styles | massing / drilling / planning, measured over 200-match sweeps |
 | Escalation | accelerating curve, 4.52× → 5.38×, zero regressions |
 | **Unit names** | all 25 are people; `contingent` carries the troop type; `SHORT_NAME` deleted |
+| **Per-man sim** | one ledger entry = a body of men, each with his own position, target and death. Squad stats DIVIDED among them, so head count changes look and attrition, never strength |
+| **Battle motion** | per-silhouette gaits, knockback with lateral stagger, per-man swing hand, men fall over rather than fading |
+| **Carpet board** | Pazyryk-derived border in the surround; one design for all 13 Achaemenid arenas, recoloured by `themeFor` |
+| **The Wildcard** | seeded ×2 on your pick, chance rising with the deficit (8.2% level → 42.5% two behind) |
 
 **Art in hand:** 25/25 units, 7/8 cards, 4/13 arenas.
 
