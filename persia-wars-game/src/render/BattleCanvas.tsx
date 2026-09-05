@@ -274,6 +274,64 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         const fh = h - fy * 2;
         const r = Math.min(28, fw * 0.09);
 
+        /**
+         * The carpet border.
+         *
+         * The floor is a BOARD, not terrain — nobody fought a battle on a rug,
+         * and the game must not imply they did. But a carpet is identified by
+         * its borders rather than its field (it is how you tell a Tabriz from a
+         * Kashan across a room), so the pattern goes in the surround, which was
+         * flat colour doing nothing, and the fighting floor stays quiet.
+         *
+         * That ordering is also what keeps units readable. They draw at
+         * 22-85px, and this codebase has already lost one legibility fight at
+         * that scale — six infantry at 26px were the same brown smudge. No
+         * sprite ever stands in the surround, so the border can carry real
+         * contrast while the field carries almost none.
+         *
+         * The motif is a stepped lozenge run, reduced from the star-and-cross
+         * rosettes of the PAZYRYK carpet — 5th-4th c. BCE, frozen in a Saka
+         * kurgan in the Altai, the oldest knotted pile carpet that survives and
+         * the only one contemporary with these thirteen arenas. Its borders are
+         * griffins, fallow deer and horsemen; none of those read at this size,
+         * the geometry does.
+         *
+         * It is deliberately ONE design for all thirteen. Every current arena
+         * is Achaemenid, so under the two-axis rule in DESIGN-CARPET.md they
+         * all share a floor — the named city schools (Tabriz, Isfahan, Mashhad)
+         * do not exist yet and arrive only with the Safavid and Afsharid
+         * arenas. Per-arena identity comes from `themeFor`, which recolours
+         * this same geometry thirteen ways for free.
+         */
+        // Clamped to what the surround can actually hold. `inset` is
+        // min(w * 0.06, 22), so on a narrow phone an unclamped band runs off
+        // the left edge and the border reads as broken rather than as a border.
+        const band = Math.max(5, Math.min(inset - 6, inset * 0.62));
+        const step = band * 1.45;
+        const lozenge = (px: number, py: number, k: number): void => {
+          ground
+            .moveTo(px, py - k)
+            .lineTo(px + k, py)
+            .lineTo(px, py + k)
+            .lineTo(px - k, py)
+            .lineTo(px, py - k);
+        };
+        const k = band * 0.30;
+        for (let px = fx - 5 + step / 2; px < fx + fw + 5; px += step) {
+          lozenge(px, fy - 5 - band / 2, k);
+          lozenge(px, fy + fh + 5 + band / 2, k);
+        }
+        for (let py = fy - 5 + step / 2; py < fy + fh + 5; py += step) {
+          lozenge(fx - 5 - band / 2, py, k);
+          lozenge(fx + fw + 5 + band / 2, py, k);
+        }
+        ground.stroke({ width: 1.4, color: accent, alpha: 0.5 });
+
+        // Guard stripes, which is how a real border is bounded on both sides.
+        ground
+          .roundRect(fx - 5 - band, fy - 5 - band, fw + 10 + band * 2, fh + 10 + band * 2, r + 4 + band)
+          .stroke({ width: 1, color: accent, alpha: 0.35 });
+
         // The fighting floor.
         ground.roundRect(fx - 5, fy - 5, fw + 10, fh + 10, r + 4).fill(accent);
         ground.roundRect(fx, fy, fw, fh, r).fill(floor);
@@ -326,6 +384,20 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
             .lineTo(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad);
         }
         ground.stroke({ width: 1.5, color: accent, alpha: 0.3 });
+
+        // Close the eight spokes into a star. The centre was already called a
+        // medallion in this file before any of the carpet work — the board had
+        // the shape of one and only wanted the geometry.
+        for (let i = 0; i < 8; i++) {
+          const a1 = (i / 8) * Math.PI * 2;
+          const a2 = ((i + 0.5) / 8) * Math.PI * 2;
+          const a3 = ((i + 1) / 8) * Math.PI * 2;
+          ground
+            .moveTo(cx + Math.cos(a1) * rad, cy + Math.sin(a1) * rad)
+            .lineTo(cx + Math.cos(a2) * rad * 0.62, cy + Math.sin(a2) * rad * 0.62)
+            .lineTo(cx + Math.cos(a3) * rad, cy + Math.sin(a3) * rad);
+        }
+        ground.stroke({ width: 1.2, color: accent, alpha: 0.22 });
 
         // The two baselines, so it is obvious which end is yours.
         ground.roundRect(fx + fw * 0.2, fy + fh - 8, fw * 0.6, 5, 3).fill(SIDE_COLOR.a);
