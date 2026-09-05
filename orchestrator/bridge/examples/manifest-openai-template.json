@@ -1,0 +1,32 @@
+{
+  "schema_version": "bridge.v1",
+  "source": "openai-strategy",
+  "generated_at": "2026-09-03T00:00:00Z",
+  "tasks": [
+    {
+      "task_id": "REPLACE-short-kebab-id",
+      "property_id": "exploreorient.com",
+      "assigned_agent": "agent2_writer",
+      "action_type": "content_brief",
+      "target_urls": ["https://exploreorient.com/destination/uzbekistan/"],
+      "priority": "P2",
+      "rationale": "State the concrete gap. Example: destination pages carry Organization + Breadcrumb schema but no TouristTrip entity linking the destination to bookable Silk Road itineraries, so AI engines can't surface it for multi-country Central Asia queries.",
+      "payload": {
+        "primary_keyword": "Uzbekistan Silk Road cultural tour",
+        "target_url_path": "/destination/uzbekistan/",
+        "angle": "Extractable statements a generative engine can quote — what it is, who it's for, which real itineraries cover it.",
+        "must_cover": [
+          "Name the real bookable itineraries that visit this destination (from the live /tour/ list — do NOT invent a trip name)",
+          "European-operator framing, independent of any Iran/Middle-East corporate identity",
+          "One factual logistics line per itinerary (nights, entry points) — never an invented rate or date"
+        ]
+      },
+      "provenance": {
+        "sources": ["orchestrator/bridge/inventory/site-inventory-seed.json"],
+        "gsc_backed": false,
+        "live_retrieval": false
+      },
+      "review": "required"
+    }
+  ]
+}
