@@ -2,10 +2,63 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "boutimar-com",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "boutimar-com",
+        "--",
+        "--port",
+        "4321"
+      ],
+      "port": 4321
+    },
+    {
       "name": "static-site",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "3000"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "3000"
+      ],
       "port": 3000
+    },
+    {
+      "name": "cruise24-home",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        ".claude/serve-cruise24-preview.py",
+        "4980",
+        "/private/tmp/claude-501/-Users-alimozzy-claude-websitebuilder/f1c8e7de-9ba8-4182-9016-b0a30413a0b2/scratchpad/homepreview"
+      ],
+      "port": 4980
+    },
+    {
+      "name": "persia-at-war",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "persia-wars-game"
+      ],
+      "port": 5183
+    },
+    {
+      "name": "operator-intel",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "/private/tmp/claude-501/-Users-alimozzy-claude-websitebuilder/7c137921-b21f-4445-972c-5ec3e3d73cf5/scratchpad/oi-work/operator-intel",
+        "--",
+        "--port",
+        "5190"
+      ],
+      "port": 5190
     }
   ]
 }

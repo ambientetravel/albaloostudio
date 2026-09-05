@@ -95,7 +95,8 @@ silently deleted, which is how the Wheeling Line emblem lost its shields.
 
 | file | what is in it |
 |---|---|
-| `DECISIONS.md` | **read first** — several decisions were reversed on review |
+| `../DECISIONS.md` | **read first** — repo root, not docs/. Several decisions were reversed on review |
+| `../README.md`, `../TESTING.md`, `../DEPLOY.md` | repo root |
 | `CONCEPT-v0.2.md` | the core design |
 | `DESIGN-v0.3-COMMANDERS.md` | the commander turn, and what the ninth costs |
 | `COMMANDER-ROSTER.md` | the nine, with kits and campaigns |
