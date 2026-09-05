@@ -132,3 +132,71 @@ under your feet becomes a date**:
 **That teaches the history of Persian carpet weaving for free**, as a side effect
 of playing, and it does it in the correct order — which is the opposite of what
 putting a Safavid medallion under Cyrus would have done.
+
+---
+
+# Correction — regional motifs, and the two-axis rule
+
+**The objection above was over-applied.** It holds for the thirteen Achaemenid
+arenas and nowhere else. **Chaldoran is 1514 and it is fought in Azerbaijan, a
+day's ride from Tabriz, in the reign of the shah whose capital Tabriz was.** A
+Tabriz motif there is not an anachronism — it is the correct carpet, in the
+correct place, in the correct decade. Same for Mashhad under Nader.
+
+So the answer is a mix, and the rule that produces it has **two axes, both of
+which must pass**:
+
+1. **WHERE** — which regional school belongs to that ground.
+2. **WHEN** — whether that school existed yet.
+
+One axis alone gives the wrong answer in both directions: place alone puts a
+Safavid medallion under Cyrus; date alone puts a Kerman vase carpet in
+Azerbaijan.
+
+## What that produces across the nine commanders
+
+| commander · battle | where | when | floor |
+|---|---|---|---|
+| Cyrus · Pasargadae | Fars | 550 BCE | **no school exists.** Pazyryk-era ground + the chahar bagh |
+| Darius · Bisotun | Kermanshah | 522 BCE | open ground — it is a cliff |
+| Surena · Carrhae | Harran | 53 BCE | no school |
+| Shapur I · Edessa | upper Mesopotamia | 3rd c. CE | Sasanian; nothing survives |
+| Rostam Farrokhzad · Qadisiyya | southern Iraq | 636 CE | **the Spring of Khosrow, which the conquest cut up** |
+| Babak · Badhdh | **Azerbaijan** | 816–837 CE | Azerbaijan, **but seven centuries before the Tabriz school**. Highland kilim geometry, not a city medallion |
+| Yaqub · Dayr al-Aqul | Sistan → Tigris | 861–879 CE | Sistan/Baluch geometry, same caution |
+| **Ismail · Chaldoran** | **West Azerbaijan** | **1514** | **TABRIZ. Both axes pass cleanly — this is the anchor case** |
+| **Nader · Karnal** | **Haryana, India** | **1739** | he is fighting the **Mughals on their own ground**, and Mughal carpet weaving is a real school descended from Persian. **Mughal floor, Khorasan borders** — the invasion is in the pattern |
+
+**Babak is the one that tests the rule.** He is in Azerbaijan, which is Tabriz
+country — but in the **ninth century**, seven hundred years before the Tabriz
+court workshops. He gets highland geometric weaving, not a medallion. **A
+designer working from place alone would have got him wrong.**
+
+## The thing this gives the game for free
+
+**The floor goes from anonymous to named.**
+
+Weaving is ancient — Pazyryk proves it at 400 BCE. But the *named regional
+schools* — Tabriz, Kashan, Isfahan, Kerman, Mashhad, Qom — crystallise from the
+Safavid period onward. So in early arenas the ground is a shared, unattributed
+ancient pattern, and as the centuries pass **the floor acquires a hometown.**
+
+That is not a decorative gradient. **It is the actual history of Persian carpet
+weaving**, taught as a side effect of playing, in the right order.
+
+*One caution to carry: **Shiraz/Fars** weaving is tribal — Qashqai and Khamseh —
+and is documented far later than the court schools. It is not the Safavid peer
+of Tabriz and Isfahan, and the codex should not imply it is.*
+
+## And the payoff that makes Chaldoran the best arena in the game
+
+**Ismail loses Chaldoran in August 1514. Selim enters Tabriz the following
+month — and the sources record that he carried its craftsmen back to Istanbul.**
+
+So the Tabriz carpet under that battlefield **is what the battle costs.** The
+player is standing on the thing that is about to be taken. Nothing has to be
+invented, nothing has to be said out loud in the battle itself, and the codex
+line writes itself.
+
+**That is the strongest single argument for doing this at all** — it turns the
+floor from decoration into a fact about the battle being fought on it.
