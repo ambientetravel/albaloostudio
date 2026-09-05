@@ -32,23 +32,28 @@ import compliance  # noqa: E402
 # The git-backed properties and the compliance profile each PR is judged under.
 # exploreorient uses the brand-neutral profile so a boutimar brand/link leak —
 # the Explore Orient brand-separation breach — is caught automatically.
+GAME_REPO = "ambientetravel/persia-at-war"
+
 REPOS = {
     "ambientetravel/boutimar": "boutimar_v1",
     "ambientetravel/boutimarfarsi": "boutimar_v1",
     "ambientetravel/exploreorient": "partner_widget_v1",
-    # Holds the orchestrator AND the game, which is why the profile below is
-    # chosen per PATH rather than per repo.
     "ambientetravel/albaloostudio": "boutimar_v1",
+    # Persia at War — a standalone game, deliberately NOT a travel property.
+    # Its own repo so an outside agent can be given PR access to the game
+    # without being handed read of the whole travel operation. Change the name
+    # here and in PATH_PROFILES below if the repo is created under another owner.
+    GAME_REPO: "persia_at_war_v1",
 }
 
-# Paths that are judged under a different profile than their repo's default.
+# Paths judged under a different profile than their repo's default.
 #
-# Persia at War is not a travel product: nothing in it sells a holiday, so the
-# visa and sanctions rules would only produce noise, and the rule that actually
-# matters — it never invents a date, an outcome, a unit or a king — has no
-# analogue on the website side. Judging the game under boutimar_v1 would pass a
-# PR that invented a Persian heroine, which is the one failure this product
-# cannot survive.
+# One entry, and it is a TRANSITIONAL one: the game still sits inside
+# albaloostudio under persia-wars-game/ until the standalone repo above is
+# created and pushed. Once it is, this rule stops matching anything and can go.
+# It is kept meanwhile because judging the game under the travel profile passes
+# a PR that invents a Persian heroine, and that is the one failure a product
+# built to teach honestly cannot survive.
 PATH_PROFILES = (
     ("persia-wars-game/", "persia_at_war_v1"),
 )
