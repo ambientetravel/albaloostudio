@@ -145,3 +145,140 @@ structural — they are content in a system already designed. **Mirzakhani, Teri
 Rabia and Parvin can ship the day the Anjoman does.** Purandokht is next, because
 her campaign reuses the Sasanian collapse already built for Rostam Farrokhzad.
 Artemisia is last, because she is the one that needs ships.
+
+---
+
+# Second pass — voices, Esther, the Shahnameh women, and the modern age
+
+## 5 · The singers, and the fact that defines them
+
+**هایده Hayedeh** — Ma'soumeh Dadehbala, 1942 Tehran → 1990 San Francisco,
+dead at 47, buried in Westwood, Los Angeles. **مهستی Mahasti** — Eftekhar
+Dadehbala, 1946 → 2007, **her actual younger sister**, who died in Los Angeles
+too. Two sisters, two of the largest voices in Persian music, both buried in
+California.
+
+**The fact that matters:** solo singing by women in public has been banned in
+Iran since 1979. Hayedeh and Mahasti left and never sang publicly at home again.
+**These are the voices that play at diaspora gatherings precisely because they
+cannot be heard in Tehran** — which means for the audience this game is aimed at,
+they are not history. They are the sound of the room the kid is sitting in.
+
+Mahasti also shares her name with **مهستی گنجوی Mahasti Ganjavi**, the
+twelfth-century poet already in the Anjoman. Eight hundred years apart, one name.
+
+**Powers, shaped as always by the actual work:**
+- **Hayedeh — «The Held Note».** Her range was the thing. One squad keeps
+  fighting for a full extra round after it should have stopped.
+- **Mahasti — «The Sister».** Any power gained by the other sister applies to
+  you too. They only ever really work as a pair.
+
+**And the one who came first, who is safer and arguably more important:**
+**قمرالملوک وزیری Qamar-ol-Molouk Vaziri**, 1905–1959 — **the first Iranian
+woman to sing in public without a hijab**, Grand Hotel Tehran, 1924. Everything
+Hayedeh could do, she could do because Qamar did it first. Power: **«The First
+Time»** — the first of anything you do in a match counts double.
+
+**The honest flag.** Hayedeh, Mahasti and Qamar are all a statement inside Iran
+in a way Ferdowsi is not. This goes in the same box as Tahirih: a distribution
+question for a diaspora-first game, and your call, not mine. **مرضیه Marzieh**
+(1924–2010, died in Paris) and **دلکش Delkash** (1924–2004) are equally real if
+a longer list helps.
+
+**One category flag: living people.** گوگوش Googoosh, silenced in Iran for
+twenty-one years and singing again since 2000, is the biggest name here and is
+alive. Living figures bring likeness rights and the possibility of later
+disagreement. Everyone else on these lists is dead, which is not a small
+administrative difference.
+
+## 6 · استر — Esther
+
+Yes, and she is a better fit than she first looks, because the game already has
+the machinery.
+
+- **The Book of Esther** places her as queen to **Ahasuerus**, which is
+  Khshayarsha — **Xerxes I**. She prevents the destruction of the Jews of the
+  empire. Purim commemorates it.
+- **The Tomb of Esther and Mordechai in Hamadan is real and still stands** — one
+  of the most important Jewish sites in Iran, and a working pilgrimage place.
+- **What is not attested:** Esther appears in no Persian or Greek source.
+  Herodotus names Xerxes' queen as **Amestris**. Most historians read the book as
+  a novella rather than a chronicle.
+
+**So she goes exactly where Rostam son of Zal goes** — the legend tier, with the
+codex saying all three things at once: here is the story, here is the tomb that
+is genuinely there, here is what no record confirms. The game does this already
+and does it well.
+
+**What it lets the game say, which is true and worth saying:** the Jews of Iran
+are one of the oldest continuous Jewish communities on earth, and they are there
+because **Cyrus freed them from Babylon** — and the **Cyrus Cylinder** is a real
+object in the British Museum, not a story. Commander #1 already carries this.
+Stated plainly, with no modern reading attached in either direction, per the rule
+already on the books.
+
+**Power: «The Petition».** She goes to the king uninvited, which could have
+killed her. Once per match, ask for something you have not earned — take a card
+from outside your offer.
+
+## 7 · The Shahnameh women — the deep dive
+
+All spell-tier, all flagged legend, same as Rostam son of Zal.
+
+| | who she is | the spell |
+|---|---|---|
+| **رودابه Rudabeh** | princess of Kabul, Zal's love, Rostam's mother. Lets down her hair from the tower — and he refuses to hurt her by climbing it, and throws a rope instead. Rostam's birth is the first caesarean in the poem, on the Simurgh's advice | **The Rope** — reach a card two ranks above you |
+| **تهمینه Tahmineh** | princess of Samangan. She comes to Rostam at night and asks him for a child — **she chooses**. Sohrab is the result, and Rostam kills him not knowing him | **The Token** — mark one enemy card; you cannot be made to fight it |
+| **گردآفرید Gordafarid** | rides out disguised as a man, fights Sohrab to a standstill, and when unmasked talks her way back inside the walls. **She wins on wits, not strength** | **The Unmasking** — an enemy card is revealed and loses its trait |
+| **بانوگشسپ Banu Goshasp** | Rostam's daughter, with her own epic, the *Banu Goshasp Nama* | **The Daughter** — inherit the traits of a squad you have lost |
+| **سیندخت Sindokht** | Rudabeh's mother, who **negotiates the peace between Kabul and Iran herself** — she rides out and does the diplomacy | **The Terms** — end a round in a draw instead of a loss |
+| **منیژه Manijeh** | Afrasiab's daughter. Cast out with nothing, she keeps Bijan alive in the pit by begging for food door to door | **The Pit** — a squad on 1 HP cannot be killed this round |
+| **فرنگیس Farangis** | Afrasiab's daughter, Siyavash's wife, mother of Kay Khosrow — she gets her son out | **The Escape** — withdraw a squad and keep it for next round |
+| **همای چهرزاد Homay** | ruled Iran in her own name for thirty-two years in the poem | **The Regency** — command with no commander for one round, and pay nothing for it |
+| **سودابه Sudabeh** | falsely accuses Siyavash and destroys him. **The antagonist** | **The False Word** — an enemy trait is turned against them. *A woman who is the villain is good writing, not bad representation* |
+
+**Two who cross the line between story and record:**
+- **شیرین Shirin** — Nizami's *Khosrow and Shirin* is a romance, but **Khosrow II
+  genuinely had a Christian wife named Shirin, attested in the chronicles.** She
+  is legend AND history, and the game's two tiers can hold her in both at once —
+  which is a nice demonstration of why the two tiers exist.
+- **شهرزاد Scheherazade** — frame-narrator of the *Thousand and One Nights*,
+  whose Persian core is the *Hezār Afsān*. **She survives by telling a better
+  story each night.** Power: **«One More Night» — postpone a defeat by one
+  round.** That is the best single female spell card available and it is exactly
+  what the character does.
+
+Also outside Ferdowsi: **ویس Vis** of *Vis o Rāmin* (Gorgani, 11th century,
+older than Tristan and Isolde and possibly upstream of it), and **لیلی Layli**
+of Nizami.
+
+## 8 · Cinema and the modern age
+
+- **فروغ فرخزاد Forough Farrokhzad** · 1934 Tehran → 1967, dead at 32. Major
+  modernist poet **and a filmmaker** — *خانه سیاه است* / *The House Is Black*
+  (1963), on a leprosy colony, is a foundation stone of the Iranian New Wave.
+  **She belongs in the Anjoman twice over.** Power: **«The Other Wind»** — change
+  the arena mid-match.
+- **مرجانه ساتراپی Marjane Satrapi** · b. 1969. ***Persepolis* is about an
+  Iranian girl aged roughly nine to fourteen** growing up through a revolution
+  and then into a diaspora. **That is this game's player, in a book.** Living —
+  see the flag below.
+- **رخشان بنی‌اعتماد Rakhshan Bani-Etemad**, **سمیرا مخملباف Samira
+  Makhmalbaf** (in Cannes competition at seventeen), **شیرین نشاط Shirin
+  Neshat**. All living.
+- **مریم میرزاخانی Maryam Mirzakhani** — already in the Anjoman and still the
+  strongest addition on any of these lists.
+- **کیمیا علیزاده Kimia Alizadeh** — first Iranian woman to win an Olympic medal,
+  Rio 2016. Living.
+- **شیرین عبادی Shirin Ebadi** (Nobel Peace, 2003) and **نرگس محمدی Narges
+  Mohammadi** (Nobel Peace, 2023). Both living, both political in a way that goes
+  well past Hayedeh, and Narges Mohammadi's situation is ongoing. **My
+  recommendation is to leave both out of a children's game** — not because they
+  are unworthy, but because the game cannot hold a live political case honestly
+  at this age level, and half-holding it would be worse than not.
+
+**The living-people rule this suggests:** everyone on the historical rosters is
+dead, which is why the game can say what they did and stop. A living person can
+say something tomorrow that the game is then carrying. **Default: the dead.**
+Mirzakhani, Forough, Hayedeh, Mahasti, Terian, Qamar all qualify. Satrapi is the
+one living exception I would argue for, and only with her permission.
