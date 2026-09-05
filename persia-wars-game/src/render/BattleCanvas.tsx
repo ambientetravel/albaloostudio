@@ -7,11 +7,11 @@ import { FIELD_MAX, FIELD_MIN, TICK_RATE } from '../sim/types';
 import { themeFor } from '../ui/arenaTheme';
 import { attackPose, gait, motionFor } from './motion';
 import { PALETTE, drawSilhouette } from './silhouettes';
-import { rigUrls, unitArtUrl } from './unitArt';
+import { rigDef, rigUrls, unitArtUrl } from './unitArt';
 import {
-  HORSE_RIG,
   RIG_PARTS,
   applyPose,
+  asRigDef,
   buildRig,
   gallop,
   idle,
@@ -246,16 +246,18 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
               RIG_PARTS.map((part) => [part, rigTex.get(`${u.defId}/${part}`)]),
             ) as Record<(typeof RIG_PARTS)[number], Texture>;
             if (RIG_PARTS.every((part) => tex[part])) {
-              const built = buildRig(HORSE_RIG, tex);
+              // Pivots come from this unit's own rig.json — see asRigDef.
+              const def = asRigDef(rigDef(u.defId));
+              const built = buildRig(def, tex);
               rig = built;
               // The rig is drawn in texture pixels, so scale it to the same
               // height a plain sprite gets and hang it from the same foot line.
-              const k = SPRITE_HEIGHT / HORSE_RIG.size[1];
+              const k = SPRITE_HEIGHT / def.size[1];
               const holder = new Container();
               holder.addChild(built.root);
               holder.scale.set(k);
-              holder.position.set((-HORSE_RIG.size[0] / 2) * k, -SPRITE_HEIGHT * 0.94);
-              ringRx = Math.max(7, HORSE_RIG.size[0] * k * 0.42);
+              holder.position.set((-def.size[0] / 2) * k, -SPRITE_HEIGHT * 0.94);
+              ringRx = Math.max(7, def.size[0] * k * 0.42);
               return holder;
             }
           }

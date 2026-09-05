@@ -37,19 +37,36 @@ export interface RigDef {
 }
 
 /**
- * The mounted rig. Pivots measured off `persian-cavalry.png` (168x256): the
- * hind legs meet the barrel at the stifle, the forelegs at the shoulder, the
- * tail at the dock, and the whole animal turns about the hip.
+ * The fallback rig — persian-cavalry's, at 168x256.
+ *
+ * Real rigs come per unit from `rig.json`, written by the cutter beside the
+ * parts. They have to be per unit: these sprites are 168 to 260 pixels wide and
+ * the horses sit at different x within them, so one shared pivot table puts a
+ * horse's hind legs on its shoulder. This constant survives only so a rig with
+ * a missing or malformed json still draws something sane.
  */
 export const HORSE_RIG: RigDef = {
   size: [168, 256],
   joints: {
     tail: { pivot: [37, 132], z: 0 },
-    'legs-hind': { pivot: [72, 200], z: 1 },
-    body: { pivot: [85, 195], z: 2 },
-    'legs-front': { pivot: [122, 200], z: 3 },
+    'legs-hind': { pivot: [65, 200], z: 1 },
+    body: { pivot: [84, 195], z: 2 },
+    'legs-front': { pivot: [126, 200], z: 3 },
   },
 };
+
+/** Validates a rig loaded from JSON, falling back rather than drawing nonsense. */
+export function asRigDef(raw: unknown): RigDef {
+  const d = raw as Partial<RigDef> | null;
+  if (!d || !Array.isArray(d.size) || d.size.length !== 2 || !d.joints) return HORSE_RIG;
+  for (const part of RIG_PARTS) {
+    const j = d.joints[part];
+    if (!j || !Array.isArray(j.pivot) || j.pivot.length !== 2 || typeof j.z !== 'number') {
+      return HORSE_RIG;
+    }
+  }
+  return d as RigDef;
+}
 
 export interface RigPose {
   /** Rotation per part, radians. */

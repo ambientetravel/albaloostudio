@@ -53,7 +53,32 @@ const rigFiles = import.meta.glob('../assets/rig/*/*.png', {
   import: 'default',
 }) as Record<string, string>;
 
-const RIGGED = new Set(['persian-cavalry']);
+/**
+ * Pivots, emitted by the cutter next to the parts.
+ *
+ * Per unit and not shared: these sprites are 168 to 260 pixels wide and the
+ * horses sit at different x within them, so one shared pivot table puts a
+ * horse's hind legs on its shoulder.
+ */
+const rigDefs = import.meta.glob('../assets/rig/*/rig.json', { eager: true, import: 'default' }) as Record<
+  string,
+  unknown
+>;
+
+/**
+ * Units whose cut has been LOOKED AT as a contact sheet.
+ *
+ * The seam finder is good but it is a heuristic on painted art, and an
+ * un-checked cut once split one hind leg from three forelegs. A unit off this
+ * list draws as a still sprite, so a bad cut cannot reach the field.
+ */
+const RIGGED = new Set([
+  'persian-cavalry',
+  'saka-horse-archer',
+  'armenian-lancer',
+  'chorasmian-rider',
+  'sagartian-lassoer',
+]);
 
 const index = (files: Record<string, string>): Map<string, string> => {
   const map = new Map<string, string>();
@@ -86,6 +111,15 @@ export function rigUrls(unitId: string): Record<string, string> | null {
     if (bits.pop() === unitId && part) parts[part] = url;
   }
   return Object.keys(parts).length === 4 ? parts : null;
+}
+
+/** The pivots for a rigged unit, or null. */
+export function rigDef(unitId: string): unknown | null {
+  if (!RIGGED.has(unitId)) return null;
+  for (const [path, def] of Object.entries(rigDefs)) {
+    if (path.split('/').at(-2) === unitId) return def;
+  }
+  return null;
 }
 
 /** The emblem for an Upgrade or Doctrine, or null while it is a placeholder. */
