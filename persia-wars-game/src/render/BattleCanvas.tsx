@@ -33,6 +33,40 @@ const hex = (s: string): number => Number.parseInt(s.replace('#', ''), 16);
  */
 const SPRITE_HEIGHT = 38;
 
+/**
+ * Men drawn per squad, by rank.
+ *
+ * The simulation is unchanged: one ledger entry is still ONE SimUnit with one
+ * HP pool, and these copies are cosmetic. That is deliberate and it is the
+ * whole reason this is cheap. Making rank spawn real entities would multiply
+ * the sim by six, invalidate every balance number already measured — the
+ * 200-match style sweeps, the 4.52x-to-5.38x escalation curve — and six-fold
+ * the desync surface the server checks both clients against.
+ *
+ * What it buys instead: **rank becomes visible**. A Levy Rausha is two men, a
+ * fully drilled one is six. That is the 'normal, then iron shield, then the
+ * strongest version' progression, expressed as mass rather than as three
+ * separate paintings — 25 units x 3 upgrade arts would be 75 new images and
+ * this is none.
+ *
+ * Six squads at the cap draws 36 a side, which is the density asked for.
+ */
+const FILES_BY_TIER = [2, 3, 4, 6] as const;
+/** Idle sway, in radians. A standing line should never be perfectly still. */
+const WIND_TILT = 0.055;
+const WIND_SPEED = 0.075;
+const filesForTier = (tier: number): number =>
+  FILES_BY_TIER[Math.max(0, Math.min(FILES_BY_TIER.length - 1, tier - 1))] ?? 2;
+
+/** Where each extra man stands relative to the file leader. */
+function filePost(i: number, facing: number): { x: number; y: number } {
+  if (i === 0) return { x: 0, y: 0 };
+  const col = ((i - 1) % 3) - 1;
+  const row = Math.floor((i - 1) / 3) + 1;
+  // Ranks fall in BEHIND the leader, which is away from the enemy.
+  return { x: col * 7 + (row % 2) * 3.5, y: row * 5 * -facing };
+}
+
 interface Props {
   log: BattleLog;
   battle: Battle;
@@ -173,6 +207,13 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
         hurt: number;
         /** True when this unit is commissioned art rather than a placeholder. */
         tall: boolean;
+        /**
+         * Every man in the squad, leader first. `body` is files[0], kept as its
+         * own field so the existing rotation and hit-recoil code is untouched.
+         */
+        files: Container[];
+        /** Per-man phase, so a rank ripples in the wind instead of tilting as a slab. */
+        filePhase: number[];
       }
 
       const sprites = new Map<number, Piece>();
@@ -181,24 +222,45 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
 
         const url = unitArtUrl(u.defId);
         const texture = url ? textures.get(url) : undefined;
-        let body: Container;
         // The ring has to match whatever it sits under: a horseman is half again
         // as wide as an archer, and one fixed ellipse looks wrong beneath both.
         let ringRx = 9;
-        if (texture) {
-          const art = new Sprite(texture);
-          // Feet essentially on the origin, with a sliver below so the figure
-          // meets the ground rather than hovering over it.
-          art.anchor.set(0.5, 0.94);
-          art.height = SPRITE_HEIGHT;
-          art.width = (texture.width / texture.height) * SPRITE_HEIGHT;
-          ringRx = Math.max(7, art.width * 0.42);
-          body = art;
-        } else {
+        const makeBody = (): Container => {
+          if (texture) {
+            const art = new Sprite(texture);
+            // Feet essentially on the origin, with a sliver below so the figure
+            // meets the ground rather than hovering over it.
+            art.anchor.set(0.5, 0.94);
+            art.height = SPRITE_HEIGHT;
+            art.width = (texture.width / texture.height) * SPRITE_HEIGHT;
+            ringRx = Math.max(7, art.width * 0.42);
+            return art;
+          }
           const shape = new Graphics();
           drawSilhouette(shape, u.silhouette, SIDE_COLOR[u.side], SIDE_TRIM[u.side]);
-          body = shape;
+          return shape;
+        };
+
+        // Side A holds the bottom of the screen, so its ranks fall in downward.
+        const facing = u.side === 'a' ? 1 : -1;
+        const files: Container[] = [];
+        const filePhase: number[] = [];
+        for (let i = 0; i < filesForTier(u.tier); i++) {
+          const man = makeBody();
+          const post = filePost(i, facing);
+          man.position.set(post.x, post.y);
+          // Rear ranks sit fractionally smaller and dimmer, which reads as depth
+          // without needing a second camera or a real z axis.
+          const depth = 1 - Math.min(0.18, i * 0.035);
+          // MULTIPLY, never assign. Setting `.height` on a Pixi Sprite works by
+          // writing `.scale`, so `scale.set(depth)` throws that away and the man
+          // snaps back to the texture's native 2048px. It filled the whole board.
+          man.scale.set(man.scale.x * depth, man.scale.y * depth);
+          man.alpha = 1 - Math.min(0.22, i * 0.045);
+          files.push(man);
+          filePhase.push((u.uid * 0.37 + i * 0.61) % 1);
         }
+        const body = files[0];
 
         // The team is read off a coloured ring on the ground, not off the unit.
         // Tinting full-colour art muddies it, and two armies of muddy figures is
@@ -211,7 +273,9 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
           .stroke({ width: 1.2, color: SIDE_TRIM[u.side], alpha: 0.75 });
 
         const bar = new Graphics();
-        root.addChild(ring, body, bar);
+        root.addChild(ring);
+        for (let i = files.length - 1; i >= 0; i--) root.addChild(files[i]);
+        root.addChild(bar);
         unitLayer.addChild(root);
         sprites.set(u.uid, {
           root,
@@ -223,6 +287,8 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
           swing: 0,
           hurt: 0,
           tall: Boolean(texture),
+          files,
+          filePhase,
         });
       }
 
@@ -258,8 +324,14 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
        * The silhouettes are drawn at a size that suited a wide field seen from
        * the side. On a phone-width portrait floor they came out about 20px tall
        * and read as specks, so they are scaled to the width they have to share.
+       *
+       * Pulled down again once squads became files: six men where there was one
+       * needs roughly a third of the old height or the ranks overlap into a
+       * single blur. This is the trade named in DESIGN-MASS.md — at this size
+       * identity comes from silhouette, base-ring colour and formation shape,
+       * NOT from detail. The detail lives on the card, at full size.
        */
-      const unitScale = (w: number): number => Math.max(1.2, Math.min(2.4, w / 172));
+      const unitScale = (w: number): number => Math.max(0.95, Math.min(1.7, w / 250));
 
       const paintFloor = (w: number, h: number): void => {
         ground.clear();
@@ -500,7 +572,22 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
           // non-uniform, so this has to undo BOTH axes — a plain 1/k would leave
           // the bar squashing along with the body every time the unit was hit.
           sprite.bar.scale.set(1 / (k * squash), squash / k);
-          sprite.body.rotation = g.tilt + spin;
+          /*
+           * Wind. A rank of men holding spears is never still, and a field that
+           * only moves when someone swings reads as a diagram rather than an
+           * army. Each man carries his own phase, so the line RIPPLES across
+           * instead of tilting as one slab — which is the whole difference
+           * between wind and a wobble.
+           *
+           * Driven off elapsedTicks rather than a clock, so it stays inside the
+           * determinism rule: nothing in this file may make two machines
+           * disagree about a frame.
+           */
+          const wind = elapsedTicks * WIND_SPEED;
+          for (let f = 0; f < sprite.files.length; f++) {
+            sprite.files[f].rotation =
+              g.tilt + spin + Math.sin(wind + sprite.filePhase[f] * Math.PI * 2) * WIND_TILT;
+          }
 
           const hpFrac = meta.maxHp > 0 ? p.hp / meta.maxHp : 0;
           if (p.hp <= 0) {
@@ -509,6 +596,16 @@ export function BattleCanvas({ log, battle, arenaId, speed, onFinished }: Props)
             sprite.bar.clear();
           } else {
             sprite.root.alpha = 1;
+            /*
+             * Attrition. Men fall out of the file as the squad's HP drops, so a
+             * squad that is nearly gone LOOKS nearly gone from across the board
+             * — which the bar alone never managed at this size. The last man
+             * never disappears while the squad lives.
+             */
+            const standing = Math.max(1, Math.ceil(sprite.files.length * hpFrac));
+            for (let f = 0; f < sprite.files.length; f++) {
+              sprite.files[f].visible = f < standing;
+            }
             sprite.bar.clear();
             // The bar is counter-scaled, so this offset is in WORLD pixels — it
             // has to include the unit's scale or it lands on the chest instead
