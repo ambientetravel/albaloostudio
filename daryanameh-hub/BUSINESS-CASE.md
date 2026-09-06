@@ -1,7 +1,8 @@
 # دریانامه — business case v1 (2026-09-06)
 
 Companion to BRAINSTORM.md. All numbers are estimates from comparable niche media, not measurements.
-Assumed entity: Ambiente Tours (Germany). Currency EUR.
+Entity: Ambiente Turizm (Kuşadası, Türkiye). Currency EUR. v1.1: legal section rewritten for Turkish law;
+the v1 German-law text was based on a wrong assumption about the entity.
 
 ## 1. Verdict
 
@@ -61,30 +62,61 @@ Year 2: advertiser base compounds, print pays for itself; 60–100k direct reven
 From month 4 a part-time Farsi editor / community manager (Iran-based, 500–1,200 / month) takes the daily
 Telegram and first-pass review; his hours drop to 3–4 / week, all on advertisers.
 
-## 4. Legal role
+## 4. Legal role (Türkiye)
 
-It is a publisher / media platform. It never sells travel, so it sits outside package-travel law (no
-Pauschalreise duties, no insolvency insurance, no IATA). What it does need:
-- Impressum with a named responsible editor (MStV §18), and an editorial policy page naming the three sales
-  companies as commercial partners.
-- Separation and labelling of advertising (Trennungsgebot): «آگهی» on house ads, «با حمایت» on sponsored guides,
-  reviews never sold.
-- GDPR double opt-in for the newsletter and app push consent.
-- Image licensing for every photo; no invented credits (existing hard rule).
-- EU AI Act Art. 50 (in force 2 Aug 2026): AI-generated podcast audio needs an audible disclosure at the start of
-  each episode and machine-readable marking of the file. Make it a brand feature: name the two AI hosts, say so.
-- Sanctions and payments: international advertisers pay the German entity by card / SEPA. Iran-based advertisers
-  pay in rial to the Iranian entity under an intercompany service agreement; screen advertisers against
-  sanctions lists; never take payment from a listed person or entity.
-- Trademark: word mark «دریانامه» / Daryanameh at EUIPO and in Iran once the name is final.
-- Structure: a trade name / division of Ambiente Tours now; a separate GmbH/UG only when direct revenue passes
-  ~50k / year or an outside partner comes in.
+Legal term: the print product is a **süreli yayın** (periodical) under Basın Kanunu 5187; the operation is a
+**yayıncı** (publisher). In English: a periodical publisher / media platform. It never sells travel, so TÜRSAB
+and package-travel rules do not touch it, and Ambiente's A-group licence is unaffected.
+
+Run it as a side activity of Ambiente Turizm, not a new company
+- Allowed if the ana sözleşme "amaç ve konu" covers publishing / advertising / printing (NACE 58.14 magazine
+  publishing, 73.11 advertising). Alireza reports marketing and printing were added ~3 years ago; confirm the
+  wording with the accountant. If publishing is missing, a one-line amendment at the Ticaret Sicili adds it.
+- Spin out a separate Ltd. Şti. only when direct revenue passes ~€50k/year, or an outside partner joins, or the
+  ad business needs its own bank relationships. Not before.
+
+Steps before issue 1 (all in Kuşadası)
+1. Süreli yayın beyannamesi to Kuşadası Cumhuriyet Başsavcılığı (Art. 7): name, nature, frequency (3 aylık),
+   management address, owner (Ambiente Turizm, with a copy of the ana sözleşme and signature circular),
+   representative, and the sorumlu müdür. No licence, no fee, no approval wait: publication may start once the
+   declaration is filed; the prosecutor may ask for missing documents within 15 days.
+2. Sorumlu müdür (Art. 5): at least one per periodical; carries legal responsibility for content. Must be 18+,
+   resident in Türkiye, at least lise graduate, not legally restricted, no disqualifying convictions.
+   Alireza qualifies if resident in Kuşadası; otherwise a resident Ambiente staff member.
+3. Künye (Art. 4) in every issue: publication name, place and date of printing, printer name and address,
+   owner, sorumlu müdür. In Persian and Turkish.
+4. Teslim (Art. 10): two copies of every issue delivered to the Başsavcılık on publication day.
+5. ISSN from Milli Kütüphane (free, online).
+6. Trademark «دریانامه» / DARYANAMEH at TÜRKPATENT (classes 16, 35, 41; ~€100–200), then EUIPO when European
+   advertisers matter.
+7. Website/app: publish the Law 5651 contact info block. Registration as "internet haber sitesi" under the 2022
+   amendment is optional and not needed for an editorial cruise site.
+
+Advertising and tax
+- Ads must be recognisable as ads (Reklam Yönetmeliği / RTÜK-style separation applies in spirit; TKHK consumer
+  rules on misleading ads apply). Use «آگهی» / "Reklam" labels; sponsored guides labelled «با حمایت».
+- Advertising invoices carry 20% KDV. Printed periodicals themselves have been KDV-exempt since 2019 (Law 7166);
+  confirm current status with the accountant before pricing single copies.
+- International advertisers pay by card or SWIFT to the Turkish company; Iranian-resident advertisers can be
+  invoiced by the Turkish company (Türkiye is outside EU/US Iran sanctions) but Turkish banks may still refuse
+  Iran-origin transfers; expect to route those in rial through the Iranian side under an intercompany agreement.
+- Card acquiring: iyzico or PayTR for TRY/EUR/USD; for diaspora subscriptions consider a merchant-of-record
+  (Paddle, Lemon Squeezy) so foreign card checkout and VAT handling are theirs.
+
+Data and AI
+- KVKK (Turkish data law) for newsletter and app consent, plus GDPR for EU readers; double opt-in covers both.
+- EU AI Act Art. 50 reaches non-EU deployers when the output is used in the EU; label the AI podcast anyway.
+  It costs one sentence and is honest.
+
+Everything outside Iran
+- Entity, bank, domain (.com under Ambiente Turizm), hosting (EU or Türkiye), print (Türkiye), stores (Apple/Google
+  under Ambiente's developer accounts). Iran-side only: rial collection through cruise24's gateway.
 
 ## 5. What it is called
 
 Public: «دریانامه» + descriptor «رسانهٔ فارسی‌زبان کروز و سفر دریایی».
 Slogan (ALEPH pattern): «نخستین رسانهٔ فارسی‌زبان کروز» / "The first Persian-language cruise media platform".
-Legal line in the Impressum: "Daryanameh Media, a division of Ambiente Tours [GmbH]".
+Künye line: «دریانامه» — Ambiente Turizm Seyahat Acentası yayınıdır, Kuşadası. Sorumlu müdür: [name].
 Call it a media platform, never just a magazine: web + newsletter + Telegram + podcast + quarterly print + app.
 
 ## 6. Podcast (AI, two hosts, Farsi, bi-weekly)
@@ -99,7 +131,7 @@ Call it a media platform, never just a magazine: web + newsletter + Telegram + p
 
 ## 7. App
 
-Two steps, both under Ambiente's developer accounts.
+Two steps, both under Ambiente Turizm's developer accounts.
 1. Month 2–3, ~1 week of Code work: PWA of the hub. Installable on iPhone and Android, push notifications,
    and the one feature that justifies an app at all: offline port guides, ship info and excursion notes
    downloaded before sailing (internet at sea costs 20–40 / day). Plus "ships in port today" and a member card
@@ -114,3 +146,28 @@ Iran-based users get the free tier or pay in rial via cruise24's gateway.
 Free reach (Telegram + newsletter + app): 15–25k combined, roughly 6–10k unique people.
 Paid: 100–300 base, 500–800 upside only if the printed magazine is the perk. Model it as a magazine
 subscription, not a content paywall; Iran-based readers will not pay for online content.
+
+## 9. Print and distribution from Kuşadası (v1.1)
+
+Print in Türkiye. İzmir (90 km) has good glossy printers; Istanbul (İkitelli / Topkapı cluster) is cheaper at
+volume and better for perfect binding. Indicative: 1,000 copies, 72–80 pages A4, 115–135 g coated, perfect bound:
+€1,800–3,000 per issue plus design. Cheaper than Germany or Canada by roughly half.
+
+Distribution model (ALEPH's): controlled free circulation through advertisers and partners in the diaspora cities,
+plus a paid mailed subscription for readers outside those cities. Bulk cartons by air cargo (Turkish Cargo /
+DHL) to one partner per city: Istanbul, Dubai, Toronto, Vancouver, LA, Hamburg. Single copies mailed from
+Türkiye cost €8–15 each in postage, so the mailed tier must be priced to cover that.
+
+Kuşadası as the pivot: Türkiye's number one cruise port in 2025 (617 calls, ~995,000 passengers; Istanbul second
+with 265 calls). AROYA started calling in 2025. That makes Kuşadası the natural place for ship visits, port
+guides written on the spot, crew interviews, and a "Persian corner" at the port shops for advertisers.
+
+Pricing proposal
+| Tier                                  | Price                        |
+|---------------------------------------|------------------------------|
+| Digital member (PDF + newsletter + app)| free                        |
+| Print, picked up at a partner venue    | free (controlled circulation)|
+| Single copy, shop retail               | €9 / 350 TL / 12 CAD         |
+| Mailed subscription, 4 issues, EU/TR   | €45                          |
+| Mailed subscription, 4 issues, N. America / Gulf | €60 / 90 CAD        |
+| Supporter membership (mailed + events + partner discounts) | €90 / year |
