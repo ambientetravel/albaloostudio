@@ -197,7 +197,7 @@ def build(check_only=False):
     (PUBLIC/"robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {site['brand']['domain']}/sitemap.xml\n")
     # Precache manifest for the service worker: shell + every port page (offline port guides).
     shell = ["/", "/offline/", "/css/hub.css", "/js/hub.js", "/js/offers.js", "/js/pwa.js", "/manifest.webmanifest",
-             "/data/visa.json", "/data/offers.json"] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.svg")] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.png")]
+             "/data/visa.json", "/data/offers.json"] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.svg")] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.png")] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.webp")]
     (PUBLIC/"precache.json").write_text(json.dumps({"version": built + "-" + str(len(urls)), "shell": shell,
                                                     "pages": urls}, ensure_ascii=False), encoding="utf-8")
     print(f"built {len(urls)} pages · offers: {len(offers)} ({feed_status}) · {sum(len(v) for v in data.values())} items")

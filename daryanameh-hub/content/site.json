@@ -17,10 +17,10 @@
     "title": "دریا، به روایت فارسی",
     "sub": "بندرها، کشتی‌ها، رودخانه‌ها و همهٔ چیزهایی که پیش از سوارشدن باید بدانید.",
     "scenes": [
-      {"id": "galataport", "src": "img/scene-galataport.svg", "caption": "گالاتاپورت، استانبول", "credit": ""},
-      {"id": "ship", "src": "img/scene-ship.svg", "caption": "کنارهٔ کشتی", "credit": ""},
-      {"id": "balcony", "src": "img/scene-balcony.svg", "caption": "درِ بالکن", "credit": ""},
-      {"id": "cabin", "src": "img/scene-cabin.svg", "caption": "سوئیت با بالکن", "credit": ""}
+      {"id": "galataport", "src": "img/scene-galataport.webp", "caption": "گالاتاپورت، استانبول", "credit": "تصویر تولیدشده با هوش مصنوعی (Higgsfield)"},
+      {"id": "ship", "src": "img/scene-ship.webp", "caption": "کنارهٔ کشتی", "credit": "تصویر تولیدشده با هوش مصنوعی (Higgsfield)"},
+      {"id": "balcony", "src": "img/scene-balcony.webp", "caption": "درِ بالکن", "credit": "تصویر تولیدشده با هوش مصنوعی (Higgsfield)"},
+      {"id": "cabin", "src": "img/scene-cabin.webp", "caption": "سوئیت با بالکن", "credit": "تصویر تولیدشده با هوش مصنوعی (Higgsfield)"}
     ],
     "cta_primary": {"label": "بندرنامه را ورق بزنید", "href": "ports/"},
     "cta_secondary": {"label": "پیشنهادهای این فصل", "href": "offers/"}
