@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} · {{ coll.title }} · {{ site.brand.fa }}{% endblock %}
+{% block description %}{{ item.summary }}{% endblock %}
+{% block content %}
+<article class="detail" data-offline="{{ 'yes' if item.offline else 'no' }}">
+  <header class="detail__head">
+    {% if item.image and item.image.src %}<figure class="detail__photo"><img src="{{ item.image.src }}" alt="{{ item.image.alt or item.title }}">{% if item.image.credit %}<figcaption>عکس: {{ item.image.credit }}</figcaption>{% endif %}</figure>{% else %}<div class="detail__art art art--wide art--{{ item.slug|length % 4 }}"></div>{% endif %}
+    <div class="wrap detail__title">
+      <p class="kicker"><a href="/{{ coll.slug }}/">{{ coll.title }}</a> · {{ item.kicker }}</p>
+      <h1 class="display">{{ item.title }}</h1>
+      <p class="latin">{{ item.latin }}</p>
+      <p class="lede">{{ item.summary }}</p>
+      {% if item.offline %}<button class="btn btn--ghost btn--sm" data-save-offline>ذخیره برای خواندن روی کشتی</button>{% endif %}
+    </div>
+  </header>
+  <div class="wrap detail__grid">
+    <div class="detail__body">
+      {% for p in item.body %}<p>{{ p }}</p>{% endfor %}
+      {% if item.cta %}<a class="btn btn--ink" href="{{ item.cta.href }}">{{ item.cta.label }}</a>{% endif %}
+      {% if item.didyouknow %}<aside class="dyk-inline"><p class="kicker">می‌دانستید؟</p><p>{{ item.didyouknow }}</p></aside>{% endif %}
+    </div>
+    <aside class="facts">
+      <h2 class="facts__h">در یک نگاه</h2>
+      <dl>{% for k in coll.facts %}{% if item.facts.get(k) %}<div><dt>{{ labels.get(k, k) }}</dt><dd>{{ item.facts[k] }}</dd></div>{% endif %}{% endfor %}</dl>
+      {% if item.facts.visa %}<p class="tiny">وضعیت ویزا طبق قاعدهٔ خانهٔ دریانامه؛ پیش از رزرو با آژانس بررسی کنید. <a href="/visa/">ویزانامه</a></p>{% endif %}
+    </aside>
+  </div>
+  {% if related %}
+  <section class="sec sec--sand"><div class="wrap"><p class="kicker">مرتبط</p><div class="grid3">
+    {% for r in related %}<a class="tile" href="{{ r.href }}"><p class="kicker">{{ r.kicker }}</p><h3>{{ r.title }}</h3></a>{% endfor %}
+  </div></div></section>
+  {% endif %}
+</article>
+{% endblock %}

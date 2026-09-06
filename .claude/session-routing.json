@@ -17,7 +17,7 @@
   "ListAgents will NOT show a stopped session — it only lists live peers.",
   "That difference cost a round trip on 26 Aug 2026."
  ],
- "verified": "2026-08-31",
+ "verified": "2026-09-06",
  "routes": [
   {
    "properties": [
@@ -91,6 +91,19 @@
    "note": "Confirmed by Alireza 2026-08-31 — he named 'boutimar cruise' explicitly, resolving the two-candidate ambiguity that had kept boutimar.ir in unrouted. The other candidate, 'Boutimar Farsi destinations' (local_7000dbcd), is NOT the owner.",
    "repo_paths": [
     "boutimar-ir/"
+   ]
+  },
+  {
+   "properties": [
+    "daryanameh.com"
+   ],
+   "title": "Daryanameh Farsi cruise domain brainstorm",
+   "sessionId": "session_01ATjVLDfSDHRuvSzCdEPqwc",
+   "confirmed_by_user": true,
+   "note": "Alireza asked this session to brainstorm and then build the hub (6 Sep 2026). Editorial hub for all Farsi cruise properties; never sells.",
+   "platform": "static HTML + PWA, Ambiente Turizm entity, DirectAdmin",
+   "repo_paths": [
+    "daryanameh-hub/"
    ]
   }
  ],

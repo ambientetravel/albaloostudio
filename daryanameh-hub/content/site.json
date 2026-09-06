@@ -1,0 +1,41 @@
+{
+  "brand": {"fa": "دریانامه", "latin": "DARYANAMEH", "tagline_fa": "نخستین رسانهٔ فارسی‌زبان کروز و سفر دریایی",
+            "descriptor_fa": "رسانهٔ فارسی‌زبان کروز و سفر دریایی", "domain": "https://daryanameh.com"},
+  "kunye": {"owner": "Ambiente Turizm Seyahat Acentası", "city": "Kuşadası, Türkiye", "responsible_editor": "[نام مدیر مسئول]"},
+  "nav": [
+    {"label": "بندرنامه", "href": "ports/"},
+    {"label": "کشتی‌نامه", "href": "ships/"},
+    {"label": "خطوط کروز", "href": "lines/"},
+    {"label": "رودخانه‌ها", "href": "rivers/"},
+    {"label": "گشت و اقامت", "href": "excursions/"},
+    {"label": "میراث جهانی", "href": "unesco/"},
+    {"label": "پیشنهادها", "href": "offers/"},
+    {"label": "مجله", "href": "journal/"}
+  ],
+  "hero": {
+    "kicker": "از گالاتاپورت تا بالکن کابین",
+    "title": "دریا، به روایت فارسی",
+    "sub": "بندرها، کشتی‌ها، رودخانه‌ها و همهٔ چیزهایی که پیش از سوارشدن باید بدانید.",
+    "scenes": [
+      {"id": "galataport", "src": "img/scene-galataport.svg", "caption": "گالاتاپورت، استانبول", "credit": ""},
+      {"id": "ship", "src": "img/scene-ship.svg", "caption": "کنارهٔ کشتی", "credit": ""},
+      {"id": "balcony", "src": "img/scene-balcony.svg", "caption": "درِ بالکن", "credit": ""},
+      {"id": "cabin", "src": "img/scene-cabin.svg", "caption": "سوئیت با بالکن", "credit": ""}
+    ],
+    "cta_primary": {"label": "بندرنامه را ورق بزنید", "href": "ports/"},
+    "cta_secondary": {"label": "پیشنهادهای این فصل", "href": "offers/"}
+  },
+  "partners": [
+    {"name": "کروز۲۴", "href": "https://cruise24.ir", "role": "قیمت و رزرو، داخل ایران", "label": "آگهی"},
+    {"name": "CruiseBaz", "href": "https://cruisebaz.com", "role": "ایرانیان خارج از کشور", "label": "آگهی"},
+    {"name": "بوتیمار", "href": "https://boutimar.ir", "role": "آژانس‌ها و همکاران", "label": "آگهی"}
+  ],
+  "feed": {"url": "https://boutimar.ir/api/cruises.php", "book_url": "https://cruise24.ir/", "book_label": "دیدن قیمت در کروز۲۴", "max_offers": 8},
+  "channels": {
+    "telegram": "https://t.me/daryanameh",
+    "newsletter_action": "#newsletter",
+    "podcast_title": "رادیو دریانامه",
+    "podcast_note": "گفت‌وگوی دو مجریِ هوش‌مصنوعی، هر دو هفته یک بار. این پادکست با هوش مصنوعی ساخته می‌شود."
+  },
+  "editorial_policy": "آگهی‌های خانگی با برچسب «آگهی» و راهنماهای حمایت‌شده با برچسب «با حمایت» مشخص می‌شوند. نقد و امتیازِ خوانندگان هرگز فروخته نمی‌شود."
+}
