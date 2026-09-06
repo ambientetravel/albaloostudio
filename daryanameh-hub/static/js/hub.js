@@ -71,6 +71,42 @@
     document.addEventListener('click', e => { if (!e.target.closest('.hero__search')) results.hidden = true; });
     window.hubSearch = f => { const q = f.q.value.trim(); if (!q) return false; loadIdx().then(l => { const h = l.find(p => (p.t + ' ' + (p.l || '')).toLowerCase().includes(q.toLowerCase())); location.href = h ? h.u : '/ports/'; }); return false; };
   }
+  /* ---------- longform: reading bar, hero + figure parallax, reveals ---------- */
+  const bar = $('#readingBar'), art = $('.lf__body');
+  if (bar && art && !reduce) {
+    const tick = () => {
+      const top = art.offsetTop, h = art.offsetHeight - innerHeight;
+      const p = h > 0 ? Math.min(1, Math.max(0, (scrollY - top) / h)) : 0;
+      bar.style.width = (p * 100).toFixed(2) + '%';
+    };
+    addEventListener('scroll', tick, { passive: true }); addEventListener('resize', tick); tick();
+  }
+  const shots = [...$$('[data-hero] img'), ...$$('.figure[data-parallax] img')];
+  if (shots.length && !reduce) {
+    let raf = 0;
+    const move = () => {
+      raf = 0;
+      shots.forEach(im => {
+        const r = im.parentElement.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > innerHeight + 200) return;
+        const mid = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+        im.style.transform = `translateY(${(-mid * 8).toFixed(2)}%)`;
+      });
+    };
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(move); }, { passive: true });
+    addEventListener('resize', move); move();
+  }
+  const revealables = $$('[data-reveal]');
+  if (revealables.length) {
+    if (reduce || !('IntersectionObserver' in window)) revealables.forEach(el => el.classList.add('in'));
+    else {
+      const io = new IntersectionObserver((es) => es.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      }), { rootMargin: '0px 0px -8% 0px' });
+      revealables.forEach(el => io.observe(el));
+    }
+  }
+
   window.hubNewsletter = f => { toast('ایمیل ثبت شد. تأیید عضویت را در صندوق ورودی ببینید.'); f.reset(); return false; };
   window.toast = (msg, action) => { const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = `<span>${msg}</span>`; if (action) { const b = document.createElement('button'); b.textContent = action.label; b.onclick = () => { action.fn(); t.remove(); }; t.appendChild(b); } document.body.appendChild(t); setTimeout(() => t.remove(), 6000); };
 })();

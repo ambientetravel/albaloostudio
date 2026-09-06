@@ -41,6 +41,25 @@
   </div>
 </section>
 
+{% if news %}
+<section class="newsrail reveal" id="news" aria-labelledby="newsrailh">
+  <div class="wrap">
+    <div class="newsrail__head">
+      <h2 class="display--sm" id="newsrailh">اخبار کروز</h2>
+      <a class="link tiny" href="/news/">همهٔ خبرها</a>
+    </div>
+    <div class="newsrail__list">
+      {% for n in news[:4] %}
+      <a class="newsrail__item" href="/news/{{ n.slug }}/">
+        <time datetime="{{ n.date }}">{{ n.date|fa }}{% if n.category %} · {{ n.category }}{% endif %}</time>
+        <h3>{{ n.title }}</h3>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <section class="sec reveal" id="ports">
   <div class="wrap">
     <div class="sec__head"><p class="kicker">بندرنامه</p><h2 class="display display--md">بندرها، به روایت گذرنامهٔ ایرانی</h2><a class="more" href="/ports/">همهٔ بندرها</a></div>

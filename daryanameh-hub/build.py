@@ -54,12 +54,17 @@ def load(name):
     return json.loads((CONTENT/f"{name}.json").read_text(encoding="utf-8"))
 
 def md_to_html(md: str) -> str:
-    """Tiny Markdown: headings, paragraphs, bullet lists, bold, links. Enough for editorial."""
+    """Editorial Markdown: headings, paragraphs, lists, bold, links, plus the three
+    magazine devices the journal layout needs — a pull quote (> line), a full-bleed
+    figure (![alt](/img/x.webp "credit")) and a chapter break (---)."""
     out, para, ul = [], [], False
     def flush():
         nonlocal para
         if para:
             out.append("<p>" + inline(" ".join(para)) + "</p>"); para = []
+    def close_ul():
+        nonlocal ul
+        if ul: out.append("</ul>"); ul = False
     def inline(t):
         t = html.escape(t, quote=False)
         t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
@@ -67,26 +72,43 @@ def md_to_html(md: str) -> str:
         return t
     for line in md.splitlines():
         s = line.rstrip()
+        m_img = re.match(r'^!\[(.*?)\]\((\S+?)(?:\s+"(.*?)")?\)$', s)
         if s.startswith("## "):
-            flush(); out.append(f"<h2>{inline(s[3:])}</h2>")
+            flush(); close_ul(); out.append(f"<h2>{inline(s[3:])}</h2>")
         elif s.startswith("### "):
-            flush(); out.append(f"<h3>{inline(s[4:])}</h3>")
+            flush(); close_ul(); out.append(f"<h3>{inline(s[4:])}</h3>")
+        elif m_img:
+            flush(); close_ul()
+            alt, src, credit = m_img.group(1), m_img.group(2), m_img.group(3) or ""
+            cap = f'<figcaption>{inline(credit)}</figcaption>' if credit else ""
+            out.append(f'<figure class="figure" data-parallax><img src="{html.escape(src)}" '
+                       f'alt="{html.escape(alt)}" loading="lazy" decoding="async">{cap}</figure>')
+        elif s.startswith("> "):
+            flush(); close_ul()
+            out.append(f'<blockquote class="pull">{inline(s[2:])}</blockquote>')
+        elif s.strip() in ("---", "***"):
+            flush(); close_ul(); out.append('<hr class="chapter">')
         elif s.startswith("- "):
             flush()
             if not ul: out.append("<ul>"); ul = True
             out.append(f"<li>{inline(s[2:])}</li>")
         elif not s:
-            flush()
-            if ul: out.append("</ul>"); ul = False
+            flush(); close_ul()
         else:
             para.append(s)
-    flush()
-    if ul: out.append("</ul>")
+    flush(); close_ul()
     return "\n".join(out)
 
-def load_articles():
-    arts = []
-    for p in sorted((CONTENT/"articles").glob("*.md")):
+def _read_md_dir(folder: str):
+    """Markdown files with a `key: value` front-matter block. Files starting with _ are
+    skipped, so `_example.md` can sit next to real copy as a writer's template."""
+    items = []
+    d = CONTENT/folder
+    if not d.exists():
+        return items
+    for p in sorted(d.glob("*.md")):
+        if p.name.startswith("_"):
+            continue
         txt = p.read_text(encoding="utf-8")
         meta, body = {}, txt
         if txt.startswith("---"):
@@ -94,10 +116,31 @@ def load_articles():
             for ln in fm.strip().splitlines():
                 k, _, v = ln.partition(":"); meta[k.strip()] = v.strip()
         meta.setdefault("title", p.stem); meta.setdefault("date", ""); meta.setdefault("summary", "")
-        meta["slug"] = p.stem; meta["html"] = md_to_html(body.strip())
-        arts.append(meta)
-    arts.sort(key=lambda a: a["date"], reverse=True)
-    return arts
+        meta["slug"] = p.stem
+        meta["html"] = md_to_html(body.strip())
+        meta["text"] = re.sub(r"<[^>]+>", " ", meta["html"])
+        items.append(meta)
+    items.sort(key=lambda a: a["date"], reverse=True)
+    return items
+
+def load_articles():
+    return _read_md_dir("articles")
+
+def load_news():
+    """News items, newest first.
+
+    HOUSE RULE, same shape as offers needing `verified_on`: a news item without a
+    `source` is not published. We report other people's facts, so every item says
+    whose fact it is. `source_url` is optional; `source` is not.
+    """
+    items, dropped = [], []
+    for it in _read_md_dir("news"):
+        if not it.get("source"):
+            dropped.append(it["slug"]); continue
+        it["related"] = [dict(zip(("collection", "slug"), r.strip().split(":", 1)))
+                         for r in it.get("related", "").split(",") if ":" in r]
+        items.append(it)
+    return items, dropped
 
 def fetch_feed(url: str):
     try:
@@ -125,6 +168,7 @@ def build(check_only=False):
     data = {c["slug"]: load(c["slug"]) for c in collections}
     didyouknow, glossary, offers_cfg = load("didyouknow"), load("glossary"), load("offers")
     articles = load_articles()
+    news, news_dropped = load_news()
     index = {(c["slug"], it["slug"]): it for c in collections for it in data[c["slug"]]}
     coll_by_slug = {c["slug"]: c for c in collections}
 
@@ -160,6 +204,7 @@ def build(check_only=False):
     search = [{"u": f"/{c['slug']}/{it['slug']}/", "t": it["title"], "l": it.get("latin", ""), "k": it.get("kicker", ""),
                "c": c["singular"]} for c in collections for it in data[c["slug"]]]
     search += [{"u": f"/journal/{a['slug']}/", "t": a["title"], "l": "", "k": a.get("kicker", ""), "c": "مجله"} for a in articles]
+    search += [{"u": f"/news/{n['slug']}/", "t": n["title"], "l": "", "k": n.get("category", ""), "c": "خبر"} for n in news]
     search += [{"u": "/visa/", "t": "ویزانامه", "l": "visa", "k": "ویزا", "c": "راهنما"}, {"u": "/glossary/", "t": "واژه‌نامهٔ کروز", "l": "glossary", "k": "", "c": "راهنما"}]
     (PUBLIC/"data"/"search.json").write_text(json.dumps(search, ensure_ascii=False), encoding="utf-8")
 
@@ -172,7 +217,7 @@ def build(check_only=False):
 
     featured = {c["slug"]: data[c["slug"]][:4] for c in collections}
     write("index.html", "home.html", featured=featured, didyouknow=didyouknow, offers=offers[:4],
-          feed_status=feed_status, articles=articles[:3], gatherings=data["gatherings"][:3])
+          feed_status=feed_status, articles=articles[:3], gatherings=data["gatherings"][:3], news=news[:6])
     for c in collections:
         write(f"{c['slug']}/index.html", "listing.html", coll=c, items=data[c["slug"]])
         for it in data[c["slug"]]:
@@ -182,6 +227,11 @@ def build(check_only=False):
     write("visa/index.html", "visa.html", schengen=sorted(_visa.SCHENGEN_PORTS), free=sorted(_visa.VISA_FREE_PORTS),
           easy=sorted(_visa.EASY_VISA_PORTS), hard=sorted(_visa.HARD_VISA_PORTS))
     write("glossary/index.html", "glossary.html", glossary=glossary)
+    write("news/index.html", "news.html", news=news)
+    for n in news:
+        rel = [r for r in (resolve(x) for x in n.get("related", [])) if r]
+        write(f"news/{n['slug']}/index.html", "news-item.html", item=n, related=rel,
+              more=[o for o in news if o["slug"] != n["slug"]][:3])
     write("journal/index.html", "journal.html", articles=articles)
     for a in articles:
         write(f"journal/{a['slug']}/index.html", "article.html", article=a)
@@ -195,12 +245,50 @@ def build(check_only=False):
     sm.append("</urlset>")
     (PUBLIC/"sitemap.xml").write_text("\n".join(sm), encoding="utf-8")
     (PUBLIC/"robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {site['brand']['domain']}/sitemap.xml\n")
+
+    # ── Syndication ────────────────────────────────────────────────────────────
+    # Teasers only, never full text: partners get headline + summary + a link home, so
+    # the canonical copy stays here and Google does not have to choose between us and
+    # a partner. Prices are deliberately absent — a stale rate on someone else's site
+    # with our name on it is the one mistake the whole masthead cannot absorb.
+    dom = site["brand"]["domain"]
+    feed_items = [{"title": n["title"], "summary": n["summary"], "date": n["date"],
+                   "category": n.get("category", ""), "source": n["source"],
+                   "url": f"{dom}/news/{n['slug']}/"} for n in news]
+    (PUBLIC/"news").mkdir(parents=True, exist_ok=True)
+    (PUBLIC/"news"/"feed.json").write_text(json.dumps(
+        {"title": f"{site['brand']['fa']} · اخبار", "home": dom, "updated": built,
+         "terms": "نقل با ذکر نام دریانامه و پیوند به صفحهٔ اصلی خبر آزاد است.",
+         "items": feed_items}, ensure_ascii=False, indent=1), encoding="utf-8")
+    rss = ["<?xml version='1.0' encoding='UTF-8'?>",
+           "<rss version='2.0'><channel>",
+           f"<title>{html.escape(site['brand']['fa'])} · اخبار</title>",
+           f"<link>{dom}/news/</link>",
+           f"<description>{html.escape(site['brand']['tagline_fa'])}</description>",
+           "<language>fa-IR</language>"]
+    for n in news:
+        rss += ["<item>", f"<title>{html.escape(n['title'])}</title>",
+                f"<link>{dom}/news/{n['slug']}/</link>",
+                f"<guid isPermaLink='true'>{dom}/news/{n['slug']}/</guid>",
+                f"<description>{html.escape(n['summary'])}</description>",
+                f"<pubDate>{n['date']}</pubDate>", "</item>"]
+    rss += ["</channel></rss>"]
+    (PUBLIC/"news"/"feed.xml").write_text("\n".join(rss), encoding="utf-8")
+
+    embed = (STATIC/"embed"/"news.js")
+    if embed.exists():
+        (PUBLIC/"embed").mkdir(parents=True, exist_ok=True)
+        (PUBLIC/"embed"/"news.js").write_text(
+            embed.read_text(encoding="utf-8").replace("__ORIGIN__", dom), encoding="utf-8")
     # Precache manifest for the service worker: shell + every port page (offline port guides).
-    shell = ["/", "/offline/", "/css/hub.css", "/js/hub.js", "/js/offers.js", "/js/pwa.js", "/manifest.webmanifest",
+    shell = ["/", "/news/", "/offline/", "/css/hub.css", "/js/hub.js", "/js/offers.js", "/js/pwa.js", "/manifest.webmanifest",
              "/data/visa.json", "/data/offers.json"] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.svg")] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.png")] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.webp")]
     (PUBLIC/"precache.json").write_text(json.dumps({"version": built + "-" + str(len(urls)), "shell": shell,
                                                     "pages": urls}, ensure_ascii=False), encoding="utf-8")
-    print(f"built {len(urls)} pages · offers: {len(offers)} ({feed_status}) · {sum(len(v) for v in data.values())} items")
+    print(f"built {len(urls)} pages · news: {len(news)} · offers: {len(offers)} ({feed_status}) "
+          f"· {sum(len(v) for v in data.values())} items")
+    if news_dropped:
+        print("  news held back (no `source:` line): " + ", ".join(news_dropped))
     return urls
 
 def check():

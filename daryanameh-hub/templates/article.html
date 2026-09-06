@@ -1,10 +1,33 @@
 {% extends "base.html" %}
 {% block title %}{{ article.title }} · {{ site.brand.fa }}{% endblock %}
 {% block description %}{{ article.summary }}{% endblock %}
+{% block bodyclass %}page longform{% endblock %}
 {% block content %}
-<article class="prose-page"><div class="wrap wrap--narrow">
-<p class="kicker"><a href="/journal/">مجله</a> · {{ article.kicker }} · {{ article.date|fa }}</p>
-<h1 class="display">{{ article.title }}</h1><p class="lede">{{ article.summary }}</p>
-<div class="prose">{{ article.html|safe }}</div>
-</div></article>
+<div class="reading" id="reading" aria-hidden="true"><span id="readingBar"></span></div>
+
+<article class="lf">
+  <header class="lf__open{% if not article.hero %} lf__open--plain{% endif %}">
+    {% if article.hero %}
+    <div class="lf__media" data-hero>
+      <img src="/{{ article.hero }}" alt="{{ article.hero_alt|default(article.title, true) }}" fetchpriority="high" decoding="async">
+    </div>
+    {% endif %}
+    <div class="lf__openin wrap">
+      <p class="kicker"><a href="/journal/">مجله</a> · {{ article.kicker }} · {{ article.date|fa }}</p>
+      <h1 class="display lf__title">{{ article.title }}</h1>
+      <p class="lf__lede">{{ article.summary }}</p>
+      {% if article.hero_credit %}<p class="lf__credit">{{ article.hero_credit }}</p>{% endif %}
+    </div>
+    {% if article.hero %}<div class="lf__scroll" aria-hidden="true"><span></span></div>{% endif %}
+  </header>
+
+  <div class="lf__body">
+    <div class="wrap wrap--narrow prose prose--lf">{{ article.html|safe }}</div>
+  </div>
+
+  <footer class="lf__end wrap wrap--narrow">
+    <p class="tiny">{{ site.editorial_policy }}</p>
+    <a class="btn btn--ghost" href="/journal/">همهٔ نوشته‌های مجله</a>
+  </footer>
+</article>
 {% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} · اخبار · {{ site.brand.fa }}{% endblock %}
+{% block description %}{{ item.summary }}{% endblock %}
+{% block bodyclass %}page news-item{% endblock %}
+{% block content %}
+<article class="prose-page">
+  <div class="wrap wrap--narrow">
+    <p class="kicker"><a href="/news/">اخبار</a>{% if item.category %} · {{ item.category }}{% endif %} · <time datetime="{{ item.date }}">{{ item.date|fa }}</time></p>
+    <h1 class="display display--sm">{{ item.title }}</h1>
+    <p class="lede">{{ item.summary }}</p>
+    <div class="prose">{{ item.html|safe }}</div>
+
+    <p class="srcline">منبع: {% if item.source_url %}<a class="link" href="{{ item.source_url }}" rel="nofollow noopener" target="_blank">{{ item.source }}</a>{% else %}{{ item.source }}{% endif %}</p>
+
+    {% if related %}
+    <nav class="related" aria-label="در دریانامه">
+      <h2 class="display--sm">در دریانامه</h2>
+      <div class="related__row">{% for r in related %}<a class="chip" href="{{ r.href }}"><small>{{ r.kicker }}</small>{{ r.title }}</a>{% endfor %}</div>
+    </nav>
+    {% endif %}
+  </div>
+
+  {% if more %}
+  <div class="wrap">
+    <h2 class="display--sm morehead">خبرهای دیگر</h2>
+    <div class="grid3">{% for n in more %}<a class="tile" href="/news/{{ n.slug }}/"><p class="kicker">{{ n.category }} · {{ n.date|fa }}</p><h3>{{ n.title }}</h3><p>{{ n.summary }}</p></a>{% endfor %}</div>
+  </div>
+  {% endif %}
+</article>
+{% endblock %}
