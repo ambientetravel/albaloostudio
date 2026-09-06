@@ -150,9 +150,18 @@ seed = {
             'old number as a problem statement. Average final army 4.63 squads '
             'against a cap of 6.'
         ),
-        'reference_game_comparison': 'The mobile game this takes its shape from offers cards '
-                                     'worth +2 to +5 units early and +5 to +8 late, with armies '
-                                     'reaching 40+. Its picks ALTERNATE; ours are simultaneous.',
+        'reference_game_comparison': (
+            'DRAFT SHOWDOWN, watched frame by frame rather than recalled. Cards read '
+            '"+2 TNT", "+3 Kupid", "+5 Gans" and a "TNT x2" throughout, INCLUDING the '
+            'fourth draft — the earlier claim that late offers reach +5 to +8 is NOT '
+            'supported by the one recording available and should not be repeated. '
+            'Armies do reach roughly 40 a side. THREE local picks per fight against our '
+            'one, so twelve decisions to our four across a 4-0 match. Picks ALTERNATE; '
+            'ours are simultaneous and stay that way. The offer cards OVERLAY the board '
+            'with both armies visible; men pack into a block along the baseline rather '
+            'than into per-squad lanes; there are no health bars anywhere; and every '
+            'piece of decoration sits OUTSIDE the play area.'
+        ),
         'constants': {
             'TIER_MULT': const('src/sim/roundCore.ts', 'TIER_MULT'),
             'MAX_SQUADS': const('src/sim/roundCore.ts', 'MAX_SQUADS'),
