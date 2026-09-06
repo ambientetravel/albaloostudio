@@ -1,8 +1,16 @@
 {
  "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
  "cooldown_days": 45,
- "updated_at": "2026-09-01T11:41:25+00:00",
+ "updated_at": "2026-09-06T08:49:02+00:00",
  "entries": [
+  {
+   "domain": "boutimar.com",
+   "query": "alamut",
+   "first_briefed": "2026-09-06T08:42:14+00:00",
+   "last_briefed": "2026-09-06T08:42:14+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/discover-iran/alamut-castle-guide/"
+  },
   {
    "domain": "boutimar.com",
    "query": "alamut castle",
@@ -29,11 +37,43 @@
   },
   {
    "domain": "cruisebaz.com",
+   "query": "aroya cruise dubai",
+   "first_briefed": "2026-09-06T08:49:02+00:00",
+   "last_briefed": "2026-09-06T08:49:02+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/aroya/dubai-jeddah-moqayese"
+  },
+  {
+   "domain": "cruisebaz.com",
    "query": "aroya cruise price",
    "first_briefed": "2026-09-01T11:39:09+00:00",
    "last_briefed": "2026-09-01T11:39:09+00:00",
    "times_briefed": 1,
    "target_url_path": "/aroya/qeymat-va-rezerv-belit"
+  },
+  {
+   "domain": "cruisebaz.com",
+   "query": "aroya cruise ticket price",
+   "first_briefed": "2026-09-06T08:49:02+00:00",
+   "last_briefed": "2026-09-06T08:49:02+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/en/aroya/tickets-and-prices"
+  },
+  {
+   "domain": "ambientetravel.com",
+   "query": "avintura",
+   "first_briefed": "2026-09-06T08:45:48+00:00",
+   "last_briefed": "2026-09-06T08:45:48+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/avintura"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "can i travel to iran now",
+   "first_briefed": "2026-09-06T08:42:14+00:00",
+   "last_briefed": "2026-09-06T08:42:14+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/travel-guide/is-it-safe-to-travel-to-iran-now/"
   },
   {
    "domain": "cruise24.me",
@@ -85,6 +125,22 @@
   },
   {
    "domain": "boutimar.com",
+   "query": "hotels in yazd",
+   "first_briefed": "2026-09-06T08:42:14+00:00",
+   "last_briefed": "2026-09-06T08:42:14+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/hotels/yazd/"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "iran dmc",
+   "first_briefed": "2026-09-06T08:42:14+00:00",
+   "last_briefed": "2026-09-06T08:42:14+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/iran-dmc/"
+  },
+  {
+   "domain": "boutimar.com",
    "query": "iran oil show",
    "first_briefed": "2026-08-08T14:10:00Z",
    "last_briefed": "2026-08-09T07:35:18Z",
@@ -116,6 +172,22 @@
    "target_url_path": "/joybar-boutique-hotel"
   },
   {
+   "domain": "boutimar.com",
+   "query": "kish island",
+   "first_briefed": "2026-09-06T08:42:14+00:00",
+   "last_briefed": "2026-09-06T08:42:14+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/destinations/kish-island-travel-guide/"
+  },
+  {
+   "domain": "cruisebaz.com",
+   "query": "norouz 2027",
+   "first_briefed": "2026-09-06T08:49:02+00:00",
+   "last_briefed": "2026-09-06T08:49:02+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/norooz-2027-keruz-tatilat"
+  },
+  {
    "domain": "cruisebaz.com",
    "query": "nowruz 2027",
    "first_briefed": "2026-09-01T11:39:09+00:00",
@@ -130,6 +202,14 @@
    "last_briefed": "2026-09-01T11:39:09+00:00",
    "times_briefed": 1,
    "target_url_path": "/cruise/safar-daryaei-irani"
+  },
+  {
+   "domain": "cruisebaz.com",
+   "query": "persian gulf cruises",
+   "first_briefed": "2026-09-06T08:49:02+00:00",
+   "last_briefed": "2026-09-06T08:49:02+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/khalije-fars/keruzhaye-safar"
   },
   {
    "domain": "boutimar.com",
@@ -148,12 +228,44 @@
    "target_url_path": "/toranj-marine-hotel"
   },
   {
+   "domain": "ambientetravel.com",
+   "query": "travel",
+   "first_briefed": "2026-09-06T08:45:48+00:00",
+   "last_briefed": "2026-09-06T08:45:48+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/travel"
+  },
+  {
    "domain": "exploreorient.com",
    "query": "united arab emirates stag",
    "first_briefed": "2026-08-08T14:10:03Z",
    "last_briefed": "2026-08-09T07:35:21Z",
    "times_briefed": 6,
    "target_url_path": "/united-arab-emirates-stag"
+  },
+  {
+   "domain": "cruisebaz.com",
+   "query": "آرویا",
+   "first_briefed": "2026-09-06T08:49:02+00:00",
+   "last_briefed": "2026-09-06T08:49:02+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/aroya/rahnamaye-kamel"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "جزیره لانزاروته",
+   "first_briefed": "2026-09-06T08:44:17+00:00",
+   "last_briefed": "2026-09-06T08:44:17+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/jazireh-lanzarote-rahnama-safar"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "فیوردهای نروژ",
+   "first_briefed": "2026-09-06T08:44:17+00:00",
+   "last_briefed": "2026-09-06T08:44:17+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/fiordha-ye-norvej-rahnama-safar"
   },
   {
    "domain": "boutimar.ir",
