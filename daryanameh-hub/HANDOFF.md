@@ -65,11 +65,15 @@ Booking links go to cruise24.ir (`site.json` → `feed.book_url`) and are labell
 
 ## The hero film
 
-`static/img/scene-*.svg` are four placeholder scenes (Galataport, hull, balcony, cabin) drawn as vector art
-so the choreography could be built and verified now. Replace them with photographs of the same four moments
-(1600×900 or larger, same file names or edit `site.json` → `hero.scenes`) and the film works unchanged.
-Shot list: (1) Galataport quay at dusk with a ship moored, (2) the ship's side, rows of balconies, from the
-quay, (3) a balcony looking through the open door, (4) the cabin interior with the sea in the glass.
+`static/img/scene-{galataport,ship,balcony,cabin}.webp` are the four hero scenes (1600×900, VP8 WebP,
+55–166 KB each). They are AI-generated with Higgsfield (nano_banana_pro, 16:9) on 6 Sep 2026 and every scene
+carries the credit «تصویر تولیدشده با هوش مصنوعی (Higgsfield)» in `site.json` → `hero.scenes[].credit` — keep
+the credit if the images stay, change it if they are replaced with licensed photographs. The build sandbox
+cannot reach the Higgsfield CDN, so the files were moved through the Higgsfield sandbox as base64 chunks and
+md5-checked on both ends; if you regenerate, do it from a machine with normal egress.
+Shot list, should you reshoot with a camera: (1) Galataport quay at dusk with a ship moored, (2) the ship's
+side, rows of balconies, from the quay, (3) a balcony looking through the open door, (4) the cabin interior
+with the sea in the glass. Same file names, or edit `site.json` → `hero.scenes`, and the film works unchanged.
 The engine is `static/js/hub.js` (no library; a sticky stage scrubbed against scroll with damping).
 `prefers-reduced-motion` and no-JS get the cabin scene and the full interface immediately.
 
@@ -81,7 +85,7 @@ Home Screen; Android prompts. Store wrappers (Capacitor, Cafe Bazaar, Myket) are
 
 ## Not done, deliberately
 
-- Photographs. Everything visual is vector placeholder until licensed photos exist.
+- Port/article photographs. Only the four hero scenes exist (AI-generated, credited); everything else is a colour field until licensed photos exist.
 - Newsletter form posts nowhere yet (`site.json` → `channels.newsletter_action`); wire to nitrosend.
 - Telegram link is a placeholder handle (`t.me/daryanameh`) until the channel exists.
 - Podcast section says «به‌زودی».

@@ -6,7 +6,7 @@
   <div class="hero__stage">
     {% for s in site.hero.scenes %}
     <figure class="scene scene--{{ s.id }}" data-scene="{{ loop.index0 }}">
-      <img src="/{{ s.src }}" alt="{{ s.caption }}" decoding="async" {% if loop.index0 > 0 %}loading="lazy"{% endif %}>
+      <img src="/{{ s.src }}" alt="{{ s.caption }}" decoding="async" {% if loop.index0 > 0 %}loading="lazy"{% else %}fetchpriority="high"{% endif %}>
       {% if s.credit %}<figcaption class="scene__credit">{{ s.credit }}</figcaption>{% endif %}
     </figure>
     {% endfor %}
