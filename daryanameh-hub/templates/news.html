@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}اخبار کروز · {{ site.brand.fa }}{% endblock %}
+{% block description %}خبرهای کروز و سفر دریایی به فارسی؛ مسیرها، بندرها، کشتی‌ها و قواعد ویزا.{% endblock %}
+{% block bodyclass %}page news{% endblock %}
+{% block head %}<link rel="alternate" type="application/rss+xml" title="{{ site.brand.fa }} · اخبار" href="/news/feed.xml">{% endblock %}
+{% block content %}
+<section class="pagehead"><div class="wrap">
+  <p class="kicker">میز خبر</p>
+  <h1 class="display display--md">اخبار کروز</h1>
+  <p class="lede">مسیرها، بندرها، کشتی‌ها و — مهم‌تر از همه — تغییر قواعد ویزا. هر خبر منبع دارد.</p>
+  <p class="tiny"><a class="link" href="/news/feed.xml">RSS</a> · <a class="link" href="/news/feed.json">JSON</a> · <a class="link" href="/policy/#syndication">نقل خبر در سایت شما</a></p>
+</div></section>
+
+<section class="sec"><div class="wrap">
+{% if news %}
+  <ol class="wire">
+    {% for n in news %}
+    <li class="wire__item" data-reveal>
+      <a class="wire__link" href="/news/{{ n.slug }}/">
+        <time class="wire__date" datetime="{{ n.date }}">{{ n.date|fa }}</time>
+        <div class="wire__body">
+          {% if n.category %}<p class="kicker">{{ n.category }}</p>{% endif %}
+          <h2 class="wire__title">{{ n.title }}</h2>
+          <p class="wire__sum">{{ n.summary }}</p>
+          <p class="wire__src">منبع: {{ n.source }}</p>
+        </div>
+      </a>
+    </li>
+    {% endfor %}
+  </ol>
+{% else %}
+  <p class="lede">هنوز خبری منتشر نشده است.</p>
+{% endif %}
+</div></section>
+{% endblock %}

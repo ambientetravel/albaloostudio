@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ coll.title }} · {{ site.brand.fa }}{% endblock %}
+{% block description %}{{ coll.lede }}{% endblock %}
+{% block content %}
+<section class="pagehead"><div class="wrap"><p class="kicker">{{ site.brand.fa }}</p><h1 class="display display--md">{{ coll.title }}</h1><p class="lede">{{ coll.lede }}</p>
+<input class="filter" type="search" placeholder="فیلتر…" data-filter="#list" aria-label="فیلتر"></div></section>
+<section class="sec"><div class="wrap"><div class="grid3" id="list">
+{% for it in items %}
+<a class="tile" href="/{{ coll.slug }}/{{ it.slug }}/" data-text="{{ it.title }} {{ it.latin }} {{ it.kicker }} {{ it.summary }}">
+  <div class="art art--{{ loop.index0 % 4 }}"></div>
+  <p class="kicker">{{ it.kicker }}</p><h3>{{ it.title }}</h3><p>{{ it.summary }}</p>
+  {% if it.facts.visa %}<span class="pill pill--{{ 'free' if 'بدون ویزا' in it.facts.visa else ('schengen' if 'شینگن' in it.facts.visa else 'easy') }}">{{ it.facts.visa }}</span>{% endif %}
+</a>
+{% endfor %}
+</div></div></section>
+{% endblock %}

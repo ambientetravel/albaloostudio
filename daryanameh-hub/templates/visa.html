@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}ویزانامه · ویزای کروز برای گذرنامهٔ ایرانی · {{ site.brand.fa }}{% endblock %}
+{% block description %}کدام بندرها برای گذرنامهٔ ایرانی بدون ویزا، ویزای آسان، شینگن یا ویزای دشوارند.{% endblock %}
+{% block content %}
+<section class="pagehead"><div class="wrap"><p class="kicker">ویزانامه</p><h1 class="display display--md">ویزای کروز برای گذرنامهٔ ایرانی</h1>
+<p class="lede">قاعدهٔ خانه: فقط مسیرهای ترکیه و مصرِ AROYA و سیشل واقعاً بدون ویزا هستند. خلیج فارس و دبی «ویزای آسان» است، نه بدون ویزا. هر بندر یونانی، ایتالیایی، اسپانیایی یا فرانسوی، مسیر را شینگن می‌کند؛ حتی با سوارشدن از استانبول.</p></div></section>
+<section class="sec"><div class="wrap visa">
+  <div class="visa__col"><h2 class="pill pill--free">بدون ویزا</h2><ul>{% for p in free %}<li>{{ p }}</li>{% endfor %}</ul></div>
+  <div class="visa__col"><h2 class="pill pill--easy">ویزای آسان</h2><ul>{% for p in easy %}<li>{{ p }}</li>{% endfor %}</ul></div>
+  <div class="visa__col"><h2 class="pill pill--schengen">شینگن</h2><ul>{% for p in schengen %}<li>{{ p }}</li>{% endfor %}</ul></div>
+  <div class="visa__col"><h2 class="pill pill--hard">ویزای دشوار</h2><ul>{% for p in hard %}<li>{{ p }}</li>{% endfor %}</ul></div>
+</div><p class="tiny wrap">بندری که در هیچ فهرستی نیست «نیازمند بررسی» است؛ ما به جای حدس، همین را می‌گوییم. فهرست‌ها با شبکهٔ فروش مشترک است و با هم به‌روز می‌شوند.</p></section>
+{% endblock %}

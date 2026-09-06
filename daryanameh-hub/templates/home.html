@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block bodyclass %}home{% endblock %}
+{% block content %}
+<section class="hero" id="hero" data-scenes="{{ site.hero.scenes|length }}">
+ <div class="hero__sticky">
+  <div class="hero__stage">
+    {% for s in site.hero.scenes %}
+    <figure class="scene scene--{{ s.id }}" data-scene="{{ loop.index0 }}">
+      <img src="/{{ s.src }}" alt="{{ s.caption }}" decoding="async" {% if loop.index0 > 0 %}loading="lazy"{% else %}fetchpriority="high"{% endif %}>
+      {% if s.credit %}<figcaption class="scene__credit">{{ s.credit }}</figcaption>{% endif %}
+    </figure>
+    {% endfor %}
+    <div class="scene__door" aria-hidden="true"></div>
+    <div class="hero__grain" aria-hidden="true"></div>
+  </div>
+  <div class="hero__copy hero__copy--a">
+    <p class="kicker">{{ site.hero.kicker }}</p>
+    <h1 class="display">{{ site.hero.title }}</h1>
+    <p class="lede">{{ site.hero.sub }}</p>
+    <p class="hero__hint"><span>برای ورود به کابین، پایین بروید</span><i></i></p>
+  </div>
+  <div class="hero__copy hero__copy--b">
+    <p class="kicker">به کابین خوش آمدید</p>
+    <h2 class="display display--sm">هر چیزی که پیش از سوارشدن باید بدانید</h2>
+    <div class="hero__ctas">
+      <a class="btn btn--light" href="/{{ site.hero.cta_primary.href }}">{{ site.hero.cta_primary.label }}</a>
+      <a class="btn btn--ghost" href="/{{ site.hero.cta_secondary.href }}">{{ site.hero.cta_secondary.label }}</a>
+    </div>
+    <form class="hero__search" action="/ports/" role="search" onsubmit="return window.hubSearch && hubSearch(this)">
+      <input type="search" name="q" placeholder="بندر، کشتی، رودخانه…" aria-label="جست‌وجو" autocomplete="off">
+      <button type="submit">جست‌وجو</button>
+      <div class="hero__results" id="searchResults" hidden></div>
+    </form>
+  </div>
+ </div>
+</section>
+
+<section class="strip reveal">
+  <div class="wrap strip__in">
+    {% for c in collections[:6] %}<a class="strip__item" href="/{{ c.slug }}/"><span class="strip__n">{{ loop.index|fa }}</span><span>{{ c.title }}</span></a>{% endfor %}
+  </div>
+</section>
+
+{% if news %}
+<section class="newsrail reveal" id="news" aria-labelledby="newsrailh">
+  <div class="wrap">
+    <div class="newsrail__head">
+      <h2 class="display--sm" id="newsrailh">اخبار کروز</h2>
+      <a class="link tiny" href="/news/">همهٔ خبرها</a>
+    </div>
+    <div class="newsrail__list">
+      {% for n in news[:4] %}
+      <a class="newsrail__item" href="/news/{{ n.slug }}/">
+        <time datetime="{{ n.date }}">{{ n.date|fa }}{% if n.category %} · {{ n.category }}{% endif %}</time>
+        <h3>{{ n.title }}</h3>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="sec reveal" id="ports">
+  <div class="wrap">
+    <div class="sec__head"><p class="kicker">بندرنامه</p><h2 class="display display--md">بندرها، به روایت گذرنامهٔ ایرانی</h2><a class="more" href="/ports/">همهٔ بندرها</a></div>
+    <div class="bento">
+      {% for it in featured.ports %}
+      <a class="card card--{{ 'tall' if loop.first else 'std' }}" href="/ports/{{ it.slug }}/">
+        <div class="card__art art art--{{ loop.index0 % 4 }}"></div>
+        <div class="card__body"><p class="kicker">{{ it.kicker }}</p><h3>{{ it.title }}</h3><p>{{ it.summary }}</p>
+        <span class="pill pill--{{ 'free' if 'بدون ویزا' in it.facts.visa else ('schengen' if 'شینگن' in it.facts.visa else 'easy') }}">{{ it.facts.visa }}</span></div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--ink reveal" id="ships">
+  <div class="wrap">
+    <div class="sec__head"><p class="kicker">کشتی‌نامه</p><h2 class="display display--md">از غول‌های شش‌هزارنفره تا یات‌های همه‌سوئیت</h2><a class="more" href="/ships/">همهٔ کشتی‌ها</a></div>
+    <div class="rail" data-rail>
+      {% for it in featured.ships %}
+      <a class="rail__card" href="/ships/{{ it.slug }}/"><div class="art art--ship art--{{ loop.index0 % 4 }}"></div><p class="kicker">{{ it.kicker }}</p><h3>{{ it.title }}</h3><p class="meta">{{ it.facts.gt }} GT · {{ it.facts.guests }}</p></a>
+      {% endfor %}
+      {% for it in featured['river-ships'][:2] %}
+      <a class="rail__card" href="/river-ships/{{ it.slug }}/"><div class="art art--river art--{{ loop.index0 % 4 }}"></div><p class="kicker">{{ it.kicker }}</p><h3>{{ it.title }}</h3><p class="meta">{{ it.facts.guests }} مهمان · {{ it.facts.river }}</p></a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec reveal" id="lines">
+  <div class="wrap two">
+    <div>
+      <p class="kicker">خطوط کروز</p><h2 class="display display--md">هر خط، یک شخصیت</h2>
+      <p class="lede">MSC برای کشتی بزرگ و پرواز کوتاه به دبی، Explora برای سکوت و سوئیت، AROYA برای مسیرهای واقعاً بدون ویزا، Viking برای رودخانه.</p>
+      <a class="more" href="/lines/">همهٔ خطوط</a>
+    </div>
+    <ul class="list">
+      {% for it in featured.lines %}<li><a href="/lines/{{ it.slug }}/"><strong>{{ it.title }}</strong><span>{{ it.summary }}</span></a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="sec sec--sand reveal" id="rivers">
+  <div class="wrap">
+    <div class="sec__head"><p class="kicker">رودخانه‌ها</p><h2 class="display display--md">شهر به شهر، بدون چمدان‌کشیدن</h2><a class="more" href="/rivers/">همهٔ رودخانه‌ها</a></div>
+    <div class="grid3">
+      {% for it in featured.rivers[:3] %}<a class="tile" href="/rivers/{{ it.slug }}/"><p class="kicker">{{ it.kicker }}</p><h3>{{ it.title }}</h3><p>{{ it.summary }}</p><span class="meta">{{ it.facts.classic_route }}</span></a>{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec reveal" id="offers">
+  <div class="wrap">
+    <div class="sec__head"><p class="kicker">پیشنهادهای این فصل <span class="tag">آگهی</span></p><h2 class="display display--md">قیمت‌ها از شبکهٔ فروش، نه از حدس</h2><a class="more" href="/offers/">همهٔ پیشنهادها</a></div>
+    <div class="offers" id="offersHome" data-limit="4" data-feed="{{ site.feed.url }}" data-book="{{ site.feed.book_url }}" data-book-label="{{ site.feed.book_label }}">
+      {% include "_offers.html" %}
+    </div>
+  </div>
+</section>
+
+<section class="dyk reveal" id="dyk">
+  <div class="wrap dyk__in">
+    <p class="kicker">می‌دانستید؟</p>
+    <div class="dyk__slider" id="dyk-slider">
+      {% for d in didyouknow %}<a class="dyk__item{% if loop.first %} is-on{% endif %}" href="/{{ d.link }}">{{ d.text }}</a>{% endfor %}
+    </div>
+    <div class="dyk__dots" id="dyk-dots"></div>
+  </div>
+</section>
+
+<section class="sec reveal" id="heritage">
+  <div class="wrap">
+    <div class="sec__head"><p class="kicker">میراث جهانی و تاریخ</p><h2 class="display display--md">تاریخی که از عرشه به آن می‌رسید</h2></div>
+    <div class="grid3">
+      {% for it in featured.unesco[:3] %}<a class="tile tile--line" href="/unesco/{{ it.slug }}/"><p class="kicker">{{ it.kicker }}</p><h3>{{ it.title }}</h3><p>{{ it.summary }}</p><span class="meta">{{ it.facts.nearest_port }} · {{ it.facts.distance }}</span></a>{% endfor %}
+    </div>
+    <div class="links-row"><a class="more" href="/unesco/">میراث جهانی نزدیک بندرها</a><a class="more" href="/landmarks/">مکان‌های تاریخی</a><a class="more" href="/excursions/">گشت و اقامت کوتاه</a><a class="more" href="/hotels/">هتل‌ها</a></div>
+  </div>
+</section>
+
+<section class="sec sec--ink reveal" id="gatherings">
+  <div class="wrap">
+    <div class="sec__head"><p class="kicker">نوروز و گردهمایی‌ها</p><h2 class="display display--md">سال تحویل روی آب</h2><a class="more" href="/gatherings/">همهٔ گردهمایی‌ها</a></div>
+    <div class="grid3">
+      {% for it in gatherings %}<a class="tile tile--ink" href="/gatherings/{{ it.slug }}/"><p class="kicker">{{ it.kicker }}</p><h3>{{ it.title }}</h3><p>{{ it.summary }}</p><span class="meta">{{ it.facts.status }}</span></a>{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec reveal" id="journal">
+  <div class="wrap">
+    <div class="sec__head"><p class="kicker">مجله</p><h2 class="display display--md">دریانامه می‌نویسد</h2><a class="more" href="/journal/">همهٔ نوشته‌ها</a></div>
+    <div class="grid3">{% for a in articles %}<a class="tile" href="/journal/{{ a.slug }}/"><p class="kicker">{{ a.kicker }}</p><h3>{{ a.title }}</h3><p>{{ a.summary }}</p></a>{% endfor %}</div>
+  </div>
+</section>
+
+<section class="channels reveal" id="newsletter">
+  <div class="wrap channels__in">
+    <div class="channel">
+      <p class="kicker">خبرنامه · پنجشنبه‌ها</p><h3>پنجشنبه‌های دریا</h3><p>یک نوشتهٔ بلند، سه کوتاه، کشتی‌های این هفته در بندرها.</p>
+      <form class="nl" action="{{ site.channels.newsletter_action }}" method="post" onsubmit="return window.hubNewsletter && hubNewsletter(this)"><input type="email" name="email" required placeholder="ایمیل شما"><button class="btn btn--ink" type="submit">عضویت</button></form>
+      <p class="tiny">با عضویت، دریافت خبرنامه را تأیید می‌کنید. لغو با یک کلیک.</p>
+    </div>
+    <div class="channel"><p class="kicker">تلگرام · هر روز</p><h3>کانال دریانامه</h3><p>بندرِ روز، کشتیِ روز، یک نکتهٔ ویزا.</p><a class="btn btn--ink" href="{{ site.channels.telegram }}" target="_blank" rel="noopener">عضویت در کانال</a></div>
+    <div class="channel"><p class="kicker">پادکست · هر دو هفته</p><h3>{{ site.channels.podcast_title }}</h3><p>{{ site.channels.podcast_note }}</p><span class="tiny">به‌زودی</span></div>
+  </div>
+</section>
+
+<section class="partners reveal">
+  <div class="wrap partners__in">
+    <p class="kicker">همراهان تجاری <span class="tag">آگهی</span></p>
+    <div class="partners__row">{% for p in site.partners %}<a href="{{ p.href }}" rel="sponsored noopener" target="_blank"><strong>{{ p.name }}</strong><span>{{ p.role }}</span></a>{% endfor %}
+      <a class="partners__cta" href="/policy/#advertise"><strong>آگهی شما اینجا</strong><span>برنامهٔ همراهان بنیان‌گذار، ۹۰ روز</span></a></div>
+  </div>
+</section>
+{% endblock %}
