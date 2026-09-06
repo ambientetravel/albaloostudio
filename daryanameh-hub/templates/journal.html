@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}مجله · {{ site.brand.fa }}{% endblock %}
+{% block content %}
+<section class="pagehead"><div class="wrap"><p class="kicker">مجله</p><h1 class="display display--md">دریانامه می‌نویسد</h1></div></section>
+<section class="sec"><div class="wrap grid3">{% for a in articles %}<a class="tile" href="/journal/{{ a.slug }}/"><p class="kicker">{{ a.kicker }} · {{ a.date|fa }}</p><h3>{{ a.title }}</h3><p>{{ a.summary }}</p></a>{% endfor %}</div></section>
+{% endblock %}
