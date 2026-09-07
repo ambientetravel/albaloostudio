@@ -17,7 +17,7 @@
     {% for n in news %}
     <li class="wire__item" data-reveal>
       <a class="wire__link" href="/news/{{ n.slug }}/">
-        <time class="wire__date" datetime="{{ n.date }}">{{ n.date|fa }}</time>
+        {% with d=n.date %}{% include "_date.html" %}{% endwith %}
         <div class="wire__body">
           {% if n.category %}<p class="kicker">{{ n.category }}</p>{% endif %}
           <h2 class="wire__title">{{ n.title }}</h2>

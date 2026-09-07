@@ -13,7 +13,7 @@
     </div>
     {% endif %}
     <div class="lf__openin wrap">
-      <p class="kicker"><a href="/journal/">مجله</a> · {{ article.kicker }} · {{ article.date|fa }}</p>
+      <p class="kicker"><a href="/journal/">مجله</a> · {{ article.kicker }} · {% with d=article.date, compact=True %}{% include "_date.html" %}{% endwith %}</p>
       <h1 class="display lf__title">{{ article.title }}</h1>
       <p class="lf__lede">{{ article.summary }}</p>
       {% if article.hero_credit %}<p class="lf__credit">{{ article.hero_credit }}</p>{% endif %}

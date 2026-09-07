@@ -32,6 +32,7 @@ HERE = Path(__file__).resolve().parent
 CONTENT, TEMPLATES, STATIC, PUBLIC = HERE/"content", HERE/"templates", HERE/"static", HERE/"public"
 sys.path.insert(0, str(HERE.parent/"cruise24-ir"))
 import _visa  # noqa: E402  (shared visa classifier — the single source of truth)
+import jalali  # noqa: E402  (Jalali dates; readers live on two calendars)
 
 FA_DIGITS = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
 FACT_LABELS = {
@@ -49,6 +50,14 @@ VISA_LABEL = {"schengen": "شینگن", "hard": "ویزای دشوار (آمری
 
 def fa(n) -> str:
     return str(n).translate(FA_DIGITS)
+
+def jdate(iso) -> str:
+    """'2026-09-06' → '۱۵ شهریور ۱۴۰۵'."""
+    return jalali.jalali_str(iso)
+
+def gdate(iso) -> str:
+    """'2026-09-06' → '۶ سپتامبر ۲۰۲۶'."""
+    return jalali.gregorian_str(iso)
 
 def load(name):
     return json.loads((CONTENT/f"{name}.json").read_text(encoding="utf-8"))
@@ -186,6 +195,8 @@ def build(check_only=False):
 
     env = Environment(loader=FileSystemLoader(str(TEMPLATES)), autoescape=select_autoescape(["html"]))
     env.filters["fa"] = fa
+    env.filters["jdate"] = jdate
+    env.filters["gdate"] = gdate
     built = datetime.date.today().isoformat()
     base = dict(site=site, nav=site["nav"], collections=collections, labels=FACT_LABELS, built=built,
                 year_fa=fa(datetime.date.today().year), resolve=resolve)

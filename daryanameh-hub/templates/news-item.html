@@ -5,7 +5,7 @@
 {% block content %}
 <article class="prose-page">
   <div class="wrap wrap--narrow">
-    <p class="kicker"><a href="/news/">اخبار</a>{% if item.category %} · {{ item.category }}{% endif %} · <time datetime="{{ item.date }}">{{ item.date|fa }}</time></p>
+    <p class="kicker"><a href="/news/">اخبار</a>{% if item.category %} · {{ item.category }}{% endif %} · {% with d=item.date, compact=True %}{% include "_date.html" %}{% endwith %}</p>
     <h1 class="display display--sm">{{ item.title }}</h1>
     <p class="lede">{{ item.summary }}</p>
     <div class="prose">{{ item.html|safe }}</div>
@@ -23,7 +23,7 @@
   {% if more %}
   <div class="wrap">
     <h2 class="display--sm morehead">خبرهای دیگر</h2>
-    <div class="grid3">{% for n in more %}<a class="tile" href="/news/{{ n.slug }}/"><p class="kicker">{{ n.category }} · {{ n.date|fa }}</p><h3>{{ n.title }}</h3><p>{{ n.summary }}</p></a>{% endfor %}</div>
+    <div class="grid3">{% for n in more %}<a class="tile" href="/news/{{ n.slug }}/"><p class="kicker">{{ n.category }} · {% with d=n.date, compact=True %}{% include "_date.html" %}{% endwith %}</p><h3>{{ n.title }}</h3><p>{{ n.summary }}</p></a>{% endfor %}</div>
   </div>
   {% endif %}
 </article>

@@ -51,7 +51,7 @@
     <div class="newsrail__list">
       {% for n in news[:4] %}
       <a class="newsrail__item" href="/news/{{ n.slug }}/">
-        <time datetime="{{ n.date }}">{{ n.date|fa }}{% if n.category %} · {{ n.category }}{% endif %}</time>
+        {% with d=n.date, compact=True %}{% include "_date.html" %}{% endwith %}{% if n.category %}<span class="dt__cat"> · {{ n.category }}</span>{% endif %}
         <h3>{{ n.title }}</h3>
       </a>
       {% endfor %}
