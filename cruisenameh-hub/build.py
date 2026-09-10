@@ -303,11 +303,25 @@ def build(check_only=False):
     return urls
 
 def check():
+    """House rules, checked at SOURCE and in the built output.
+
+    Source first, deliberately: `--check` on its own does not rebuild, so scanning
+    only public/ silently passed a violation that had been written into content/
+    but not yet built. Anyone editing content can now run --check before a build
+    and get a true answer.
+    """
     bad = 0
+    banned = (("خلیج عربی", "«خلیج عربی»"), ("Arabian Gulf", "'Arabian Gulf'"))
+    sources = list(CONTENT.rglob("*.json")) + list(CONTENT.rglob("*.md")) \
+        + list(TEMPLATES.rglob("*.html")) + list((STATIC/"js").rglob("*.js"))
+    for p in sources:
+        t = p.read_text(encoding="utf-8")
+        for needle, label in banned:
+            if needle in t: print(f"HOUSE RULE: {label} in", p.relative_to(HERE)); bad += 1
     for p in PUBLIC.rglob("*.html"):
         t = p.read_text(encoding="utf-8")
-        if "خلیج عربی" in t: print("HOUSE RULE: «خلیج عربی» in", p); bad += 1
-        if "Arabian Gulf" in t: print("HOUSE RULE: 'Arabian Gulf' in", p); bad += 1
+        for needle, label in banned:
+            if needle in t: print(f"HOUSE RULE: {label} in", p.relative_to(HERE)); bad += 1
     for it in load("ports"):
         v = it["facts"].get("visa", "")
         port_name = it["title"].split(" ·")[0].split(" (")[0]

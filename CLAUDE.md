@@ -70,6 +70,45 @@ The registry is `.claude/session-routing.json`. Before handing off:
 Hand off the finished work — commit sha, what changed, what is deliberately not
 done — not a request for the other session to go and do the task.
 
+### Area ownership — when two people share one property
+
+Session routing answers *which session owns a site*. It does not answer *which
+person owns which part of it*, and on **cruisenameh** two people now do. Route by
+area as well as by property.
+
+**cruisenameh.com — کروزنامه**
+
+| Area | Owner | Files |
+|------|-------|-------|
+| Content and editorial | **[COLLABORATOR NAME — Rome, GitHub @handle: TO BE FILLED]** | `cruisenameh-hub/content/**` — the collection JSON, `content/news/*.md`, `content/articles/*.md` |
+| Build, templates, deploy | This session | `build.py`, `jalali.py`, `templates/`, `static/`, `tools/` |
+| Generated output | Nobody | `cruisenameh-hub/public/` |
+
+Three rules make that split hold:
+
+- **`public/` is never hand-edited by anyone.** It is build output, committed only
+  so the site can be deployed by unzipping it. Every conflict in it is resolved by
+  rebuilding, never by merging. This is why the split works at all: content is
+  JSON and Markdown, which merges cleanly, and the only files two people would
+  otherwise both touch are generated.
+- **Content owner does not edit templates or `build.py`; build owner does not
+  rewrite editorial copy.** Crossing that line is what produces the collisions.
+  When content needs a template change — a new fact key, a new section, a
+  different card — it is a request to the build owner, not an edit.
+- **The hard rules below bind the content owner harder than anyone.** She is
+  writing the sentences those rules govern. Before pushing content, run
+  `python3 build.py --check`: it fails the build on «خلیج فارس» violations and on
+  a visa-free label attached to an easy-visa port. A news item without a
+  `source:` line is refused by the build; that is deliberate and not to be
+  worked around.
+
+If the content owner runs her own Claude session, that session owns the content
+area of cruisenameh and this one keeps build and deploy. Two sessions on one
+property is fine **only** with the area split above written into both; without it
+they will both think they own the whole site.
+
+`.claude/session-routing.json` carries the same split under `area_owners`.
+
 ## Hard rules that override everything
 
 - **«خلیج فارس» / Persian Gulf. Never "Arabian Gulf".** Every page, card, email,
