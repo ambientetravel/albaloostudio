@@ -108,12 +108,12 @@
    "area_owners": {
     "_comment": "Two people share this property. Route by area, not only by property — see CLAUDE.md § Area ownership.",
     "content": {
-     "owner": "TO BE FILLED — collaborator in Rome (name, GitHub handle)",
-     "confirmed_by_user": false,
+     "owner": "Golbarg — Rome. Tourism Management MSc. GitHub handle not yet supplied.",
+     "confirmed_by_user": true,
      "paths": [
       "cruisenameh-hub/content/"
      ],
-     "note": "Collections JSON, news/*.md, articles/*.md. Bound by the hard rules; run build.py --check before pushing."
+     "note": "Confirmed by Alireza 11 Sep 2026. Collections JSON, news/*.md, articles/*.md. Bound by the hard rules; run build.py --check before pushing."
     },
     "build": {
      "owner": "this session",

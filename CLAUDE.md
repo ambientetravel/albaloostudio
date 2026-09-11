@@ -80,7 +80,7 @@ area as well as by property.
 
 | Area | Owner | Files |
 |------|-------|-------|
-| Content and editorial | **[COLLABORATOR NAME — Rome, GitHub @handle: TO BE FILLED]** | `cruisenameh-hub/content/**` — the collection JSON, `content/news/*.md`, `content/articles/*.md` |
+| Content and editorial | **Golbarg** — Rome (GitHub handle: not yet supplied) | `cruisenameh-hub/content/**` — the collection JSON, `content/news/*.md`, `content/articles/*.md` |
 | Build, templates, deploy | This session | `build.py`, `jalali.py`, `templates/`, `static/`, `tools/` |
 | Generated output | Nobody | `cruisenameh-hub/public/` |
 
