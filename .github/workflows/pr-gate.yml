@@ -55,9 +55,13 @@ jobs:
             echo '```'
             cat /tmp/gate.txt
             echo '```'
-            if [ "$code" -ge 2 ]; then echo "> ✗ At least one PR is **BLOCKED** on a house rule.";
+            if [ "$code" -eq 3 ]; then echo "> ✗ **The gate could not read a single repo — nothing was reviewed.** Check BRIDGE_GH_TOKEN's repository access.";
+            elif [ "$code" -ge 2 ]; then echo "> ✗ At least one PR is **BLOCKED** on a house rule.";
             elif [ "$code" -eq 1 ]; then echo "> ▲ At least one PR has a **WARN**.";
             else echo "> ✓ All open PRs pass, or there are none."; fi
           } >> "$GITHUB_STEP_SUMMARY"
-          # A block/warn is information for a human, not a failed run.
+          # A block/warn is information for a human, not a failed run. A gate
+          # that could read nothing IS a failed run — that must surface as red,
+          # not as a 27th consecutive green that reviewed nothing.
+          if [ "$code" -eq 3 ]; then exit 1; fi
           exit 0

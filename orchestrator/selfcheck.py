@@ -154,7 +154,11 @@ ok("actions:read is granted for the cross-workflow artifact",
 import re as _re
 _lim_input = _re.search(r'limit:\n\s+description:[^\n]*\n\s+required: false\n\s+default: "(\d+)"', _wf2)
 _lim_shell = set(_re.findall(r"inputs\.limit \|\| '(\d+)'", _wf2))
-ok("the brief limit is 5", _lim_input and _lim_input.group(1) == "5",
+# 0 = all eligible briefs. A cap "defers to the next run", but the next run
+# scouts fresh and the ledger's 45-day cooldown then blocks the deferred
+# keywords — on 6 Sep, 9 of 14 briefs were paid for and lost that way.
+ok("the brief limit is 0 (all) — a cap loses briefs to the ledger cooldown",
+   _lim_input and _lim_input.group(1) == "0",
    _lim_input.group(1) if _lim_input else "not found")
 ok("the input default and the shell fallback agree",
    _lim_input and {_lim_input.group(1)} == _lim_shell,
@@ -717,7 +721,7 @@ _a2bsrc = pathlib.Path(__file__).with_name("agent2_writer_batch.py").read_text(e
 ok("which the batch runner records as deferred, not failed",
    'oc.status = "deferred"' in _a2bsrc)
 ok("so a capacity blip at Google cannot turn the nightly cron red",
-   'return 1 if manifest["failed"] else 0' in _a2bsrc
+   'return 1 if (manifest["failed"] and not manifest["drafted"]) else 0' in _a2bsrc
    and '"deferred_upstream": sum(o.status == "deferred"' in _a2bsrc)
 ok("and the two kinds of deferral are counted separately",
    '"deferred_by_limit"' in _a2bsrc and '"deferred_upstream"' in _a2bsrc,
@@ -2421,8 +2425,11 @@ _b_src = pathlib.Path("agent2_writer_batch.py").read_text(encoding="utf-8")
 ok("the batch runner maps it to blocked_config",
    "except AdapterNotConfigured" in _b_src and 'oc.status = "blocked_config"' in _b_src)
 ok("and counts it separately in the manifest", '"blocked_config": sum(' in _b_src)
-ok("the exit code still keys on `failed` alone",
-   'return 1 if manifest["failed"] else 0' in _b_src)
+# Exit 1 only when a fault produced NOTHING. On 6 Sep three articles were
+# drafted and opened as PRs, one brief failed on a provider fault, the run
+# exited 1, and Agent 3 was skipped for work that had succeeded.
+ok("the exit code keys on `failed` with nothing drafted — partial success stays green",
+   'return 1 if (manifest["failed"] and not manifest["drafted"]) else 0' in _b_src)
 # The distinction that matters: config-blocked stays green, a real fault does not.
 _mk = lambda st: a2b.Outcome(brief_file="x", status=st)
 _green = [_mk("drafted"), _mk("blocked_config"), _mk("deferred")]

@@ -166,12 +166,26 @@ def main() -> int:
     a = ap.parse_args()
 
     jobs: list[tuple[str, int, str]] = []
+    unreadable: list[tuple[str, str]] = []
+    readable = 0
     if a.all:
+        # One unreadable repo must not abort the whole review. On 6-12 Sep the
+        # listing 404'd on exploreorient (the token lacked that repo), the
+        # exception escaped this loop before a single PR was reviewed, and the
+        # workflow's unconditional `exit 0` reported 27 consecutive green runs
+        # that had reviewed nothing. List per repo, keep going, and say so.
         for repo, prof in REPOS.items():
-            for pr in _gh(f"/repos/{repo}/pulls?state=open&per_page=50"):
+            try:
+                prs = _gh(f"/repos/{repo}/pulls?state=open&per_page=50")
+            except (RuntimeError, ValueError) as exc:
+                unreadable.append((repo, str(exc)[:110]))
+                continue
+            readable += 1
+            for pr in prs if isinstance(prs, list) else []:
                 jobs.append((repo, pr["number"], a.profile or prof))
     elif a.repo and a.pr:
         jobs.append((a.repo, a.pr, a.profile or REPOS.get(a.repo, "boutimar_v1")))
+        readable = 1
     else:
         ap.error("give --all, or --repo owner/name --pr N")
 
@@ -187,8 +201,21 @@ def main() -> int:
         if a.post:
             _post(repo, num, _comment_body(r))
         worst = max(worst, rank[r["verdict"]])
-    print(f"\n{len(jobs)} PR(s) reviewed. Nothing merged; the merge is a human's.")
-    return worst  # non-zero exit on WARN/BLOCK, so CI can gate on it
+
+    for repo, why in unreadable:
+        print(f"\n! {repo} — UNREADABLE, not reviewed: {why}")
+        if "404" in why:
+            print("      (404 on a private repo means the token has no access to it —"
+                  " add it to BRIDGE_GH_TOKEN's repository list, or the repo does not exist)")
+    print(f"\n{len(jobs)} PR(s) reviewed across {readable} readable repo(s)"
+          f"{f', {len(unreadable)} unreadable' if unreadable else ''}. "
+          "Nothing merged; the merge is a human's.")
+    # 0 pass / 1 warn / 2 block are verdicts for a human. 3 means the gate could
+    # not read ANY repo — that is a broken gate, not a clean one, and must not
+    # report green.
+    if a.all and readable == 0:
+        return 3
+    return worst
 
 
 if __name__ == "__main__":

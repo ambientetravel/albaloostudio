@@ -36,9 +36,9 @@ on:
         required: false
         type: string
       limit:
-        description: "Max briefs to write (0 = all)"
+        description: "Max briefs to write (0 = all, the default — a cap loses briefs to the ledger cooldown)"
         required: false
-        default: "5"
+        default: "0"
         type: string
       no_llm:
         description: "Skip Gemini — exercise parsing, gate and adapters only"
@@ -175,7 +175,13 @@ jobs:
           # run — workflow_run carries no inputs. Both say 5; a limit that
           # lives in two places and disagrees is the same bug as the model
           # default that shipped as flash in config.py and pro in this file.
-          if [ "${{ inputs.limit || '5' }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit || '5' }}"; fi
+          # Default is ALL eligible briefs. The old cap of 5 "deferred to the next
+          # run" — but the next run scouts fresh briefs and the ledger's 45-day
+          # cooldown then blocks the deferred keywords, so 9 of 14 briefs were
+          # paid for and lost on 6 Sep. At ~$0.05 an article there is no cost
+          # case for a cap; the prompt-size guard in the listener removes the
+          # runtime one.
+          if [ "${{ inputs.limit || '0' }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit || '0' }}"; fi
 
           # Without a key, run the structural path instead of failing. Same
           # reasoning as the scout's missing-endpoint guard: a cron that is red

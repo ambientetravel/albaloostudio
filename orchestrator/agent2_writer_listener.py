@@ -19,6 +19,7 @@ payload (ARCHITECTURE.md §4), not the platform.
 from __future__ import annotations
 
 import json
+import os
 import logging
 import random
 import threading
@@ -397,6 +398,38 @@ def _user_prompt(brief: ContentBrief, data: dict[str, Any]) -> str:
     )
 
 
+# A live feed goes into the prompt VERBATIM, and nothing bounded it. On 6 Sep the
+# boutimar.ir «فیوردهای نروژ» brief pointed at the full cruise feed, the writer
+# handed Anthropic a 1,723,883-token prompt, got 400 "prompt is too long", fell
+# to Gemini's free tier, hit 429, and the brief failed — which then failed the
+# whole run and skipped Agent 3. The model needs the shape and a sample, not
+# every sailing. Cap each field; say what was cut so nothing reads as complete.
+_MAX_DEP_CHARS = int(os.environ.get("WRITER_MAX_DEP_CHARS", "20000"))
+
+
+def _bound_value(value: Any, budget: int = _MAX_DEP_CHARS) -> tuple[Any, str | None]:
+    """Shrink a fetched feed to `budget` serialised chars. Lists keep a prefix,
+    dicts keep their keys with long list values trimmed; anything else is cut.
+    Returns (value, note) — note is None when nothing was removed."""
+    raw = json.dumps(value, ensure_ascii=False)
+    if len(raw) <= budget:
+        return value, None
+    if isinstance(value, list):
+        keep = max(1, int(len(value) * budget / max(len(raw), 1)))
+        return value[:keep], f"truncated: {keep} of {len(value)} items shown"
+    if isinstance(value, dict):
+        out: dict[str, Any] = {}
+        notes = []
+        per = max(500, budget // max(len(value), 1))
+        for k, v in value.items():
+            bv, n = _bound_value(v, per)
+            out[k] = bv
+            if n:
+                notes.append(f"{k}: {n}")
+        return out, ("; ".join(notes) or "truncated")
+    return raw[:budget], f"truncated to {budget} chars of {len(raw)}"
+
+
 def _resolve_data_dependencies(brief: ContentBrief) -> dict[str, Any]:
     """
     Fetch the live feeds the brief points at. Anything that fails to load is
@@ -413,12 +446,18 @@ def _resolve_data_dependencies(brief: ContentBrief) -> dict[str, Any]:
                 source, timeout=15, headers={"User-Agent": config.USER_AGENT}
             )
             resp.raise_for_status()
-            resolved["fields"][field_name] = {
+            value, cut = _bound_value(resp.json())
+            entry: dict[str, Any] = {
                 "status": "available",
                 "source": source,
                 "asof": rfc3339(),
-                "value": resp.json(),
+                "value": value,
             }
+            if cut:
+                entry["note"] = (f"Feed {cut}. Quote only figures present here; "
+                                 f"say the rest is available on request.")
+                log.warning("data dependency %s — %s", source, cut)
+            resolved["fields"][field_name] = entry
         except (requests.RequestException, ValueError) as exc:
             log.warning("data dependency %s failed: %s", source, exc)
             resolved["fields"][field_name] = {

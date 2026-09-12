@@ -259,6 +259,24 @@ def watch(written: Path, token: str | None, *, emit: Path | None = None
             rows.append(row)
             continue
 
+        # Promoted on an earlier run: the event file still carries no live_url
+        # (promotion writes to emit/, never back into written/), so every run
+        # re-derived the URL, re-found the page, re-warned "live at a different
+        # URL", and re-counted it as "newly live". Joybar and the Oil Show were
+        # reported newly live on 17 consecutive runs. A promoted record is the
+        # memory that this already happened.
+        promoted = (emit / f"{item['name']}.json") if emit else None
+        if promoted is not None and promoted.exists():
+            try:
+                prev = json.loads(promoted.read_text(encoding="utf-8"))
+                prev_url = (prev.get("publication") or {}).get("live_url")
+            except (OSError, ValueError):
+                prev_url = None
+            row.update(state="already live", live_url=prev_url or row["intended_url"],
+                       detail="promoted on an earlier run")
+            rows.append(row)
+            continue
+
         number, repo = _pr_number(row["pr_url"]), _repo(row["pr_url"])
         if not (number and repo):
             row.update(state="no pull request",

@@ -1,0 +1,58 @@
+name: Health — what broke, what needs you
+
+# One report that leads with the failures. It runs after every writer/broadcaster
+# cycle and once a day, reads the agents' own artifacts, and goes RED when a
+# core agent failed or produced nothing — the one signal GitHub emails about
+# without any new infrastructure. A PR waiting on a merge is yellow, not red.
+
+on:
+  workflow_run:
+    workflows: ["Agent 2 — Writer", "Agent 3 — Broadcaster"]
+    types: [completed]
+  schedule:
+    - cron: "0 7 * * *"          # 07:00 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: write     # commits reports/health-latest.md back, like the ledger
+  actions: read       # read other workflows' runs + artifacts
+
+concurrency:
+  group: health
+  cancel-in-progress: true
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build the health report
+        id: report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRIDGE_GH_TOKEN: ${{ secrets.BRIDGE_GH_TOKEN }}
+        run: |
+          set -uo pipefail
+          cd orchestrator
+          python3 tools/health_report.py --json | tee /tmp/health.md
+          code=${PIPESTATUS[0]}
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          cat /tmp/health.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit the report
+        run: |
+          set -euo pipefail
+          git config user.name "albaloo-health"
+          git config user.email "albaloo-health@users.noreply.github.com"
+          git add orchestrator/reports/
+          git diff --cached --quiet && exit 0
+          git commit -m "Health: $(head -1 orchestrator/reports/health-latest.md | sed 's/^# //')"
+          git push
+      - name: Go red only when something actually broke
+        run: |
+          code="${{ steps.report.outputs.code }}"
+          echo "health exit code: $code (0 clean · 1 needs you · 2 broke · 4 no token)"
+          if [ "$code" = "2" ] || [ "$code" = "4" ]; then exit 1; fi
+          exit 0

@@ -458,9 +458,12 @@ def main(argv: list[str] | None = None) -> int:
              "(of %d briefs)", manifest["drafted"], manifest["blocked"],
              manifest["deferred_upstream"], manifest["failed"], len(files))
 
-    # A blocked brief is the gate working, not the run failing. Only a genuine
-    # error — an unreadable payload, a model or adapter fault — is exit 1.
-    return 1 if manifest["failed"] else 0
+    # A blocked brief is the gate working, not the run failing. And ONE failed
+    # brief among drafted ones is not a failed run either: on 6 Sep three
+    # articles were drafted and opened as PRs, one brief failed on a provider
+    # fault, the run exited 1 — and Agent 3 was skipped, so nothing downstream
+    # ran for work that had succeeded. Exit 1 only when nothing came out.
+    return 1 if (manifest["failed"] and not manifest["drafted"]) else 0
 
 
 if __name__ == "__main__":
