@@ -37,8 +37,14 @@ jobs:
         run: |
           set -uo pipefail
           cd orchestrator
+          # GitHub runs this under `bash -e`. The report's exit code IS the
+          # verdict (0 clean / 1 needs you / 2 broke), and with -e a 2 aborted
+          # the step here — before the commit and the deliberate red/yellow
+          # decision below ever ran. Capture it, never let it abort.
+          set +e
           python3 tools/health_report.py --json | tee /tmp/health.md
           code=${PIPESTATUS[0]}
+          set -e
           echo "code=$code" >> "$GITHUB_OUTPUT"
           cat /tmp/health.md >> "$GITHUB_STEP_SUMMARY"
       - name: Commit the report
