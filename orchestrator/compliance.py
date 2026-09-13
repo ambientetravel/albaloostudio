@@ -192,8 +192,13 @@ def _clause_bounds(text: str, match: re.Match[str]) -> tuple[int, int]:
 #
 # `persian_gulf_only` deliberately gets NO such guard: that rule bans a term
 # outright, and "Arabian Gulf" is wrong in any framing.
+# "rather than" / "instead of" deny what follows them: "an easy-visa process
+# rather than anything resembling a visa-free entry" states the rule. Without
+# these, the gate WARNed boutimar#7 (12 Sep) for writing the rule correctly. A
+# claim placed BEFORE the phrase ("visa-free rather than easy-visa") still flags,
+# because the negator has to precede the match.
 _NEG_BEFORE = re.compile(
-    r"(?i)\b(not|isn'?t|aren'?t|never|non|no)\b[^.!?؟\n]{0,24}$"
+    r"(?i)\b(not|isn'?t|aren'?t|never|non|no|rather\s+than|instead\s+of)\b[^.!?؟\n]{0,24}$"
     r"|(نه|نمی|بدون\s+اینکه)[^.!?؟\n]{0,24}$"
 )
 _NEG_AFTER = re.compile(
@@ -459,8 +464,15 @@ def check(
             forbidden = _VISA_FORBIDDEN_DEST.search(clause)
             exempt = _VISA_EXEMPT_DEST.search(clause)
             # A clause that classifies the forbidden destination as easy-visa is
-            # stating the rule, not breaking it.
-            classified = _EASY_VISA_MARKER.search(clause)
+            # stating the rule, not breaking it. But the marker must AFFIRM easy
+            # visa: "Dubai is visa-free rather than easy-visa" and "Dubai is
+            # visa-free, no easy visa needed" both contain the marker and both
+            # are the exact lie this rule exists to stop — they passed until
+            # 13 Sep, because any mention of "easy visa" excused the clause.
+            classified = any(
+                not _NEG_BEFORE.search(clause[max(0, em.start() - 60):em.start()])
+                for em in _EASY_VISA_MARKER.finditer(clause)
+            )
 
             if forbidden and not classified:
                 out.append(Violation(

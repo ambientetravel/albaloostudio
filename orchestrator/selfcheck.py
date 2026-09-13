@@ -1264,6 +1264,17 @@ ok("visa-free blocked by default", any(v.rule == "visa_accuracy" for v in c("Thi
 ok("بدون ویزا blocked", any(v.rule == "visa_accuracy" for v in c("سفر بدون ویزا")))
 # The gate bans a CLAIM, not a term. A negated claim states the rule correctly —
 # blocking it blocked the very instruction that enforces the rule.
+ok("'rather than … visa-free' is allowed (states the rule — boutimar#7, 12 Sep)",
+   not any(v.rule == "visa_accuracy" for v in c(
+       "the practicalities of an easy-visa process rather than anything resembling a visa-free entry")))
+ok("but a claim placed before 'rather than' still flags",
+   any(v.rule == "visa_accuracy" for v in c("Dubai cruises are visa-free rather than easy-visa")))
+ok("a DENIED easy-visa marker does not excuse a false claim (loophole closed 13 Sep)",
+   any(v.rule == "visa_accuracy" and v.severity == "block"
+       for v in c("Dubai is visa-free, no easy visa needed")))
+ok("an AFFIRMED easy-visa marker still reads as the rule stated correctly",
+   not any(v.severity == "block" for v in c(
+       "Separate the visa-free routes (Türkiye, Seychelles) from the easy-visa ones (Persian Gulf, Dubai)")))
 ok("'not visa-free' is allowed (states the rule)",
    not any(v.rule == "visa_accuracy" for v in c("Iran stays are not visa-free")))
 ok("'is not visa-free' allowed", not any(v.rule == "visa_accuracy"
