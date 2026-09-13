@@ -1,9 +1,8 @@
 {
- "generated": "2026-09-13T09:50+00:00",
+ "generated": "2026-09-13T11:52+00:00",
  "critical": [],
  "needs_you": [
-  "2 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
-  "**3 article PR(s) waiting on your merge** (oldest 12 days): [boutimar#6](https://github.com/ambientetravel/boutimar/pull/6) Agent 2 draft: Is Iran Open for Tourism Now? Cur; [boutimar#7](https://github.com/ambientetravel/boutimar/pull/7) Agent 2 draft: Iran DMC | Boutimar Destination M; [boutimar#8](https://github.com/ambientetravel/boutimar/pull/8) Agent 2 draft: Kish Island Travel Guide: Iran's "
+  "2 social post(s) blocked for **missing media** — no image source is wired, so these can never ship"
  ],
  "warn": [
   "2 brief(s) built **without the model** on boutimar.ir, ambientetravel.com — not worth publishing; the writer skips them. Cause: Gemini call failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is cur",
@@ -31,57 +30,57 @@
   "posts_held": 2,
   "posts_no_media": 2,
   "campaigns": 2,
-  "open_prs": 8
+  "open_prs": 5
  },
  "agents": [
   {
    "agent": "Scout",
    "result": "success",
-   "age_days": 0.0,
+   "age_days": 0.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34749663919",
    "run": 35
   },
   {
    "agent": "Writer",
    "result": "success",
-   "age_days": 0.0,
+   "age_days": 0.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34750024970",
    "run": 48
   },
   {
    "agent": "Broadcaster",
    "result": "success",
-   "age_days": 0.0,
+   "age_days": 0.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34750309025",
    "run": 46
   },
   {
    "agent": "Closer",
    "result": "success",
-   "age_days": 13.0,
+   "age_days": 13.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/33375735105",
    "run": 1
   },
   {
    "agent": "Auditor+Analyst",
    "result": "success",
-   "age_days": 6.0,
+   "age_days": 6.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34109004813",
    "run": 7
   },
   {
    "agent": "Cartographer",
    "result": "success",
-   "age_days": 6.0,
+   "age_days": 6.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34112443305",
    "run": 9
   },
   {
    "agent": "Watcher",
    "result": "success",
-   "age_days": 7.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34026453120",
-   "run": 7
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305",
+   "run": 8
   },
   {
    "agent": "Oracle",
@@ -92,21 +91,21 @@
   {
    "agent": "Merge-watch",
    "result": "success",
-   "age_days": 0.9,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34691119351",
-   "run": 28
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34755504344",
+   "run": 29
   },
   {
    "agent": "PR gate",
    "result": "success",
-   "age_days": 0.3,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34736406917",
-   "run": 34
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34754071801",
+   "run": 35
   },
   {
    "agent": "Dashboard",
    "result": "success",
-   "age_days": 5.9,
+   "age_days": 6.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34118444254",
    "run": 10
   }
