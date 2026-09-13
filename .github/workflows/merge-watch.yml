@@ -67,7 +67,12 @@ jobs:
           #
           # Artifacts are kept 90 days, so ten runs is comfortably more history
           # than a review cycle needs, and each is small.
-          RUNS=$(gh run list --workflow agent2-writer.yml --status success --limit 10                    --json databaseId --jq '.[].databaseId'                    --repo "${{ github.repository }}" 2>/dev/null || true)
+          # `completed`, not `success`: a writer run can draft articles, open their
+          # PRs and still exit 1. Run #47 (6 Sep) did exactly that, and its PRs
+          # boutimar#7 and #8 were invisible here — merged, then never watched, so
+          # the Broadcaster would never have posted them. A run with no artifact
+          # is already skipped by the download below.
+          RUNS=$(gh run list --workflow agent2-writer.yml --status completed --limit 10                    --json databaseId --jq '.[].databaseId'                    --repo "${{ github.repository }}" 2>/dev/null || true)
           if [ -z "${RUNS:-}" ]; then
             echo "::notice title=Nothing to watch::Agent 2 has no successful run yet, so there are no drafts whose pull requests could have merged."
             exit 0
