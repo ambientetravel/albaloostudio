@@ -1,22 +1,19 @@
-# Orchestration health — 2026-09-12T07:45 UTC
+# Orchestration health — 2026-09-13T09:50 UTC
 
-**2 broke · 2 need you · 4 to watch.**
+**0 broke · 2 need you · 2 to watch.**
 
 ## 🔴 Broke
 
-- **Writer** last run **failed** (#47, 6.0d ago) — https://github.com/ambientetravel/albaloostudio/actions/runs/34022924506
-- **Broadcaster** was **skipped** last cycle (#45) — its upstream failed, so nothing downstream ran
+- Nothing. Every core agent's last run succeeded.
 
 ## 🟡 Needs you — only you can do these
 
 - 2 social post(s) blocked for **missing media** — no image source is wired, so these can never ship
-- **3 article PR(s) waiting on your merge** (oldest 11 days): [boutimar#6](https://github.com/ambientetravel/boutimar/pull/6) Agent 2 draft: Is Iran Open for Tourism Now? Cur; [boutimar#7](https://github.com/ambientetravel/boutimar/pull/7) Agent 2 draft: Iran DMC | Boutimar Destination M; [boutimar#8](https://github.com/ambientetravel/boutimar/pull/8) Agent 2 draft: Kish Island Travel Guide: Iran's 
+- **3 article PR(s) waiting on your merge** (oldest 12 days): [boutimar#6](https://github.com/ambientetravel/boutimar/pull/6) Agent 2 draft: Is Iran Open for Tourism Now? Cur; [boutimar#7](https://github.com/ambientetravel/boutimar/pull/7) Agent 2 draft: Iran DMC | Boutimar Destination M; [boutimar#8](https://github.com/ambientetravel/boutimar/pull/8) Agent 2 draft: Kish Island Travel Guide: Iran's 
 
 ## 👀 To watch
 
-- 2 brief(s) built **without the model** on ambientetravel.com — not worth publishing; the writer skips them. Cause: Gemini call failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is cur
-- **boutimar.ir** 'فیوردهای نروژ' failed: all prose providers failed; last: Gemini was unavailable on all 3 attempts: 429 RESOURCE_EXHAUSTED. {'error': {'code': 4
-- 9 brief(s) deferred by the per-run cap — these are lost to the 45-day ledger cooldown, not queued
+- 2 brief(s) built **without the model** on boutimar.ir, ambientetravel.com — not worth publishing; the writer skips them. Cause: Gemini call failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is cur
 - Open PRs unreadable on: ambientetravel/exploreorient (GitHub 404 for /repos/ambientetravel/exp) — BRIDGE_GH_TOKEN lacks these repos
 
 ## Numbers — last cycle
@@ -24,31 +21,31 @@
 | Metric | This cycle | Previous |
 |---|---:|---:|
 | Sites scanned | 10 | |
-| Gap candidates → briefs | 63 → **14** | |
-| Skipped by ledger (already briefed) | 22 | |
+| Gap candidates → briefs | 71 → **10** | |
+| Skipped by ledger (already briefed) | 35 | |
 | Dead-lettered / degraded | 0 / 2 | |
-| Articles drafted (as PRs) | **3** | 1 |
-| Briefs deferred by cap | 9 | |
-| Model spend | $0.153 | $0.051 |
+| Articles drafted (as PRs) | **6** | 3 |
+| Briefs deferred by cap | 0 | |
+| Model spend | $0.438 | $0.153 |
 | Social: campaigns / posts held / no-media | 2 / 2 / 2 | |
-| Article PRs open | 3 | |
+| Article PRs open | 8 | |
 | AI recall (Oracle, monthly) | — | |
 
 ## Agents
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34022448872) |
-| Writer | ✗ failure | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34022924506) |
-| Broadcaster | ⏭ skipped | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34023128786) |
-| Closer | ✓ success | 11.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/33375735105) |
-| Auditor+Analyst | ✓ success | 4.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34109004813) |
-| Cartographer | ✓ success | 4.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34112443305) |
-| Watcher | ✓ success | 5.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34026453120) |
+| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34749663919) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34750024970) |
+| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34750309025) |
+| Closer | ✓ success | 13.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/33375735105) |
+| Auditor+Analyst | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34109004813) |
+| Cartographer | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34112443305) |
+| Watcher | ✓ success | 7.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34026453120) |
 | Oracle | · never ran | — |  |
-| Merge-watch | ✓ success | 0.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34596855326) |
-| PR gate | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34681374915) |
-| Dashboard | ✓ success | 4.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34118444254) |
+| Merge-watch | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34691119351) |
+| PR gate | ✓ success | 0.3d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34736406917) |
+| Dashboard | ✓ success | 5.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34118444254) |
 
 ## ✓ Fine
 
