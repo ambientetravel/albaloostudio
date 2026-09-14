@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}واژه‌نامهٔ کروز · {{ site.brand.fa }}{% endblock %}
+{% block description %}اصطلاحات کروز به فارسی.{% endblock %}
+{% block content %}
+<section class="pagehead"><div class="wrap"><p class="kicker">واژه‌نامه</p><h1 class="display display--md">واژه‌نامهٔ کروز</h1><p class="lede">واژه‌هایی که در بروشور، در کشتی و در قرارداد می‌بینید، به فارسی.</p></div></section>
+<section class="sec"><div class="wrap"><dl class="gloss">{% for g in glossary %}<div><dt>{{ g.term }}</dt><dd>{{ g.def }}</dd></div>{% endfor %}</dl></div></section>
+{% endblock %}

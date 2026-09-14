@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}{{ site.brand.fa }} · {{ site.brand.tagline_fa }}{% endblock %}</title>
+<meta name="description" content="{% block description %}{{ site.brand.tagline_fa }}{% endblock %}">
+<link rel="canonical" href="{{ site.brand.domain }}/{{ path.replace('index.html','') }}">
+<meta property="og:type" content="website"><meta property="og:locale" content="fa_IR">
+<meta property="og:site_name" content="{{ site.brand.fa }}">
+<meta property="og:title" content="{{ self.title() }}"><meta property="og:description" content="{{ self.description() }}">
+<meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/img/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/hub.css?v={{ built }}">
+{% block head %}{% endblock %}
+</head>
+<body class="{% block bodyclass %}page{% endblock %}">
+<a class="skip" href="#main">پرش به محتوا</a>
+<header class="nav" id="nav">
+  <div class="nav__in">
+    <a class="brand" href="/"><span class="brand__fa">{{ site.brand.fa }}</span><span class="brand__latin">{{ site.brand.latin }}</span></a>
+    <nav class="nav__links" aria-label="بخش‌ها">
+      {% for n in nav %}<a href="/{{ n.href }}">{{ n.label }}</a>{% endfor %}
+    </nav>
+    <div class="nav__tools">
+      <a class="nav__tg" href="{{ site.channels.telegram }}" rel="noopener" target="_blank" aria-label="تلگرام">تلگرام</a>
+      <button class="nav__burger" id="burger" aria-label="منو" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav__sheet" id="sheet">
+    {% for n in nav %}<a href="/{{ n.href }}">{{ n.label }}</a>{% endfor %}
+    <a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامه</a><a href="/policy/">سیاست تحریریه</a>
+  </div>
+</header>
+<main id="main">
+{% block content %}{% endblock %}
+</main>
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand">
+      <div class="brand__fa">{{ site.brand.fa }}</div>
+      <p class="foot__tag">{{ site.brand.tagline_fa }}</p>
+      <p class="foot__policy">{{ site.editorial_policy }}</p>
+    </div>
+    <div class="foot__cols">
+      <div><h4>بخش‌ها</h4>{% for c in collections %}<a href="/{{ c.slug }}/">{{ c.title }}</a>{% endfor %}</div>
+      <div><h4>راهنما</h4><a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/journal/">مجله</a><a href="/offers/">پیشنهادها</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
+      <div><h4>همراهان تجاری <span class="tag">آگهی</span></h4>{% for p in site.partners %}<a href="{{ p.href }}" rel="sponsored noopener" target="_blank">{{ p.name }} <small>· {{ p.role }}</small></a>{% endfor %}</div>
+    </div>
+    <div class="foot__kunye">
+      <span>{{ site.brand.fa }} یک نشریهٔ {{ site.kunye.owner }} است · {{ site.kunye.city }}</span>
+      <span>مدیر مسئول: {{ site.kunye.responsible_editor }}</span>
+      <span>© {{ year_fa }}</span>
+    </div>
+  </div>
+</footer>
+<script src="/js/hub.js?v={{ built }}" defer></script>
+<script src="/js/pwa.js?v={{ built }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

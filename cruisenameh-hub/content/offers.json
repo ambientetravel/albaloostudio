@@ -1,0 +1,4 @@
+{
+  "_readme": "Manual offers go in `manual`. Each needs title, line, ship, nights, ports (Farsi, matching the feed vocabulary), dates (ISO), price_from, currency, book_url, and `verified_on`. Nothing here is invented: leave a field empty rather than guess. The live feed is merged at build time from site.json.feed.url and refreshed in the browser by offers.js.",
+  "manual": []
+}
