@@ -44,6 +44,7 @@ an upload.
 from __future__ import annotations
 
 import argparse
+import html as _html
 import json
 import logging
 import re
@@ -141,7 +142,42 @@ def page_is_live(url: str, title: str, session: requests.Session) -> dict[str, A
     if words and not all(w in text for w in words):
         return {"live": False,
                 "reason": "200, but the page does not contain this article's title"}
-    return {"live": True, "reason": None, "bytes": len(r.content)}
+    return {"live": True, "reason": None, "bytes": len(r.content), "html": text}
+
+
+_STRIP_BLOCKS = re.compile(
+    r"(?is)<(script|style|noscript|nav|header|footer|aside|form|svg|template)\b.*?</\1\s*>")
+_BLOCK_END = re.compile(r"(?i)<\s*(br\s*/?|/p|/h[1-6]|/li|/div|/section|/blockquote|/tr)\s*>")
+PUBLISHED_TEXT_LIMIT = 8000
+
+
+def published_text(page_html: str, limit: int = PUBLISHED_TEXT_LIMIT) -> str:
+    """
+    The article as a reader sees it on the live page — what Agent 3 must write from.
+
+    Agent 2's event is frozen at draft time. Everything a reviewer removes in the
+    pull request — on 22 Aug an invented room count and a wrong district from the
+    Joybar piece, on 13 Sep a Seychelles route wrongly credited to AROYA — is still
+    in that event, and Agent 3 was recombining it into social copy. The published
+    page is the only text a human has signed off on. Longest <article> wins
+    (related-post cards are articles too), then <main>, then <body>.
+    """
+    arts = re.findall(r"(?is)<article\b[^>]*>(.*?)</article\s*>", page_html)
+    if arts:
+        body = max(arts, key=len)
+    else:
+        m = (re.search(r"(?is)<main\b[^>]*>(.*?)</main\s*>", page_html)
+             or re.search(r"(?is)<body\b[^>]*>(.*)</body\s*>", page_html))
+        body = m.group(1) if m else page_html
+    body = _STRIP_BLOCKS.sub(" ", body)
+    body = _BLOCK_END.sub("\n", body)
+    body = _html.unescape(re.sub(r"<[^>]+>", " ", body))
+    lines = (re.sub(r"[ \t ‌]+", " ", ln).strip() for ln in body.splitlines())
+    return "\n".join(ln for ln in lines if ln)[:limit]
+
+
+def _norm(s: str) -> str:
+    return re.sub(r"\s+", " ", s or "").strip().lower()
 
 
 def derived_urls(event: dict[str, Any], intended: str = "") -> list[str]:
@@ -213,15 +249,34 @@ def load_articles(written: Path) -> list[dict[str, Any]]:
     return out
 
 
-def promote(event: dict[str, Any], live_url: str, merged_at: str) -> dict[str, Any]:
+def promote(event: dict[str, Any], live_url: str, merged_at: str,
+            published: str | None = None) -> dict[str, Any]:
     """
     The same event, now asserting a live page.
 
     A COPY is returned and the original file is never rewritten. Agent 2's
     output is the record of what Agent 2 did, and editing it in place would
     destroy the evidence that the article was a draft when it was written.
+
+    With `published` (the live page's text), the draft-time material Agent 3
+    recombines is replaced by what is actually on the page: key_points are
+    dropped (paraphrases cannot be checked against the page) and quotable_lines
+    survive only if they appear verbatim in it.
     """
     ev = json.loads(json.dumps(event))          # deep copy, no shared dicts
+    if published:
+        cs = ev.setdefault("content_summary", {})
+        quotes = cs.get("quotable_lines") or []
+        page = _norm(published)
+        kept = [q for q in quotes if _norm(q) and _norm(q) in page]
+        dropped = {"key_points": len(cs.get("key_points") or []),
+                   "quotable_lines": len(quotes) - len(kept)}
+        cs["key_points"] = []
+        cs["quotable_lines"] = kept
+        pt = ev.setdefault("source_brief", {}).setdefault("passthrough", {})
+        pt["published_text"] = published
+        pt["published_text_asof"] = config.rfc3339()
+        pt["draft_material_dropped"] = dropped
     pub = ev.setdefault("publication", {})
     pub["status"] = "published"
     pub["live_url"] = live_url
@@ -236,12 +291,48 @@ def promote(event: dict[str, Any], live_url: str, merged_at: str) -> dict[str, A
     return ev
 
 
-def watch(written: Path, token: str | None, *, emit: Path | None = None
-          ) -> list[dict[str, Any]]:
+def _reverify(name: str, prev: dict[str, Any], session: requests.Session,
+              emit: Path | None) -> dict[str, Any]:
+    """An article promoted on an earlier run: re-read its live page, refresh the
+    published text (a humanizer pass after deploy must reach Agent 3 too), and
+    keep it in promoted/ so it outlives the writer-artifact window."""
+    pub = prev.get("publication") or {}
+    url = pub.get("live_url") or ""
+    title = (prev.get("content_summary") or {}).get("title") or ""
+    row: dict[str, Any] = {"name": name, "domain": urlparse(url).netloc, "title": title,
+                           "pr_url": "", "intended_url": url, "live_url": url}
+    check = page_is_live(url, title, session) if url else {"live": False, "reason": "no live_url"}
+    if not check["live"]:
+        row.update(state="was live, now unreachable", detail=check["reason"])
+        return row
+    row.update(state="already live", bytes=check.get("bytes"),
+               detail="promoted on an earlier run; published text refreshed")
+    if emit:
+        emit.mkdir(parents=True, exist_ok=True)
+        (emit / f"{name}.json").write_text(
+            json.dumps(promote(prev, url, pub.get("published_at") or "",
+                               published_text(check["html"])),
+                       ensure_ascii=False, indent=2), encoding="utf-8")
+        row["emitted"] = str(emit / f"{name}.json")
+    return row
+
+
+def watch(written: Path, token: str | None, *, emit: Path | None = None,
+          previous: Path | None = None) -> list[dict[str, Any]]:
+    """
+    `previous` holds promoted events from earlier runs, restored by the workflow.
+    It must be a DIFFERENT directory from `emit`: the workflow calls this twice
+    in one job (md, then json), and reading the first call's output as "earlier
+    runs" made the second report count every new article as already live.
+    """
     session = requests.Session()
     rows: list[dict[str, Any]] = []
+    prev_files = ({p.stem: p for p in previous.glob("*.json")}
+                  if previous and previous.is_dir() else {})
+    seen: set[str] = set()
 
     for item in load_articles(written):
+        seen.add(item["name"])
         ev, cms = item["event"], item["cms"]
         pub = ev.get("publication") or {}
         title = (ev.get("content_summary") or {}).get("title") or ""
@@ -259,23 +350,19 @@ def watch(written: Path, token: str | None, *, emit: Path | None = None
             rows.append(row)
             continue
 
-        # Promoted on an earlier run: the event file still carries no live_url
-        # (promotion writes to emit/, never back into written/), so every run
-        # re-derived the URL, re-found the page, re-warned "live at a different
-        # URL", and re-counted it as "newly live". Joybar and the Oil Show were
-        # reported newly live on 17 consecutive runs. A promoted record is the
-        # memory that this already happened.
-        promoted = (emit / f"{item['name']}.json") if emit else None
-        if promoted is not None and promoted.exists():
+        # Promoted on an earlier run. Without this, every run re-derived the URL,
+        # re-found the page and re-counted it as "newly live" — Joybar and the Oil
+        # Show were reported newly live on 17 consecutive runs. The memory has to
+        # come from `previous` (restored from earlier artifacts), not from `emit`:
+        # on GitHub `emit` starts empty every run, so a check against it never fired.
+        if item["name"] in prev_files:
             try:
-                prev = json.loads(promoted.read_text(encoding="utf-8"))
-                prev_url = (prev.get("publication") or {}).get("live_url")
+                prev = json.loads(prev_files[item["name"]].read_text(encoding="utf-8"))
             except (OSError, ValueError):
-                prev_url = None
-            row.update(state="already live", live_url=prev_url or row["intended_url"],
-                       detail="promoted on an earlier run")
-            rows.append(row)
-            continue
+                prev = None
+            if prev and (prev.get("publication") or {}).get("live_url"):
+                rows.append(_reverify(item["name"], prev, session, emit))
+                continue
 
         number, repo = _pr_number(row["pr_url"]), _repo(row["pr_url"])
         if not (number and repo):
@@ -332,10 +419,24 @@ def watch(written: Path, token: str | None, *, emit: Path | None = None
         if emit:
             emit.mkdir(parents=True, exist_ok=True)
             (emit / f"{item['name']}.json").write_text(
-                json.dumps(promote(ev, found_at, pr["merged_at"]),
+                json.dumps(promote(ev, found_at, pr["merged_at"],
+                                   published_text(check["html"])),
                            ensure_ascii=False, indent=2), encoding="utf-8")
             row["emitted"] = str(emit / f"{item['name']}.json")
         rows.append(row)
+
+    # Live articles whose writer artifact has left the 10-run window. They were
+    # dropped entirely before — the Broadcaster lost Joybar and the Oil Show on
+    # 13 Sep for no reason but age.
+    for name, path in sorted(prev_files.items()):
+        if name in seen:
+            continue
+        try:
+            prev = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if (prev.get("publication") or {}).get("live_url"):
+            rows.append(_reverify(name, prev, session, emit))
     return rows
 
 
@@ -392,6 +493,8 @@ def main(argv: list[str] | None = None) -> int:
                     help="Agent 2 output directory (contains events/ and drafts/)")
     ap.add_argument("--emit", type=Path,
                     help="write promoted publishing.event.v1 files here for Agent 3")
+    ap.add_argument("--previous", type=Path,
+                    help="promoted events from earlier runs (read-only; never the --emit dir)")
     ap.add_argument("--format", choices=["md", "json"], default="md")
     ap.add_argument("--out", type=Path)
     args = ap.parse_args(argv)
@@ -410,7 +513,10 @@ def main(argv: list[str] | None = None) -> int:
         log.warning("no ASTRO_GITHUB_TOKEN or GITHUB_TOKEN — pull request state "
                     "cannot be read, so nothing can be promoted")
 
-    rows = watch(args.written, token, emit=args.emit)
+    if args.previous and args.emit and args.previous.resolve() == args.emit.resolve():
+        log.error("--previous and --emit must be different directories")
+        return 2
+    rows = watch(args.written, token, emit=args.emit, previous=args.previous)
     for r in rows:
         log.info("%s — %s", r["name"], r["state"])
 

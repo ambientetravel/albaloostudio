@@ -99,6 +99,28 @@ jobs:
             echo "::notice title=No drafts in any recent run::Agent 2 has run but produced no publishing events in the last 10 successful runs."
           fi
 
+      - name: Restore articles promoted on earlier runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # promoted/ used to exist only inside one run, so nothing remembered
+          # that an article had gone live: it was re-announced every run while
+          # its writer artifact was in the window, then silently dropped once it
+          # aged out (Joybar and the Oil Show, 13 Sep). Collect the last ten
+          # merge-watch artifacts, oldest first, so the newest record wins.
+          mkdir -p promoted_prev
+          RUNS=$(gh run list --workflow merge-watch.yml --status success --limit 10 \
+                 --json databaseId --jq 'reverse | .[].databaseId' \
+                 --repo "${{ github.repository }}" 2>/dev/null || true)
+          for run in $RUNS; do
+            rm -rf _mw && mkdir -p _mw
+            gh run download "$run" --name merge-watch --dir _mw --repo "${{ github.repository }}" 2>/dev/null || continue
+            DIR=$(find _mw -type d -name promoted | head -1 || true)
+            [ -n "$DIR" ] && cp -R "$DIR"/. promoted_prev/ 2>/dev/null || true
+          done
+          echo "restored $(ls promoted_prev | wc -l | tr -d ' ') previously promoted article(s)"
+
       - name: Watch for merges that actually reached the server
         env:
           # The same token Agent 2 pushes with: it is the one scoped to the
@@ -110,9 +132,13 @@ jobs:
           [ -d written/events ] || exit 0
           mkdir -p reports promoted
           STAMP=$(date -u +%Y-%m-%d)
-          python3 tools/merge_watch.py --written written --emit promoted \
+          # --previous is read-only history; --emit is this run's output. They
+          # must differ: this tool runs twice per job, and when the second call
+          # read the first call's output as history, the JSON report counted
+          # every new article as "already live" and the summary said 0 newly live.
+          python3 tools/merge_watch.py --written written --previous promoted_prev --emit promoted \
             --format md   --out "reports/merge-watch-$STAMP.md"
-          python3 tools/merge_watch.py --written written --emit promoted \
+          python3 tools/merge_watch.py --written written --previous promoted_prev --emit promoted \
             --format json --out "reports/merge-watch-$STAMP.json"
           cat "reports/merge-watch-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
 

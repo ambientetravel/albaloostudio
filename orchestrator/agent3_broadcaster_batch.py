@@ -46,6 +46,7 @@ from agent3_broadcaster import (
     _call_claude,
     _campaign_id,
     _resolve_channels,
+    published_text_of,
     _schedule_times,
     _with_utm,
     autopost_allowed,
@@ -130,6 +131,18 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Ou
             oc.error = ("nothing was published — Agent 2 staged a draft "
                         f"(intended: {getattr(event.publication, 'intended_url', None) or 'unknown'}). "
                         "Broadcast when the page is live.")
+            return oc
+
+        # A live page but no captured page text means the only material is the
+        # draft-time event — and on 13 Sep that produced a LinkedIn post opening
+        # "Seven rooms", a room count the Joybar review had removed, set in the
+        # wrong district. Composing from the draft repeats what a human struck
+        # out. Hold until merge-watch re-verifies the page and captures its text.
+        if not published_text_of(event):
+            oc.status = "skipped"
+            oc.error = ("live, but no published page text was captured — composing "
+                        "from the draft would repeat claims removed in review. "
+                        "merge-watch captures it on its next run.")
             return oc
 
         channel_cfgs = _resolve_channels(event)

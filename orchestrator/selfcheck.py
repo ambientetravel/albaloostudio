@@ -2918,6 +2918,46 @@ ok("promotion does not invent sitemap or GSC submission",
    _pr["publication"]["indexation"].get("sitemap_updated") is False
    and "submitted_to_gsc" not in _pr["publication"]["indexation"])
 
+# Social copy must come from the PUBLISHED page, not the draft-time event. On
+# 13 Sep a LinkedIn post opened "Seven rooms" and placed Joybar in "Yazd's
+# UNESCO-inscribed Fahadan district" — none of which is on the live page; the
+# review had removed them, the event had not.
+_page = ("<html><body><nav>Menu Hotels Cruises</nav><script>var x='Seven rooms';</script>"
+         "<main><article><h3>Related</h3><p>Other piece</p></article>"
+         "<article><h1>Joybar Boutique Hotel</h1><p>An architect-owned Qajar mansion"
+         " on Neshat Street.</p><p>Rooms around a sunken courtyard.</p></article></main>"
+         "<footer>© Boutimar</footer></body></html>")
+_pt = mw.published_text(_page)
+ok("published text takes the longest <article>, not a related-post card",
+   "Neshat Street" in _pt and "Other piece" not in _pt)
+ok("scripts, nav and footer never reach the published text",
+   "Seven rooms" not in _pt and "Menu" not in _pt and "©" not in _pt)
+_ev2 = {"publication": {}, "source_brief": {},
+        "content_summary": {"title": "Joybar",
+                            "key_points": ["Seven rooms — the entire allotment"],
+                            "quotable_lines": ["Seven rooms. That's the entire allotment.",
+                                               "An architect-owned Qajar mansion on Neshat Street."]}}
+_pr2 = mw.promote(_ev2, "https://x.test/j", "2026-08-22T00:00:00Z", _pt)
+ok("promotion with page text drops draft key_points (unverifiable paraphrase)",
+   _pr2["content_summary"]["key_points"] == [])
+ok("and keeps only quotable_lines that appear verbatim on the page",
+   _pr2["content_summary"]["quotable_lines"] == ["An architect-owned Qajar mansion on Neshat Street."])
+ok("the page text travels to Agent 3 in passthrough",
+   "Neshat Street" in _pr2["source_brief"]["passthrough"]["published_text"])
+ok("and Agent 2's original event is still untouched",
+   len(_ev2["content_summary"]["key_points"]) == 1)
+_a3b = pathlib.Path("agent3_broadcaster_batch.py").read_text(encoding="utf-8")
+_a3s = pathlib.Path("agent3_broadcaster.py").read_text(encoding="utf-8")
+ok("Agent 3 refuses to compose a live event that carries no published text",
+   "if not published_text_of(event):" in _a3b)
+ok("and its prompt names published_text as the only source of facts",
+   "article.published_text" in _a3s and '"published_text": published_text_of(event)' in _a3s)
+_mwyml = pathlib.Path("../.github/workflows/merge-watch.yml").read_text(encoding="utf-8")
+ok("merge-watch restores earlier promotions, so a live article is not dropped when it ages out",
+   "Restore articles promoted on earlier runs" in _mwyml and "--previous promoted_prev" in _mwyml)
+ok("and history is never the emit dir (the double-run miscount of 13 Sep)",
+   "must be different directories" in _MWSRC)
+
 ok("a merged PR whose page is absent is a finding, not a failure",
    "MERGED, NOT DEPLOYED" in _MWSRC and "waiting for a human upload" in _MWSRC)
 ok("boutimar.ir reports the URL the article will really have",

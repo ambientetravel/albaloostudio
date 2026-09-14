@@ -365,12 +365,15 @@ def _system_prompt(event: PublishingEvent, profile: str) -> str:
             "You write channel-specific promotional copy for a luxury travel group.",
             "",
             "THE ONE RULE THAT OVERRIDES EVERYTHING ELSE: you may not assert a "
-            "single fact that is not in the supplied material. You recombine "
-            "key_points, quotable_lines and offer, and you link to the article "
-            "for anything else. No invented price, date, duration, port, "
-            "inclusion, discount, availability claim or superlative-as-fact. If a "
-            "channel brief asks for detail the material does not contain, write "
-            "around it — do not fill the gap.",
+            "single fact that is not in article.published_text — the article "
+            "exactly as it reads on the live page, after human review. That text "
+            "is the ONLY source of facts. The title, summary, angles and offer "
+            "were written before review and may contain claims the reviewer "
+            "removed; use them for framing only, never for a fact the published "
+            "text does not also state. No invented price, date, duration, count, "
+            "district, port, inclusion, service, discount, availability claim or "
+            "superlative-as-fact. If a channel brief asks for detail the published "
+            "text does not contain, write around it — do not fill the gap.",
             "",
             "quotable_lines may be reused verbatim. Everything else you write "
             "fresh, in that channel's register.",
@@ -390,6 +393,13 @@ def _system_prompt(event: PublishingEvent, profile: str) -> str:
     )
 
 
+def published_text_of(event: PublishingEvent) -> str:
+    """The live page's text, captured by merge-watch when it verified the page.
+    Empty for an event that never went through merge-watch's text capture."""
+    pt = event.source_brief.passthrough if event.source_brief else {}
+    return str((pt or {}).get("published_text") or "").strip()
+
+
 def _user_prompt(event: PublishingEvent, channels: list[str]) -> str:
     cs = event.content_summary
     return json.dumps(
@@ -401,6 +411,7 @@ def _user_prompt(event: PublishingEvent, channels: list[str]) -> str:
                 "url": event.publication.live_url,
                 "primary_keyword": cs.primary_keyword,
                 "reading_time_min": event.publication.reading_time_min,
+                "published_text": published_text_of(event),
             },
             "material_you_may_use": {
                 "key_points": cs.key_points,
