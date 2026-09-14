@@ -1,4 +1,4 @@
-# Orchestration health — 2026-09-14T11:17 UTC
+# Orchestration health — 2026-09-14T13:51 UTC
 
 **0 broke · 1 need you · 2 to watch.**
 
@@ -34,17 +34,17 @@
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34836332263) |
-| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34836723361) |
-| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34837311087) |
+| Scout | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34836332263) |
+| Writer | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34836723361) |
+| Broadcaster | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34837311087) |
 | Closer | · never ran | — |  |
-| Auditor+Analyst | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
-| Cartographer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
-| Watcher | ✓ success | 1.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305) |
+| Auditor+Analyst | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
+| Cartographer | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
+| Watcher | ✓ success | 1.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305) |
 | Oracle | · never ran | — |  |
-| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34834477387) |
-| PR gate | ✓ success | 0.3d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34804318484) |
-| Dashboard | ✓ success | 7.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34118444254) |
+| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34850558150) |
+| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34841783565) |
+| Dashboard | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34841243848) |
 
 ## ✓ Fine
 
