@@ -1,58 +1,58 @@
 {
- "generated": "2026-09-14T10:45+00:00",
+ "generated": "2026-09-14T11:15+00:00",
  "critical": [],
  "needs_you": [
   "2 social post(s) blocked for **missing media** — no image source is wired, so these can never ship"
  ],
  "warn": [
-  "2 brief(s) built **without the model** on boutimar.ir, ambientetravel.com — not worth publishing; the writer skips them. Cause: Gemini call failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is cur",
+  "**cruisebaz.com** 'aroya cruise price' failed: https://cruisebaz.com/aroya/gheymat already exists but the brief says missing_page — refusing to overwrite. Re-run the s",
   "Open PRs unreadable on: ambientetravel/exploreorient (GitHub 404 for /repos/ambientetravel/exp) — BRIDGE_GH_TOKEN lacks these repos"
  ],
  "fine": [
   "2 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
  "numbers": {
-  "briefs": 10,
+  "briefs": 9,
   "candidates": 71,
   "dlq": 0,
-  "degraded": 2,
-  "ledger_skipped": 35,
+  "degraded": 0,
+  "ledger_skipped": 45,
   "sites_scanned": 10,
-  "scout_run": "run_20260913T0932Z_fa5b",
+  "scout_run": "run_20260914T1105Z_d979",
   "articles": 6,
-  "writer_failed": 0,
+  "writer_failed": 1,
   "deferred": 0,
-  "briefs_seen": 10,
-  "cost_usd": 0.438465,
-  "prev_cost_usd": 0.152547,
-  "prev_articles": 3,
+  "briefs_seen": 9,
+  "cost_usd": 0.463608,
+  "prev_cost_usd": 0.438465,
+  "prev_articles": 6,
   "posts": 4,
   "posts_held": 2,
   "posts_no_media": 2,
   "campaigns": 2,
-  "open_prs": 5
+  "open_prs": 7
  },
  "agents": [
   {
    "agent": "Scout",
    "result": "success",
-   "age_days": 1.1,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34749663919",
-   "run": 35
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34836332263",
+   "run": 36
   },
   {
    "agent": "Writer",
    "result": "success",
-   "age_days": 1.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34750024970",
-   "run": 48
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34836723361",
+   "run": 49
   },
   {
    "agent": "Broadcaster",
-   "result": "success",
+   "result": "in_progress",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34834607687",
-   "run": 47
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34837311087",
+   "run": 48
   },
   {
    "agent": "Closer",
@@ -70,9 +70,9 @@
   {
    "agent": "Cartographer",
    "result": "success",
-   "age_days": 7.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34112443305",
-   "run": 9
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423",
+   "run": 10
   },
   {
    "agent": "Watcher",

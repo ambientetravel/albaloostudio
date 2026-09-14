@@ -1,4 +1,4 @@
-# Orchestration health — 2026-09-14T10:45 UTC
+# Orchestration health — 2026-09-14T11:15 UTC
 
 **0 broke · 1 need you · 2 to watch.**
 
@@ -12,7 +12,7 @@
 
 ## 👀 To watch
 
-- 2 brief(s) built **without the model** on boutimar.ir, ambientetravel.com — not worth publishing; the writer skips them. Cause: Gemini call failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is cur
+- **cruisebaz.com** 'aroya cruise price' failed: https://cruisebaz.com/aroya/gheymat already exists but the brief says missing_page — refusing to overwrite. Re-run the s
 - Open PRs unreadable on: ambientetravel/exploreorient (GitHub 404 for /repos/ambientetravel/exp) — BRIDGE_GH_TOKEN lacks these repos
 
 ## Numbers — last cycle
@@ -20,26 +20,26 @@
 | Metric | This cycle | Previous |
 |---|---:|---:|
 | Sites scanned | 10 | |
-| Gap candidates → briefs | 71 → **10** | |
-| Skipped by ledger (already briefed) | 35 | |
-| Dead-lettered / degraded | 0 / 2 | |
-| Articles drafted (as PRs) | **6** | 3 |
+| Gap candidates → briefs | 71 → **9** | |
+| Skipped by ledger (already briefed) | 45 | |
+| Dead-lettered / degraded | 0 / 0 | |
+| Articles drafted (as PRs) | **6** | 6 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $0.438 | $0.153 |
+| Model spend | $0.464 | $0.438 |
 | Social: campaigns / posts held / no-media | 2 / 2 / 2 | |
-| Article PRs open | 5 | |
+| Article PRs open | 7 | |
 | AI recall (Oracle, monthly) | — | |
 
 ## Agents
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 1.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34749663919) |
-| Writer | ✓ success | 1.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34750024970) |
-| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34834607687) |
+| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34836332263) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34836723361) |
+| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34837311087) |
 | Closer | · never ran | — |  |
 | Auditor+Analyst | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
-| Cartographer | ✓ success | 7.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34112443305) |
+| Cartographer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
 | Watcher | ✓ success | 1.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305) |
 | Oracle | · never ran | — |  |
 | Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34834477387) |
