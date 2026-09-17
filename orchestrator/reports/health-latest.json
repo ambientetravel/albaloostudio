@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-17T11:58+00:00",
+ "generated": "2026-09-17T12:33+00:00",
  "critical": [],
  "needs_you": [
   "4 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
@@ -71,14 +71,14 @@
   {
    "agent": "Cartographer",
    "result": "success",
-   "age_days": 3.0,
+   "age_days": 3.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423",
    "run": 10
   },
   {
    "agent": "Watcher",
    "result": "success",
-   "age_days": 4.0,
+   "age_days": 4.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305",
    "run": 8
   },
@@ -91,14 +91,14 @@
   {
    "agent": "Merge-watch",
    "result": "success",
-   "age_days": 1.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35095736951",
-   "run": 35
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35221024802",
+   "run": 36
   },
   {
    "agent": "PR gate",
    "result": "success",
-   "age_days": 0.0,
+   "age_days": 0.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35214492581",
    "run": 50
   },
