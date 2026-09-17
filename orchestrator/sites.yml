@@ -269,6 +269,10 @@ sites:
       # ISO coords, venue capacities — that a writing agent has no business
       # inventing.
       collection: blog
+      # Its blog schema is description: z.string().max(220); a longer meta
+      # red-builds the PR. The adapter caps the rendered description at this at a
+      # word boundary. boutimar's journal has no cap and omits this.
+      description_max: 220
       # exploreorient's blog schema is NOT boutimar's journal schema, and Astro
       # refuses to build an entry that misses a field. Names here are the zod
       # field names, not a house style:

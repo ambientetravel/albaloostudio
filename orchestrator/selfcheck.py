@@ -2613,6 +2613,18 @@ ok("and description, not summary", "description" in _eo_fm and "summary" not in 
 # valid and lets the fallback hero take over. It must never be present-and-empty.
 ok("heroImage is omitted (schema is nullish; page supplies a fallback hero)",
    "heroImage" not in _eo_fm)
+# exploreorient's blog is description: z.string().max(220). A longer meta_description
+# red-builds the PR and the empty-field guard can't catch a too-long (non-empty)
+# value, so the adapter caps it. boutimar's journal has no cap.
+import agent2_writer_listener as _a2meta
+ok("exploreorient declares its description cap", _eo.cms.get("description_max") == 220)
+ok("a too-long meta_description is capped under the limit at a word boundary",
+   len(_a2meta._cap_meta("word " * 60, 220)) <= 220
+   and not _a2meta._cap_meta("word " * 60, 220).endswith(" wor"))
+ok("a site with no cap leaves the description untouched",
+   _a2meta._cap_meta("x" * 400, None) == "x" * 400
+   and next(s for s in config.load_sites(include_hold=True)
+            if s.domain == "boutimar.com").cms.get("description_max") is None)
 _bm = [s for s in config.load_sites(include_hold=True) if s.domain == "boutimar.com"][0]
 ok("the two astro sites do NOT share a frontmatter shape",
    set(_bm.cms["frontmatter"]) != set(_eo_fm))

@@ -362,6 +362,8 @@ def _system_instruction(brief: ContentBrief) -> str:
             '[{"path": str, "anchor": str}]}',
             "body_markdown uses ## and ### only — no H1, the CMS renders that from "
             "the title.",
+            "meta_description is a Google snippet: one plain sentence, about 155 "
+            "characters and never over 200 — some sites reject a longer one.",
         ]
     )
 
@@ -1062,6 +1064,16 @@ def _push_wordpress(
     }
 
 
+def _cap_meta(text: str | None, limit: int | None) -> str:
+    """Trim a meta description to `limit` chars at a word boundary. No limit or a
+    short-enough string passes through unchanged. Guards against a red Astro
+    build on a collection whose schema caps the description (exploreorient)."""
+    t = (text or "").strip()
+    if limit and len(t) > int(limit):
+        t = t[:int(limit)].rsplit(" ", 1)[0].rstrip(" ,;:—–-")
+    return t
+
+
 def _push_astro_pr(
     brief: ContentBrief, draft: dict[str, Any], url: str
 ) -> dict[str, Any]:
@@ -1131,7 +1143,12 @@ def _push_astro_pr(
         "title": draft.get("title") or brief.brief.working_title,
         "date": utc_now().strftime("%Y-%m-%d"),
         "category": (brief.opportunity.primary_keyword or "Travel").strip()[:60],
-        "summary": (draft.get("meta_description") or "").strip(),
+        # Some collections cap the description (exploreorient's blog is
+        # z.string().max(220)); a longer one red-builds the PR, and the
+        # empty-field guard can't catch a value that is merely too long. Cap it
+        # at the site's declared limit, at a word boundary. A site with no cap
+        # (boutimar's journal) is untouched.
+        "summary": _cap_meta(draft.get("meta_description"), cms.get("description_max")),
         "language": brief.brief.language,
     }
     template = cms.get("frontmatter") or {}
