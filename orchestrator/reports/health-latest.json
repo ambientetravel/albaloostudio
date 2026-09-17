@@ -1,60 +1,59 @@
 {
- "generated": "2026-09-17T10:32+00:00",
+ "generated": "2026-09-17T11:56+00:00",
  "critical": [],
  "needs_you": [
   "5 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
-  "**5 article PR(s) waiting on your merge** (oldest 4 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln"
+  "**7 article PR(s) waiting on your merge** (oldest 4 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln; [boutimar#14](https://github.com/ambientetravel/boutimar/pull/14) Agent 2 draft: Parsian Khazar Hotel, Chalous | B; [boutimar#15](https://github.com/ambientetravel/boutimar/pull/15) Agent 2 draft: Iran Oil Show 2026 | Exhibition G"
  ],
  "warn": [
-  "**ambientetravel.com** 'how to choose a destination management company' failed: https://ambientetravel.com/how-to-choose-a-destination-management-company already exists but the brief says missing_page",
-  "**ambientetravel.com** 'Iran DMC services for European tour operators' failed: https://ambientetravel.com/iran-dmc-services-tour-operators already exists but the brief says missing_page — refusing to",
+  "1 brief(s) built **without the model** on ambientetravel.com — not worth publishing; the writer skips them. Cause: Gemini call failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is cur",
   "Open PRs unreadable on: ambientetravel/exploreorient (GitHub 404 for /repos/ambientetravel/exp) — BRIDGE_GH_TOKEN lacks these repos"
  ],
  "fine": [
   "5 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
  "numbers": {
-  "briefs": 21,
-  "candidates": 92,
+  "briefs": 14,
+  "candidates": 89,
   "dlq": 0,
-  "degraded": 0,
-  "ledger_skipped": 52,
+  "degraded": 1,
+  "ledger_skipped": 63,
   "sites_scanned": 10,
-  "scout_run": "run_20260917T1009Z_881f",
-  "articles": 13,
-  "writer_failed": 2,
+  "scout_run": "run_20260917T1136Z_9077",
+  "articles": 11,
+  "writer_failed": 0,
   "deferred": 0,
-  "briefs_seen": 21,
-  "cost_usd": 1.002729,
-  "prev_cost_usd": 0.463608,
-  "prev_articles": 6,
+  "briefs_seen": 14,
+  "cost_usd": 0.690681,
+  "prev_cost_usd": 1.002729,
+  "prev_articles": 13,
   "posts": 10,
   "posts_held": 5,
   "posts_no_media": 5,
   "campaigns": 5,
-  "open_prs": 11
+  "open_prs": 15
  },
  "agents": [
   {
    "agent": "Scout",
    "result": "success",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35208916116",
-   "run": 37
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35216543861",
+   "run": 38
   },
   {
    "agent": "Writer",
    "result": "success",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35209781119",
-   "run": 50
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35217285187",
+   "run": 51
   },
   {
    "agent": "Broadcaster",
-   "result": "success",
+   "result": "in_progress",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35210858582",
-   "run": 49
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35218345533",
+   "run": 50
   },
   {
    "agent": "Closer",
@@ -65,7 +64,7 @@
   {
    "agent": "Auditor+Analyst",
    "result": "success",
-   "age_days": 3.0,
+   "age_days": 3.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072",
    "run": 8
   },
@@ -92,21 +91,21 @@
   {
    "agent": "Merge-watch",
    "result": "success",
-   "age_days": 0.9,
+   "age_days": 1.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35095736951",
    "run": 35
   },
   {
    "agent": "PR gate",
    "result": "success",
-   "age_days": 0.3,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35180177757",
-   "run": 49
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35214492581",
+   "run": 50
   },
   {
    "agent": "Dashboard",
    "result": "success",
-   "age_days": 2.9,
+   "age_days": 3.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34841243848",
    "run": 11
   }
