@@ -1,8 +1,8 @@
 {
- "generated": "2026-09-17T10:30+00:00",
+ "generated": "2026-09-17T10:32+00:00",
  "critical": [],
  "needs_you": [
-  "2 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
+  "5 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
   "**5 article PR(s) waiting on your merge** (oldest 4 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln"
  ],
  "warn": [
@@ -11,7 +11,7 @@
   "Open PRs unreadable on: ambientetravel/exploreorient (GitHub 404 for /repos/ambientetravel/exp) — BRIDGE_GH_TOKEN lacks these repos"
  ],
  "fine": [
-  "2 social post(s) composed and held at the autopost gate (switched off, as designed)"
+  "5 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
  "numbers": {
   "briefs": 21,
@@ -28,10 +28,10 @@
   "cost_usd": 1.002729,
   "prev_cost_usd": 0.463608,
   "prev_articles": 6,
-  "posts": 4,
-  "posts_held": 2,
-  "posts_no_media": 2,
-  "campaigns": 2,
+  "posts": 10,
+  "posts_held": 5,
+  "posts_no_media": 5,
+  "campaigns": 5,
   "open_prs": 11
  },
  "agents": [
@@ -51,7 +51,7 @@
   },
   {
    "agent": "Broadcaster",
-   "result": "in_progress",
+   "result": "success",
    "age_days": 0.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35210858582",
    "run": 49
