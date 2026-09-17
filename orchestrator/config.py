@@ -429,6 +429,15 @@ class Site:
     # demand the scout runs on. Each is written once (the ledger cooldown, then
     # the sitemap, stop it repeating), and real GSC demand always outranks a seed.
     seed_keywords: list[str] = field(default_factory=list)
+    # URL of the site's OFFER FEED — a public JSON list of what it actually sells
+    # (offer.v1: offerings[] with slug/title/type/summary/url/regions/countries/
+    # duration/route, deliberately NO prices). The writer needs this or it can
+    # only avoid denying products, not promote real ones: on 17 Sep it wrote
+    # "Explore Orient does not currently hold a proprietary Silk Road itinerary"
+    # about a site that sells exactly that. Empty = the writer works as before
+    # (no catalogue), and an unreachable feed degrades to the same. Each site's
+    # own export builds and deploys the feed; see bridge/OFFER-FEED-CONTRACT.md.
+    offer_feed: str = ""
 
     @property
     def on_hold(self) -> bool:
@@ -494,6 +503,7 @@ def load_sites(
                 audit_sample_pages=int(merged.get("audit_sample_pages", 10)),
                 competitors=[str(u).rstrip("/") for u in (merged.get("competitors") or [])],
                 seed_keywords=[str(k).strip() for k in (merged.get("seed_keywords") or []) if str(k).strip()],
+                offer_feed=str(merged.get("offer_feed", "") or "").strip(),
             )
         )
 

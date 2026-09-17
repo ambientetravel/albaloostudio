@@ -2644,6 +2644,16 @@ ok("the never-invent rule forbids denying a product exists, not just inventing f
    "does not have" in _cruise_prompt and "available on enquiry" in _cruise_prompt)
 ok("the writer is told to use internal links and not to repeat the title as an H2",
    "INTERNAL LINKS:" in _a2src and "repeats the title" in _a2src)
+# Offer feed (offer.v1): the writer needs each site's real catalogue or it can only
+# avoid denying products, not promote them. The git-backed sites declare a feed;
+# a missing/unreachable feed degrades to a marker that STILL forbids denying a product.
+ok("the git-backed sites declare an offer_feed",
+   all(next(s for s in config.load_sites(include_hold=True) if s.domain == d).offer_feed
+       for d in ("exploreorient.com", "boutimar.com", "boutimar.ir", "cruise24.ir")))
+ok("the writer injects site_offerings and forbids denying a product exists",
+   '"site_offerings": _fetch_offerings(brief)' in _a2src and "SITE OFFERINGS:" in _a2src)
+ok("an unreachable feed degrades to a marker, never a silent None-into-false-disclaimer",
+   '"status": "unavailable"' in _a2src and "available on enquiry" in _a2src)
 _bm = [s for s in config.load_sites(include_hold=True) if s.domain == "boutimar.com"][0]
 ok("the two astro sites do NOT share a frontmatter shape",
    set(_bm.cms["frontmatter"]) != set(_eo_fm))

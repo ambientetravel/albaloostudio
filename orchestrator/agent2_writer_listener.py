@@ -349,10 +349,15 @@ def _system_instruction(brief: ContentBrief) -> str:
             "STRUCTURE: follow the supplied outline exactly — same headings, same "
             "order. Cover every must_cover point under its own heading.",
             "",
-            "INTERNAL LINKS: weave at least two of the brief's internal_link_suggestions "
-            "into the body as inline markdown links to the site's own pages. A guide that "
-            "links nowhere on the site does nothing for it. Never link a page you were "
-            "not given; use only the supplied suggestions.",
+            "INTERNAL LINKS: weave at least two links to the site's own pages into the "
+            "body as inline markdown — from the brief's internal_link_suggestions and from "
+            "site_offerings[].url. A guide that links nowhere on the site does nothing for "
+            "it. Never link a page you were not given.",
+            "",
+            "SITE OFFERINGS: site_offerings lists what this house actually sells. When the "
+            "topic relates to one, name it by its exact title and link its url — that is how "
+            "a guide earns its keep. You may NEVER state or imply the house lacks a product; "
+            "if none fits, simply don't mention products. Never invent an offering not listed.",
             "",
             "Do NOT open the body with an H2 that repeats the title — the CMS renders "
             "the title as the H1; start with the first real section.",
@@ -376,10 +381,46 @@ def _system_instruction(brief: ContentBrief) -> str:
     )
 
 
+_OFFER_FIELDS = ("slug", "title", "type", "summary", "url", "regions",
+                 "countries", "duration", "route", "stops", "groupType")
+
+
+def _fetch_offerings(brief: ContentBrief) -> dict[str, Any] | None:
+    """The site's real catalogue, so the writer promotes actual products instead
+    of inventing or denying them. Reads the site's offer_feed (offer.v1) from the
+    registry, slims each entry to the essentials (never prices), and bounds the
+    count. A missing or unreachable feed returns a marker that still forbids
+    claiming the site lacks a product — never None-silently into a false disclaimer."""
+    try:
+        site = config.load_sites(only=[brief.site.domain], include_hold=True)[0]
+    except Exception:
+        return None
+    url = getattr(site, "offer_feed", "") or ""
+    if not url:
+        return None
+    try:
+        resp = requests.get(url, timeout=15, headers={"User-Agent": config.USER_AGENT})
+        resp.raise_for_status()
+        payload = resp.json()
+        items = payload.get("offerings") if isinstance(payload, dict) else payload
+        slim = [{k: o[k] for k in _OFFER_FIELDS if o.get(k) is not None}
+                for o in (items or [])[:60] if isinstance(o, dict)]
+        return {"status": "available", "count": len(slim), "offerings": slim,
+                "instruction": "These are the real products this site sells. Reference the "
+                "relevant ones by their exact title and link to their url. NEVER invent one, "
+                "and NEVER write that the site lacks a product that appears here."}
+    except (requests.RequestException, ValueError) as exc:
+        log.warning("offer feed %s unavailable: %s", url, exc)
+        return {"status": "unavailable", "source": url,
+                "instruction": "The offer catalogue could not be loaded. Do NOT claim the "
+                "site lacks any product; write that specific itineraries are available on enquiry."}
+
+
 def _user_prompt(brief: ContentBrief, data: dict[str, Any]) -> str:
     b, o = brief.brief, brief.opportunity
     return json.dumps(
         {
+            "site_offerings": _fetch_offerings(brief),
             "assignment": {
                 "working_title": b.working_title,
                 "content_type": b.content_type,

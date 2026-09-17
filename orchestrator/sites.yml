@@ -58,6 +58,7 @@ sites:
     property_uri: "sc-domain:boutimar.com"
     gsc_account: "alimozzarella@gmail.com"
     brand: Boutimar
+    offer_feed: "https://boutimar.com/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: en
     market: INT
     base_url: "https://boutimar.com"
@@ -145,6 +146,7 @@ sites:
     property_uri: "sc-domain:boutimar.ir"
     gsc_account: "alimozzarella@gmail.com"
     brand: Boutimar
+    offer_feed: "https://boutimar.ir/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: fa-IR
     market: IR
     base_url: "https://boutimar.ir"
@@ -217,6 +219,7 @@ sites:
     property_uri: "sc-domain:exploreorient.com"
     gsc_account: "contactmozaffari@gmail.com"
     brand: Explore Orient
+    offer_feed: "https://exploreorient.com/inventory/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     compliance_profile: orient_v1   # non-cruise: no AROYA/Seychelles/Schengen rules injected
     seed_keywords:            # starter topics — this site has ~no GSC footprint yet
       - "Silk Road travel guide"
@@ -421,6 +424,7 @@ sites:
     property_uri: "sc-domain:cruise24.ir"
     gsc_account: "alimozzarella@gmail.com"
     brand: Cruise24
+    offer_feed: "https://cruise24.ir/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     seed_keywords:            # starter topics — this site has ~no GSC footprint yet
       - "راهنمای انتخاب کابین کشتی کروز"
       - "سفر کشتی کروز برای خانواده"
