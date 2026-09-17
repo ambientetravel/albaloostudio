@@ -1,6 +1,6 @@
-# Orchestration health — 2026-09-16T12:32 UTC
+# Orchestration health — 2026-09-17T10:30 UTC
 
-**0 broke · 2 need you · 2 to watch.**
+**0 broke · 2 need you · 3 to watch.**
 
 ## 🔴 Broke
 
@@ -9,11 +9,12 @@
 ## 🟡 Needs you — only you can do these
 
 - 2 social post(s) blocked for **missing media** — no image source is wired, so these can never ship
-- **5 article PR(s) waiting on your merge** (oldest 3 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln
+- **5 article PR(s) waiting on your merge** (oldest 4 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln
 
 ## 👀 To watch
 
-- **cruisebaz.com** 'aroya cruise price' failed: https://cruisebaz.com/aroya/gheymat already exists but the brief says missing_page — refusing to overwrite. Re-run the s
+- **ambientetravel.com** 'how to choose a destination management company' failed: https://ambientetravel.com/how-to-choose-a-destination-management-company already exists but the brief says missing_page
+- **ambientetravel.com** 'Iran DMC services for European tour operators' failed: https://ambientetravel.com/iran-dmc-services-tour-operators already exists but the brief says missing_page — refusing to
 - Open PRs unreadable on: ambientetravel/exploreorient (GitHub 404 for /repos/ambientetravel/exp) — BRIDGE_GH_TOKEN lacks these repos
 
 ## Numbers — last cycle
@@ -21,31 +22,31 @@
 | Metric | This cycle | Previous |
 |---|---:|---:|
 | Sites scanned | 10 | |
-| Gap candidates → briefs | 71 → **9** | |
-| Skipped by ledger (already briefed) | 45 | |
+| Gap candidates → briefs | 92 → **21** | |
+| Skipped by ledger (already briefed) | 52 | |
 | Dead-lettered / degraded | 0 / 0 | |
-| Articles drafted (as PRs) | **6** | 6 |
+| Articles drafted (as PRs) | **13** | 6 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $0.464 | $0.438 |
+| Model spend | $1.003 | $0.464 |
 | Social: campaigns / posts held / no-media | 2 / 2 / 2 | |
-| Article PRs open | 7 | |
+| Article PRs open | 11 | |
 | AI recall (Oracle, monthly) | — | |
 
 ## Agents
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 2.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34836332263) |
-| Writer | ✓ success | 2.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34836723361) |
-| Broadcaster | ✓ success | 2.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34837311087) |
+| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35208916116) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35209781119) |
+| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35210858582) |
 | Closer | · never ran | — |  |
-| Auditor+Analyst | ✓ success | 2.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
-| Cartographer | ✓ success | 2.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
-| Watcher | ✓ success | 3.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305) |
+| Auditor+Analyst | ✓ success | 3.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
+| Cartographer | ✓ success | 3.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
+| Watcher | ✓ success | 4.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305) |
 | Oracle | · never ran | — |  |
-| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35095736951) |
-| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35088186540) |
-| Dashboard | ✓ success | 2.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34841243848) |
+| Merge-watch | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35095736951) |
+| PR gate | ✓ success | 0.3d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35180177757) |
+| Dashboard | ✓ success | 2.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34841243848) |
 
 ## ✓ Fine
 
