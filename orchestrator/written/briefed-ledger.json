@@ -1,8 +1,64 @@
 {
  "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
  "cooldown_days": 45,
- "updated_at": "2026-09-14T11:08:52+00:00",
+ "updated_at": "2026-09-17T10:18:11+00:00",
  "entries": [
+  {
+   "domain": "cruise24.me",
+   "query": "Akdeniz gemi turu rehberi",
+   "first_briefed": "2026-09-17T10:18:11+00:00",
+   "last_briefed": "2026-09-17T10:18:11+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/mediterranean-cruise-guide"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "Caucasus multi-country itinerary",
+   "first_briefed": "2026-09-17T10:13:08+00:00",
+   "last_briefed": "2026-09-17T10:13:08+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/caucasus-multi-country-itinerary"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "Central Asia visa guide for travellers",
+   "first_briefed": "2026-09-17T10:13:08+00:00",
+   "last_briefed": "2026-09-17T10:13:08+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/central-asia-visa-guide"
+  },
+  {
+   "domain": "ambientetravel.com",
+   "query": "Iran DMC services for European tour operators",
+   "first_briefed": "2026-09-17T10:14:10+00:00",
+   "last_briefed": "2026-09-17T10:14:10+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/iran-dmc-services-tour-operators"
+  },
+  {
+   "domain": "ambientetravel.com",
+   "query": "MICE destinations in the Middle East",
+   "first_briefed": "2026-09-17T10:14:10+00:00",
+   "last_briefed": "2026-09-17T10:14:10+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/mice-destinations-middle-east"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "Silk Road travel guide",
+   "first_briefed": "2026-09-17T10:13:08+00:00",
+   "last_briefed": "2026-09-17T10:13:08+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/silk-road-travel-guide"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "Uzbekistan cultural tour guide",
+   "first_briefed": "2026-09-17T10:13:08+00:00",
+   "last_briefed": "2026-09-17T10:13:08+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/uzbekistan-cultural-tour-guide"
+  },
   {
    "domain": "boutimar.com",
    "query": "alamut",
@@ -36,6 +92,14 @@
    "target_url_path": "/discover-iran/unesco-heritage/alamut/"
   },
   {
+   "domain": "boutimar.com",
+   "query": "alamut persia",
+   "first_briefed": "2026-09-17T10:11:59+00:00",
+   "last_briefed": "2026-09-17T10:11:59+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/discover-iran/unesco-heritage/alamut/"
+  },
+  {
    "domain": "ambientetravel.com",
    "query": "ambient travel",
    "first_briefed": "2026-09-01T11:37:18+00:00",
@@ -58,6 +122,14 @@
    "last_briefed": "2026-09-13T09:37:29+00:00",
    "times_briefed": 1,
    "target_url_path": "/ambiente-travel"
+  },
+  {
+   "domain": "cruisebaz.com",
+   "query": "aroya cruise",
+   "first_briefed": "2026-09-17T10:16:27+00:00",
+   "last_briefed": "2026-09-17T10:16:27+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/khat-kroz-aroya"
   },
   {
    "domain": "cruisebaz.com",
@@ -87,9 +159,9 @@
    "domain": "cruisebaz.com",
    "query": "aroya cruise price",
    "first_briefed": "2026-09-01T11:39:09+00:00",
-   "last_briefed": "2026-09-14T11:08:52+00:00",
-   "times_briefed": 2,
-   "target_url_path": "/aroya/gheymat"
+   "last_briefed": "2026-09-17T10:16:27+00:00",
+   "times_briefed": 3,
+   "target_url_path": "/aroya/gheymat-belit-kashti-jeddah"
   },
   {
    "domain": "cruisebaz.com",
@@ -114,6 +186,14 @@
    "last_briefed": "2026-09-06T08:45:48+00:00",
    "times_briefed": 1,
    "target_url_path": "/avintura"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "best time to visit Central Asia",
+   "first_briefed": "2026-09-17T10:13:08+00:00",
+   "last_briefed": "2026-09-17T10:13:08+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/best-time-to-visit-central-asia"
   },
   {
    "domain": "boutimar.com",
@@ -188,6 +268,14 @@
    "target_url_path": "/hotels/tehran-espinas-palace-hotel/"
   },
   {
+   "domain": "cruise24.me",
+   "query": "gemi turu nedir kapsamli rehber",
+   "first_briefed": "2026-09-17T10:18:11+00:00",
+   "last_briefed": "2026-09-17T10:18:11+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/what-is-a-cruise-first-timer-guide"
+  },
+  {
    "domain": "boutimar.com",
    "query": "hanna boutique hotel",
    "first_briefed": "2026-08-08T14:10:00Z",
@@ -197,11 +285,27 @@
   },
   {
    "domain": "boutimar.com",
+   "query": "hotels in shiraz",
+   "first_briefed": "2026-09-17T10:11:59+00:00",
+   "last_briefed": "2026-09-17T10:11:59+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/hotels/shiraz-hotels-guide/"
+  },
+  {
+   "domain": "boutimar.com",
    "query": "hotels in yazd",
    "first_briefed": "2026-09-06T08:42:14+00:00",
    "last_briefed": "2026-09-06T08:42:14+00:00",
    "times_briefed": 1,
    "target_url_path": "/hotels/yazd/"
+  },
+  {
+   "domain": "ambientetravel.com",
+   "query": "how to choose a destination management company",
+   "first_briefed": "2026-09-17T10:14:10+00:00",
+   "last_briefed": "2026-09-17T10:14:10+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/how-to-choose-a-destination-management-company"
   },
   {
    "domain": "boutimar.com",
@@ -261,11 +365,35 @@
   },
   {
    "domain": "boutimar.com",
+   "query": "is iran open to tourists",
+   "first_briefed": "2026-09-17T10:11:59+00:00",
+   "last_briefed": "2026-09-17T10:11:59+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/travel-to-iran-now/"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "isfahan hotel",
+   "first_briefed": "2026-09-17T10:11:59+00:00",
+   "last_briefed": "2026-09-17T10:11:59+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/hotels/isfahan-hotels-guide/"
+  },
+  {
+   "domain": "boutimar.com",
    "query": "joybar boutique hotel",
    "first_briefed": "2026-08-08T14:10:00Z",
    "last_briefed": "2026-08-09T07:35:19Z",
    "times_briefed": 5,
    "target_url_path": "/joybar-boutique-hotel"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "kadus grand hotel",
+   "first_briefed": "2026-09-17T10:11:59+00:00",
+   "last_briefed": "2026-09-17T10:11:59+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/hotels/rasht-kadus-grand-hotel/"
   },
   {
    "domain": "boutimar.com",
@@ -396,6 +524,30 @@
    "target_url_path": "/jazireh-lanzarote-rahnama-safar"
   },
   {
+   "domain": "cruise24.ir",
+   "query": "راهنمای انتخاب کابین کشتی کروز",
+   "first_briefed": "2026-09-17T10:17:23+00:00",
+   "last_briefed": "2026-09-17T10:17:23+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guide/how-to-choose-a-cruise-cabin"
+  },
+  {
+   "domain": "cruise24.ir",
+   "query": "راهنمای بستن چمدان برای سفر دریایی",
+   "first_briefed": "2026-09-17T10:17:23+00:00",
+   "last_briefed": "2026-09-17T10:17:23+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guide/cruise-packing-guide"
+  },
+  {
+   "domain": "cruise24.ir",
+   "query": "سفر کشتی کروز برای خانواده",
+   "first_briefed": "2026-09-17T10:17:23+00:00",
+   "last_briefed": "2026-09-17T10:17:23+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guide/family-cruise-travel"
+  },
+  {
    "domain": "boutimar.ir",
    "query": "فیوردهای نروژ",
    "first_briefed": "2026-09-06T08:44:17+00:00",
@@ -442,6 +594,14 @@
    "last_briefed": "2026-08-09T07:35:20Z",
    "times_briefed": 6,
    "target_url_path": "/aroya"
+  },
+  {
+   "domain": "cruise24.ir",
+   "query": "کشتی کروز چیست و چگونه کار می‌کند",
+   "first_briefed": "2026-09-17T10:17:23+00:00",
+   "last_briefed": "2026-09-17T10:17:23+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guide/what-is-a-cruise-ship"
   }
  ]
 }
