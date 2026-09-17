@@ -276,29 +276,21 @@ sites:
       #   description  z.string().max(220)   ← hard cap, see below
       #   publishDate  z.coerce.date()       ← not `date`
       #   author       defaults to "Explore Orient Editorial"
-      #   heroImage    z.string()            ← REQUIRED, and has no default
+      #   heroImage    z.string().nullish()  ← optional since 17 Sep (exploreorient b95eeb6); the page falls back to a section hero, so the template omits it
       frontmatter:
         title: "{title}"
         description: "{summary}"
         publishDate: "{date}"
         author: "Explore Orient Editorial"
-        # ⚠️ DELIBERATELY EMPTY, so nothing publishes until a human decides.
-        #
-        # `heroImage` is required by the schema and the pipeline has no image
-        # for a page it has just written. Inventing one would mean asserting a
-        # photo credit nobody checked, which is a standing rule against.
-        #
-        # Empty means the adapter's "never open a PR that cannot build" guard
-        # fires and the brief is reported as failed, naming this field. That is
-        # intended: a red build on exploreorient blocks every other merge into
-        # that repo, which is worse than no article.
-        #
-        # To switch exploreorient on, pick ONE:
-        #   a) put a real, correctly-licensed default image URL here, which
-        #      every generated post then carries until an editor replaces it;
-        #   b) make heroImage optional in exploreorient's content.config.ts and
-        #      delete this line.
-        heroImage: ""
+        # heroImage is intentionally NOT templated (option b, done 17 Sep). The
+        # exploreorient schema made it z.string().nullish() (b95eeb6) and the
+        # page falls back to the destination's hero, then /videos/hero-poster.jpg,
+        # so an imageless article still publishes with a real, correctly-licensed
+        # hero and no invented credit. Omitting the key lets the adapter skip it;
+        # a "" value here would instead trip the empty-field guard and block the PR.
+        # Optional later: add `destination: "{destination}"` for a country hero —
+        # but ONLY if the brief renders a VALID destinations id, or Astro's
+        # reference() fails the build (and an empty value trips the guard anyway).
     channels:
       - name: linkedin
         audience: b2b

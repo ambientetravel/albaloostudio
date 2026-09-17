@@ -2607,8 +2607,12 @@ _eo_fm = _eo.cms.get("frontmatter") or {}
 ok("exploreorient targets the blog collection", _eo.cms.get("collection") == "blog")
 ok("and uses publishDate, not date", "publishDate" in _eo_fm and "date" not in _eo_fm)
 ok("and description, not summary", "description" in _eo_fm and "summary" not in _eo_fm)
-ok("heroImage is present and deliberately empty, so the build guard fires",
-   "heroImage" in _eo_fm and _eo_fm["heroImage"] == "")
+# 17 Sep: exploreorient's schema made heroImage z.string().nullish() (b95eeb6)
+# with a section-hero fallback, so the template now OMITS heroImage rather than
+# forcing it "" — an empty value would trip the build guard, an omitted key is
+# valid and lets the fallback hero take over. It must never be present-and-empty.
+ok("heroImage is omitted (schema is nullish; page supplies a fallback hero)",
+   "heroImage" not in _eo_fm)
 _bm = [s for s in config.load_sites(include_hold=True) if s.domain == "boutimar.com"][0]
 ok("the two astro sites do NOT share a frontmatter shape",
    set(_bm.cms["frontmatter"]) != set(_eo_fm))
