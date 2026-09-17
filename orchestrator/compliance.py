@@ -650,6 +650,13 @@ def prompt_constraints(profile: str = "boutimar_v1") -> str:
             "details are available on enquiry — do NOT write that it 'does not have', "
             "'does not currently hold' or 'lacks' one. No price guarantees."
         )
+        lines.append(
+            "- Do NOT assert that a specific border crossing, road or transit "
+            "connection is open or usable — these change and some are closed to "
+            "travellers (Azerbaijan's land borders are closed to tourists, for one). "
+            "Describe the destinations without claiming an overland crossing between "
+            "them; the house arranges the routing."
+        )
     if rules["brand_neutral_embed"]:
         lines.append(
             "4. Brand-neutral output: no «بوتیمار»/Boutimar mention, no link to "

@@ -2654,6 +2654,9 @@ ok("the writer injects site_offerings and forbids denying a product exists",
    '"site_offerings": _fetch_offerings(brief)' in _a2src and "SITE OFFERINGS:" in _a2src)
 ok("an unreachable feed degrades to a marker, never a silent None-into-false-disclaimer",
    '"status": "unavailable"' in _a2src and "available on enquiry" in _a2src)
+ok("the writer won't assert a closed border crossing (e.g. Azerbaijan land borders)",
+   "Azerbaijan" in compliance.prompt_constraints("orient_v1")
+   and "border crossing" in compliance.prompt_constraints("boutimar_v1"))
 _bm = [s for s in config.load_sites(include_hold=True) if s.domain == "boutimar.com"][0]
 ok("the two astro sites do NOT share a frontmatter shape",
    set(_bm.cms["frontmatter"]) != set(_eo_fm))
