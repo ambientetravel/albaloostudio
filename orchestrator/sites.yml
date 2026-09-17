@@ -338,10 +338,6 @@ sites:
     property_uri: "sc-domain:ambientetravel.com"
     gsc_account: "contactmozaffari@gmail.com"
     brand: Ambiente Travel
-    seed_keywords:            # starter topics — this site has ~no GSC footprint yet
-      - "Iran DMC services for European tour operators"
-      - "MICE destinations in the Middle East"
-      - "how to choose a destination management company"
     locale: en
     market: DACH
     base_url: "https://ambientetravel.com"
