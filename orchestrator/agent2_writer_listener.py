@@ -22,6 +22,7 @@ import json
 import os
 import logging
 import random
+import re
 import threading
 import time
 from typing import Any, Literal
@@ -384,6 +385,79 @@ def _system_instruction(brief: ContentBrief) -> str:
 _OFFER_FIELDS = ("slug", "title", "type", "summary", "url", "regions",
                  "countries", "duration", "route", "stops", "groupType")
 
+# How many offerings reach the prompt. A ceiling, not a slice point: the list is
+# relevance-ranked first (see _rank_offerings), so the 60 that survive are the 60
+# that matter to THIS brief — never an arbitrary first-60 by feed order.
+_OFFER_CAP = 60
+
+# Words that signal the writer is asking about a whole product line, so we can
+# float that line up even when titles don't share tokens with the query. Persian
+# and English both, because the feeds and briefs come in both.
+_TYPE_SYNONYMS = {
+    "hotel": {"hotel", "hotels", "stay", "accommodation", "resort",
+              "هتل", "اقامتگاه", "اقامت"},
+    "tour": {"tour", "tours", "itinerary", "trip", "package", "journey",
+             "تور", "سفر", "برنامه"},
+    "destination": {"destination", "city", "guide", "مقصد", "شهر", "راهنما"},
+    "cruise": {"cruise", "sailing", "ship", "کروز", "کشتی", "دریایی"},
+    "corridor": {"corridor", "route", "road", "کریدور", "مسیر", "جاده"},
+}
+
+
+def _tokens(*parts: Any) -> set[str]:
+    """Lowercased word set across strings and lists of strings. `\\w` matches
+    Unicode letters, so Persian tokenizes the same as Latin."""
+    flat = []
+    for p in parts:
+        if not p:
+            continue
+        flat.append(" ".join(map(str, p)) if isinstance(p, (list, tuple)) else str(p))
+    return set(re.findall(r"\w+", " ".join(flat).lower()))
+
+
+def _rank_offerings(brief: "ContentBrief", items: list[dict]) -> list[dict]:
+    """Order the catalogue by relevance to THIS brief, then cap. A blind first-N
+    slice made whole product lines invisible — boutimar.com serves 159 offerings
+    ordered tours→destinations→hotels, so a first-60 cut dropped every hotel and
+    every destination and the writer would "not have" a product the site sells.
+    Rank by query-token overlap (keyword, secondary keywords, title, must-include,
+    url path), keep the site's own priority as the tiebreak, then guarantee every
+    product type the site sells keeps at least one slot so the writer is never
+    structurally blind to a line."""
+    b, o = brief.brief, brief.opportunity
+    query = _tokens(o.primary_keyword, o.secondary_keywords, b.working_title,
+                    b.must_include, b.target_url_path)
+    intent_types = {t for t, syns in _TYPE_SYNONYMS.items() if query & syns}
+
+    def score(off: dict) -> int:
+        ot = _tokens(off.get("title"), off.get("summary"), off.get("regions"),
+                     off.get("countries"), off.get("route"), off.get("stops"),
+                     off.get("slug"), off.get("type"))
+        return len(query & ot) + (2 if off.get("type") in intent_types else 0)
+
+    order = [items[i] for i in sorted(range(len(items)), key=lambda i: (-score(items[i]), i))]
+    selected = order[:_OFFER_CAP]
+
+    present = {x.get("type") for x in items if x.get("type")}
+    shown = {x.get("type") for x in selected}
+    for t in present - shown:
+        best = next((x for x in order if x.get("type") == t), None)
+        if best is None:
+            continue
+        counts: dict[str, int] = {}
+        for x in selected:
+            counts[x.get("type")] = counts.get(x.get("type"), 0) + 1
+        # Evict the lowest-ranked item whose line has more than one rep, so making
+        # room for a missing line never erases the last example of another.
+        for j in range(len(selected) - 1, -1, -1):
+            if counts.get(selected[j].get("type"), 0) > 1:
+                selected.pop(j)
+                break
+        else:
+            selected.pop()
+        selected.append(best)
+    return selected
+
 
 def _fetch_offerings(brief: ContentBrief) -> dict[str, Any] | None:
     """The site's real catalogue, so the writer promotes actual products instead
@@ -403,8 +477,8 @@ def _fetch_offerings(brief: ContentBrief) -> dict[str, Any] | None:
         resp.raise_for_status()
         payload = resp.json()
         items = payload.get("offerings") if isinstance(payload, dict) else payload
-        slim = [{k: o[k] for k in _OFFER_FIELDS if o.get(k) is not None}
-                for o in (items or [])[:60] if isinstance(o, dict)]
+        ranked = _rank_offerings(brief, [o for o in (items or []) if isinstance(o, dict)])
+        slim = [{k: o[k] for k in _OFFER_FIELDS if o.get(k) is not None} for o in ranked]
         return {"status": "available", "count": len(slim), "offerings": slim,
                 "instruction": "These are the real products this site sells. Reference the "
                 "relevant ones by their exact title and link to their url. NEVER invent one, "

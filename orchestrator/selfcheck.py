@@ -2654,6 +2654,25 @@ ok("the writer injects site_offerings and forbids denying a product exists",
    '"site_offerings": _fetch_offerings(brief)' in _a2src and "SITE OFFERINGS:" in _a2src)
 ok("an unreachable feed degrades to a marker, never a silent None-into-false-disclaimer",
    '"status": "unavailable"' in _a2src and "available on enquiry" in _a2src)
+# The 60-entry cap must be relevance-RANKED, not a first-60 feed slice. boutimar.com
+# ships 159 offerings ordered tours→destinations→hotels; a blind slice dropped every
+# hotel and destination, so the writer would "not have" a product the site sells —
+# the exact deny-a-product failure the feed exists to prevent. Functional, not a
+# string grep: build a feed where a whole product line sits entirely past the cap.
+from types import SimpleNamespace as _NS
+_feed = ([{"type": "tour", "title": f"Tour {i}", "slug": f"t{i}",
+           "summary": "a journey"} for i in range(_a2l._OFFER_CAP + 20)]
+         + [{"type": "hotel", "title": f"Hotel {i}", "slug": f"h{i}",
+             "summary": "a stay in Gorgan"} for i in range(30)])
+def _mk(pk="", title=""):
+    return _NS(brief=_NS(working_title=title, must_include=[], target_url_path=""),
+               opportunity=_NS(primary_keyword=pk, secondary_keywords=[]))
+_hotel_sel = _a2l._rank_offerings(_mk(pk="best hotel to stay", title="Where to stay"), _feed)
+ok("a hotel brief surfaces hotels even when they sit past the raw cap",
+   any(o["type"] == "hotel" for o in _hotel_sel) and len(_hotel_sel) == _a2l._OFFER_CAP)
+_generic_sel = _a2l._rank_offerings(_mk(pk="zzqxnomatch", title="zzqxnomatch"), _feed)
+ok("the diversity guard keeps every product line visible on a zero-match brief",
+   {"tour", "hotel"} <= {o["type"] for o in _generic_sel})
 ok("the writer won't assert a closed border crossing (e.g. Azerbaijan land borders)",
    "Azerbaijan" in compliance.prompt_constraints("orient_v1")
    and "border crossing" in compliance.prompt_constraints("boutimar_v1"))

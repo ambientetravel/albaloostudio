@@ -79,7 +79,11 @@ before the pipeline can read it. Until then the writer degrades safely (see belo
   Istanbul). The writer is told never to paraphrase these into «بدون ویزا» — that
   is the one paraphrase that puts a passenger at a counter without a visa.
 - List everything the site sells that a guide article could reference; the
-  pipeline caps at 60 entries.
+  pipeline caps at 60 entries **after relevance-ranking them against the brief**
+  (keyword, title, must-include, url path), with a guard that keeps at least one of
+  every product `type` you ship. So a 159-offering feed is fine — order it by your
+  own priority and the pipeline floats the ones that matter to each article to the
+  top; you do not need to pre-trim to 60.
 
 ## How the writer uses it
 Injected into the draft prompt as `site_offerings`. The rules: name a relevant
