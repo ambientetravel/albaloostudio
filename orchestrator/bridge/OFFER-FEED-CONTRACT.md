@@ -55,6 +55,29 @@ before the pipeline can read it. Until then the writer degrades safely (see belo
 - **No price of any kind.** Deliberate: a `priceFrom` becomes a stated rate in
   prose and breaks the never-invent-figures rule. "Priced on request" is the only
   honest phrasing and it needs no field.
+- **No counts in `summary`.** Stricter than "no price," and learned from
+  cruise24.ir: a summary like "۷۸۲ کروز در ۹ مقصد" is true today and wrong next
+  week, but once the writer prints it as a fact in an article it stays wrong
+  forever. Keep any digit away from سفر/کروز/کشتی/مقصد/کلاس/حرکت (and their English
+  equivalents). Build the export to assert on this and refuse to emit — cruise24's
+  build caught 5 stale counts, boutimar cruise's caught more.
+- **One offering per product page, never per sailing.** A partner API may hold
+  thousands of sailings; a per-sailing feed is meaningless after the 60-entry cap
+  and stale within a day. Emit the durable product pages (a cruise line, a
+  destination, a ship) ordered by priority, so the first 60 are the ones that
+  matter and every `url` is a page that exists.
+- **Omit a product that does not exist — do not list a page that says "no."**
+  cruise24.ir deliberately leaves `cruise-kish.html` out of its feed: that page
+  exists to explain that no cruise departs Kish, Bandar Abbas or Qeshm, and
+  listing it as an offering would invite the writer to promote a product that
+  isn't real. The honest answer to "cruise from Iran" is that passengers fly to
+  Dubai, Abu Dhabi or Doha — the feed carries only things a guest can actually buy.
+- **Visa wording is derived, never typed.** Where a `summary` mentions visas, it
+  must come from that product's computed per-port verdicts under the hard rules
+  (Persian Gulf = easy visa, «بدونِ ویزا» نیست; AROYA only Türkiye+Egypt truly
+  visa-free; any Greek/Schengen port needs a Schengen visa even sailing from
+  Istanbul). The writer is told never to paraphrase these into «بدون ویزا» — that
+  is the one paraphrase that puts a passenger at a counter without a visa.
 - List everything the site sells that a guide article could reference; the
   pipeline caps at 60 entries.
 
