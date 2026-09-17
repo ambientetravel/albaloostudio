@@ -217,6 +217,7 @@ sites:
     property_uri: "sc-domain:exploreorient.com"
     gsc_account: "contactmozaffari@gmail.com"
     brand: Explore Orient
+    compliance_profile: orient_v1   # non-cruise: no AROYA/Seychelles/Schengen rules injected
     seed_keywords:            # starter topics — this site has ~no GSC footprint yet
       - "Silk Road travel guide"
       - "best time to visit Central Asia"
@@ -334,6 +335,7 @@ sites:
     property_uri: "sc-domain:ambientetravel.com"
     gsc_account: "contactmozaffari@gmail.com"
     brand: Ambiente Travel
+    compliance_profile: orient_v1   # non-cruise: no AROYA/Seychelles/Schengen rules injected
     locale: en
     market: DACH
     base_url: "https://ambientetravel.com"

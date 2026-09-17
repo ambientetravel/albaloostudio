@@ -281,6 +281,21 @@ PROFILES: dict[str, dict[str, bool]] = {
         "sanctions_check": False,
         "fabricated_history": True,
     },
+    # Non-cruise travel sites (exploreorient's European Silk Road / Central Asia
+    # / Caucasus content). The cruise visa facts (AROYA/Seychelles/Schengen) are
+    # OFF: injected as must-follow rules on 17 Sep they made the writer graft a
+    # cruise section onto a Central Asia visa guide and call itself "a cruise
+    # house first". Persian-Gulf naming stays on (global, and the gate still
+    # blocks "Arabian Gulf" anywhere) and so does never-invent, but the writer is
+    # no longer told cruise-route rules it will otherwise treat as content.
+    "orient_v1": {
+        "persian_gulf_only": True,
+        "visa_accuracy": False,
+        "no_invented_facts": True,
+        "brand_neutral_embed": False,
+        "sanctions_check": True,
+        "fabricated_history": True,
+    },
 }
 
 
@@ -594,9 +609,12 @@ def prompt_constraints(profile: str = "boutimar_v1") -> str:
     ]
     if rules["persian_gulf_only"]:
         lines.append(
-            '1. Always «خلیج فارس» / "Persian Gulf". Never "Arabian Gulf" / «خلیج عربی» '
-            "— in body copy, headings, alt text, meta, schema or relabelled source "
-            'data. ("Arabian Sea" is a different body of water; leave it alone.)'
+            '1. IF you refer to the gulf between Iran and the Arabian peninsula, '
+            'call it «خلیج فارس» / "Persian Gulf" — never "Arabian Gulf" / «خلیج عربی», '
+            "anywhere (body, headings, alt text, meta, schema, relabelled data). But do "
+            "NOT introduce it when the subject does not already call for it: a Central "
+            "Asia or Caucasus piece has no reason to mention it. "
+            '("Arabian Sea" is a different body of water; leave it alone.)'
         )
     if rules.get("fabricated_history"):
         lines.append(
@@ -625,8 +643,12 @@ def prompt_constraints(profile: str = "boutimar_v1") -> str:
         )
         lines.append(
             "3. Never invent a rate, a departure date, an inclusion or a photo "
-            "credit. Use only the figures supplied in the brief's data. If the data "
-            "is not there, write that it is not there. No price guarantees."
+            "credit. Use only the figures supplied in the brief's data; if a FIGURE "
+            "is missing, say it is available on request. This governs FIGURES ONLY: "
+            "never state or imply this travel house does not offer a tour, route, "
+            "destination or service. Lacking specifics about an offering, write that "
+            "details are available on enquiry — do NOT write that it 'does not have', "
+            "'does not currently hold' or 'lacks' one. No price guarantees."
         )
     if rules["brand_neutral_embed"]:
         lines.append(

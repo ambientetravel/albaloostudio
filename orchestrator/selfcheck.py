@@ -2625,6 +2625,25 @@ ok("a site with no cap leaves the description untouched",
    _a2meta._cap_meta("x" * 400, None) == "x" * 400
    and next(s for s in config.load_sites(include_hold=True)
             if s.domain == "boutimar.com").cms.get("description_max") is None)
+
+# 17 Sep — the five exploreorient PRs were all unmergeable for content reasons the
+# Explore Orient session's build-check caught. Root causes, all pipeline-side:
+_a2src = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("no Albaloo credit footer is appended to article bodies (it was on every brand page)",
+   'draft.get("body_markdown", "") + footer' not in _a2src)
+ok("non-cruise sites use a profile without the cruise visa rules",
+   _eo.compliance_profile == "orient_v1" and compliance.PROFILES["orient_v1"]["visa_accuracy"] is False
+   and compliance.PROFILES["orient_v1"]["persian_gulf_only"] is True)
+_orient_prompt = compliance.prompt_constraints("orient_v1")
+_cruise_prompt = compliance.prompt_constraints("boutimar_v1")
+ok("the cruise visa facts (AROYA/Seychelles/Schengen) are NOT injected for non-cruise sites",
+   "AROYA" not in _orient_prompt and "AROYA" in _cruise_prompt)
+ok("Persian-Gulf naming stays for non-cruise but is conditional, not an order to mention it",
+   "Persian Gulf" in _orient_prompt and "IF you refer to" in _orient_prompt)
+ok("the never-invent rule forbids denying a product exists, not just inventing figures",
+   "does not have" in _cruise_prompt and "available on enquiry" in _cruise_prompt)
+ok("the writer is told to use internal links and not to repeat the title as an H2",
+   "INTERNAL LINKS:" in _a2src and "repeats the title" in _a2src)
 _bm = [s for s in config.load_sites(include_hold=True) if s.domain == "boutimar.com"][0]
 ok("the two astro sites do NOT share a frontmatter shape",
    set(_bm.cms["frontmatter"]) != set(_eo_fm))

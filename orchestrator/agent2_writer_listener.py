@@ -349,6 +349,14 @@ def _system_instruction(brief: ContentBrief) -> str:
             "STRUCTURE: follow the supplied outline exactly — same headings, same "
             "order. Cover every must_cover point under its own heading.",
             "",
+            "INTERNAL LINKS: weave at least two of the brief's internal_link_suggestions "
+            "into the body as inline markdown links to the site's own pages. A guide that "
+            "links nowhere on the site does nothing for it. Never link a page you were "
+            "not given; use only the supplied suggestions.",
+            "",
+            "Do NOT open the body with an H2 that repeats the title — the CMS renders "
+            "the title as the H1; start with the first real section.",
+            "",
             compliance.prompt_constraints(brief.compliance.profile),
             "",
             "If a required figure (price, date, inclusion) is absent from the "
@@ -903,11 +911,12 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
     adapter = site.cms.adapter or "unimplemented"
     url = f"{site.base_url}{brief.brief.target_url_path}"
 
-    footer = (
-        f"\n\n---\n_Pipeline architecture by {config.ARCHITECTURE_CREDIT} — "
-        f"{config.ARCHITECTURE_URL}_\n"
-    )
-    draft["body_markdown"] = draft.get("body_markdown", "") + footer
+    # No public credit footer. The Albaloo architecture credit belongs in the
+    # envelope and manifest (internal provenance), NOT appended to the article
+    # body — that put an outbound vendor link "Pipeline architecture by Albaloo
+    # Studio" on every public brand page, wrong on a separate brand like
+    # exploreorient and never meant to be reader-facing. (Found 17 Sep across all
+    # 5 exploreorient PRs; it is on boutimar's live articles too.)
 
     if site.cms.type == "unknown" or adapter == "unimplemented":
         # This branch said "staging the draft" and staged nothing, then returned
