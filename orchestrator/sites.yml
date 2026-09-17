@@ -217,6 +217,12 @@ sites:
     property_uri: "sc-domain:exploreorient.com"
     gsc_account: "contactmozaffari@gmail.com"
     brand: Explore Orient
+    seed_keywords:            # starter topics — this site has ~no GSC footprint yet
+      - "Silk Road travel guide"
+      - "best time to visit Central Asia"
+      - "Uzbekistan cultural tour guide"
+      - "Caucasus multi-country itinerary"
+      - "Central Asia visa guide for travellers"
     locale: en
     market: INT
     base_url: "https://exploreorient.com"
@@ -332,6 +338,10 @@ sites:
     property_uri: "sc-domain:ambientetravel.com"
     gsc_account: "contactmozaffari@gmail.com"
     brand: Ambiente Travel
+    seed_keywords:            # starter topics — this site has ~no GSC footprint yet
+      - "Iran DMC services for European tour operators"
+      - "MICE destinations in the Middle East"
+      - "how to choose a destination management company"
     locale: en
     market: DACH
     base_url: "https://ambientetravel.com"
@@ -417,6 +427,11 @@ sites:
     property_uri: "sc-domain:cruise24.ir"
     gsc_account: "alimozzarella@gmail.com"
     brand: Cruise24
+    seed_keywords:            # starter topics — this site has ~no GSC footprint yet
+      - "راهنمای انتخاب کابین کشتی کروز"
+      - "سفر کشتی کروز برای خانواده"
+      - "راهنمای بستن چمدان برای سفر دریایی"
+      - "کشتی کروز چیست و چگونه کار می‌کند"
     # OFF HOLD 2026-08-09. It was a 375-byte coming-soon page on 6 Aug; it now
     # serves a real 31KB storefront — "Search 2,200+ sailings from MSC, Explora
     # Journeys, Celestyal and AROYA".
@@ -456,6 +471,10 @@ sites:
     property_uri: "sc-domain:cruise24.me"
     gsc_account: "contactmozaffari@gmail.com"
     brand: Cruise24
+    seed_keywords:            # starter topics — this site has ~no GSC footprint yet
+      - "gemi turu nedir kapsamli rehber"
+      - "Akdeniz gemi turu rehberi"
+      - "ilk kez gemi turu ipuclari"
     locale: en
     market: INT                # the world-audience twin of cruise24.ir
     base_url: "https://cruise24.me"

@@ -88,6 +88,28 @@ ok("AGENT2_WEBHOOK_URL is passed to the scout step",
    "AGENT2_WEBHOOK_URL: ${{ secrets.AGENT2_WEBHOOK_URL }}" in _wf,
    "the guard tests an env var that must actually be populated")
 _scout_src = pathlib.Path(__file__).with_name("agent1_seo_scout.py").read_text(encoding="utf-8")
+
+# Seed topics: a site with no Search Console footprint (cruise24.ir has 57
+# query-rows to boutimar.com's 3,690) produces zero briefs forever — no traffic,
+# no data, no gaps. Seed keywords break that deadlock. Added 17 Sep because seven
+# of eight properties were producing nothing.
+import agent1_seo_scout as _a1seed
+_seed_site = next((s for s in config.load_sites(include_hold=True) if s.domain == "cruise24.ir"), None)
+ok("starved sites carry seed topics so they can produce content at all",
+   bool(_seed_site) and len(_seed_site.seed_keywords) >= 3, _seed_site and _seed_site.seed_keywords)
+_seeds = _a1seed.seed_candidates(_seed_site, {"https://cruise24.ir/aroya.html"}, existing=[]) if _seed_site else []
+ok("a seed with no page becomes a missing_page candidate",
+   bool(_seeds) and all(c["gap_type"] == "missing_page" and c.get("seed") for c in _seeds))
+ok("real GSC demand always outranks a seed",
+   sorted([{"query": "g", "local_score": 52.0}] + _seeds,
+          key=lambda c: c["local_score"], reverse=True)[0]["query"] == "g")
+# Coverage dedupe on an English site, where slug tokens are unambiguous:
+# "Silk Road travel guide" is dropped when /silk-road-travel-guide/ exists.
+_eo = next((s for s in config.load_sites(include_hold=True) if s.domain == "exploreorient.com"), None)
+ok("a seed the sitemap already covers is dropped",
+   bool(_eo) and not any(
+       c["query"] == "Silk Road travel guide" for c in _a1seed.seed_candidates(
+           _eo, {"https://exploreorient.com/silk-road-travel-guide/"}, existing=[])))
 ok("a missing delivery endpoint is optional, not fatal — the artifact is the handoff",
    'optional_env("AGENT2_WEBHOOK_URL")' in _scout_src
    and 'require_env("AGENT2_WEBHOOK_URL")' not in _scout_src,

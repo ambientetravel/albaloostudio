@@ -528,6 +528,45 @@ def find_gaps(site: Site, gsc: dict[str, Any], sitemap_urls: set[str]) -> list[d
     return candidates[:MAX_CANDIDATES_TO_LLM]
 
 
+def seed_candidates(site: Site, sitemap_urls: set[str],
+                    existing: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Turn a site's seed_keywords into missing_page candidates.
+
+    For a site with no Search Console footprint, find_gaps returns little or
+    nothing — there is no measured demand to diff. These are the curated topics
+    the site should cover, added so it can start producing content and earn the
+    traffic that later becomes real gaps. A seed is dropped if the sitemap
+    already covers it (token overlap, the same test find_gaps uses) or a GSC
+    candidate already names it. Its local_score is deliberately tiny, below any
+    real GSC candidate, so measured demand always ranks first; seeds only fill
+    the space GSC leaves empty.
+    """
+    if not site.seed_keywords:
+        return []
+    have = {str(c["query"]).lower() for c in existing}
+    sitemap_tokens = [_slug_tokens(u) for u in sitemap_urls]
+    out: list[dict[str, Any]] = []
+    for i, kw in enumerate(site.seed_keywords):
+        q = kw.strip()
+        if not q or q.lower() in have:
+            continue
+        qt = {t for t in _SLUG_SPLIT.split(q.lower()) if len(t) > 2}
+        if any(qt and len(qt & toks) >= max(1, len(qt) // 2) for toks in sitemap_tokens):
+            continue  # the site already has a page for this
+        out.append({
+            "query": q, "gap_type": "missing_page",
+            "impressions": 0, "clicks": 0, "ctr": 0.0,
+            "position": site.max_position, "best_position": site.max_position,
+            "trend": "seed", "current_url": None, "competing_urls": [],
+            "top_country": None, "device_split": {},
+            "covered_by_sitemap": False,
+            "local_score": round(1.0 / (i + 1), 3),
+            "seed": True,
+        })
+    return out
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # 4. OpenAI — classify, prioritise, outline (one batched call per domain)
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1560,6 +1599,7 @@ def process_site(
     started = time.time()
     stat: dict[str, Any] = {
         "domain": site.domain, "status": "ok", "gsc_rows": 0, "candidates": 0,
+        "seed_candidates": 0,
         "briefs_emitted": 0, "delivered": 0, "dlq": 0, "blocked": 0,
         # Briefs this site produced without the LLM step. Green-but-degraded is
         # the run state that hides best, so it gets its own counter rather than
@@ -1578,6 +1618,16 @@ def process_site(
 
         sitemap_urls = fetch_sitemap_urls(site, session)
         candidates = find_gaps(site, gsc, sitemap_urls)
+        # Break the no-traffic deadlock: a site with no GSC footprint gets its
+        # curated starter topics as candidates so it can produce content at all.
+        seeds = seed_candidates(site, sitemap_urls, candidates)
+        if seeds:
+            candidates = sorted(candidates + seeds,
+                                key=lambda c: c["local_score"], reverse=True)
+            log.info("%s — %d seed topic(s) added; %d GSC gap(s) — this site has "
+                     "little search footprint to gap-find from",
+                     site.domain, len(seeds), len(candidates) - len(seeds))
+        stat["seed_candidates"] = len(seeds)
         stat["candidates"] = len(candidates)
 
         # Pages Google already ranks that the sitemap never mentions. Both

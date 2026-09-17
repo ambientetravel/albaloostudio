@@ -420,6 +420,15 @@ class Site:
     # compete with is a judgement about the business, and a crawler guessing at
     # it would confidently study the wrong sites.
     competitors: list[str] = field(default_factory=list)
+    # Starter topics for a site with no Search Console footprint yet. The scout
+    # writes briefs from GSC gaps — demand it can measure — so a new, low-traffic
+    # site (cruise24.ir has 57 query-rows to boutimar.com's 3,690) produces
+    # nothing: no traffic, no data, no gaps, no briefs, forever. These are the
+    # break-out of that deadlock: curated topics the site SHOULD cover, injected
+    # as candidates so it earns a content footprint that then generates the real
+    # demand the scout runs on. Each is written once (the ledger cooldown, then
+    # the sitemap, stop it repeating), and real GSC demand always outranks a seed.
+    seed_keywords: list[str] = field(default_factory=list)
 
     @property
     def on_hold(self) -> bool:
@@ -484,6 +493,7 @@ def load_sites(
                 status=str(merged.get("status", "active")).lower(),
                 audit_sample_pages=int(merged.get("audit_sample_pages", 10)),
                 competitors=[str(u).rstrip("/") for u in (merged.get("competitors") or [])],
+                seed_keywords=[str(k).strip() for k in (merged.get("seed_keywords") or []) if str(k).strip()],
             )
         )
 
