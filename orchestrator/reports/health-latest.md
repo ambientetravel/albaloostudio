@@ -1,11 +1,10 @@
-# Orchestration health — 2026-09-18T13:48 UTC
+# Orchestration health — 2026-09-18T13:51 UTC
 
-**2 broke · 2 need you · 1 to watch.**
+**0 broke · 2 need you · 1 to watch.**
 
 ## 🔴 Broke
 
-- **Writer** was **skipped** last cycle (#54) — its upstream failed, so nothing downstream ran
-- **Broadcaster** was **skipped** last cycle (#53) — its upstream failed, so nothing downstream ran
+- Nothing. Every core agent's last run succeeded.
 
 ## 🟡 Needs you — only you can do these
 
@@ -21,12 +20,12 @@
 | Metric | This cycle | Previous |
 |---|---:|---:|
 | Sites scanned | 1 | |
-| Gap candidates → briefs | 5 → **4** | |
-| Skipped by ledger (already briefed) | 0 | |
+| Gap candidates → briefs | 5 → **1** | |
+| Skipped by ledger (already briefed) | 3 | |
 | Dead-lettered / degraded | 0 / 0 | |
-| Articles drafted (as PRs) | **4** | 11 |
+| Articles drafted (as PRs) | **1** | 4 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $0.354 | $0.691 |
+| Model spend | $0.116 | $0.354 |
 | Social: campaigns / posts held / no-media | 5 / 5 / 5 | |
 | Article PRs open | 15 | |
 | AI recall (Oracle, monthly) | — | |
@@ -35,9 +34,9 @@
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | · cancelled | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35351334487) |
-| Writer | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352314083) |
-| Broadcaster | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352318826) |
+| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352381859) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352518235) |
+| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352673214) |
 | Closer | · never ran | — |  |
 | Auditor+Analyst | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
 | Cartographer | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |

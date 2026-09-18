@@ -1,9 +1,6 @@
 {
- "generated": "2026-09-18T13:48+00:00",
- "critical": [
-  "**Writer** was **skipped** last cycle (#54) — its upstream failed, so nothing downstream ran",
-  "**Broadcaster** was **skipped** last cycle (#53) — its upstream failed, so nothing downstream ran"
- ],
+ "generated": "2026-09-18T13:51+00:00",
+ "critical": [],
  "needs_you": [
   "5 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
   "**7 article PR(s) waiting on your merge** (oldest 5 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln; [boutimar#14](https://github.com/ambientetravel/boutimar/pull/14) Agent 2 draft: Parsian Khazar Hotel, Chalous | B; [boutimar#15](https://github.com/ambientetravel/boutimar/pull/15) Agent 2 draft: Iran Oil Show 2026 | Exhibition G"
@@ -15,20 +12,20 @@
   "5 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
  "numbers": {
-  "briefs": 4,
+  "briefs": 1,
   "candidates": 5,
   "dlq": 0,
   "degraded": 0,
-  "ledger_skipped": 0,
+  "ledger_skipped": 3,
   "sites_scanned": 1,
-  "scout_run": "run_20260918T1244Z_c669",
-  "articles": 4,
+  "scout_run": "run_20260918T1348Z_8803",
+  "articles": 1,
   "writer_failed": 0,
   "deferred": 0,
-  "briefs_seen": 4,
-  "cost_usd": 0.354054,
-  "prev_cost_usd": 0.690681,
-  "prev_articles": 11,
+  "briefs_seen": 1,
+  "cost_usd": 0.115803,
+  "prev_cost_usd": 0.354054,
+  "prev_articles": 4,
   "posts": 10,
   "posts_held": 5,
   "posts_no_media": 5,
@@ -38,24 +35,24 @@
  "agents": [
   {
    "agent": "Scout",
-   "result": "cancelled",
+   "result": "success",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35351334487",
-   "run": 41
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35352381859",
+   "run": 42
   },
   {
    "agent": "Writer",
-   "result": "skipped",
+   "result": "success",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35352314083",
-   "run": 54
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35352518235",
+   "run": 55
   },
   {
    "agent": "Broadcaster",
-   "result": "skipped",
+   "result": "in_progress",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35352318826",
-   "run": 53
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35352673214",
+   "run": 54
   },
   {
    "agent": "Closer",
