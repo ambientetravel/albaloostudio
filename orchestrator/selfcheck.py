@@ -2705,6 +2705,14 @@ ok("a finished draft (Persian ؟ or Latin .) passes the completeness guard",
    and _a2l._draft_incomplete_reason("جملهٔ کامل است. " * 200 + "آماده‌اید؟", _bq) is None)
 ok("the writer is told to hedge once in voice and not narrate its own sourcing",
    "HEDGE ONCE" in _a2src and "describe your own sourcing" in _a2src)
+# Regulated-activity guardrail (from the exploreorient UAE-stag draft, which
+# promoted nightlife with zero mention of alcohol law, conduct or Ramadan). The
+# writer has no "what's restricted here" feed, so a prompt rule must make it flag
+# that local rules govern such activities and defer to an official source — the
+# same register as the entry hedge, legal stakes instead of logistical.
+ok("the writer must flag regulated activities and defer to an official source",
+   "REGULATED ACTIVITIES" in _a2src and "confirm the current rules with an official source" in _a2src
+   and "do NOT state the rule itself" in _a2src)
 ok("the writer won't assert a closed border crossing (e.g. Azerbaijan land borders)",
    "Azerbaijan" in compliance.prompt_constraints("orient_v1")
    and "border crossing" in compliance.prompt_constraints("boutimar_v1"))

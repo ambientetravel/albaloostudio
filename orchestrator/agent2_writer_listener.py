@@ -367,6 +367,16 @@ def _system_instruction(brief: ContentBrief) -> str:
             "LOI). Never simplify a qualified regime, never imply a rule is permanent, never "
             "attach a date to it, and never state a rule for a country not in the records.",
             "",
+            "REGULATED ACTIVITIES: if the article promotes an activity that local law commonly "
+            "governs — alcohol and nightlife, beachwear or public swimming, photographing people "
+            "or infrastructure, drones, dress or conduct at religious sites, unmarried couples "
+            "sharing a room, Ramadan-period conduct — you MUST note that local rules apply and "
+            "that the traveller should confirm the current rules with an official source before "
+            "the trip. Say such rules exist and matter; do NOT state the rule itself — it varies "
+            "and dates, exactly like an entry requirement. Silence here can put a client in legal "
+            "jeopardy, not merely inconvenience them; promoting the activity without the caveat is "
+            "the same overclaim as naming a rate you were not given.",
+            "",
             "Do NOT open the body with an H2 that repeats the title — the CMS renders "
             "the title as the H1; start with the first real section.",
             "",
