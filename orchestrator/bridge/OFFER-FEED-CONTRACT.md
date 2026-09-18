@@ -78,6 +78,15 @@ before the pipeline can read it. Until then the writer degrades safely (see belo
   visa-free; any Greek/Schengen port needs a Schengen visa even sailing from
   Istanbul). The writer is told never to paraphrase these into «بدون ویزا» — that
   is the one paraphrase that puts a passenger at a counter without a visa.
+- **A summary may name the route your product actually operates.** The rule that
+  an article must not assert a land border is "open" governs the writer's evergreen
+  prose — nobody re-reads a blog guide when a crossing closes. It does NOT mean a
+  feed must strip operational truth: an operated, request-based itinerary with a
+  DMC behind it may state the crossing it runs (its summary can say "over the
+  Sadakhlo crossing to Tbilisi"), because that describes what the product does, not
+  what is permanently true of the border. Describe the product honestly; the
+  pipeline keeps the evergreen framing on its side. Do not, though, dress an
+  aspiration as an operation — name only routes you actually run.
 - List everything the site sells that a guide article could reference; the
   pipeline caps at 60 entries **after relevance-ranking them against the brief**
   (keyword, title, must-include, url path), with a guard that keeps at least one of
