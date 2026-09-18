@@ -1,7 +1,7 @@
 {
  "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
  "cooldown_days": 45,
- "updated_at": "2026-09-18T13:49:41+00:00",
+ "updated_at": "2026-09-18T14:03:33+00:00",
  "entries": [
   {
    "domain": "cruise24.me",
@@ -18,6 +18,14 @@
    "last_briefed": "2026-09-18T12:45:28+00:00",
    "times_briefed": 1,
    "target_url_path": "/itineraries/caucasus-multi-country-itinerary"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "Central Asia visa guide for travellers",
+   "first_briefed": "2026-09-18T14:03:33+00:00",
+   "last_briefed": "2026-09-18T14:03:33+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/central-asia-visa-guide"
   },
   {
    "domain": "ambientetravel.com",
