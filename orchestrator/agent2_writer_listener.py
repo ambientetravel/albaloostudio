@@ -360,6 +360,13 @@ def _system_instruction(brief: ContentBrief) -> str:
             "a guide earns its keep. You may NEVER state or imply the house lacks a product; "
             "if none fits, simply don't mention products. Never invent an offering not listed.",
             "",
+            "ENTRY & VISAS: if site_access is present and the topic touches visas or entry, "
+            "ground every entry claim in its records — never hedge generically when the fact is "
+            "right there. Quote a `regime` whole (its nationality qualifier is part of the fact) "
+            "and name the house's own `handling` where given (the GBAO permit, a Turkmenistan "
+            "LOI). Never simplify a qualified regime, never imply a rule is permanent, never "
+            "attach a date to it, and never state a rule for a country not in the records.",
+            "",
             "Do NOT open the body with an H2 that repeats the title — the CMS renders "
             "the title as the H1; start with the first real section.",
             "",
@@ -540,11 +547,59 @@ def _fetch_offerings(brief: ContentBrief) -> dict[str, Any] | None:
                 "site lacks any product; write that specific itineraries are available on enquiry."}
 
 
+# Per access record the pipeline reads (access.v1). Extra keys are ignored. The
+# `regime` is verbatim and already nationality-qualified — it must be quoted whole.
+_ACCESS_FIELDS = ("name", "country", "region", "regime", "lead_time", "status",
+                  "handling", "url", "guarantee")
+
+
+def _fetch_access(brief: ContentBrief) -> dict[str, Any] | None:
+    """The site's entry/visa facts (access.v1), so a visa or entry guide grounds on
+    real records instead of hedging generically. Products live in the offer feed; a
+    country's entry regime does not. Records are orientation data about OTHER
+    countries' rules — not the site's product and never guaranteed — so the marker
+    forbids simplifying a qualified regime or implying a rule is permanent. No feed
+    configured returns None (the writer works as before); an unreachable one returns
+    a marker that still forbids inventing a visa fact."""
+    try:
+        site = config.load_sites(only=[brief.site.domain], include_hold=True)[0]
+    except Exception:
+        return None
+    url = getattr(site, "access_feed", "") or ""
+    if not url:
+        return None
+    try:
+        resp = requests.get(url, timeout=15, headers={"User-Agent": config.USER_AGENT})
+        resp.raise_for_status()
+        payload = resp.json()
+        rows = payload.get("countries") if isinstance(payload, dict) else payload
+        slim = [{k: r[k] for k in _ACCESS_FIELDS if r.get(k) is not None}
+                for r in (rows or [])[:80] if isinstance(r, dict)]
+        return {
+            "status": "available",
+            "disclaimer": (payload.get("disclaimer") if isinstance(payload, dict) else None),
+            "countries": slim,
+            "instruction": "Entry/visa orientation for these countries — used ONLY when the "
+            "topic involves visas or entry. Quote a `regime` WHOLE: its nationality qualifier "
+            "is part of the fact, so never shorten 'Visa-free for EU & many; eVisa otherwise' "
+            "to 'visa-free'. Weave in `handling` where it exists — it is what the house actually "
+            "does (e.g. the GBAO permit or a Turkmenistan LOI). NEVER state or imply a regime is "
+            "stable or permanent, never attach a year or date to it, and never invent a rule for "
+            "a country not listed here. This is orientation, not a guarantee of issuance."}
+    except (requests.RequestException, ValueError) as exc:
+        log.warning("access feed %s unavailable: %s", url, exc)
+        return {"status": "unavailable", "source": url,
+                "instruction": "The access catalogue could not be loaded. Do NOT invent a visa "
+                "or entry rule; say entry requirements vary by nationality and should be confirmed "
+                "with the relevant embassy or the destination page before booking."}
+
+
 def _user_prompt(brief: ContentBrief, data: dict[str, Any]) -> str:
     b, o = brief.brief, brief.opportunity
     return json.dumps(
         {
             "site_offerings": _fetch_offerings(brief),
+            "site_access": _fetch_access(brief),
             "assignment": {
                 "working_title": b.working_title,
                 "content_type": b.content_type,

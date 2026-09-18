@@ -220,6 +220,7 @@ sites:
     gsc_account: "contactmozaffari@gmail.com"
     brand: Explore Orient
     offer_feed: "https://exploreorient.com/inventory/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
+    access_feed: "https://exploreorient.com/inventory/access.json"  # access.v1 — entry/visa facts so a visa guide grounds on real records, not generic hedging
     compliance_profile: orient_v1   # non-cruise: no AROYA/Seychelles/Schengen rules injected
     seed_keywords:            # starter topics — this site has ~no GSC footprint yet
       - "Silk Road travel guide"

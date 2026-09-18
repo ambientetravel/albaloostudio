@@ -438,6 +438,11 @@ class Site:
     # (no catalogue), and an unreachable feed degrades to the same. Each site's
     # own export builds and deploys the feed; see bridge/OFFER-FEED-CONTRACT.md.
     offer_feed: str = ""
+    # Companion to offer_feed for entry/visa/access facts (access.v1). Products
+    # live in offer_feed; a country's entry regime does not, so a visa guide had
+    # nothing real to ground on and hedged generically. Empty = the writer never
+    # sees access data (unchanged behaviour). See bridge/OFFER-FEED-CONTRACT.md.
+    access_feed: str = ""
 
     @property
     def on_hold(self) -> bool:
@@ -504,6 +509,7 @@ def load_sites(
                 competitors=[str(u).rstrip("/") for u in (merged.get("competitors") or [])],
                 seed_keywords=[str(k).strip() for k in (merged.get("seed_keywords") or []) if str(k).strip()],
                 offer_feed=str(merged.get("offer_feed", "") or "").strip(),
+                access_feed=str(merged.get("access_feed", "") or "").strip(),
             )
         )
 

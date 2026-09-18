@@ -2654,6 +2654,19 @@ ok("the git-backed sites declare an offer_feed",
        for d in ("exploreorient.com", "boutimar.com", "boutimar.ir", "cruise24.ir")))
 ok("the writer injects site_offerings and forbids denying a product exists",
    '"site_offerings": _fetch_offerings(brief)' in _a2src and "SITE OFFERINGS:" in _a2src)
+# Access feed (access.v1): a visa/entry guide needs real entry records or it hedges
+# generically (exploreorient #6). Products live in offer_feed; entry regimes don't.
+ok("exploreorient declares an access_feed for entry/visa facts",
+   next(s for s in config.load_sites(include_hold=True)
+        if s.domain == "exploreorient.com").access_feed.endswith("/access.json"))
+ok("the writer injects site_access and is told to ground visa claims in it",
+   '"site_access": _fetch_access(brief)' in _a2src and "ENTRY & VISAS:" in _a2src)
+ok("the access marker forbids simplifying a qualified regime or implying permanence",
+   "quote a `regime` whole" in _a2src.lower()
+   and "never simplify a qualified regime" in _a2src.lower()
+   and "never state or imply a regime is" in _a2src.lower())
+ok("a site with no access_feed simply gets no access data (unchanged behaviour)",
+   "access_feed" in _a2src and 'if not url:\n        return None' in _a2src)
 ok("an unreachable feed degrades to a marker, never a silent None-into-false-disclaimer",
    '"status": "unavailable"' in _a2src and "available on enquiry" in _a2src)
 # The 60-entry cap must be relevance-RANKED, not a first-60 feed slice. boutimar.com
