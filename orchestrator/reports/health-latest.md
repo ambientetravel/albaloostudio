@@ -1,4 +1,4 @@
-# Orchestration health — 2026-09-18T13:53 UTC
+# Orchestration health — 2026-09-18T14:06 UTC
 
 **0 broke · 2 need you · 1 to watch.**
 
@@ -23,9 +23,9 @@
 | Gap candidates → briefs | 5 → **1** | |
 | Skipped by ledger (already briefed) | 3 | |
 | Dead-lettered / degraded | 0 / 0 | |
-| Articles drafted (as PRs) | **1** | 4 |
+| Articles drafted (as PRs) | **1** | 1 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $0.116 | $0.354 |
+| Model spend | $0.104 | $0.116 |
 | Social: campaigns / posts held / no-media | 5 / 5 / 5 | |
 | Article PRs open | 15 | |
 | AI recall (Oracle, monthly) | — | |
@@ -34,11 +34,11 @@
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352381859) |
-| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352518235) |
-| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352673214) |
+| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35353790415) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35353908236) |
+| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35354036393) |
 | Closer | · never ran | — |  |
-| Auditor+Analyst | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
+| Auditor+Analyst | ✓ success | 4.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
 | Cartographer | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
 | Watcher | ✓ success | 5.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305) |
 | Oracle | · never ran | — |  |
