@@ -114,6 +114,30 @@ fact-checked, not as a scratch dump of your database. If a claim is only true fo
 part of a product, say which part in the summary or leave it out — do not round it
 up. Sweep an existing feed for this the way you would proofread a landing page.
 
+## A feed is a syndication surface, not just a read
+The pipeline is not the only consumer. A public `/inventory/*.json` is fetched by
+whatever reads it — the writer here, another brand's site, a partner. On 18 Sep an
+exploreorient feed carried "our Tehran office" wording that breached the European-
+brand separation rule, and seven of those records had already syndicated to Ambiente
+Travel. A phrasing mistake in a feed does not stay in the feed; it travels to every
+consumer with the feed's authority. Review a feed as a published surface, and when
+you fix a claim, assume something downstream already cached the wrong one — tell the
+consumers to re-pull. (This pipeline holds no cache: it fetches every feed live on
+each run, so a corrected feed is picked up on the next cycle with nothing to purge.)
+
+## Companion feed: `access.v1` for entry/visa facts
+Products belong in `offer_feed`; a country's entry regime does not, so a visa or
+entry guide had nothing real to ground on and hedged generically. A site may also
+publish an **access.v1** feed (exploreorient: `/inventory/access.json`), set as
+`access_feed:` in sites.yml. Per country: a verbatim, **nationality-qualified**
+`regime`, `lead_time`, `status`, the house's own `handling` (the GBAO permit, a
+Turkmenistan LOI), `url`, and `guarantee: false`, under a top-level `disclaimer`.
+Same discipline as offer.v1, with its own build guards: **"visa-free" may never
+stand unqualified**, no dated claims, no price-like data. The writer quotes a
+`regime` whole (the qualifier is part of the fact), names the `handling`, and never
+implies a regime is permanent — access data decays faster than a product catalogue
+and nobody re-reads a published guide.
+
 ## Adding a new site
-Set `offer_feed:` in its sites.yml block, build the export to this contract, deploy
-it. Nothing else in the pipeline changes.
+Set `offer_feed:` (and optionally `access_feed:`) in its sites.yml block, build the
+export to this contract, deploy it. Nothing else in the pipeline changes.
