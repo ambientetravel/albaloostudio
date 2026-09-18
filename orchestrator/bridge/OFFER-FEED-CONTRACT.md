@@ -92,6 +92,19 @@ imply the house lacks a product. If the feed is missing or unreachable, the writ
 is told the catalogue could not be loaded and still must not deny any product —
 it writes "available on enquiry" instead.
 
+## The feed is reviewed copy, not convenience text
+Every factual claim in a `summary` — a duration, a transport mode, a route — is
+ground truth to the writer, and it will amplify it into confident prose. On 18 Sep
+a tour summary said three cities were "linked by high-speed rail"; one leg is
+actually a road crossing, and the drafted article promised a customer "move between
+them by rail in an afternoon". The writer did nothing wrong — it grounded itself in
+the catalogue exactly as designed. **That is the failure mode grounding creates:
+a wrong fact in the feed ships with more confidence than the model would have
+invented on its own.** So treat the feed as customer-facing copy that has been
+fact-checked, not as a scratch dump of your database. If a claim is only true for
+part of a product, say which part in the summary or leave it out — do not round it
+up. Sweep an existing feed for this the way you would proofread a landing page.
+
 ## Adding a new site
 Set `offer_feed:` in its sites.yml block, build the export to this contract, deploy
 it. Nothing else in the pipeline changes.
