@@ -1,6 +1,6 @@
-# Orchestration health — 2026-09-18T12:11 UTC
+# Orchestration health — 2026-09-18T12:49 UTC
 
-**0 broke · 2 need you · 2 to watch.**
+**0 broke · 2 need you · 1 to watch.**
 
 ## 🔴 Broke
 
@@ -13,20 +13,19 @@
 
 ## 👀 To watch
 
-- 1 brief(s) built **without the model** on ambientetravel.com — not worth publishing; the writer skips them. Cause: Gemini call failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is cur
 - Open PRs unreadable on: ambientetravel/exploreorient (GitHub 404 for /repos/ambientetravel/exp) — BRIDGE_GH_TOKEN lacks these repos
 
 ## Numbers — last cycle
 
 | Metric | This cycle | Previous |
 |---|---:|---:|
-| Sites scanned | 10 | |
-| Gap candidates → briefs | 89 → **14** | |
-| Skipped by ledger (already briefed) | 63 | |
-| Dead-lettered / degraded | 0 / 1 | |
-| Articles drafted (as PRs) | **11** | 13 |
+| Sites scanned | 1 | |
+| Gap candidates → briefs | 5 → **4** | |
+| Skipped by ledger (already briefed) | 0 | |
+| Dead-lettered / degraded | 0 / 0 | |
+| Articles drafted (as PRs) | **4** | 11 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $0.691 | $1.003 |
+| Model spend | $0.354 | $0.691 |
 | Social: campaigns / posts held / no-media | 4 / 4 / 4 | |
 | Article PRs open | 15 | |
 | AI recall (Oracle, monthly) | — | |
@@ -35,9 +34,9 @@
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 1.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35216543861) |
-| Writer | ✓ success | 1.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35217285187) |
-| Broadcaster | ✓ success | 1.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35218345533) |
+| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35346210117) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35346380982) |
+| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35346672879) |
 | Closer | · never ran | — |  |
 | Auditor+Analyst | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
 | Cartographer | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
