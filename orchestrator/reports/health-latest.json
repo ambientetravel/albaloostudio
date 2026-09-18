@@ -1,8 +1,8 @@
 {
- "generated": "2026-09-18T13:39+00:00",
+ "generated": "2026-09-18T13:48+00:00",
  "critical": [
-  "**Writer** was **skipped** last cycle (#53) — its upstream failed, so nothing downstream ran",
-  "**Broadcaster** was **skipped** last cycle (#52) — its upstream failed, so nothing downstream ran"
+  "**Writer** was **skipped** last cycle (#54) — its upstream failed, so nothing downstream ran",
+  "**Broadcaster** was **skipped** last cycle (#53) — its upstream failed, so nothing downstream ran"
  ],
  "needs_you": [
   "5 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
@@ -38,7 +38,7 @@
  "agents": [
   {
    "agent": "Scout",
-   "result": "in_progress",
+   "result": "cancelled",
    "age_days": 0.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35351334487",
    "run": 41
@@ -47,15 +47,15 @@
    "agent": "Writer",
    "result": "skipped",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35351408710",
-   "run": 53
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35352314083",
+   "run": 54
   },
   {
    "agent": "Broadcaster",
    "result": "skipped",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35351414015",
-   "run": 52
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35352318826",
+   "run": 53
   },
   {
    "agent": "Closer",

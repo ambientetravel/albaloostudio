@@ -1,11 +1,11 @@
-# Orchestration health — 2026-09-18T13:39 UTC
+# Orchestration health — 2026-09-18T13:48 UTC
 
 **2 broke · 2 need you · 1 to watch.**
 
 ## 🔴 Broke
 
-- **Writer** was **skipped** last cycle (#53) — its upstream failed, so nothing downstream ran
-- **Broadcaster** was **skipped** last cycle (#52) — its upstream failed, so nothing downstream ran
+- **Writer** was **skipped** last cycle (#54) — its upstream failed, so nothing downstream ran
+- **Broadcaster** was **skipped** last cycle (#53) — its upstream failed, so nothing downstream ran
 
 ## 🟡 Needs you — only you can do these
 
@@ -35,9 +35,9 @@
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35351334487) |
-| Writer | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35351408710) |
-| Broadcaster | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35351414015) |
+| Scout | · cancelled | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35351334487) |
+| Writer | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352314083) |
+| Broadcaster | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35352318826) |
 | Closer | · never ran | — |  |
 | Auditor+Analyst | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
 | Cartographer | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
