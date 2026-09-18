@@ -2665,6 +2665,14 @@ ok("the access marker forbids simplifying a qualified regime or implying permane
    "quote a `regime` whole" in _a2src.lower()
    and "never simplify a qualified regime" in _a2src.lower()
    and "never state or imply a regime is" in _a2src.lower())
+# A permit can be narrower than its country (Tajikistan's GBAO covers only the
+# Pamirs, not the western Fann range). The writer joined the country-level permit
+# to a Fann tour that never enters GBAO — a field-accurate quote, wrong join. The
+# feed now carries `scope`; the writer must read it and honour the boundary.
+ok("the writer reads a record's scope and won't tie a permit to a product outside it",
+   "scope" in _a2l._ACCESS_FIELDS
+   and "bounds where its permit or rule applies" in _a2src
+   and "plainly falls inside the scope" in _a2src)
 ok("a site with no access_feed simply gets no access data (unchanged behaviour)",
    "access_feed" in _a2src and 'if not url:\n        return None' in _a2src)
 ok("an unreachable feed degrades to a marker, never a silent None-into-false-disclaimer",

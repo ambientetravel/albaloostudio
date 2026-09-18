@@ -365,7 +365,14 @@ def _system_instruction(brief: ContentBrief) -> str:
             "right there. Quote a `regime` whole (its nationality qualifier is part of the fact) "
             "and name the house's own `handling` where given (the GBAO permit, a Turkmenistan "
             "LOI). Never simplify a qualified regime, never imply a rule is permanent, never "
-            "attach a date to it, and never state a rule for a country not in the records.",
+            "attach a date to it, and never state a rule for a country not in the records. A "
+            "record's `scope`, when present, bounds where its permit or rule applies — a permit "
+            "can be narrower than its country (a regional permit, one restricted zone). Never tie "
+            "a permit or rule to a specific product (a named tour, a region, a city) unless that "
+            "product plainly falls inside the scope; if you cannot tell that it does, state the "
+            "rule generally and do NOT pair it with that product. Joining a country-level permit "
+            "to the wrong tour tells a traveller to get paperwork they don't need, or implies a "
+            "trip reaches a region it never enters.",
             "",
             "REGULATED ACTIVITIES: if the article promotes an activity that local law commonly "
             "governs — alcohol and nightlife, beachwear or public swimming, photographing people "
@@ -560,7 +567,7 @@ def _fetch_offerings(brief: ContentBrief) -> dict[str, Any] | None:
 # Per access record the pipeline reads (access.v1). Extra keys are ignored. The
 # `regime` is verbatim and already nationality-qualified — it must be quoted whole.
 _ACCESS_FIELDS = ("name", "country", "region", "regime", "lead_time", "status",
-                  "handling", "url", "guarantee")
+                  "handling", "url", "guarantee", "scope")
 
 
 def _fetch_access(brief: ContentBrief) -> dict[str, Any] | None:

@@ -138,6 +138,18 @@ stand unqualified**, no dated claims, no price-like data. The writer quotes a
 implies a regime is permanent — access data decays faster than a product catalogue
 and nobody re-reads a published guide.
 
+**A permit narrower than its country must state its boundary.** A country-level
+record with a country-level `handling` note invites the writer to attach the permit
+to any product in that country — and it will. Tajikistan's GBAO permit covers only
+Gorno-Badakhshan (the Pamirs); a draft joined it to a Fann Mountains tour in the
+west that never enters GBAO, telling travellers to get paperwork they don't need.
+The quote was accurate; the join was wrong, and no field check catches a bad join.
+So give any sub-national permit an optional **`scope`** naming exactly where it
+applies and where it does not ("…the Fann Mountains and Penjikent lie outside GBAO
+and need no permit"). The writer honours it: it will not pair a permit with a
+product unless that product plainly falls inside the scope. This recurs — Saudi's
+Royal Commission zones and Iran's regional permits are the same shape.
+
 ## Adding a new site
 Set `offer_feed:` (and optionally `access_feed:`) in its sites.yml block, build the
 export to this contract, deploy it. Nothing else in the pipeline changes.
