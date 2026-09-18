@@ -369,6 +369,15 @@ def _system_instruction(brief: ContentBrief) -> str:
             "supplied data, write that it is available on request. Do not "
             "estimate, round, or reason your way to a number.",
             "",
+            "HEDGE ONCE, IN VOICE: when you must flag uncertainty (a shifting "
+            "visa rule, a rate you weren't given), say it a single time in the "
+            "brand's own voice, then move on. Never describe your own sourcing "
+            "or process — no 'we have no sourced consensus figure', no 'what we "
+            "have in front of us', no 'we'd rather send you to an official "
+            "board'. The reader wants the guidance, not a window into how it was "
+            "assembled. 'Confirm current visa rules with the consulate before you "
+            "book' is right; a paragraph about why you won't quote one is not.",
+            "",
             "OUTPUT: a single JSON object and nothing else:",
             '{"title": str, "meta_description": str, "body_markdown": str, '
             '"key_points": [str], "quotable_lines": [str], "faq": '
@@ -384,6 +393,47 @@ def _system_instruction(brief: ContentBrief) -> str:
 
 _OFFER_FIELDS = ("slug", "title", "type", "summary", "url", "regions",
                  "countries", "duration", "route", "stops", "groupType")
+
+# Whitespace a model occasionally emits that renders as a visible gap or an
+# invisible artifact in prose. We map these to a normal space or drop them —
+# but DELIBERATELY leave U+200C (ZWNJ / نیم‌فاصله) and U+200D (ZWJ) untouched,
+# because they are meaningful in Persian and other scripts the portfolio writes
+# in (boutimar.ir, cruise24.ir). Stripping them would corrupt Farsi words.
+_WS_FIXUPS = {
+    "　": " ",   # ideographic space  → normal space (caught in exploreorient #7)
+    " ": " ",   # non-breaking space → normal space
+    "​": "",    # zero-width space   → drop
+    "﻿": "",    # BOM / zero-width no-break space → drop
+}
+# Characters a well-formed sentence may end on: Latin/Persian terminals, closing
+# quotes and brackets, the ellipsis, and the Arabic question mark U+061F.
+_SENTENCE_END = set('.!?…"\'”’»)]؟।')
+
+
+def _sanitize_body(text: str) -> str:
+    """Strip meaningless whitespace artifacts without touching script-significant
+    joiners (ZWNJ/ZWJ). Idempotent."""
+    if not text:
+        return text
+    for bad, good in _WS_FIXUPS.items():
+        if bad in text:
+            text = text.replace(bad, good)
+    return text
+
+
+def _draft_incomplete_reason(body: str, brief: ContentBrief) -> str | None:
+    """Why this draft looks unfinished, or None if it's fine. Catches the class
+    exploreorient #6 fell into: the model emitted valid JSON whose body_markdown
+    stops mid-sentence at 277 words while its siblings ran 960+. `max_tokens` was
+    not the cause (the JSON parsed), so only a content check catches it."""
+    words = len(body.split())
+    floor = max(150, int((brief.brief.word_count_target.min or 0) * 0.5))
+    if words < floor:
+        return f"body is {words} words, under the {floor}-word floor"
+    tail = body.rstrip()
+    if tail and tail[-1] not in _SENTENCE_END:
+        return f"body ends mid-sentence (…{tail[-40:]!r}) — looks truncated"
+    return None
 
 # How many offerings reach the prompt. A ceiling, not a slice point: the list is
 # relevance-ranked first (see _rank_offerings), so the 60 that survive are the 60
@@ -868,34 +918,51 @@ def _call_anthropic(
     else:
         create = client.messages.create
 
-    try:
-        resp = create(**kwargs)
-    except Exception as beta_exc:
-        # Newer models reject the server-side-fallback beta with a 400; the
-        # feature is optional, writing is not. Retry once on the plain endpoint.
-        if "fallbacks" in str(beta_exc).lower() and "betas" in kwargs:
-            log.warning("%s rejects the fallbacks beta; retrying without it",
-                        config.PROSE_MODEL)
-            kwargs.pop("betas", None)
-            kwargs.pop("fallbacks", None)
-            resp = client.messages.create(**kwargs)
-        else:
+    def _once() -> Any:
+        nonlocal create
+        try:
+            return create(**kwargs)
+        except Exception as beta_exc:
+            # Newer models reject the server-side-fallback beta with a 400; the
+            # feature is optional, writing is not. Fall to the plain endpoint.
+            if "fallbacks" in str(beta_exc).lower() and "betas" in kwargs:
+                log.warning("%s rejects the fallbacks beta; retrying without it",
+                            config.PROSE_MODEL)
+                kwargs.pop("betas", None)
+                kwargs.pop("fallbacks", None)
+                create = client.messages.create
+                return create(**kwargs)
             raise
 
-    if getattr(resp, "stop_reason", None) == "refusal":
-        raise RuntimeError("draft declined by safety classifiers")
-    text = "".join(b.text for b in resp.content
-                   if getattr(b, "type", "") == "text").strip()
-    draft = json.loads(text)
-    if not draft.get("body_markdown"):
-        raise ValueError("model returned no body_markdown")
+    # Retry on an INCOMPLETE draft, not just a failed call. exploreorient #6 came
+    # back as valid JSON whose body stopped mid-sentence at 277 words — a real,
+    # shippable-looking stub. One regeneration on the same model clears it.
+    draft: dict[str, Any] = {}
+    last_reason = ""
+    for attempt in range(1, 4):
+        resp = _once()
+        if getattr(resp, "stop_reason", None) == "refusal":
+            raise RuntimeError("draft declined by safety classifiers")
+        text = "".join(b.text for b in resp.content
+                       if getattr(b, "type", "") == "text").strip()
+        draft = json.loads(text)
+        if not draft.get("body_markdown"):
+            raise ValueError("model returned no body_markdown")
+        draft["body_markdown"] = _sanitize_body(draft["body_markdown"])
+        last_reason = _draft_incomplete_reason(draft["body_markdown"], brief) or ""
+        if not last_reason:
+            break
+        log.warning("anthropic attempt %d produced an incomplete draft (%s); retrying",
+                    attempt, last_reason)
+    else:
+        raise ValueError(f"draft still incomplete after 3 attempts: {last_reason}")
     usage = getattr(resp, "usage", None)
     meta = {
         "provider": "anthropic",
         "model": getattr(resp, "model", config.PROSE_MODEL),
         "input_tokens": getattr(usage, "input_tokens", None),
         "output_tokens": getattr(usage, "output_tokens", None),
-        "attempts": 1,
+        "attempts": attempt,
         "duration_ms": int((time.time() - started) * 1000),
     }
     return draft, meta
@@ -940,6 +1007,10 @@ def _call_gemini(
             draft = json.loads(text)
             if not draft.get("body_markdown"):
                 raise ValueError("model returned no body_markdown")
+            draft["body_markdown"] = _sanitize_body(draft["body_markdown"])
+            reason = _draft_incomplete_reason(draft["body_markdown"], brief)
+            if reason:
+                raise ValueError(f"incomplete draft: {reason}")
 
             meta = {
                 "provider": "gemini",

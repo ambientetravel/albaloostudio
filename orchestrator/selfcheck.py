@@ -835,7 +835,9 @@ ok("and the error says which two things would fix it",
    and "enable billing" in _src2b)
 
 _src2 = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
-_seg = _src2.split("for attempt in range(1, 4):", 1)[1][:900]
+# Anchor on the gemini retry specifically — the anthropic path now shares the
+# same `for attempt in range(1, 4)` idiom, so key on its unique _gemini_once call.
+_seg = _src2.split("text, usage = _gemini_once", 1)[1][:900]
 ok("a missing credential is not retried three times",
    "except config.ConfigError" in _seg and "raise" in _seg,
    "retrying a ConfigError wastes 7s per brief and buries the cause")
@@ -2673,6 +2675,23 @@ ok("a hotel brief surfaces hotels even when they sit past the raw cap",
 _generic_sel = _a2l._rank_offerings(_mk(pk="zzqxnomatch", title="zzqxnomatch"), _feed)
 ok("the diversity guard keeps every product line visible on a zero-match brief",
    {"tour", "hotel"} <= {o["type"] for o in _generic_sel})
+# Draft hygiene (exploreorient regen, 18 Sep): a model shipped valid JSON whose
+# body stopped mid-sentence at 277 words (#6), and dropped U+3000 ideographic
+# spaces into #7. The writer now sanitises exotic whitespace WITHOUT touching the
+# Persian ZWNJ, and rejects an incomplete draft so it retries instead of shipping.
+ok("the body sanitiser strips U+3000/zero-width space but PRESERVES Persian ZWNJ",
+   _a2l._sanitize_body("a　b​﻿") == "a b"
+   and "‌" in _a2l._sanitize_body("نیم‌فاصله"))
+_bq = _NS(brief=_NS(word_count_target=_NS(min=800)))
+ok("the completeness guard flags a body that ends mid-sentence, even a long one",
+   _a2l._draft_incomplete_reason("A full sentence. " * 200 + "and then it stops", _bq) is not None)
+ok("the completeness guard flags a too-short stub like the 277-word #6",
+   _a2l._draft_incomplete_reason("word " * 277, _bq) is not None)
+ok("a finished draft (Persian ؟ or Latin .) passes the completeness guard",
+   _a2l._draft_incomplete_reason("This finishes cleanly. " * 200, _bq) is None
+   and _a2l._draft_incomplete_reason("جملهٔ کامل است. " * 200 + "آماده‌اید؟", _bq) is None)
+ok("the writer is told to hedge once in voice and not narrate its own sourcing",
+   "HEDGE ONCE" in _a2src and "describe your own sourcing" in _a2src)
 ok("the writer won't assert a closed border crossing (e.g. Azerbaijan land borders)",
    "Azerbaijan" in compliance.prompt_constraints("orient_v1")
    and "border crossing" in compliance.prompt_constraints("boutimar_v1"))
