@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-18T14:06+00:00",
+ "generated": "2026-09-19T11:53+00:00",
  "critical": [],
  "needs_you": [
   "5 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
-  "**7 article PR(s) waiting on your merge** (oldest 5 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln; [boutimar#14](https://github.com/ambientetravel/boutimar/pull/14) Agent 2 draft: Parsian Khazar Hotel, Chalous | B; [boutimar#15](https://github.com/ambientetravel/boutimar/pull/15) Agent 2 draft: Iran Oil Show 2026 | Exhibition G"
+  "**7 article PR(s) waiting on your merge** (oldest 6 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln; [boutimar#14](https://github.com/ambientetravel/boutimar/pull/14) Agent 2 draft: Parsian Khazar Hotel, Chalous | B; [boutimar#15](https://github.com/ambientetravel/boutimar/pull/15) Agent 2 draft: Iran Oil Show 2026 | Exhibition G"
  ],
  "warn": [
   "Open PRs unreadable on: ambientetravel/exploreorient (GitHub 404 for /repos/ambientetravel/exp) — BRIDGE_GH_TOKEN lacks these repos"
@@ -36,21 +36,21 @@
   {
    "agent": "Scout",
    "result": "success",
-   "age_days": 0.0,
+   "age_days": 0.9,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35353790415",
    "run": 43
   },
   {
    "agent": "Writer",
    "result": "success",
-   "age_days": 0.0,
+   "age_days": 0.9,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35353908236",
    "run": 56
   },
   {
    "agent": "Broadcaster",
    "result": "success",
-   "age_days": 0.0,
+   "age_days": 0.9,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35354036393",
    "run": 55
   },
@@ -63,21 +63,21 @@
   {
    "agent": "Auditor+Analyst",
    "result": "success",
-   "age_days": 4.2,
+   "age_days": 5.1,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072",
    "run": 8
   },
   {
    "agent": "Cartographer",
    "result": "success",
-   "age_days": 4.1,
+   "age_days": 5.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423",
    "run": 10
   },
   {
    "agent": "Watcher",
    "result": "success",
-   "age_days": 5.1,
+   "age_days": 6.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305",
    "run": 8
   },
@@ -90,21 +90,21 @@
   {
    "agent": "Merge-watch",
    "result": "success",
-   "age_days": 0.1,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35342751554",
-   "run": 37
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35441064381",
+   "run": 38
   },
   {
    "agent": "PR gate",
    "result": "success",
    "age_days": 0.1,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35336303772",
-   "run": 54
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35437563100",
+   "run": 58
   },
   {
    "agent": "Dashboard",
    "result": "success",
-   "age_days": 4.1,
+   "age_days": 5.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/34841243848",
    "run": 11
   }

@@ -1,4 +1,4 @@
-# Orchestration health — 2026-09-18T14:06 UTC
+# Orchestration health — 2026-09-19T11:53 UTC
 
 **0 broke · 2 need you · 1 to watch.**
 
@@ -9,7 +9,7 @@
 ## 🟡 Needs you — only you can do these
 
 - 5 social post(s) blocked for **missing media** — no image source is wired, so these can never ship
-- **7 article PR(s) waiting on your merge** (oldest 5 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln; [boutimar#14](https://github.com/ambientetravel/boutimar/pull/14) Agent 2 draft: Parsian Khazar Hotel, Chalous | B; [boutimar#15](https://github.com/ambientetravel/boutimar/pull/15) Agent 2 draft: Iran Oil Show 2026 | Exhibition G
+- **7 article PR(s) waiting on your merge** (oldest 6 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln; [boutimar#14](https://github.com/ambientetravel/boutimar/pull/14) Agent 2 draft: Parsian Khazar Hotel, Chalous | B; [boutimar#15](https://github.com/ambientetravel/boutimar/pull/15) Agent 2 draft: Iran Oil Show 2026 | Exhibition G
 
 ## 👀 To watch
 
@@ -34,17 +34,17 @@
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35353790415) |
-| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35353908236) |
-| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35354036393) |
+| Scout | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35353790415) |
+| Writer | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35353908236) |
+| Broadcaster | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35354036393) |
 | Closer | · never ran | — |  |
-| Auditor+Analyst | ✓ success | 4.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
-| Cartographer | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
-| Watcher | ✓ success | 5.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305) |
+| Auditor+Analyst | ✓ success | 5.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34832799072) |
+| Cartographer | ✓ success | 5.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34835421423) |
+| Watcher | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34753126305) |
 | Oracle | · never ran | — |  |
-| Merge-watch | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35342751554) |
-| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35336303772) |
-| Dashboard | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34841243848) |
+| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35441064381) |
+| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35437563100) |
+| Dashboard | ✓ success | 5.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/34841243848) |
 
 ## ✓ Fine
 
