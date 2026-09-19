@@ -928,6 +928,27 @@ ok("its limit default and shell fallback agree",
 # rather than trusted.
 _src3 = pathlib.Path(__file__).with_name("agent3_broadcaster_batch.py").read_text(encoding="utf-8")
 ok("the batch runner emits copy.hash", '"hash": "sha256:"' in _src3)
+# Cross-run de-dup: the batch reprocesses every published event each cycle, so
+# without a persistent seen-set it re-composes an already-broadcast article and
+# drafts it onto the channel again — a duplicate every week (the Oil Show class).
+_bl = {"campaigns": {}}
+a3b.record_broadcast(_bl, "journal-x", "https://a.com/journal/x/")
+_first = _bl["campaigns"]["journal-x"]["first_broadcast"]
+a3b.record_broadcast(_bl, "journal-x", "https://other")
+ok("the broadcast ledger records a campaign once and never overwrites first_broadcast",
+   a3b.broadcast_seen(_bl) == {"journal-x"}
+   and _bl["campaigns"]["journal-x"]["first_broadcast"] == _first
+   and _bl["campaigns"]["journal-x"]["live_url"] == "https://a.com/journal/x/")
+ok("broadcast_one skips a campaign already broadcast, before the model call",
+   "already broadcast in a previous run" in _src3
+   and "if already and oc.campaign_id in already:" in _src3
+   # the guard returns immediately — the skip precedes the compose/gate work
+   and "in already:\n        oc.status = \"skipped\"" in _src3)
+ok("only a successful compose is remembered, so a blocked/failed one retries",
+   'oc.status == "composed"' in _src3 and "record_broadcast(ledger" in _src3)
+ok("a --no-llm run neither consults nor updates the de-dup ledger",
+   "load_broadcast_ledger() if not args.no_llm" in _src3
+   and "if not args.no_llm:\n        save_broadcast_ledger" in _src3)
 ok("and the hash covers channel AND body, so one post per channel is distinct",
    "f\"{d['channel']}|{d['body']}\"" in _src3)
 ok("the stub copy is documented as never publishable",

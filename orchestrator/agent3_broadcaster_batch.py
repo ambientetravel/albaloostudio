@@ -34,6 +34,7 @@ import json
 import logging
 import sys
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -100,7 +101,8 @@ def _stub_copy(event: PublishingEvent, channels: list[str]) -> tuple[list[dict],
     )
 
 
-def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Outcome:
+def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
+                  already: set[str] | None = None) -> Outcome:
     """Compose, gate, schedule and record one publishing event. Never raises."""
     name = payload.get("envelope", {}).get("message_id", "unknown")
     oc = Outcome(event_file=name)
@@ -112,6 +114,16 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Ou
         return oc
 
     oc.campaign_id = _campaign_id(event)
+    # Cross-run de-duplication. The batch reprocesses every published event each
+    # cycle; without this, an article already broadcast in a prior run is composed
+    # again and drafted onto the channel a second time — a duplicate every week it
+    # stays in the feed. Skip BEFORE the model call so a repeat costs nothing. Only
+    # successfully-composed campaigns are remembered (see main), so a blocked or
+    # failed one still retries next run.
+    if already and oc.campaign_id in already:
+        oc.status = "skipped"
+        oc.error = "already broadcast in a previous run — not re-composing"
+        return oc
     # title lives on content_summary, not publication — publication carries
     # where and how it was published, content_summary carries what it says.
     oc.title = event.content_summary.title
@@ -260,6 +272,41 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Ou
         return oc
 
 
+# Cross-run de-dup state: which campaigns have already been broadcast. Committed
+# (like briefed-ledger.json) so it survives across scheduled runs — the whole
+# point is to remember between cycles. Keyed by campaign_id, which _campaign_id()
+# derives stably from the article's live_url.
+BROADCAST_LEDGER = Path(__file__).with_name("written") / "broadcast-ledger.json"
+
+
+def load_broadcast_ledger(path: Path = BROADCAST_LEDGER) -> dict[str, Any]:
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(doc, dict) and isinstance(doc.get("campaigns"), dict):
+            return doc
+    except (OSError, ValueError):
+        pass
+    return {"campaigns": {}, "updated_at": None}
+
+
+def broadcast_seen(doc: dict[str, Any]) -> set[str]:
+    return set((doc.get("campaigns") or {}).keys())
+
+
+def record_broadcast(doc: dict[str, Any], campaign_id: str, live_url: str = "") -> None:
+    """Remember a campaign only once — first_broadcast is not overwritten."""
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    camps = doc.setdefault("campaigns", {})
+    if campaign_id and campaign_id not in camps:
+        camps[campaign_id] = {"first_broadcast": now, "live_url": live_url}
+        doc["updated_at"] = now
+
+
+def save_broadcast_ledger(doc: dict[str, Any], path: Path = BROADCAST_LEDGER) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--events", required=True, help="directory of publishing.event.v1 JSON files")
@@ -299,6 +346,12 @@ def main(argv: list[str] | None = None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     outcomes: list[Outcome] = []
 
+    # Load the cross-run de-dup ledger. A --no-llm run composes stub copy for
+    # testing, not a real draft, so it neither consults nor updates the ledger —
+    # it must not dedupe a genuine future broadcast.
+    ledger = load_broadcast_ledger() if not args.no_llm else {"campaigns": {}}
+    seen = broadcast_seen(ledger) if not args.no_llm else None
+
     for path in files:
         if args.limit and len(outcomes) >= args.limit:
             break
@@ -308,8 +361,12 @@ def main(argv: list[str] | None = None) -> int:
             outcomes.append(Outcome(event_file=path.name, status="failed",
                                     error=f"unreadable: {exc}"))
             continue
-        oc = broadcast_one(payload, out_dir, no_llm=args.no_llm)
+        oc = broadcast_one(payload, out_dir, no_llm=args.no_llm, already=seen)
         outcomes.append(oc)
+        # Remember only a real, successful compose, so a blocked or failed one
+        # retries next run.
+        if not args.no_llm and oc.status == "composed":
+            record_broadcast(ledger, oc.campaign_id, oc.domain)
         log.info("%s — %s — %d post(s), %d held, %d blocked on media — %s",
                  oc.campaign_id or "?", oc.status, oc.posts, oc.held,
                  oc.blocked_media, oc.title[:60])
@@ -337,6 +394,10 @@ def main(argv: list[str] | None = None) -> int:
     }
     (out_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # Persist the de-dup ledger so the next cycle skips what this one broadcast.
+    if not args.no_llm:
+        save_broadcast_ledger(ledger)
 
     log.info("Agent 3 finished — %d composed, %d blocked, %d skipped, %d failed | "
              "%d post(s): %d held, %d blocked on media",
