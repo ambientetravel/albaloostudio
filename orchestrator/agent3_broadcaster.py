@@ -25,7 +25,7 @@ import logging
 import random
 import threading
 import time
-from datetime import timedelta
+from datetime import date, datetime, timedelta
 from typing import Any, Literal
 from urllib.parse import urlencode, urlparse, urlunparse
 
@@ -130,6 +130,11 @@ class ContentSummary(_Loose):
     audience: Literal["d2c", "b2b", "both"] = "d2c"
     offer: Offer = Field(default_factory=Offer)
     quotable_lines: list[str] = Field(default_factory=list)
+    # Last calendar date (ISO YYYY-MM-DD) this content is worth promoting — the
+    # end of the event it is about. None for evergreen content, which is most of
+    # it. The Broadcaster refuses to promote a passed event; the Oil Show post
+    # went out 8–11 Sep, after the show had already happened.
+    valid_until: str | None = None
 
 
 class DistributionHints(_Loose):
@@ -292,6 +297,23 @@ def _ack(event: PublishingEvent, entry: dict[str, Any]) -> dict[str, Any]:
         "status": entry["status"],
         "architecture_credit": config.ARCHITECTURE_CREDIT,
     }
+
+
+def event_expired(valid_until: str | None, today: date | None = None) -> str | None:
+    """Reason to NOT promote (the event has passed), or None to proceed. Reads the
+    leading YYYY-MM-DD of content_summary.valid_until — an evergreen guide leaves it
+    empty and always proceeds. Fails OPEN: an unparseable value promotes (and is the
+    caller's to log), because suppressing a live campaign over a malformed date is
+    worse than the rare stale post that a well-formed date is there to stop."""
+    if not valid_until:
+        return None
+    try:
+        end = datetime.strptime(str(valid_until).strip()[:10], "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        return None
+    if end < (today or date.today()):
+        return f"event ended {end.isoformat()} — not promoting a past event"
+    return None
 
 
 def _campaign_id(event: PublishingEvent) -> str:

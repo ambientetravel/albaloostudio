@@ -406,11 +406,17 @@ def _system_instruction(brief: ContentBrief) -> str:
             '{"title": str, "meta_description": str, "body_markdown": str, '
             '"key_points": [str], "quotable_lines": [str], "faq": '
             '[{"q": str, "a": str}], "internal_link_suggestions": '
-            '[{"path": str, "anchor": str}]}',
+            '[{"path": str, "anchor": str}], "valid_until": str}',
             "body_markdown uses ## and ### only — no H1, the CMS renders that from "
             "the title.",
             "meta_description is a Google snippet: one plain sentence, about 155 "
             "characters and never over 200 — some sites reject a longer one.",
+            "valid_until: set it to the ISO date (YYYY-MM-DD) this piece stops being "
+            "worth promoting — the LAST day of the event it is about (a festival, an "
+            "exhibition, a fixed departure, an eclipse). This is the single thing that "
+            "keeps a share from advertising an event after it has happened. For "
+            "evergreen content — a guide, a destination, anything without a fixed end "
+            "date — return an empty string. When unsure, empty string.",
         ]
     )
 
@@ -949,9 +955,13 @@ _DRAFT_SCHEMA = {
             "additionalProperties": False,
             "properties": {"path": {"type": "string"}, "anchor": {"type": "string"}},
             "required": ["path", "anchor"]}},
+        # ISO YYYY-MM-DD last date the piece is worth promoting — set ONLY for a
+        # dated event, "" for evergreen (almost everything). Feeds the Broadcaster's
+        # past-event guard. Required by Anthropic strict mode, so "" is the default.
+        "valid_until": {"type": "string"},
     },
     "required": ["title", "meta_description", "body_markdown", "key_points",
-                 "quotable_lines", "faq", "internal_link_suggestions"],
+                 "quotable_lines", "faq", "internal_link_suggestions", "valid_until"],
 }
 
 
@@ -2015,6 +2025,9 @@ def build_publishing_event(
                 "price_asof": price_field.get("asof"),
             },
             "quotable_lines": draft.get("quotable_lines", []),
+            # Carried through to the Broadcaster's past-event guard. "" for the
+            # evergreen majority; a YYYY-MM-DD for a dated event.
+            "valid_until": (draft.get("valid_until") or "").strip() or None,
         },
         "distribution_hints": {
             "channels": [],   # Agent 3 resolves these from sites.yml

@@ -46,6 +46,7 @@ from agent3_broadcaster import (
     PublishingEvent,
     _call_claude,
     _campaign_id,
+    event_expired,
     _resolve_channels,
     published_text_of,
     _schedule_times,
@@ -123,6 +124,16 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
     if already and oc.campaign_id in already:
         oc.status = "skipped"
         oc.error = "already broadcast in a previous run — not re-composing"
+        return oc
+
+    # Past-event guard. Content about a dated event carries content_summary.
+    # valid_until; once that date is behind us, promoting it advertises something
+    # that has already happened — the Oil Show went out after the show. Skip
+    # before the model call. Evergreen content leaves valid_until empty and passes.
+    _expired = event_expired(event.content_summary.valid_until)
+    if _expired:
+        oc.status = "skipped"
+        oc.error = _expired
         return oc
     # title lives on content_summary, not publication — publication carries
     # where and how it was published, content_summary carries what it says.

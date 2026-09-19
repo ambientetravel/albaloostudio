@@ -949,6 +949,29 @@ ok("only a successful compose is remembered, so a blocked/failed one retries",
 ok("a --no-llm run neither consults nor updates the de-dup ledger",
    "load_broadcast_ledger() if not args.no_llm" in _src3
    and "if not args.no_llm:\n        save_broadcast_ledger" in _src3)
+# Past-event guard: content about a dated event carries content_summary.valid_until;
+# the Broadcaster refuses to promote it once that date is behind us (the Oil Show
+# went out after the show). The writer emits the date, "" for the evergreen majority.
+import agent3_broadcaster as _a3m
+from datetime import date as _date
+_T = _date(2026, 9, 19)
+ok("event_expired skips a past event but proceeds on future/today/empty/malformed",
+   _a3m.event_expired("2026-09-11", today=_T)
+   and _a3m.event_expired("2026-09-19", today=_T) is None      # ends today, still valid
+   and _a3m.event_expired("2026-12-01", today=_T) is None
+   and _a3m.event_expired("", today=_T) is None
+   and _a3m.event_expired(None, today=_T) is None
+   and _a3m.event_expired("garbage", today=_T) is None)        # fail open, never suppress
+ok("the Broadcaster consults the past-event guard before composing",
+   "event_expired(event.content_summary.valid_until)" in _src3)
+ok("content_summary carries valid_until (default None = evergreen)",
+   "valid_until: str | None = None" in _a3src)
+_a2l_src = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("the writer's draft schema requires valid_until and the event carries it through",
+   _a2l_src.count('"valid_until": {"type": "string"}') == 1
+   and '"valid_until": (draft.get("valid_until")' in _a2l_src)
+ok("the writer is told to set valid_until only for a dated event, empty otherwise",
+   "valid_until: set it to the ISO date" in _a2l_src and "return an empty string" in _a2l_src)
 ok("and the hash covers channel AND body, so one post per channel is distinct",
    "f\"{d['channel']}|{d['body']}\"" in _src3)
 ok("the stub copy is documented as never publishable",
