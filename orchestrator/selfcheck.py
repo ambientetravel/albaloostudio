@@ -1664,6 +1664,22 @@ sched.config.ALLOW_AUTOPOST = False
 try:
     sched.Scheduler("nope"); ok("unknown backend rejected", False)
 except config.ConfigError: ok("unknown backend rejected", True)
+# Misconfiguration guard: SCHEDULER_BACKEND=zernio set before the key exists must
+# NOT fail every post (which reddens the chain and loses the copy) — it queues to
+# file, the safe default, and warns once. Functional: force the missing-key path.
+import tempfile as _tf
+_qd0, _key0 = sched.config.QUEUE_DIR, sched.config.SCHEDULER_API_KEY
+try:
+    sched.config.QUEUE_DIR = pathlib.Path(_tf.mkdtemp())
+    sched.config.SCHEDULER_API_KEY = ""
+    _zr = sched.Scheduler("zernio").schedule(
+        post={"channel": "linkedin", "copy": "x", "assets": [],
+              "scheduled_for": "2026-10-01T09:00:00Z", "url": "https://x/y"},
+        channel_cfg={"name": "linkedin"}, campaign_id="c", correlation_id="corr")
+    ok("zernio backend with no key queues to file, it does not fail the post",
+       _zr.status == "queued")
+finally:
+    sched.config.QUEUE_DIR, sched.config.SCHEDULER_API_KEY = _qd0, _key0
 
 import tempfile
 from pathlib import Path

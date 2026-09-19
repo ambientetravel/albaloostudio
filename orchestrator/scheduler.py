@@ -122,6 +122,17 @@ class Scheduler:
         if self.backend == "file":
             return self._queue_to_file(post, campaign_id, correlation_id, status="queued")
         if self.backend == "zernio":
+            # Misconfiguration guard: zernio selected but no key yet. Failing every
+            # post reddens the whole chain and loses the composed copy; queue it to
+            # file instead (the safe default backend) so nothing is lost and the run
+            # stays green, and warn ONCE so the missing key is visible without spam.
+            if not config.SCHEDULER_API_KEY:
+                if not getattr(self, "_warned_no_zernio_key", False):
+                    log.warning("SCHEDULER_BACKEND=zernio but SCHEDULER_API_KEY is unset "
+                                "— queueing posts to file instead of failing them. Set the "
+                                "key to actually schedule.")
+                    self._warned_no_zernio_key = True
+                return self._queue_to_file(post, campaign_id, correlation_id, status="queued")
             # Not live ⇒ push as a draft to the dashboard, which is where the
             # human reviews and releases it. Still not a publish.
             return self._zernio(post, channel_cfg, draft=not live)
