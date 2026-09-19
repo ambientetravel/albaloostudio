@@ -30,14 +30,16 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import compliance  # noqa: E402
 
 # The git-backed properties and the compliance profile each PR is judged under.
-# exploreorient uses the brand-neutral profile so a boutimar brand/link leak —
-# the Explore Orient brand-separation breach — is caught automatically.
+# exploreorient uses orient_content_v1: brand-neutral ON so a boutimar brand/link
+# leak — the Explore Orient brand-separation breach — is caught, but the cruise
+# visa rule OFF (partner_widget_v1 flagged every correct "Kazakhstan visa-free"
+# line as a WARN — it only knows the cruise destinations).
 GAME_REPO = "ambientetravel/persia-at-war"
 
 REPOS = {
     "ambientetravel/boutimar": "boutimar_v1",
     "ambientetravel/boutimarfarsi": "boutimar_v1",
-    "ambientetravel/exploreorient": "partner_widget_v1",
+    "ambientetravel/exploreorient": "orient_content_v1",
     "ambientetravel/albaloostudio": "boutimar_v1",
     # Persia at War — a standalone game, deliberately NOT a travel property.
     # Its own repo so an outside agent can be given PR access to the game

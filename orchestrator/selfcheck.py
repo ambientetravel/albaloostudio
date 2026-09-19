@@ -2671,6 +2671,21 @@ _orient_prompt = compliance.prompt_constraints("orient_v1")
 _cruise_prompt = compliance.prompt_constraints("boutimar_v1")
 ok("the cruise visa facts (AROYA/Seychelles/Schengen) are NOT injected for non-cruise sites",
    "AROYA" not in _orient_prompt and "AROYA" in _cruise_prompt)
+# The PR-gate reviews exploreorient under orient_content_v1, not partner_widget_v1:
+# same content rules as the writer's orient_v1 (cruise visa OFF, so a correct
+# "Kazakhstan visa-free" line isn't a false WARN) but brand_neutral ON, so a
+# boutimar leak into the European brand is still caught. Neither existing profile
+# did both — this is functional, checking the actual finding sets.
+import tools.pr_review as _prg
+ok("the PR-gate judges exploreorient under orient_content_v1 (brand-neutral, no cruise visa)",
+   _prg.REPOS["ambientetravel/exploreorient"] == "orient_content_v1"
+   and compliance.PROFILES["orient_content_v1"]["brand_neutral_embed"] is True
+   and compliance.PROFILES["orient_content_v1"]["visa_accuracy"] is False)
+ok("that gate profile catches a boutimar leak but not a correct Central Asia visa-free line",
+   any(v.rule == "brand_neutral_embed"
+       for v in compliance.check("book via بوتیمار", profile="orient_content_v1"))
+   and not compliance.check("Kazakhstan offers visa-free 30 days for 80+ nationalities.",
+                            profile="orient_content_v1"))
 ok("Persian-Gulf naming stays for non-cruise but is conditional, not an order to mention it",
    "Persian Gulf" in _orient_prompt and "IF you refer to" in _orient_prompt)
 ok("the never-invent rule forbids denying a product exists, not just inventing figures",

@@ -296,6 +296,22 @@ PROFILES: dict[str, dict[str, bool]] = {
         "sanctions_check": True,
         "fabricated_history": True,
     },
+    # The PR-gate variant of orient_v1, for reviewing exploreorient's content PRs.
+    # Same as orient_v1 — the cruise visa rule (visa_accuracy) stays OFF, because
+    # it flags every correct "Kazakhstan visa-free 30 days for 80+ nationalities"
+    # as a WARN (it only understands the cruise destinations) — but brand_neutral
+    # is ON, so a boutimar name or link leaking into the European brand is caught,
+    # which is the EO brand-separation rule and the reason the gate watches this
+    # repo at all. partner_widget_v1 was the old choice: right on brand-neutral,
+    # wrong on visa (3 false WARNs on the live Central Asia visa guide).
+    "orient_content_v1": {
+        "persian_gulf_only": True,
+        "visa_accuracy": False,
+        "no_invented_facts": True,
+        "brand_neutral_embed": True,
+        "sanctions_check": True,
+        "fabricated_history": True,
+    },
 }
 
 
