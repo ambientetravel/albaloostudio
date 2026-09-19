@@ -123,6 +123,30 @@ def record(doc: dict[str, Any], domain: str, query: str,
     return doc
 
 
+def release(doc: dict[str, Any], domain: str, query: str) -> bool:
+    """Un-freeze one (domain, keyword): drop its entry so the next run may brief it
+    again. For a brief that consumed a ledger slot but produced no article — blocked
+    or failed at Agent 2 — so a pipeline fix isn't stranded behind a 45-day cooldown.
+    Returns True if an entry was removed."""
+    entries = doc.get("entries", [])
+    kept = [e for e in entries if not (e.get("domain") == domain and e.get("query") == query)]
+    if len(kept) == len(entries):
+        return False
+    doc["entries"] = kept
+    doc["updated_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return True
+
+
+def apply_releases(doc: dict[str, Any], pairs: list[tuple[str, str]]) -> list[str]:
+    """Release every (domain, query) that actually had an entry; return what was
+    freed, for the run log. Idempotent — a pair with no entry is a no-op."""
+    freed = []
+    for domain, query in pairs:
+        if domain and query and release(doc, domain, query):
+            freed.append(f"{domain} · {query}")
+    return freed
+
+
 def save(doc: dict[str, Any], path: Path = LEDGER_PATH) -> None:
     doc["entries"] = sorted(doc.get("entries", []), key=lambda e: e.get("query", ""))
     path.parent.mkdir(parents=True, exist_ok=True)

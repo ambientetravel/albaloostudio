@@ -186,6 +186,37 @@ ok("the input default and the shell fallback agree",
    _lim_input and {_lim_input.group(1)} == _lim_shell,
    f"input={_lim_input.group(1) if _lim_input else '?'} shell={_lim_shell}")
 
+# Ledger self-heal: Agent 2 runs read-only, so a keyword it blocked or failed to
+# draft froze for 45 days and never re-briefed — even after the pipeline bug that
+# blocked it was fixed (this cost hand-clearing entries three times on 18 Sep).
+# Agent 1 now releases those keywords from the previous cycle's Agent 2 manifest.
+import _ledger as _led
+import importlib.util as _ilu
+_crspec = _ilu.spec_from_file_location("_cr", pathlib.Path(__file__).with_name("tools") / "collect_releases.py")
+_cr = _ilu.module_from_spec(_crspec); _crspec.loader.exec_module(_cr)
+_man = {"outcomes": [
+    {"domain": "a.com", "keyword": "k1", "status": "blocked"},
+    {"domain": "a.com", "keyword": "k2", "status": "failed"},
+    {"domain": "a.com", "keyword": "k3", "status": "drafted"},
+    {"domain": "a.com", "keyword": "k4", "status": "blocked_config"},
+    {"domain": "a.com", "keyword": "k5", "status": "deferred"},
+    {"domain": "a.com", "keyword": "k1", "status": "blocked"}]}
+_rel = _cr.collect(_man)
+ok("collect_releases frees only blocked+failed, deduped (not drafted/config/deferred)",
+   {(r["domain"], r["query"]) for r in _rel} == {("a.com", "k1"), ("a.com", "k2")})
+_doc = {"entries": [{"domain": "a.com", "query": q} for q in ("k1", "k2", "k3")]}
+_freed = _led.apply_releases(_doc, [(r["domain"], r["query"]) for r in _rel])
+ok("apply_releases removes exactly the freed keywords and keeps the drafted one",
+   {(e["domain"], e["query"]) for e in _doc["entries"]} == {("a.com", "k3")} and len(_freed) == 2)
+ok("release is idempotent — a second pass frees nothing",
+   _led.apply_releases(_doc, [("a.com", "k1"), ("a.com", "k2")]) == [])
+_a1src = pathlib.Path(__file__).with_name("agent1_seo_scout.py").read_text(encoding="utf-8")
+ok("the scout consumes releases.json before filtering and deletes it (one-shot)",
+   "apply_releases(ledger" in _a1src and 'releases.json' in _a1src and "_releases.unlink" in _a1src)
+_a1wf = (pathlib.Path(__file__).parents[1] / ".github/workflows/agent1-seo-scout.yml").read_text(encoding="utf-8")
+ok("the self-heal workflow step is strictly tolerant (can never fail the scout run)",
+   "collect_releases.py" in _a1wf and "continue-on-error: true" in _a1wf and "actions: read" in _a1wf)
+
 ok("a manual dispatch resolves the latest scout run instead of failing",
    "gh run list --workflow agent1-seo-scout.yml --status success" in _wf2)
 ok("and it says so plainly when there is no scout run to read",

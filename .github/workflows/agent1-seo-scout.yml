@@ -45,6 +45,9 @@ permissions:
   # write, not read: the briefed-keyword ledger is committed back after a
   # live run so the next scheduled run knows what has already been asked for.
   contents: write
+  # read the previous cycle's Agent 2 manifest artifact, to release the keywords
+  # Agent 2 blocked or failed (it runs read-only and cannot un-record them).
+  actions: read
 
 concurrency:
   # Never let two scouts run at once — at-least-once delivery plus a second
@@ -80,6 +83,29 @@ jobs:
         # are listed as a warning and the run proceeds with what IS granted;
         # blocking three working sites on five ungranted ones helps nobody.
         run: python agent1_seo_scout.py --list-properties
+
+      - name: Self-heal the ledger from Agent 2's last outcomes
+        # Agent 2 runs read-only on this repo, so a keyword it blocked or failed
+        # to draft stays frozen under the 45-day cooldown and never re-briefs —
+        # even after the pipeline bug that blocked it is fixed. Turn the previous
+        # cycle's Agent 2 manifest into written/releases.json; the scout consumes
+        # and deletes it. STRICTLY tolerant: any failure here leaves no releases
+        # file and the scout simply skips the self-heal — it must never block a
+        # scouting run over an optional convenience.
+        if: ${{ inputs.dry_run != 'true' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          rid=$(gh run list --workflow agent2-writer.yml --status success \
+                  --limit 1 --json databaseId --jq '.[0].databaseId' 2>/dev/null)
+          if [ -n "$rid" ]; then
+            gh run download "$rid" -n agent2-written --dir "$RUNNER_TEMP/a2" 2>/dev/null
+            man=$(find "$RUNNER_TEMP/a2" -name manifest.json 2>/dev/null | head -1)
+            [ -n "$man" ] && python3 tools/collect_releases.py "$man" written/releases.json
+          fi
+          true
 
       - name: Run the scout
         env:

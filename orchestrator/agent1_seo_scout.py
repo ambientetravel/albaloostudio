@@ -1847,6 +1847,25 @@ def main(argv: list[str] | None = None) -> int:
     # skip logic can be seen working — but does not write, because a dry run
     # emitted nothing to remember.
     ledger = _ledger.load()
+    # Self-heal frozen briefs: Agent 2 runs read-only on this repo, so it can't
+    # un-record a keyword it blocked or failed to draft. The workflow drops those
+    # outcomes into written/releases.json (from the previous cycle's Agent 2
+    # manifest); release them here BEFORE filtering so a brief that produced no
+    # article — often because of a pipeline bug since fixed — isn't stranded behind
+    # the 45-day cooldown. One-shot: consumed then deleted.
+    _releases = _ledger.LEDGER_PATH.parent / "releases.json"
+    if _releases.exists():
+        try:
+            _pairs = [(str(r.get("domain", "")), str(r.get("query", "")))
+                      for r in json.loads(_releases.read_text(encoding="utf-8"))
+                      if isinstance(r, dict)]
+            _freed = _ledger.apply_releases(ledger, _pairs)
+            log.info("ledger self-heal — released %d frozen brief(s): %s",
+                     len(_freed), "; ".join(_freed) or "none")
+        except (ValueError, OSError) as exc:
+            log.warning("releases.json unreadable, skipping self-heal: %s", exc)
+        if not args.dry_run:
+            _releases.unlink(missing_ok=True)
     for site in sites:
         stats.append(
             process_site(
