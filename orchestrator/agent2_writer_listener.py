@@ -539,6 +539,24 @@ def _rank_offerings(brief: "ContentBrief", items: list[dict]) -> list[dict]:
     return selected
 
 
+def _feed_belongs_to(payload: Any, expected_domain: str) -> str | None:
+    """Reason this feed is NOT this site's, or None. offer.v1/access.v1 both carry
+    a `site`; a present value that doesn't match the domain we asked for means the
+    URL served another site's catalogue — a deploy or CDN mixup, or the shared-
+    Downloads collision that put cruise24's feed on the boutimar filename. Injecting
+    it would promote another brand's products (boutimar cruises on exploreorient).
+    A missing `site` cannot be checked, so it passes — older/looser feeds still work."""
+    if not isinstance(payload, dict):
+        return None
+    got = str(payload.get("site") or "").strip().lower()
+    got = got[4:] if got.startswith("www.") else got
+    want = str(expected_domain or "").strip().lower()
+    want = want[4:] if want.startswith("www.") else want
+    if got and want and got != want:
+        return f"feed declares site={got!r} but this is {want!r} — refusing a foreign catalogue"
+    return None
+
+
 def _fetch_offerings(brief: ContentBrief) -> dict[str, Any] | None:
     """The site's real catalogue, so the writer promotes actual products instead
     of inventing or denying them. Reads the site's offer_feed (offer.v1) from the
@@ -556,6 +574,9 @@ def _fetch_offerings(brief: ContentBrief) -> dict[str, Any] | None:
         resp = requests.get(url, timeout=15, headers={"User-Agent": config.USER_AGENT})
         resp.raise_for_status()
         payload = resp.json()
+        wrong_site = _feed_belongs_to(payload, brief.site.domain)
+        if wrong_site:
+            raise ValueError(wrong_site)
         items = payload.get("offerings") if isinstance(payload, dict) else payload
         ranked = _rank_offerings(brief, [o for o in (items or []) if isinstance(o, dict)])
         slim = [{k: o[k] for k in _OFFER_FIELDS if o.get(k) is not None} for o in ranked]
@@ -595,6 +616,9 @@ def _fetch_access(brief: ContentBrief) -> dict[str, Any] | None:
         resp = requests.get(url, timeout=15, headers={"User-Agent": config.USER_AGENT})
         resp.raise_for_status()
         payload = resp.json()
+        wrong_site = _feed_belongs_to(payload, brief.site.domain)
+        if wrong_site:
+            raise ValueError(wrong_site)
         rows = payload.get("countries") if isinstance(payload, dict) else payload
         slim = [{k: r[k] for k in _ACCESS_FIELDS if r.get(k) is not None}
                 for r in (rows or [])[:80] if isinstance(r, dict)]

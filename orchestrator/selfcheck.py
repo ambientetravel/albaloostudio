@@ -2767,6 +2767,17 @@ ok("a site with no access_feed simply gets no access data (unchanged behaviour)"
    "access_feed" in _a2src and 'if not url:\n        return None' in _a2src)
 ok("an unreachable feed degrades to a marker, never a silent None-into-false-disclaimer",
    '"status": "unavailable"' in _a2src and "available on enquiry" in _a2src)
+# A feed URL that serves the WRONG site's catalogue (a deploy/CDN mixup, or the
+# shared-Downloads collision that put cruise24's feed on the boutimar filename)
+# must be refused, not injected — else the writer promotes another brand's products.
+# offer.v1/access.v1 carry `site`; check it, but fail OPEN when it is absent.
+ok("a feed declaring a different site is refused; a matching or site-less one passes",
+   _a2l._feed_belongs_to({"site": "cruise24.ir"}, "boutimar.ir")           # collision
+   and _a2l._feed_belongs_to({"site": "www.boutimar.com"}, "boutimar.com") is None  # www + match
+   and _a2l._feed_belongs_to({}, "boutimar.com") is None                   # no site → fail open
+   and _a2l._feed_belongs_to([1, 2], "boutimar.com") is None)              # non-dict → fail open
+ok("both feed fetchers enforce the site match before using the payload",
+   _a2src.count("_feed_belongs_to(payload, brief.site.domain)") == 2)
 # The 60-entry cap must be relevance-RANKED, not a first-60 feed slice. boutimar.com
 # ships 159 offerings ordered tours→destinations→hotels; a blind slice dropped every
 # hotel and destination, so the writer would "not have" a product the site sells —
