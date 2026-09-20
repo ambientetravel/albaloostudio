@@ -274,7 +274,12 @@ def market_alignment(site: config.Site, geo: list[CountryVisibility],
     measures: dict[str, Any] = {}
     if country_rows:
         _fa = script_share(country_rows)
-        _irn = next((c.impressions for c in geo if c.country == "irn"), 0) / total
+        # Guard total==0: geo is non-empty (checked above) but every row can carry
+        # 0 impressions, and this measures block runs BEFORE the impressions floor
+        # below — so an all-zero set would divide by zero here. script_share already
+        # guards the same way; match it rather than crash the whole geo scout.
+        _irn = (next((c.impressions for c in geo if c.country == "irn"), 0) / total
+                if total else 0.0)
         measures = {
             "persian_query_share": round(_fa["share"], 3),
             "iran_country_share": round(_irn, 3),

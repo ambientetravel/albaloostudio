@@ -1247,6 +1247,13 @@ ok("no rows means no verdict, not a country-based one",
 # reading a measures dict that is populated solely when the rows are truthy.
 ok("an empty list is treated as no rows, not as a name error",
    a7.market_alignment(_ir, a7.geo_visibility(_vpn), [])["verdict"] == "no data")
+# Non-empty geo whose rows all carry 0 impressions: total==0, and the measures
+# block divides by it BEFORE the impressions floor. It used to ZeroDivisionError
+# and crash the geo scout; now iran_country_share degrades to 0.0 like script_share.
+_cv0 = [a7.CountryVisibility("irn", "Iran", 0, 0, 0.0, 0.0, 0.0, 0, "none", ""),
+        a7.CountryVisibility("deu", "Germany", 0, 0, 0.0, 0.0, 0.0, 0, "none", "")]
+ok("non-empty geo with zero total impressions does not divide by zero",
+   a7.market_alignment(_ir, _cv0, [crow("q", "irn", 0, 5.0)]).get("iran_country_share") == 0.0)
 
 # The distortion does not stop at the .ir boundary — boutimar.com is INT and
 # also serves Iranians. There the script reading is a NOTE on the country split,
