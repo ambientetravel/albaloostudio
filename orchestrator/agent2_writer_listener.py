@@ -1238,6 +1238,12 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
     if adapter == "astro_pr":
         return _push_astro_pr(brief, draft, url)
 
+    if adapter == "bundle_pr":
+        # A repo-backed static site whose build ingests a markdown+manifest bundle
+        # (cruise24.ir). Opens a PR writing content/blog/<record_id>/ into the repo;
+        # unconfigured, it stages to disk like static_bundle.
+        return _push_bundle_pr(brief, draft, url)
+
     # Named in sites.yml since the registry was written, and never dispatched:
     # boutimar.ir fell straight through to "no adapter" and staged silently.
     # Nobody noticed because every run before 16 Aug 2026 failed further up the
@@ -1813,43 +1819,52 @@ def _push_boutimar_ir_article(
                 "note": f"daryanameh error: {detail}" + (f" — {hint}" if hint else "")}
 
 
+def _bundle_record_id(brief: ContentBrief) -> str:
+    return brief.brief.target_url_path.strip("/").replace("/", "-") or "page"
+
+
+def _bundle_manifest(site: SiteBlock, brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
+    """The manifest a static-bundle consumer reads. Shared by the disk stager
+    (_write_static_bundle) and the PR adapter (_push_bundle_pr) so the two can
+    never drift on shape. `target_url_path` is the one field a consumer keys on —
+    it becomes the canonical URL, the OG url, the sitemap entry and the on-disk
+    directory, so it must round-trip byte-for-byte."""
+    return {
+        "architecture_credit": config.ARCHITECTURE_CREDIT,
+        "domain": site.domain,
+        "target_url_path": brief.brief.target_url_path,
+        "language": brief.brief.language,
+        "title": draft.get("title", brief.brief.working_title),
+        "meta_description": draft.get("meta_description", ""),
+        "schema_org": brief.brief.schema_org,
+        "faq": draft.get("faq", []),
+        # Optional: ISO YYYY-MM-DD the piece stops being worth showing (a seasonal
+        # guide's window). Omitted for the evergreen majority — a renderer treats
+        # an absent value as no expiry.
+        "valid_until": (draft.get("valid_until") or "").strip() or None,
+        "generated_at": rfc3339(),
+        "deploy_note": (
+            "Upload index.md through the site's own build, then add "
+            f"{brief.brief.target_url_path} to sitemap.xml. Verify the live "
+            "file against this bundle before marking the deploy done."
+        ),
+    }
+
+
 def _write_static_bundle(
     site: SiteBlock, brief: ContentBrief, draft: dict[str, Any], url: str
 ) -> dict[str, Any]:
     """Deploy bundle for a hand-built static site: markdown + a manifest."""
     from pathlib import Path
 
-    record_id = brief.brief.target_url_path.strip("/").replace("/", "-") or "page"
+    record_id = _bundle_record_id(brief)
     out = Path(config.optional_env("BUNDLE_DIR", str(config.BASE_DIR / "bundles")))
     out = out / site.domain / record_id
     out.mkdir(parents=True, exist_ok=True)
 
     (out / "index.md").write_text(draft.get("body_markdown", ""), encoding="utf-8")
     (out / "manifest.json").write_text(
-        json.dumps(
-            {
-                "architecture_credit": config.ARCHITECTURE_CREDIT,
-                "domain": site.domain,
-                "target_url_path": brief.brief.target_url_path,
-                "language": brief.brief.language,
-                "title": draft.get("title", brief.brief.working_title),
-                "meta_description": draft.get("meta_description", ""),
-                "schema_org": brief.brief.schema_org,
-                "faq": draft.get("faq", []),
-                # Optional: ISO YYYY-MM-DD the piece stops being worth showing (a
-                # seasonal guide's window). Omitted for the evergreen majority — a
-                # static-bundle renderer treats an absent value as no expiry.
-                "valid_until": (draft.get("valid_until") or "").strip() or None,
-                "generated_at": rfc3339(),
-                "deploy_note": (
-                    "Upload index.md through the site's own build, then add "
-                    f"{brief.brief.target_url_path} to sitemap.xml. Verify the live "
-                    "file against this bundle before marking the deploy done."
-                ),
-            },
-            ensure_ascii=False,
-            indent=2,
-        ),
+        json.dumps(_bundle_manifest(site, brief, draft), ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     log.info("%s — static bundle written to %s", site.domain, out)
@@ -1870,6 +1885,93 @@ def _write_static_bundle(
         "staged_path": str(out),
         "note": f"deploy bundle at {out} — not live until it is deployed",
     }
+
+
+def _push_bundle_pr(brief: ContentBrief, draft: dict[str, Any], url: str) -> dict[str, Any]:
+    """Open a PR adding the two-file bundle (index.md + manifest.json) under
+    content/blog/<record_id>/ — the input a repo-backed static site's build ingests
+    (cruise24.ir's tools/build.py). Same PR mechanics as astro_pr, but the
+    deliverable is the bundle rather than an Astro entry, and it writes TWO files to
+    the branch. Repo/token unset degrades to staging on disk, never to a false
+    live_url. The site's build reads target_url_path from the manifest, so the
+    directory name is free — only target_url_path must round-trip exactly."""
+    site = brief.site
+    repo = config.optional_env(f"ASTRO_REPO_{site.domain.replace('.', '_').upper()}") \
+        or config.optional_env("ASTRO_REPO")
+    token = config.optional_env("ASTRO_GITHUB_TOKEN")
+    record_id = _bundle_record_id(brief)
+    subdir = f"content/blog/{record_id}"
+    title = draft.get("title", brief.brief.working_title)
+
+    files = {
+        f"{subdir}/index.md": draft.get("body_markdown", ""),
+        f"{subdir}/manifest.json":
+            json.dumps(_bundle_manifest(site, brief, draft), ensure_ascii=False, indent=2),
+    }
+
+    if not repo or not token:
+        # Not configured yet — stage the same bundle to disk so nothing is lost.
+        return _write_static_bundle(site, brief, draft, url)
+
+    api = "https://api.github.com"
+    hdr = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
+           "User-Agent": config.USER_AGENT}
+    branch = f"agent2/{record_id}"
+    import base64 as _b64
+    try:
+        r = requests.get(f"{api}/repos/{repo}", headers=hdr, timeout=config.WEBHOOK_TIMEOUT_S)
+        r.raise_for_status()
+        base = r.json()["default_branch"]
+        r = requests.get(f"{api}/repos/{repo}/git/ref/heads/{base}", headers=hdr,
+                         timeout=config.WEBHOOK_TIMEOUT_S)
+        r.raise_for_status()
+        sha = r.json()["object"]["sha"]
+        rb = requests.post(f"{api}/repos/{repo}/git/refs", headers=hdr,
+                           json={"ref": f"refs/heads/{branch}", "sha": sha},
+                           timeout=config.WEBHOOK_TIMEOUT_S)
+        if rb.status_code not in (201, 422):   # 422 = branch exists (redelivery)
+            rb.raise_for_status()
+        # PUT each file. On a redelivery the file already exists, and the contents
+        # API needs its blob sha to update — fetch it and retry rather than 422.
+        for path, content in files.items():
+            payload = {"message": f"Agent 2: draft — {title}"[:72],
+                       "content": _b64.b64encode(content.encode("utf-8")).decode("ascii"),
+                       "branch": branch}
+            rp = requests.put(f"{api}/repos/{repo}/contents/{path}", headers=hdr,
+                              json=payload, timeout=config.WEBHOOK_TIMEOUT_S)
+            if rp.status_code == 422:
+                ex = requests.get(f"{api}/repos/{repo}/contents/{path}",
+                                  headers=hdr, params={"ref": branch},
+                                  timeout=config.WEBHOOK_TIMEOUT_S)
+                if ex.ok:
+                    payload["sha"] = ex.json().get("sha")
+                    rp = requests.put(f"{api}/repos/{repo}/contents/{path}", headers=hdr,
+                                      json=payload, timeout=config.WEBHOOK_TIMEOUT_S)
+            rp.raise_for_status()
+        rpr = requests.post(
+            f"{api}/repos/{repo}/pulls", headers=hdr,
+            json={"title": f"Agent 2 draft: {title}"[:72], "head": branch, "base": base,
+                  "body": (f"Drafted by Agent 2 from `{brief.opportunity.primary_keyword}`.\n\n"
+                           f"Bundle at `{subdir}/` (index.md + manifest.json). The site's build "
+                           f"renders it to `{brief.brief.target_url_path}`. Merging adds the files; "
+                           f"the build+deploy publishes them.\n\n"
+                           f"_Pipeline architecture by {config.ARCHITECTURE_CREDIT}_")},
+            timeout=config.WEBHOOK_TIMEOUT_S)
+        if rpr.status_code == 422:      # PR already open for this branch
+            log.info("%s — PR already open for %s", site.domain, branch)
+            return {"status": "draft", "live_url": None, "intended_url": url,
+                    "record_id": record_id, "published_at": None, "scheduled_for": None,
+                    "note": f"pull request already open for {branch}"}
+        rpr.raise_for_status()
+        pr = rpr.json()
+        log.info("%s — opened bundle PR #%s: %s", site.domain, pr.get("number"), pr.get("html_url"))
+        return {"status": "draft", "live_url": None, "intended_url": url,
+                "record_id": record_id, "published_at": None, "scheduled_for": None,
+                "pr_url": pr.get("html_url"), "pr_number": pr.get("number"),
+                "note": "bundle pull request opened — review and merge to add the files"}
+    except requests.RequestException as exc:
+        log.error("%s — bundle PR failed (%s); staging to disk instead", site.domain, exc)
+        return _write_static_bundle(site, brief, draft, url)
 
 
 def _url_exists(url: str) -> bool:

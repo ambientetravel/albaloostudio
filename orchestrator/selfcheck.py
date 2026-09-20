@@ -2539,6 +2539,18 @@ ok("the unimplemented adapter actually stages instead of claiming to",
    "result = _write_static_bundle(site, brief, draft, url)" in _pc_src)
 ok("the static bundle manifest carries optional valid_until for a seasonal post",
    '"valid_until": (draft.get("valid_until") or "").strip() or None' in _pc_src)
+# bundle_pr: the repo-backed variant for cruise24.ir. Opens a PR writing the same
+# two-file bundle into content/blog/<record_id>/; unconfigured it stages to disk
+# like static_bundle rather than reporting a live_url it did not create. The
+# manifest is shared with the stager so the PR files and the disk bundle can't
+# drift, and target_url_path — the one field a consumer keys on — round-trips.
+ok("the bundle_pr adapter is dispatched and writes to content/blog/",
+   'if adapter == "bundle_pr":' in _pc_src and "content/blog/" in _pc_src)
+ok("both the stager and the PR adapter build the manifest from _bundle_manifest",
+   _pc_src.count("_bundle_manifest(site, brief, draft)") == 2)
+ok("bundle_pr degrades to staging (no repo/token → no false live_url)",
+   "return _write_static_bundle(site, brief, draft, url)" in _pc_src
+   and _pc_src.count("_write_static_bundle(site, brief, draft, url)") >= 2)
 ok("a static bundle reports where it staged",
    '"staged_path": str(out)' in _pc_src,
    "without it the summary calls a correct bundle 'went nowhere'")
