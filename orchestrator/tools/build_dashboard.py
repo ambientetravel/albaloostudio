@@ -97,7 +97,7 @@ def _latest_scout(root: Path) -> dict | None:
 # Which sites can actually receive what the pipeline writes. This is the
 # question the whole project turns on and it was invisible until today: eight
 # active sites, and on 16 Aug exactly one of them could take an article.
-_LIVE_ADAPTERS = {"astro_pr", "boutimar_ir_static", "wordpress_rest"}
+_LIVE_ADAPTERS = {"astro_pr", "bundle_pr", "boutimar_ir_static", "wordpress_rest"}
 _STAGE_ADAPTERS = {"static_bundle"}
 
 

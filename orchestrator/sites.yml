@@ -454,7 +454,10 @@ sites:
     sitemap: "https://cruise24.ir/sitemap.xml"   # 404 as of 2026-08-09 — see below
     cms:
       type: static
-      adapter: static_bundle     # Netafraz/nginx; Agent 2 emits a deploy bundle
+      adapter: bundle_pr         # opens a PR of content/blog/<record_id>/{index.md,manifest.json}
+                                 # into ambientetravel/cruise24-ir (ASTRO_REPO_CRUISE24_IR).
+                                 # tools/build.py renders it; deploy-cruise24-ir.sh ships public_html/.
+                                 # Degrades to disk-staging if the repo var/token are unset.
       content_root: "/"
       publish_mode: draft
     channels:
