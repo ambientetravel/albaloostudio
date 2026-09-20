@@ -18,24 +18,21 @@
 #   bash orchestrator/tools/deploy-cruise24-ir.sh          # blog + storefront + sitemap + offer
 #   bash orchestrator/tools/deploy-cruise24-ir.sh --full   # every file in public_html/
 #
-# FTP host/user come from env — no cruise24.ir credential is hard-coded, and the
-# script REFUSES to run until Alireza supplies them:
-#   export C24_FTP_HOST="server22gr.axspace.com"   # confirm in DirectAdmin
-#   export C24_FTP_USER="deploy@cruise24.ir"       # confirm in DirectAdmin
+# Host and user are the FTP account's coordinates, not secrets — only the password
+# is secret, and it is prompted per run, never stored. Both were confirmed from the
+# server's own FTP banner (not inferred). Override via env if they ever change.
+# The account is jailed to cruise24.ir/public_html/ (DirectAdmin Custom type), so
+# it cannot reach book/ or climb to sibling domains — proxy.php can't leak from here.
 set -euo pipefail
 
-HOST="${C24_FTP_HOST:-}"
-USER="${C24_FTP_USER:-}"
+HOST="${C24_FTP_HOST:-server22gr.axspace.com}"
+USER="${C24_FTP_USER:-deploy@cruise24.ir}"
 BUILD_DIR="/Users/alimozzy/cruise24.ir"           # the LIVE tree, not the dead one
 OUT="public_html"                                  # tree A builds here, not public/
 BASE_URL="https://cruise24.ir"
 SHRINK_PCT=20                                      # abort if a file is >20% smaller than live
 FULL=0; [ "${1:-}" = "--full" ] && FULL=1
 
-if [ -z "$HOST" ] || [ -z "$USER" ]; then
-  echo "✗ set C24_FTP_HOST and C24_FTP_USER first (see the header). No credential is guessed."
-  exit 2
-fi
 [ -d "$BUILD_DIR" ] || { echo "✗ live tree not found at $BUILD_DIR"; exit 2; }
 
 echo "▸ cruise24.ir deploy — from $(curl -fsS --max-time 10 https://api.ipify.org || echo '?') (must be on the FTP allowlist)"
@@ -89,11 +86,16 @@ if [ -z "${FTP_PASSWORD:-}" ]; then
 fi
 [ -n "$FTP_PASSWORD" ] || { echo "✗ no password given"; exit 1; }
 
-# ── 5. upload over FTPS, creating remote dirs as needed, never deleting ───────
+# ── 5. upload over EXPLICIT FTPS, creating remote dirs as needed, never deleting ─
+# --ssl-reqd: TLS is MANDATORY — a failed AUTH TLS aborts, it never downgrades to
+#   plaintext (this account has no IP lock, so FTPS is the only protection).
+# --ftp-pret: this server family requires PRET before PASV (PRET is in its FEAT);
+#   without it the passive data connection can fail.
+# ftp:// on port 21 = explicit FTPS (FTPES). Never port 990 (implicit times out here).
 ok=0; fail=0
 for f in "${FILES[@]}"; do
   rel="${f#./}"
-  if curl -fsS --ssl-reqd --ftp-create-dirs --max-time 120 \
+  if curl -fsS --ssl-reqd --ftp-pret --ftp-create-dirs --max-time 120 \
        --user "$USER:$FTP_PASSWORD" -T "$rel" "ftp://$HOST/$rel"; then
     ok=$((ok+1)); printf '.'
   else
