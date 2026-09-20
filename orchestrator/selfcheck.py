@@ -2537,6 +2537,8 @@ ok("no adapter hands back live_url = url",
    "a staged or unpublished draft has no live URL")
 ok("the unimplemented adapter actually stages instead of claiming to",
    "result = _write_static_bundle(site, brief, draft, url)" in _pc_src)
+ok("the static bundle manifest carries optional valid_until for a seasonal post",
+   '"valid_until": (draft.get("valid_until") or "").strip() or None' in _pc_src)
 ok("a static bundle reports where it staged",
    '"staged_path": str(out)' in _pc_src,
    "without it the summary calls a correct bundle 'went nowhere'")

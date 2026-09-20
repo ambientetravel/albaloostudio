@@ -1836,6 +1836,10 @@ def _write_static_bundle(
                 "meta_description": draft.get("meta_description", ""),
                 "schema_org": brief.brief.schema_org,
                 "faq": draft.get("faq", []),
+                # Optional: ISO YYYY-MM-DD the piece stops being worth showing (a
+                # seasonal guide's window). Omitted for the evergreen majority — a
+                # static-bundle renderer treats an absent value as no expiry.
+                "valid_until": (draft.get("valid_until") or "").strip() or None,
                 "generated_at": rfc3339(),
                 "deploy_note": (
                     "Upload index.md through the site's own build, then add "
