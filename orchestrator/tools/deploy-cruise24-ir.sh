@@ -46,13 +46,21 @@ LOCAL=$(grep -c "<loc>" "$OUT/sitemap.xml" || echo 0)
 echo "  built OK — sitemap has $LOCAL URLs"
 
 # ── 2. the file set to upload ─────────────────────────────────────────────────
+# NO mapfile/readarray here. This Mac's only bash is 3.2.57 (Apple ships no
+# newer one and there is no Homebrew bash on PATH), where mapfile does not
+# exist. With `set -e` above, `mapfile: command not found` is status 127 and the
+# script dies right after the build — so every run rebuilt the tree, uploaded
+# nothing, and exited 127 before it could even reach the "nothing to upload"
+# guard. A read loop is the portable equivalent and works on both.
 cd "$OUT"
+FILES=()
+collect() { while IFS= read -r _line; do FILES+=("$_line"); done; }
 if [ "$FULL" = "1" ]; then
-  mapfile -t FILES < <(find . -type f ! -name '.DS_Store')
+  collect < <(find . -type f ! -name '.DS_Store')
   echo "▸ FULL upload: ${#FILES[@]} files"
 else
-  mapfile -t FILES < <(find blog blog.html *.html sitemap.xml offer.json llms.txt \
-                            -type f ! -name '.DS_Store' 2>/dev/null | sort -u)
+  collect < <(find blog blog.html *.html sitemap.xml offer.json llms.txt \
+                   -type f ! -name '.DS_Store' 2>/dev/null | sort -u)
   echo "▸ content upload: ${#FILES[@]} files (blog, storefront, sitemap, offer.json, llms.txt)"
 fi
 [ "${#FILES[@]}" -gt 0 ] || { echo "✗ nothing to upload — did the build run?"; exit 1; }
