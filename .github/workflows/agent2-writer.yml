@@ -158,6 +158,10 @@ jobs:
           # different repositories.
           ASTRO_REPO_BOUTIMAR_COM: ${{ vars.ASTRO_REPO_BOUTIMAR_COM }}
           ASTRO_REPO_EXPLOREORIENT_COM: ${{ vars.ASTRO_REPO_EXPLOREORIENT_COM }}
+          # cruise24.ir uses the bundle_pr adapter (same ASTRO_REPO_*/token
+          # plumbing). Empty until the var is set → bundle_pr stages to disk, so
+          # this line is safe to land before go-live.
+          ASTRO_REPO_CRUISE24_IR: ${{ vars.ASTRO_REPO_CRUISE24_IR }}
           ASTRO_REPO: ${{ vars.ASTRO_REPO }}
           ASTRO_GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
           # WordPress. Absent until set, in which case the adapter stages the
