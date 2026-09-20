@@ -42,13 +42,22 @@ fi
 
 # ── 4. the file set to upload ───────────────────────────────────────────────
 cd dist
+# NO mapfile/readarray — this Mac's only bash is 3.2.57 (no Homebrew bash on
+# PATH), where mapfile does not exist. With `set -e` above, `mapfile: command
+# not found` is status 127 and the script dies right here — after the build,
+# before any upload, shipping nothing. A read loop is the portable equivalent.
+FILES=()
+collect() { while IFS= read -r _line; do FILES+=("$_line"); done; }
 if [ "$FULL" = "1" ]; then
-  mapfile -t FILES < <(find . -type f ! -name '.DS_Store')
+  collect < <(find . -type f ! -name '.DS_Store')
   echo "▸ FULL upload: ${#FILES[@]} files (this includes images and is slow)"
 else
-  mapfile -t FILES < <(find journal sitemap.xml llms.txt index.html -type f ! -name '.DS_Store' 2>/dev/null)
+  collect < <(find journal sitemap.xml llms.txt index.html -type f ! -name '.DS_Store' 2>/dev/null)
   echo "▸ content upload: ${#FILES[@]} files (articles, journal index, sitemap, home)"
 fi
+# Guard the empty case before the loop: in bash 3.2 iterating an empty array
+# under `set -u` errors, so catch "nothing to upload" here rather than there.
+[ "${#FILES[@]}" -gt 0 ] || { echo "✗ nothing to upload — did the build run?"; exit 1; }
 
 # ── 5. upload over FTPS, creating remote dirs as needed, never deleting ──────
 # curl uses one connection per file; --ftp-create-dirs mirrors the tree.
