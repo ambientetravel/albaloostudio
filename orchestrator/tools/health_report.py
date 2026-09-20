@@ -61,7 +61,16 @@ def _now() -> datetime:
 
 
 def _age_days(iso: str) -> float:
-    return (_now() - datetime.fromisoformat(iso.replace("Z", "+00:00"))).total_seconds() / 86400
+    # GitHub created_at is reliably ISO, but a missing or malformed value must not
+    # crash the health report — it is the alert, and a dead alert is worse than a
+    # wrong age. Unparseable reads as age 0 (not stale, no false nudge), matching
+    # _ledger._parse's guard on the same construct.
+    if not iso:
+        return 0.0
+    try:
+        return (_now() - datetime.fromisoformat(str(iso).replace("Z", "+00:00"))).total_seconds() / 86400
+    except (ValueError, TypeError):
+        return 0.0
 
 
 def _curl(url: str, token: str, *, binary: bool = False) -> tuple[int, bytes]:

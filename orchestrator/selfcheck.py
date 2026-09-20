@@ -2498,6 +2498,12 @@ ok("it reads agent 6's strategy and agent 7's geography",
    'reports/strategy-*.json' in _dsrc and 'reports/geo-*.json' in _dsrc)
 ok("and the workflow collects both artifacts",
    "site-audit" in _wfd and "keyword-geo-reports" in _wfd)
+# The health report IS the alert; a malformed or missing timestamp must not crash
+# it (a dead alert is worse than a wrong age). _age_days now guards like _ledger.
+import tools.health_report as _hr
+ok("the health report survives a bad timestamp instead of crashing the alert",
+   _hr._age_days("") == 0.0 and _hr._age_days(None) == 0.0
+   and _hr._age_days("not-a-date") == 0.0 and _hr._age_days("2020-01-01T00:00:00Z") > 1000)
 ok("agent 5+6's runs/ copy cannot shadow agent 1's newer scout",
    "_dl/agent56/reports" in _wfd,
    "that artifact ships runs/ too, and it is older")
