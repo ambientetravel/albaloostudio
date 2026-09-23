@@ -48,6 +48,36 @@ FACT_LABELS = {
 VISA_LABEL = {"schengen": "شینگن", "hard": "ویزای دشوار (آمریکا/بریتانیا/کانادا)", "easy": "ویزای آسان",
               "free": "بدون ویزا", "unknown": "نیازمند بررسی"}
 
+# The homepage voyage: one example route, told stop by stop, to show the rule that
+# matters most — a sailing from Istanbul becomes a Schengen trip the moment it
+# calls at a Greek port. Levels are computed by the shared classifier on the route
+# so far, never typed in. x/y are the ports' real lon/lat projected onto the SVG.
+VOYAGE = ["istanbul-galataport", "kusadasi", "rhodes", "santorini", "piraeus"]
+VOYAGE_LONLAT = {"istanbul-galataport": (28.98, 41.03), "kusadasi": (27.26, 37.86), "rhodes": (28.23, 36.44),
+                 "santorini": (25.43, 36.39), "piraeus": (23.64, 37.94)}
+
+def port_name(it: dict) -> str:
+    return it["title"].split(" ·")[0].split(" (")[0]
+
+def build_voyage(ports: list[dict]) -> dict:
+    by = {p["slug"]: p for p in ports}
+    stops, names = [], []
+    for slug in VOYAGE:
+        it = by[slug]; names.append(port_name(it) if slug != "piraeus" else it["title"])
+        lon, lat = VOYAGE_LONLAT[slug]
+        lvl = _visa.classify(list(names))["level"]
+        stops.append({"slug": slug, "title": it["title"], "short": port_name(it), "kicker": it.get("kicker", ""), "summary": it["summary"],
+                      "port_visa": it["facts"].get("visa", ""), "level": lvl, "label": VISA_LABEL.get(lvl, "نیازمند بررسی"),
+                      "x": round((lon - 22.6) * 52, 1), "y": round((41.7 - lat) * 78, 1)})
+    segs = []
+    for a, b in zip(stops, stops[1:]):
+        # a gentle arc between stops, bowed to the sailing side, so the line reads as a course
+        mx, my = (a["x"] + b["x"]) / 2, (a["y"] + b["y"]) / 2
+        dx, dy = b["x"] - a["x"], b["y"] - a["y"]
+        cx, cy = round(mx - dy * .18, 1), round(my + dx * .18, 1)
+        segs.append({"d": f"M{a['x']} {a['y']} Q{cx} {cy} {b['x']} {b['y']}", "level": b["level"]})
+    return {"stops": stops, "segs": segs}
+
 def fa(n) -> str:
     return str(n).translate(FA_DIGITS)
 
@@ -227,7 +257,7 @@ def build(check_only=False):
         urls.append("/" + path.replace("index.html", ""))
 
     featured = {c["slug"]: data[c["slug"]][:4] for c in collections}
-    write("index.html", "home.html", featured=featured, didyouknow=didyouknow, offers=offers[:4],
+    write("index.html", "home.html", featured=featured, voyage=build_voyage(data["ports"]), didyouknow=didyouknow, offers=offers[:4],
           feed_status=feed_status, articles=articles[:3], gatherings=data["gatherings"][:3], news=news[:6])
     for c in collections:
         write(f"{c['slug']}/index.html", "listing.html", coll=c, items=data[c["slug"]])
@@ -292,7 +322,7 @@ def build(check_only=False):
         (PUBLIC/"embed"/"news.js").write_text(
             embed.read_text(encoding="utf-8").replace("__ORIGIN__", dom), encoding="utf-8")
     # Precache manifest for the service worker: shell + every port page (offline port guides).
-    shell = ["/", "/news/", "/offline/", "/css/hub.css", "/js/hub.js", "/js/offers.js", "/js/pwa.js", "/manifest.webmanifest",
+    shell = ["/", "/news/", "/offline/", "/css/hub.css", "/js/hub.js", "/js/story.js", "/js/offers.js", "/js/pwa.js", "/manifest.webmanifest",
              "/data/visa.json", "/data/offers.json"] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.svg")] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.png")] + [f"/img/{p.name}" for p in (STATIC/"img").glob("*.webp")]
     (PUBLIC/"precache.json").write_text(json.dumps({"version": built + "-" + str(len(urls)), "shell": shell,
                                                     "pages": urls}, ensure_ascii=False), encoding="utf-8")
@@ -324,8 +354,8 @@ def check():
             if needle in t: print(f"HOUSE RULE: {label} in", p.relative_to(HERE)); bad += 1
     for it in load("ports"):
         v = it["facts"].get("visa", "")
-        port_name = it["title"].split(" ·")[0].split(" (")[0]
-        if "بدون ویزا" in v and any(port_name.startswith(e) for e in _visa.EASY_VISA_PORTS):
+        name = port_name(it)
+        if "بدون ویزا" in v and any(name.startswith(e) for e in _visa.EASY_VISA_PORTS):
             print("VISA RULE: easy-visa port labelled visa-free:", it["slug"]); bad += 1
     print("check:", "OK" if not bad else f"{bad} problem(s)")
     return bad
