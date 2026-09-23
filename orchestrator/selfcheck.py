@@ -2768,6 +2768,12 @@ ok("the PR-gate judges exploreorient under orient_content_v1 (brand-neutral, no 
    _prg.REPOS["ambientetravel/exploreorient"] == "orient_content_v1"
    and compliance.PROFILES["orient_content_v1"]["brand_neutral_embed"] is True
    and compliance.PROFILES["orient_content_v1"]["visa_accuracy"] is False)
+# cruise24.ir ships bundle_pr PRs — both the gate and the health nudge must see
+# that repo, or its drafts sit unreviewed and unnudged like exploreorient's did.
+import tools.health_report as _hr
+ok("the PR gate reviews cruise24-ir under the full cruise profile, and health nudges its PRs",
+   _prg.REPOS.get("ambientetravel/cruise24-ir") == "boutimar_v1"
+   and "ambientetravel/cruise24-ir" in _hr.PR_REPOS)
 ok("that gate profile catches a boutimar leak but not a correct Central Asia visa-free line",
    any(v.rule == "brand_neutral_embed"
        for v in compliance.check("book via بوتیمار", profile="orient_content_v1"))

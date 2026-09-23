@@ -40,6 +40,9 @@ REPOS = {
     "ambientetravel/boutimar": "boutimar_v1",
     "ambientetravel/boutimarfarsi": "boutimar_v1",
     "ambientetravel/exploreorient": "orient_content_v1",
+    # cruise24.ir — Persian cruise storefront; bundle_pr PRs carry visa + Persian
+    # Gulf claims, so it is judged under the full cruise profile.
+    "ambientetravel/cruise24-ir": "boutimar_v1",
     "ambientetravel/albaloostudio": "boutimar_v1",
     # Persia at War — a standalone game, deliberately NOT a travel property.
     # Its own repo so an outside agent can be given PR access to the game

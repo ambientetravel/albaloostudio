@@ -35,7 +35,7 @@ REPO = "ambientetravel/albaloostudio"
 API = "https://api.github.com"
 # Repos whose open PRs are the pipeline's *output waiting on a human*.
 PR_REPOS = ["ambientetravel/boutimar", "ambientetravel/exploreorient",
-            "ambientetravel/boutimarfarsi"]
+            "ambientetravel/boutimarfarsi", "ambientetravel/cruise24-ir"]
 # Workflow display names → the short label used in the report.
 AGENTS = {
     "Agent 1 — SEO Scout": "Scout",
