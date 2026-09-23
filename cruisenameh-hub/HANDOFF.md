@@ -5,10 +5,19 @@ Owning session: "Daryanameh Farsi cruise domain brainstorm" (session title preda
 
 ## What this is
 
-A static Farsi cruise media site plus PWA, generated from JSON content. Same stack as cruise24.ir and
+A static Farsi cruise media site plus PWA, generated from JSON content.
+
+**Editorial position, decided 23 Sep 2026.** Cruisenameh is Farsi-first and stays that way. Most
+Iranian magazines that reach abroad publish in English for a different reader — Aleph in Canada, Trend
+for the elite inside Iran. This one goes the other way: the cruise, sea and river subject treated in a
+purely Persian manner, with as much content in Farsi as can be made. English exists in the project only
+as a separate weekly trade wire for the cruise industry, sold on Substack — a second, smaller product
+for people who cannot read the magazine. It is never a translation of the magazine and the magazine is
+never translated into it. One paid door per audience: Farsi readers pay on the site, English readers pay
+on Substack, nothing is for sale in both. Same stack as cruise24.ir and
 boutimar.ir (flat HTML on DirectAdmin), so the same deploy process.
 
-    python3 build.py           # content/ + templates/ + static/  ->  public/   (126 pages today)
+    python3 build.py           # content/ + templates/ + static/  ->  public/   (130 pages today)
     python3 build.py --check   # house rules: «خلیج فارس», no "visa-free" on easy-visa ports
     node tools/shots.mjs out/  # icons, screenshots through the scroll film, real offline test
 
