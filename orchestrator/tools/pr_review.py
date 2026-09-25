@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -70,6 +71,33 @@ def profile_for(filename: str, default: str) -> str:
         if filename.startswith(prefix):
             return profile
     return default
+# Files that are NOT publishable copy, so the house rules do not apply to them.
+# albaloostudio#6 was BLOCKed for a € print quote in BUSINESS-CASE.md and for
+# CLAUDE.md restating the visa rule; #2 for research that QUOTES a competitor's
+# page verbatim — evidence, not our claim. Judging them buries the one real
+# finding under noise. Convention: an ALL-CAPS .md (README, CLAUDE, BRAINSTORM,
+# DECISIONS, HANDOFF…) is an internal doc; site content is lowercase-slugged.
+INTERNAL_DOC = re.compile(r"(^|/)[A-Z0-9][A-Z0-9_.-]*\.md$")
+INTERNAL_PREFIXES = ("orchestrator/inbox/",)
+
+
+def is_internal(filename: str) -> bool:
+    return bool(INTERNAL_DOC.search(filename)) or filename.startswith(INTERNAL_PREFIXES)
+
+
+def _surface(name: str, text: str) -> str:
+    """The text to judge. A JSON file's items are joined one per line, so one
+    item's destination cannot condemn its neighbour's claim — a one-line JSON
+    array has no clause boundaries at all (didyouknow.json: a Santorini link in
+    item N was read as part of item N+1's correct AROYA sentence)."""
+    if name.lower().endswith(".json"):
+        try:
+            return compliance.assertive_surface(json.loads(text))
+        except ValueError:
+            pass  # a partial diff of a JSON file is not JSON; judge it raw
+    return text
+
+
 API = "https://api.github.com"
 # Only lines a person would read as content; skip lockfiles and generated noise.
 TEXT_EXT = (".md", ".mdx", ".astro", ".html", ".htm", ".json", ".js", ".ts",
@@ -109,27 +137,33 @@ def _added_text(patch: str) -> str:
 
 def review_pr(repo: str, num: int, profile: str) -> dict:
     files = _gh(f"/repos/{repo}/pulls/{num}/files?per_page=100")
-    blocks, warns, scanned = [], [], 0
+    blocks, warns, scanned, internal = [], [], 0, 0
     for f in files if isinstance(files, list) else []:
         name = f.get("filename", "")
         patch = f.get("patch")  # None for binary/renamed-only
         if not patch or not name.lower().endswith(TEXT_EXT):
             continue
+        if is_internal(name):
+            internal += 1
+            continue
         scanned += 1
-        text = _added_text(patch)
+        text = _surface(name, _added_text(patch))
         for v in compliance.check(text, profile_for(name, profile)):
             row = {"file": name, "rule": v.rule, "excerpt": v.excerpt, "fix": v.message,
                    "profile": profile_for(name, profile)}
             (blocks if v.severity == compliance.BLOCK else warns).append(row)
     verdict = "BLOCK" if blocks else ("WARN" if warns else "PASS")
     return {"repo": repo, "pr": num, "profile": profile, "files_scanned": scanned,
+            "internal_skipped": internal,
             "verdict": verdict, "blocks": blocks, "warns": warns}
 
 
 def _print(r: dict) -> None:
     mark = {"PASS": "✓", "WARN": "▲", "BLOCK": "✗"}[r["verdict"]]
+    skipped = r.get("internal_skipped") or 0
+    note = f"; {skipped} internal doc(s) not judged" if skipped else ""
     print(f"\n{mark} {r['repo']}#{r['pr']} — {r['verdict']} "
-          f"({r['files_scanned']} content file(s), profile {r['profile']})")
+          f"({r['files_scanned']} content file(s), profile {r['profile']}{note})")
     for tag, rows in (("BLOCK", r["blocks"]), ("WARN", r["warns"])):
         for x in rows:
             print(f"    {tag} [{x['rule']}] {x['file']}")

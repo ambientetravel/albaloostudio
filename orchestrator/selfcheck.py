@@ -2774,6 +2774,34 @@ import tools.health_report as _hr
 ok("the PR gate reviews cruise24-ir under the full cruise profile, and health nudges its PRs",
    _prg.REPOS.get("ambientetravel/cruise24-ir") == "boutimar_v1"
    and "ambientetravel/cruise24-ir" in _hr.PR_REPOS)
+# 25 Sep gate false positives — each was a correct or harmless line, BLOCKed or
+# WARNed, while the lie next to it must still fire. Pairs, so a fix that simply
+# stops matching fails the second half.
+def _sev(t):
+    return sorted({v.severity for v in compliance.check(t, "boutimar_v1")})
+ok("a denied guarantee is not a guarantee, a made one still warns",
+   _sev("Approval is not instant or guaranteed.") == []
+   and _sev("We're not going to hand you a rate or a guaranteed date here.") == []
+   and _sev("Best rates, guaranteed departure every week.") == [compliance.WARN])
+ok("«نرخ بدون ویزا» (fare excluding visa) and «بدون ویزای درست» (without the right visa) are not claims",
+   _sev("Persian Gulf MSC Euribia «نرخ بدون ویزا» rates for inside cabins.") == []
+   and _sev("خط کروز بدون ویزای درست، سوارتان نمی‌کند.") == []
+   and _sev("سفر دبی بدون ویزا") == [compliance.BLOCK]
+   and _sev("بدون ویزای شنگن به سانتورینی بروید") == [compliance.BLOCK])
+ok("«…به این معنا نیست که سفر بدون ویزاست» corrects the myth rather than stating it",
+   _sev("سوارشدن از استانبول به این معنا نیست که سفر بدون ویزاست.") == [])
+ok("the Schengen rule stated correctly passes; a Schengen place called visa-free still blocks",
+   _sev("only AROYA Türkiye+Egypt and Seychelles are truly visa-free, any Greek/Italian port = Schengen") == []
+   and _sev("Santorini is visa-free, part of the Schengen area.") == [compliance.BLOCK]
+   and _sev("Mykonos visa-free, no Schengen needed.") == [compliance.BLOCK])
+ok("the PR gate skips internal docs and research inbox, judges site content",
+   _prg.is_internal("cruisenameh-hub/BUSINESS-CASE.md") and _prg.is_internal("CLAUDE.md")
+   and _prg.is_internal("orchestrator/inbox/competitor-browse-2026-08-26.json")
+   and not _prg.is_internal("src/content/journal/travel-to-iran-now.md")
+   and not _prg.is_internal("cruisenameh-hub/content/ports.json"))
+ok("a JSON file is judged item by item, so a neighbour's port cannot condemn a correct line",
+   _sev(_prg._surface("d.json", '[{"link":"/ports/santorini/"},{"text":"فقط مسیرهای ترکیه و مصر AROYA و سیشل بدون ویزا هستند"}]')) == []
+   and _sev('[{"link":"/ports/santorini/"},{"text":"فقط مسیرهای ترکیه و مصر AROYA و سیشل بدون ویزا هستند"}]') == [compliance.BLOCK])
 ok("that gate profile catches a boutimar leak but not a correct Central Asia visa-free line",
    any(v.rule == "brand_neutral_embed"
        for v in compliance.check("book via بوتیمار", profile="orient_content_v1"))

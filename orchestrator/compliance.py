@@ -75,7 +75,10 @@ _NO_VISA_CLAIM = re.compile(
     r"(?i)\bvisa[-\s]?free\b"
     r"|\bno\s+visa\s+(required|needed)\b"
     r"|\bwithout\s+a?\s*visa\b"
-    r"|بدون\s*ویزا"
+    # «بدون ویزای درست» is "without the RIGHT visa" — a warning that a visa is
+    # needed, the opposite of a claim. Only those qualifiers are excluded:
+    # «بدون ویزای شنگن» ("without a Schengen visa") can still be the lie.
+    r"|بدون\s*ویزا(?!ی\s*(?:درست|معتبر|لازم|مناسب|صحیح|مورد\s*نیاز))"
     r"|بدون\s*نیاز\s*به\s*ویزا"
     r"|معاف\s*از\s*ویزا"
     r"|نیازی\s*به\s*ویزا\s*ندار"
@@ -199,12 +202,44 @@ def _clause_bounds(text: str, match: re.Match[str]) -> tuple[int, int]:
 # because the negator has to precede the match.
 _NEG_BEFORE = re.compile(
     r"(?i)\b(not|isn'?t|aren'?t|never|non|no|rather\s+than|instead\s+of)\b[^.!?؟\n]{0,24}$"
-    r"|(نه|نمی|بدون\s+اینکه)[^.!?؟\n]{0,24}$"
+    # «…به این معنا نیست که سفر بدون ویزاست» — "it does not mean the trip is
+    # visa-free". The negator is «نیست که», which precedes the claim; without
+    # it the cruisenameh visa explainer was flagged for correcting the myth.
+    r"|(نه|نمی|بدون\s+اینکه|نیست\s+که)[^.!?؟\n]{0,24}$"
 )
+
+# «نرخ بدون ویزا» on a fare label is "price EXCLUDING the visa", not "visa-free".
+# A competitor's Persian Gulf page labels every cabin that way; the gate BLOCKed
+# 11 lines of research quoting it (albaloostudio#2, 26 Aug).
+_PRICE_LABEL_BEFORE = re.compile(
+    r"(?i)(نرخ|قیمت|هزینه|تعرفه|بها)\s*$|\b(price|rate|fare)s?\s+$"
+)
+
+# The Schengen rule stated correctly names a Schengen place: "any Greek/Italian
+# port = Schengen", «بندر یونانی یعنی شنگن». The place is CLASSIFIED as Schengen
+# when the zone word follows it closely and the visa-free claim is not in
+# between — "Santorini is visa-free, part of Schengen" still blocks, because
+# there the claim sits between the place and the zone.
+_SCHENGEN_ZONE = re.compile(r"(?i)\bschengen\b|شنگن|شینگن")
 _NEG_AFTER = re.compile(
     r"(?i)^[^.!?؟\n]{0,24}\b(is|are)\s+(not|never)\b"
     r"|^[^.!?؟\n]{0,24}(نیست|نیستند|نمی[‌\s]*باشد|ندارد)"
 )
+
+
+def _schengen_place_unclassified(clause: str, claim_at: int) -> bool:
+    """True when the clause names a Schengen place it does NOT itself label
+    Schengen — i.e. a place sitting beside a visa-free claim unexplained."""
+    for pm in _SCHENGEN_IN_TEXT.finditer(clause):
+        zone = _SCHENGEN_ZONE.search(clause, pm.end(), min(len(clause), pm.end() + 40))
+        labelled = (
+            zone is not None
+            and not (pm.end() <= claim_at < zone.start())
+            and not _NEG_BEFORE.search(clause[max(0, zone.start() - 30):zone.start()])
+        )
+        if not labelled:
+            return True
+    return False
 
 
 def _is_negated(text: str, match: re.Match[str], *, lo: int = 0, hi: int | None = None) -> bool:
@@ -236,6 +271,14 @@ _PRICE = re.compile(
 _GUARANTEE = re.compile(
     r"(?i)\b(guaranteed|lowest\s+price|best\s+price\s+guarantee|price\s+match)\b"
     r"|تضمین\s*قیمت|ارزان‌?ترین\s*قیمت\s*تضمینی"
+)
+# "approval is not instant or guaranteed" and "we're not going to hand you a
+# rate or a guaranteed date" DENY a guarantee — boutimar#17 was WARNed twice for
+# the honest version. Wider than _NEG_BEFORE because the negator usually heads a
+# longer phrase ("not going to hand you a rate or a …").
+_GUARANTEE_NEG = re.compile(
+    r"(?i)\b(not|never|no|isn'?t|aren'?t|won'?t|can'?t|cannot|without)\b[^.!?\n]{0,40}$"
+    r"|(نه|نمی|هیچ|بدون)[^.!?؟\n]{0,30}$"
 )
 
 _PHOTO_CREDIT_GUESS = re.compile(r"(?i)\b(photo|image)\s*(credit)?\s*:\s*(unknown|n/?a|tbd|—|-)\s*$")
@@ -467,6 +510,8 @@ def check(
             lo, hi = _clause_bounds(text, m)
             if _is_negated(text, m, lo=lo, hi=hi):
                 continue  # "not visa-free" states the rule, it does not break it
+            if _PRICE_LABEL_BEFORE.search(text[max(lo, m.start() - 20):m.start()]):
+                continue  # «نرخ بدون ویزا»: a fare that excludes the visa fee
 
             # Which destination the claim attaches to is the whole question.
             # "Türkiye and Egypt: no visa needed" is the rule stated correctly;
@@ -511,7 +556,7 @@ def check(
                     "Only AROYA's Türkiye+Egypt routes and Seychelles are visa-free. "
                     "Persian Gulf and Dubai are EASY VISA, not visa-free.",
                 ))
-            elif schengen or _SCHENGEN_IN_TEXT.search(clause):
+            elif schengen or _schengen_place_unclassified(clause, m.start() - lo):
                 out.append(Violation(
                     "visa_accuracy", BLOCK, _excerpt(text, m),
                     "One Schengen port makes the whole itinerary Schengen — even "
@@ -559,6 +604,9 @@ def check(
                 )
             )
         for m in _GUARANTEE.finditer(text):
+            glo, _ = _clause_bounds(text, m)
+            if _GUARANTEE_NEG.search(text[max(glo, m.start() - 60):m.start()]):
+                continue  # "not guaranteed" denies the commitment
             out.append(
                 Violation(
                     "no_invented_facts",
