@@ -17,7 +17,7 @@
   "ListAgents will NOT show a stopped session — it only lists live peers.",
   "That difference cost a round trip on 26 Aug 2026."
  ],
- "verified": "2026-08-31",
+ "verified": "2026-09-10",
  "routes": [
   {
    "properties": [
@@ -92,6 +92,48 @@
    "repo_paths": [
     "boutimar-ir/"
    ]
+  },
+  {
+   "properties": [
+    "cruisenameh.com"
+   ],
+   "title": "Daryanameh Farsi cruise domain brainstorm",
+   "sessionId": "session_01ATjVLDfSDHRuvSzCdEPqwc",
+   "confirmed_by_user": true,
+   "note": "Alireza asked this session to brainstorm and then build the hub (6 Sep 2026). Editorial hub for all Farsi cruise properties; never sells. Renamed from داریانامه/daryanameh.com to کروزنامه/cruisenameh.com on 7 Sep 2026. Farsi-first by decision (23 Sep 2026); English exists only as a separate Substack trade wire, never a translation of the magazine.",
+   "platform": "static HTML + PWA, Ambiente Turizm entity, DirectAdmin",
+   "repo_paths": [
+    "cruisenameh-hub/"
+   ],
+   "area_owners": {
+    "_comment": "Two people share this property. Route by area, not only by property — see CLAUDE.md § Area ownership.",
+    "content": {
+     "owner": "Golbarg — Rome. Tourism Management MSc. GitHub handle not yet supplied.",
+     "confirmed_by_user": true,
+     "paths": [
+      "cruisenameh-hub/content/"
+     ],
+     "note": "Confirmed by Alireza 11 Sep 2026. Collections JSON, news/*.md, articles/*.md. Bound by the hard rules; run build.py --check before pushing."
+    },
+    "build": {
+     "owner": "this session",
+     "confirmed_by_user": true,
+     "paths": [
+      "cruisenameh-hub/build.py",
+      "cruisenameh-hub/jalali.py",
+      "cruisenameh-hub/templates/",
+      "cruisenameh-hub/static/",
+      "cruisenameh-hub/tools/"
+     ]
+    },
+    "generated": {
+     "owner": "nobody — never hand-edited",
+     "paths": [
+      "cruisenameh-hub/public/"
+     ],
+     "note": "Build output. Conflicts here are resolved by rebuilding, never by merging."
+    }
+   }
   }
  ],
  "unrouted": []
