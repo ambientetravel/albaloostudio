@@ -10,7 +10,10 @@ keyword) pairs Agent 1 should release on its next run, into written/releases.jso
 Released statuses: `blocked` (compliance) and `failed` (draft error) — a brief
 that consumed a slot and produced nothing. NOT `blocked_config` (a permanent
 site-config condition — re-briefing can't help), NOT `deferred` (intentional),
-NOT `skipped`/`drafted`.
+NOT `drafted`. `skipped` only in one case: a DEGRADED brief (built without the
+scout's LLM step), which the writer skips while promising a re-scout — a promise
+the ledger broke by holding the keyword for 45 days (boutimar.ir: 7 briefs, 0
+drafts). The scout no longer records those; this frees any already recorded.
 
 Pure transform, no network: the workflow downloads the manifest artifact, this
 turns it into the release list. Missing or unreadable input writes an empty list
@@ -25,18 +28,31 @@ import sys
 from pathlib import Path
 
 RELEASE_STATUSES = {"blocked", "failed"}
+# Agent 2's skip text for a degraded brief (agent2_writer_batch.py). Matched as
+# text because this tool must stay import-free — it runs as a tolerant CI step.
+DEGRADED_SKIP_MARK = "without its LLM step"
+
+
+def _released(o: dict) -> str | None:
+    status = o.get("status")
+    if status in RELEASE_STATUSES:
+        return status
+    if status == "skipped" and DEGRADED_SKIP_MARK in str(o.get("error") or ""):
+        return "skipped_degraded"
+    return None
 
 
 def collect(manifest: dict) -> list[dict[str, str]]:
     out, seen = [], set()
     for o in manifest.get("outcomes", []) or []:
-        if not isinstance(o, dict) or o.get("status") not in RELEASE_STATUSES:
+        reason = _released(o) if isinstance(o, dict) else None
+        if not reason:
             continue
         domain = str(o.get("domain") or "").strip()
         query = str(o.get("keyword") or "").strip()
         if domain and query and (domain, query) not in seen:
             seen.add((domain, query))
-            out.append({"domain": domain, "query": query, "reason": o["status"]})
+            out.append({"domain": domain, "query": query, "reason": reason})
     return out
 
 

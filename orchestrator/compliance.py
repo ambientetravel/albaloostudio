@@ -224,6 +224,11 @@ _SCHENGEN_ZONE = re.compile(r"(?i)\bschengen\b|شنگن|شینگن")
 _NEG_AFTER = re.compile(
     r"(?i)^[^.!?؟\n]{0,24}\b(is|are)\s+(not|never)\b"
     r"|^[^.!?؟\n]{0,24}(نیست|نیستند|نمی[‌\s]*باشد|ندارد)"
+    # «اگر شنیده‌اید فلان مسیر خلیج فارس «بدون ویزا» است، آن اطلاعات نادرست است»
+    # — "…that information is WRONG". The myth quoted to be refuted (cruisebaz,
+    # 13 Sep, BLOCKed). English: "…visa-free is a myth / is false / is wrong".
+    r"|^[^.!?؟\n]{0,30}(نادرست|اشتباه|غلط|شایعه)"
+    r"|^[^.!?؟\n]{0,24}\b(is|are)\s+(a\s+myth|false|wrong|incorrect)\b"
 )
 
 
@@ -573,11 +578,20 @@ def check(
                     "only AROYA Türkiye+Egypt and Seychelles qualify.",
                 ))
         for m in _SCHENGEN_MISLABEL.finditer(text):
+            # «آیا مسیرهایی که از استانبول حرکت می‌کنند همیشه بدون شنگن هستند؟ نه
+            # لزوماً» is the FAQ that debunks the myth (cruisebaz, 14 Sep, BLOCKed).
+            # A question asserts nothing — same treatment as the visa-free
+            # question above: kept visible as a WARN, never a BLOCK.
+            slo, shi = _clause_bounds(text, m)
+            sterm = text[shi:shi + 1]
+            asked = bool(sterm and sterm in "?؟") or bool(_INTERROGATIVE.search(text[slo:shi]))
             out.append(
                 Violation(
                     "visa_accuracy",
-                    BLOCK,
+                    WARN if asked else BLOCK,
                     _excerpt(text, m),
+                    "A question about Schengen exemption, not a claim — the answer must "
+                    "say one Schengen port makes it Schengen." if asked else
                     "Do not describe an itinerary as exempt from Schengen.",
                 )
             )

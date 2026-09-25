@@ -440,7 +440,7 @@ sites:
     # build for the Iranian audience lands around mid-August 2026; when it does,
     # THIS LINE MUST BECOME fa-IR. Declaring fa-IR early would flag every page
     # as a language mismatch for a week and train everyone to ignore the rule.
-    locale: en                 # → fa-IR when the Farsi build ships
+    locale: fa-IR              # Farsi build shipped — live <html lang="fa" dir="rtl">; was `en`, so 17 Sep's 4 guides came out English (fixed 25 Sep)
     market: IR
     status: active
     base_url: "https://cruise24.ir"
@@ -466,7 +466,7 @@ sites:
         autopost: false
         account_ref: null          # text-only, no Meta review — fastest channel for IR
     notes:
-      - "No sitemap.xml and no robots.txt (both 404 on 2026-08-09)."
+      - "sitemap.xml and robots.txt both live (200) as of 2026-09-25 — were 404 on 2026-08-09."
       - "Zero JSON-LD blocks."
 
   - domain: cruise24.me

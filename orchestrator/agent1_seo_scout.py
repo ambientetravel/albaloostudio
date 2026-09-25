@@ -447,6 +447,17 @@ def _trend(long_ctx: dict[str, float], short_ctx: dict[str, float] | None,
     return "rising" if ratio > 1.15 else "falling" if ratio < 0.85 else "flat"
 
 
+# A GSC query carrying search-operator syntax was typed by a tool, not a reader:
+# AI agents and scrapers search with `after:`/`site:`/`inurl:`. On 17 Sep one
+# became an ambientetravel brief with the operator baked into its URL —
+# /marrakech-instagrammable-filming-location-after-2026-07-30. No page should
+# target it, so it never becomes a candidate.
+_SEARCH_OPERATOR = re.compile(
+    r"(?i)(?:^|\s)-?(?:after|before|site|inurl|intitle|allintitle|allinurl|intext"
+    r"|filetype|ext|related|cache|source):\S"
+)
+
+
 def find_gaps(site: Site, gsc: dict[str, Any], sitemap_urls: set[str]) -> list[dict[str, Any]]:
     """Turn raw GSC rows into scored, typed gap candidates. No LLM involved yet."""
     long_agg = _agg(gsc["long_rows"])
@@ -460,6 +471,8 @@ def find_gaps(site: Site, gsc: dict[str, Any], sitemap_urls: set[str]) -> list[d
     for query, m in long_agg.items():
         if m["impressions"] < site.min_impressions or m["position"] > site.max_position:
             continue
+        if _SEARCH_OPERATOR.search(query):
+            continue  # a tool's search, not a reader's — see _SEARCH_OPERATOR
 
         ranked = pages_by_query.get(query, [])
         top_url = ranked[0][0] if ranked else None
@@ -1714,7 +1727,12 @@ def process_site(
                 violations, payload["compliance"]["profile"]
             )
             stat["briefs_emitted"] += 1
-            if ledger is not None:
+            # A degraded brief (no LLM step) is never drafted — Agent 2 skips it
+            # and says the gap will be "re-scouted next run". Recording it here
+            # made that promise false: the keyword sat in a 45-day cooldown with
+            # nothing written. boutimar.ir got ZERO drafts from 7 briefs this way
+            # (Aug–Sep). Only a brief the writer will actually use is recorded.
+            if ledger is not None and not analysis.get("_degraded"):
                 _ledger.record(ledger, site.domain, analysis["primary_keyword"],
                                payload["brief"].get("target_url_path"))
             if analysis.get("_degraded"):

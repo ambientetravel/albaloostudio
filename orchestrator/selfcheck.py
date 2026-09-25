@@ -2802,6 +2802,20 @@ ok("the PR gate skips internal docs and research inbox, judges site content",
 ok("a JSON file is judged item by item, so a neighbour's port cannot condemn a correct line",
    _sev(_prg._surface("d.json", '[{"link":"/ports/santorini/"},{"text":"فقط مسیرهای ترکیه و مصر AROYA و سیشل بدون ویزا هستند"}]')) == []
    and _sev('[{"link":"/ports/santorini/"},{"text":"فقط مسیرهای ترکیه و مصر AROYA و سیشل بدون ویزا هستند"}]') == [compliance.BLOCK])
+import agent1_seo_scout as _a1op
+ok("a GSC query with search-operator syntax is a tool's search and never becomes a candidate",
+   _a1op._SEARCH_OPERATOR.search("marrakech instagrammable filming location after:2026-07-30")
+   and _a1op._SEARCH_OPERATOR.search("site:boutimar.com iran dmc")
+   and not _a1op._SEARCH_OPERATOR.search("aroya cruise price")
+   and not _a1op._SEARCH_OPERATOR.search("قیمت کروز: راهنما"))
+ok("a quoted myth refuted in the same clause passes; the myth alone still blocks",
+   _sev("اگر جایی شنیده‌اید فلان مسیر خلیج فارس «بدون ویزا» است، آن اطلاعات نادرست است.") == []
+   and _sev("مسیر خلیج فارس بدون ویزا است.") == [compliance.BLOCK]
+   and _sev("Dubai visa-free is a myth.") == []
+   and _sev("Dubai is visa-free.") == [compliance.BLOCK])
+ok("«بدون شنگن» asked as a question warns; stated as fact it blocks",
+   _sev("آیا مسیرهایی که از استانبول حرکت می‌کنند همیشه بدون شنگن هستند؟ نه لزوماً.") == [compliance.WARN]
+   and _sev("این مسیر از استانبول بدون شنگن است.") == [compliance.BLOCK])
 ok("that gate profile catches a boutimar leak but not a correct Central Asia visa-free line",
    any(v.rule == "brand_neutral_embed"
        for v in compliance.check("book via بوتیمار", profile="orient_content_v1"))
