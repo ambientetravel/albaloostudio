@@ -440,15 +440,73 @@ _WS_FIXUPS = {
 _SENTENCE_END = set('.!?…"\'”’»)]؟।')
 
 
+# The writer narrating its own sourcing. The brief's field names ("consensus
+# figure", "proprietary fact") bait it, and the HEDGE ONCE prompt rule alone did
+# not hold: 11 of 19 boutimar.com PRs (13–20 Sep) carried lines like "We do not
+# have a sourced consensus figure — no official star rating…" and "the details
+# below reflect what is already published on this page rather than anything
+# reconstructed or assumed". That is a window into the pipeline, on a luxury
+# brand's page. Whole sentences matching this are removed; the one honest hedge
+# the rule allows ("confirm current rates with us before booking") does not match.
+_PROCESS_TALK = re.compile(
+    r"(?i)consensus figure|proprietary fact|\bsourced (?:consensus|figure|data|dates?|number)"
+    r"|\bno sourced\b|we (?:do not|don't) have (?:a )?sourced"
+    r"|(?:not been|never|wasn't|was not|were not|weren't) supplied(?: to us)?|supplied to us"
+    r"|data we hold|in front of us|rather than (?:guess|invent|reach)"
+    r"|we (?:won't|will not|would rather not|do not|don't) (?:invent|guess at|reach for)"
+    r"|we would rather say so|a number we cannot stand behind|reconstructed or assumed"
+    r"|already published on this page|this page exists because|what we can (?:say|tell you) plainly"
+    r"|we have not (?:added|guessed|embellished|invented)|guessed,? or embellished"
+    r"|(?:carried|shown|listed) on this page reflect|beyond (?:that|this) record"
+    r"|available to us|proprietary detail|we (?:do not|don't) currently hold|verified breakdown"
+    r"|we(?:'d| would) rather (?:tell|say|be)|we have not been given|can(?:'t|not) stand behind"
+    r"|dress it up|here we have to be straightforward|we want to be straightforward"
+    r"|we(?:'re| are) not going to (?:publish|hand|quote|invent)|haven't (?:sourced|been given)"
+    r"|we won't (?:pad|pretend)|named public source|figure we haven't|in (?:this|the) brief\b"
+    r"|رقم اجماعی|واقعیت اختصاصی|در اختیار ما (?:قرار )?(?:نگرفته|نیست)"
+)
+_SENT_SPLIT = re.compile(r"(?<=[.!?؟])\s+")
+
+
+def _strip_process_talk(text: str) -> str:
+    """Drop every sentence that narrates the pipeline's sourcing. Headings,
+    lists and all other sentences are left exactly as written. Idempotent."""
+    if not text or not _PROCESS_TALK.search(text):
+        return text
+    out = []
+    for para in text.split("\n\n"):
+        if para.lstrip().startswith(("#", "|", "- ", "* ", ">")) or not _PROCESS_TALK.search(para):
+            out.append(para)
+            continue
+        kept = [s for s in _SENT_SPLIT.split(para) if not _PROCESS_TALK.search(s)]
+        if kept:
+            out.append(" ".join(kept))
+    return "\n\n".join(out)
+
+
+def _scrub_faq(faq: Any) -> list[dict[str, Any]]:
+    """Same scrub for FAQ answers; an answer that was ONLY process talk is dropped
+    with its question (a question whose answer is 'we have no data' helps nobody)."""
+    out = []
+    for f in faq or []:
+        if not isinstance(f, dict):
+            continue
+        a = _strip_process_talk(str(f.get("a", ""))).strip()
+        if a:
+            out.append({**f, "a": a})
+    return out
+
+
 def _sanitize_body(text: str) -> str:
     """Strip meaningless whitespace artifacts without touching script-significant
-    joiners (ZWNJ/ZWJ). Idempotent."""
+    joiners (ZWNJ/ZWJ), and the writer's narration of its own sourcing.
+    Idempotent."""
     if not text:
         return text
     for bad, good in _WS_FIXUPS.items():
         if bad in text:
             text = text.replace(bad, good)
-    return text
+    return _strip_process_talk(text)
 
 
 def _draft_incomplete_reason(body: str, brief: ContentBrief) -> str | None:
@@ -1055,6 +1113,7 @@ def _call_anthropic(
         if not draft.get("body_markdown"):
             raise ValueError("model returned no body_markdown")
         draft["body_markdown"] = _sanitize_body(draft["body_markdown"])
+        draft["faq"] = _scrub_faq(draft.get("faq"))
         last_reason = _draft_incomplete_reason(draft["body_markdown"], brief) or ""
         if not last_reason:
             break
@@ -1114,6 +1173,7 @@ def _call_gemini(
             if not draft.get("body_markdown"):
                 raise ValueError("model returned no body_markdown")
             draft["body_markdown"] = _sanitize_body(draft["body_markdown"])
+            draft["faq"] = _scrub_faq(draft.get("faq"))
             reason = _draft_incomplete_reason(draft["body_markdown"], brief)
             if reason:
                 raise ValueError(f"incomplete draft: {reason}")

@@ -868,7 +868,7 @@ ok("and the error says which two things would fix it",
 _src2 = pathlib.Path(__file__).with_name("agent2_writer_listener.py").read_text(encoding="utf-8")
 # Anchor on the gemini retry specifically — the anthropic path now shares the
 # same `for attempt in range(1, 4)` idiom, so key on its unique _gemini_once call.
-_seg = _src2.split("text, usage = _gemini_once", 1)[1][:900]
+_seg = _src2.split("text, usage = _gemini_once", 1)[1][:1100]
 ok("a missing credential is not retried three times",
    "except config.ConfigError" in _seg and "raise" in _seg,
    "retrying a ConfigError wastes 7s per brief and buries the cause")
@@ -3593,6 +3593,24 @@ ok("the per-account daily cap holds (3 on one day), the next day is clear",
    and _b3a.account_guard(_acc, _k, "b9", "2026-10-02", 3) is None)
 ok("--no-llm (accounts=None) never blocks or records",
    _b3a.account_guard(None, _k, "کروز آروآ", "2026-10-01", 3) is None)
+
+
+print("\n=== the writer never narrates its own sourcing ===")
+_pt = ("## Overview\n\nEspinas Palace sits in Tehran's north. We do not have a sourced consensus "
+       "figure — no official star rating — to state here. The lobby is marble and quiet.\n\n"
+       "## Rooms\n\nThe room categories carried on this page reflect only what the hotel has "
+       "published — we have not added, guessed, or embellished a single type.\n\n"
+       "Confirm current visa rules with the consulate before you book.")
+_ps = a2._strip_process_talk(_pt)
+ok("process-talk sentences are removed, the prose around them is kept",
+   "consensus figure" not in _ps and "embellished" not in _ps
+   and "The lobby is marble and quiet." in _ps and "sits in Tehran's north." in _ps
+   and "## Rooms" in _ps)
+ok("the one allowed in-voice hedge survives", "Confirm current visa rules with the consulate" in _ps)
+ok("the scrub is idempotent", a2._strip_process_talk(_ps) == _ps)
+ok("an FAQ answer that is only process talk goes, with its question",
+   a2._scrub_faq([{"q": "Rates?", "a": "We do not have a sourced figure."},
+                  {"q": "Where?", "a": "North Tehran."}]) == [{"q": "Where?", "a": "North Tehran."}])
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
