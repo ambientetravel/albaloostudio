@@ -127,4 +127,24 @@ LIVE=$(curl -fsS --max-time 20 "$BASE_URL/sitemap.xml" | grep -c "<loc>" || echo
 echo "  live sitemap: $LIVE URLs (built: $LOCAL)"
 OFFER=$(curl -fsS -o /dev/null -w "%{http_code}" --max-time 20 "$BASE_URL/offer.json" || echo ERR)
 echo "  offer.json: $OFFER"
+
+# ── 7. record what shipped — the repo must equal the live site ────────────────
+# The build refreshes the cruise feed on every run (fresh sailings — a stale
+# snapshot would keep departed ones listed), which leaves public_html/ and the
+# committed feed snapshot modified. Left uncommitted, the NEXT deploy's
+# `pull --ff-only` refuses as soon as a pushed article touches those files.
+# Only reached after every file uploaded (a failure exits above), so a partial
+# deploy is never recorded as shipped. Chosen over deploying --offline on 27 Sep.
+commit_shipped() {
+  git -C "$1" add public_html tools/data/feed.snapshot.json 2>/dev/null || git -C "$1" add public_html
+  if git -C "$1" diff --cached --quiet; then
+    echo "  repo already matches what shipped — nothing to record"
+    return 0
+  fi
+  git -C "$1" commit -q -m "deploy: shipped $(date -u +%Y-%m-%dT%H:%MZ) — rebuilt pages + feed refresh"
+  git -C "$1" push -q origin HEAD:main
+  echo "  recorded: $(git -C "$1" rev-parse --short HEAD) pushed to origin/main"
+}
+echo "▸ recording the shipped tree in git…"
+commit_shipped "$BUILD_DIR"
 echo "✓ done"

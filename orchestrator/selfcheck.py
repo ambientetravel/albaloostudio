@@ -3691,6 +3691,8 @@ ok("the writer applies it too, so manifest, intended URL and broadcast link agre
 ok("merge-watch finds an article recorded under the old top-level path",
    mw.derived_urls({"publication": {"cms": {"record_id": "keshti-kroz-chist"}}},
                    "https://cruise24.ir/keshti-kroz-chist") == ["https://cruise24.ir/blog/keshti-kroz-chist/"])
+ok("the cruise24 deploy records what it shipped (commit + push after a clean upload)",
+   "commit_shipped \"$BUILD_DIR\"" in pathlib.Path("tools/deploy-cruise24-ir.sh").read_text())
 ok("the cruise24 deploy pulls before it builds, fast-forward only",
    'pull --ff-only origin main' in pathlib.Path("tools/deploy-cruise24-ir.sh").read_text())
 
