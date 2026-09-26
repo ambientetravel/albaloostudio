@@ -1,7 +1,7 @@
 {
  "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
  "cooldown_days": 45,
- "updated_at": "2026-09-25T10:02:05+00:00",
+ "updated_at": "2026-09-26T22:26:14+00:00",
  "entries": [
   {
    "domain": "cruise24.me",
@@ -10,6 +10,14 @@
    "last_briefed": "2026-09-17T10:18:11+00:00",
    "times_briefed": 1,
    "target_url_path": "/guides/mediterranean-cruise-guide"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "Azerbaijan travel guide Baku and the fire temples",
+   "first_briefed": "2026-09-26T22:24:53+00:00",
+   "last_briefed": "2026-09-26T22:24:53+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/azerbaijan-baku-fire-temples"
   },
   {
    "domain": "exploreorient.com",
@@ -28,6 +36,14 @@
    "target_url_path": "/guides/central-asia-visa-guide"
   },
   {
+   "domain": "exploreorient.com",
+   "query": "Darvaza gas crater Turkmenistan travel guide",
+   "first_briefed": "2026-09-26T22:24:53+00:00",
+   "last_briefed": "2026-09-26T22:24:53+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/darvaza-gas-crater-turkmenistan"
+  },
+  {
    "domain": "ambientetravel.com",
    "query": "Iran DMC services for European tour operators",
    "first_briefed": "2026-09-17T10:14:10+00:00",
@@ -36,12 +52,36 @@
    "target_url_path": "/iran-dmc-services-tour-operators"
   },
   {
+   "domain": "exploreorient.com",
+   "query": "Kyrgyzstan nomad yurt stay guide",
+   "first_briefed": "2026-09-26T22:24:53+00:00",
+   "last_briefed": "2026-09-26T22:24:53+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/kyrgyzstan-nomad-yurt-stay"
+  },
+  {
    "domain": "ambientetravel.com",
    "query": "MICE destinations in the Middle East",
    "first_briefed": "2026-09-17T10:14:10+00:00",
    "last_briefed": "2026-09-17T10:14:10+00:00",
    "times_briefed": 1,
    "target_url_path": "/mice-destinations-middle-east"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "Morocco kasbah route travel guide",
+   "first_briefed": "2026-09-26T22:24:53+00:00",
+   "last_briefed": "2026-09-26T22:24:53+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/morocco-kasbah-route"
+  },
+  {
+   "domain": "exploreorient.com",
+   "query": "Oman frankincense trail Dhofar travel guide",
+   "first_briefed": "2026-09-26T22:24:53+00:00",
+   "last_briefed": "2026-09-26T22:24:53+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/oman-frankincense-trail-dhofar"
   },
   {
    "domain": "exploreorient.com",
@@ -170,14 +210,6 @@
    "last_briefed": "2026-09-17T11:43:15+00:00",
    "times_briefed": 1,
    "target_url_path": "/aroya/qeymat-cruise-aroya"
-  },
-  {
-   "domain": "cruisebaz.com",
-   "query": "aroya cruise ship price",
-   "first_briefed": "2026-09-20T09:19:50+00:00",
-   "last_briefed": "2026-09-20T09:19:50+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/gheymat-cruise-aroya"
   },
   {
    "domain": "cruisebaz.com",
@@ -620,12 +652,44 @@
    "target_url_path": "/tor-keshti"
   },
   {
+   "domain": "cruise24.ir",
+   "query": "راهنمای انتخاب کابین کشتی کروز",
+   "first_briefed": "2026-09-26T22:26:14+00:00",
+   "last_briefed": "2026-09-26T22:26:14+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/rahnamaye-entekhabe-kabin-keshti-kroz"
+  },
+  {
+   "domain": "cruise24.ir",
+   "query": "راهنمای بستن چمدان برای سفر دریایی",
+   "first_briefed": "2026-09-26T22:26:14+00:00",
+   "last_briefed": "2026-09-26T22:26:14+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/rahnamaye-baste-bandi-chamedan-safar-daryaei"
+  },
+  {
+   "domain": "cruise24.ir",
+   "query": "سفر کشتی کروز برای خانواده",
+   "first_briefed": "2026-09-26T22:26:14+00:00",
+   "last_briefed": "2026-09-26T22:26:14+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/safar-keshti-kroz-baraye-khanevade"
+  },
+  {
    "domain": "cruisebaz.com",
    "query": "کروز aroya",
    "first_briefed": "2026-09-14T11:08:52+00:00",
    "last_briefed": "2026-09-14T11:08:52+00:00",
    "times_briefed": 1,
    "target_url_path": "/aroya/moarefi"
+  },
+  {
+   "domain": "cruise24.ir",
+   "query": "کشتی کروز چیست و چگونه کار می‌کند",
+   "first_briefed": "2026-09-26T22:26:14+00:00",
+   "last_briefed": "2026-09-26T22:26:14+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/keshti-kroz-chist-va-chegoone-kar-mikonad"
   }
  ]
 }
