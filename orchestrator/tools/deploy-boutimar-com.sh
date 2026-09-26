@@ -23,6 +23,10 @@ echo "▸ boutimar.com deploy — from $(curl -fsS --max-time 10 https://api.ipi
 
 # ── 1. latest source ────────────────────────────────────────────────────────
 cd "$REPO_DIR"
+# Only ever build and ship main — a tree another session left on a feature
+# branch would otherwise be built and uploaded as if it were main.
+br=$(git branch --show-current)
+[ "$br" = "main" ] || { echo "✗ $REPO_DIR is on '${br:-detached HEAD}', not main — refusing to build or deploy. Run: git -C $REPO_DIR checkout main"; exit 1; }
 echo "▸ pulling latest main…"
 git pull --ff-only origin main
 

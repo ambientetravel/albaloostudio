@@ -41,6 +41,13 @@ echo "▸ cruise24.ir deploy — from $(curl -fsS --max-time 10 https://api.ipif
 # Without this a merged article never reached the site: the script built
 # whatever was on disk. --ff-only: if local and origin ever diverge it stops
 # loudly instead of shipping a stale tree (caught by the cruise24 session, 27 Sep).
+# Only ever build and ship main. If a session left the live tree on a feature
+# branch, the pull below would merge main INTO it, steps 1–5 would upload it
+# and step 7 would push it onto main — unreviewed work reaching production and
+# main together, with nothing in the output looking wrong. (Reproduced on
+# /bin/bash 3.2 by the cruise24 session, 27 Sep.) Detached HEAD prints "".
+br=$(git -C "$BUILD_DIR" branch --show-current)
+[ "$br" = "main" ] || { echo "✗ live tree is on '${br:-detached HEAD}', not main — refusing to build or deploy. Run: git -C $BUILD_DIR checkout main"; exit 1; }
 echo "▸ pulling latest main…"
 git -C "$BUILD_DIR" pull --ff-only origin main
 
@@ -142,7 +149,12 @@ commit_shipped() {
     return 0
   fi
   git -C "$1" commit -q -m "deploy: shipped $(date -u +%Y-%m-%dT%H:%MZ) — rebuilt pages + feed refresh"
-  git -C "$1" push -q origin HEAD:main
+  if ! git -C "$1" push -q origin HEAD:main; then
+    echo "✗ upload SUCCEEDED and the site is live, but the record was not pushed"
+    echo "  (usually a PR merged on GitHub mid-deploy). Fix with:"
+    echo "    git -C $1 pull --rebase origin main && git -C $1 push origin main"
+    return 1
+  fi
   echo "  recorded: $(git -C "$1" rev-parse --short HEAD) pushed to origin/main"
 }
 echo "▸ recording the shipped tree in git…"
