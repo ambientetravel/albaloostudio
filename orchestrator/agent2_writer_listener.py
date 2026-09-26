@@ -1261,6 +1261,12 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
     """
     site = brief.site
     adapter = site.cms.adapter or "unimplemented"
+    # The site's URL contract wins over whatever path the brief carries (the
+    # scout applies it too; this covers briefs written before it did).
+    tpl = str(_cms_dict(site).get("path_template") or "")
+    if "{slug}" in tpl:
+        slug = brief.brief.target_url_path.strip("/").split("/")[-1] or "page"
+        brief.brief.target_url_path = tpl.format(slug=slug)
     url = f"{site.base_url}{brief.brief.target_url_path}"
 
     # No public credit footer. The Albaloo architecture credit belongs in the

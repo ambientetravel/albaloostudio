@@ -511,6 +511,7 @@ sites:
     cms:
       type: static
       adapter: bundle_pr         # opens a PR of content/blog/<record_id>/{index.md,manifest.json}
+      path_template: "/blog/{slug}/"   # c24blog.py render_post() SystemExits on any other shape — the whole site build
                                  # into ambientetravel/cruise24-ir (ASTRO_REPO_CRUISE24_IR).
                                  # tools/build.py renders it; deploy-cruise24-ir.sh ships public_html/.
                                  # Degrades to disk-staging if the repo var/token are unset.

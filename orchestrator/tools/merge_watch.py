@@ -217,6 +217,15 @@ def derived_urls(event: dict[str, Any], intended: str = "") -> list[str]:
     collection = str((site.cms or {}).get("collection") or "").strip("/")
     if collection:
         out.append(f"{site.base_url}/{collection}/{slug}/")
+    # A site with a URL contract (cms.path_template, e.g. cruise24.ir's
+    # "/blog/{slug}/"). record_id is the path with "/" → "-", so the template's
+    # own prefix ("blog-") is stripped back off before re-applying it. This also
+    # rescues the four 26 Sep cruise24 events recorded with top-level paths.
+    tpl = str((site.cms or {}).get("path_template") or "")
+    if "{slug}" in tpl:
+        pre = tpl.split("{slug}")[0].strip("/").replace("/", "-")
+        s = slug[len(pre) + 1:] if pre and slug.startswith(pre + "-") else slug
+        out.append(f"{site.base_url}{tpl.format(slug=s)}")
     # boutimar.ir's static adapter builds a flat file, not a collection route.
     if (site.cms or {}).get("adapter") == "boutimar_ir_static":
         out.append(f"{site.base_url}/daryanameh/{slug}.html")

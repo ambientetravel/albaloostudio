@@ -3667,5 +3667,32 @@ ok("with no token, --apply degrades to a dry run and writes nothing",
 ok("every staged draft is accounted for (sent, would-send or skipped with a reason)",
    _out.count("  would ") + _out.count("  skip ") == len(list(_bf.SRC.glob("*.json"))))
 
+
+print("\n=== a site's URL contract wins (cruise24.ir /blog/<slug>/) ===")
+_c24 = [x for x in config.load_sites(include_hold=True) if x.domain == "cruise24.ir"][0]
+ok("the scout forces cruise24.ir paths into /blog/<slug>/",
+   a1.apply_path_template(_c24, "/keshti-kroz-chist") == "/blog/keshti-kroz-chist/"
+   and a1.apply_path_template(_c24, "/blog/x/") == "/blog/x/"
+   and a1.apply_path_template(_c24, "/guide/y") == "/blog/y/")
+_b = [x for x in config.load_sites(include_hold=True) if x.domain == "boutimar.com"][0]
+ok("a site without a template is untouched", a1.apply_path_template(_b, "/hotels/x/") == "/hotels/x/")
+_tp = json.loads(json.dumps(payload))
+_tp["site"]["cms"] = {"type": "static", "adapter": "bundle_pr", "path_template": "/blog/{slug}/"}
+_tp["brief"]["target_url_path"] = "/rahnamaye-x"
+_tpm = a2.ContentBrief.model_validate(_tp)
+_orig_b = a2._push_bundle_pr
+a2._push_bundle_pr = lambda br, dr, url: {"url": url, "path": br.brief.target_url_path}
+try:
+    _r = a2.push_to_cms(_tpm, _b44d)
+finally:
+    a2._push_bundle_pr = _orig_b
+ok("the writer applies it too, so manifest, intended URL and broadcast link agree",
+   _r["path"] == "/blog/rahnamaye-x/" and _r["url"].endswith("/blog/rahnamaye-x/"))
+ok("merge-watch finds an article recorded under the old top-level path",
+   mw.derived_urls({"publication": {"cms": {"record_id": "keshti-kroz-chist"}}},
+                   "https://cruise24.ir/keshti-kroz-chist") == ["https://cruise24.ir/blog/keshti-kroz-chist/"])
+ok("the cruise24 deploy pulls before it builds, fast-forward only",
+   'pull --ff-only origin main' in pathlib.Path("tools/deploy-cruise24-ir.sh").read_text())
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

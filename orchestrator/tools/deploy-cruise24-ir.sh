@@ -37,6 +37,13 @@ FULL=0; [ "${1:-}" = "--full" ] && FULL=1
 
 echo "▸ cruise24.ir deploy — from $(curl -fsS --max-time 10 https://api.ipify.org || echo '?') (must be on the FTP allowlist)"
 
+# ── 0. latest source — pipeline articles arrive as merged PRs on GitHub ──────
+# Without this a merged article never reached the site: the script built
+# whatever was on disk. --ff-only: if local and origin ever diverge it stops
+# loudly instead of shipping a stale tree (caught by the cruise24 session, 27 Sep).
+echo "▸ pulling latest main…"
+git -C "$BUILD_DIR" pull --ff-only origin main
+
 # ── 1. build (tree A: python3 tools/build.py, idempotent, refreshes its feed) ─
 cd "$BUILD_DIR"
 echo "▸ building (python3 tools/build.py → $OUT/)…"

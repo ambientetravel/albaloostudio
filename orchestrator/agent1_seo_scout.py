@@ -552,6 +552,19 @@ def _excluded(site: Site, candidates: list[dict[str, Any]]) -> set[str]:
     return {c["query"] for c in candidates if any(p.search(c["query"]) for p in pats)}
 
 
+def apply_path_template(site: Site, path: str) -> str:
+    """Force the site's URL contract onto a proposed path. cruise24.ir's build
+    accepts only /blog/<slug>/ and SystemExits on anything else — the WHOLE site
+    build, not just the article — so its first four Farsi PRs (26 Sep, top-level
+    /keshti-kroz-…) could not be merged. The model proposes the slug; the site
+    decides where slugs live. cms.path_template, e.g. "/blog/{slug}/"."""
+    tpl = str((site.cms or {}).get("path_template") or "").strip()
+    if not tpl or "{slug}" not in tpl:
+        return path
+    slug = path.strip("/").split("/")[-1] or "page"
+    return tpl.format(slug=slug)
+
+
 def _improves_existing(site: Site) -> bool:
     """True only when this site's adapter can edit an existing page in place.
     None can today; a site opts in with cms.improve_existing: true once one does."""
@@ -1396,6 +1409,7 @@ def build_brief_payload(
     path = analysis["target_url_path"]
     if not path.startswith("/"):
         path = "/" + path
+    path = apply_path_template(site, path)
 
     # A must_include item that names a banned term is the model restating a
     # prohibition in the wrong field — "...never 'Arabian Gulf', easy visa not
