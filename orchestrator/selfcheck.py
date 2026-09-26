@@ -3652,5 +3652,20 @@ ok("real trade queries are not", not ({"iran dmc services for tour operators",
 ok("the scout's model is told to reject a misspelled or unverifiable named subject",
    "never brief a misspelling" in a1._analysis_user_prompt(_at, [], 1))
 
+
+print("\n=== backfill of pre-adapter base44 drafts ===")
+import io, contextlib
+import backfill_base44 as _bf
+_buf = io.StringIO()
+_tok = os.environ.pop("BASE44_ACCESS_TOKEN", None)
+with contextlib.redirect_stdout(_buf):
+    _rc = _bf.main(["--apply"])          # no token → must fall back to a dry run
+if _tok is not None: os.environ["BASE44_ACCESS_TOKEN"] = _tok
+_out = _buf.getvalue()
+ok("with no token, --apply degrades to a dry run and writes nothing",
+   _rc == 0 and "Dry run instead" in _out and "0 written" in _out)
+ok("every staged draft is accounted for (sent, would-send or skipped with a reason)",
+   _out.count("  would ") + _out.count("  skip ") == len(list(_bf.SRC.glob("*.json"))))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
