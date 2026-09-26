@@ -60,6 +60,18 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.com/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: en
+    # 27 Sep: GSC gaps here are almost all improvement-type (now reported, not briefed),
+    # so without seeds the site briefs nothing new. Each seed = an informational guide
+    # for a tour the site SELLS (offer.json) — the guide links to the tour, never twins it.
+    seed_keywords:
+      - Skiing in Iran guide Dizin and Shemshak          # /experience/tours/persian-powder-ski/
+      - Climbing Mount Damavand guide                    # /experience/tours/damavand-summit/
+      - Birdwatching in Iran guide                       # /experience/tours/birds-of-persia/
+      - Stargazing in the Iranian desert                 # /experience/tours/desert-skies/
+      - Cycling in Iran guide                            # /experience/tours/persia-by-bike/
+      - Persian gardens UNESCO sites guide               # /experience/tours/the-persian-garden/
+      - Biblical sites in Iran Esther and Daniel         # /experience/tours/biblical-persia/
+      - Women travelling in Iran practical guide         # /experience/tours/persia-womens-journey/
     market: INT
     base_url: "https://boutimar.com"
     # Where the bytes actually live. Recorded because it was tribal
@@ -148,6 +160,15 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.ir/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: fa-IR
+    # 27 Sep: informational guides for regions it SELLS (offer.json) — best-time / how-to
+    # angles the product pages do not cover. Distinct from cruise24.ir's seeds (fa_cruise).
+    seed_keywords:
+      - بهترین زمان سفر دریایی به فیوردهای نروژ          # norwegian-fjords.html
+      - کروز زمستانی جزایر قناری و مادیرا                # canary-islands.html
+      - کروز پایتخت‌های بالتیک از استکهلم تا تالین       # baltic-capitals.html
+      - راهنمای سفر دریایی دور دنیا برای ایرانیان         # big-journeys.html
+      - کروز لوکس چیست و چه تفاوتی با کروز معمولی دارد  # explora.html
+      - سفر دریایی به ژاپن و کره با کشتی کروز            # asia.html
     audience_group: fa_cruise   # one Farsi cruise audience + the «دریانامه» Telegram — a topic is briefed on ONE of these sites
     market: IR
     base_url: "https://boutimar.ir"
@@ -468,6 +489,12 @@ sites:
     # build for the Iranian audience lands around mid-August 2026; when it does,
     # THIS LINE MUST BECOME fa-IR. Declaring fa-IR early would flag every page
     # as a language mismatch for a week and train everyone to ignore the rule.
+      # 27 Sep: next beginner guides, each tied to a product page (offer.json).
+      - دریازدگی در سفر دریایی و راه‌های پیشگیری
+      - تفاوت ویزای کروز ترکیه با کروز یونان برای ایرانیان   # cruise-turkiye / cruise-greece
+      - راهنمای بندر گالاتاپورت استانبول برای مسافران کروز  # cruise-istanbul.html
+      - برنامه‌ریزی کروز نوروز ۱۴۰۶                         # cruise-nowruz-1406.html
+      - انتخاب کشتی مناسب در ناوگان MSC                      # msc.html
     locale: fa-IR              # Farsi build shipped — live <html lang="fa" dir="rtl">; was `en`, so 17 Sep's 4 guides came out English (fixed 25 Sep)
     audience_group: fa_cruise   # one Farsi cruise audience + the «دریانامه» Telegram — a topic is briefed on ONE of these sites
     market: IR
