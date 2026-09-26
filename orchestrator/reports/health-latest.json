@@ -1,56 +1,55 @@
 {
- "generated": "2026-09-26T12:10+00:00",
+ "generated": "2026-09-26T22:36+00:00",
  "critical": [],
  "needs_you": [
-  "5 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
-  "**19 article PR(s) waiting on your merge** (oldest 13 days): [boutimar#9](https://github.com/ambientetravel/boutimar/pull/9) Agent 2 draft: Espinas Palace Hotel Tehran: Loca; [boutimar#10](https://github.com/ambientetravel/boutimar/pull/10) Agent 2 draft: Alamut Castle Iran: History, Acce; [boutimar#11](https://github.com/ambientetravel/boutimar/pull/11) Agent 2 draft: Elecomp 2026 Tehran: ICT & Electr; [boutimar#12](https://github.com/ambientetravel/boutimar/pull/12) Agent 2 draft: Maranjab Desert Tour: Salt Lake &; [boutimar#13](https://github.com/ambientetravel/boutimar/pull/13) Agent 2 draft: Iran Health 2027: Medical & Welln; [boutimar#14](https://github.com/ambientetravel/boutimar/pull/14) Agent 2 draft: Parsian Khazar Hotel, Chalous | B; [boutimar#15](https://github.com/ambientetravel/boutimar/pull/15) Agent 2 draft: Iran Oil Show 2026 | Exhibition G; [boutimar#16](https://github.com/ambientetravel/boutimar/pull/16) Agent 2 draft: Hotels in Isfahan — Where to Stay; [boutimar#17](https://github.com/ambientetravel/boutimar/pull/17) Agent 2 draft: Is Iran Open to Tourists Right No; [boutimar#18](https://github.com/ambientetravel/boutimar/pull/18) Agent 2 draft: Kadus Grand Hotel, Rasht — Rooms ; [boutimar#19](https://github.com/ambientetravel/boutimar/pull/19) Agent 2 draft: Where to Stay in Shiraz: A Hotel ; [boutimar#20](https://github.com/ambientetravel/boutimar/pull/20) Agent 2 draft: Kadus Grand Hotel, Rasht: A Close; [boutimar#21](https://github.com/ambientetravel/boutimar/pull/21) Agent 2 draft: Iran Plast 2026: A Visitor's Trav; [boutimar#22](https://github.com/ambientetravel/boutimar/pull/22) Agent 2 draft: Iran Health & Wellness Market: Bu; [boutimar#23](https://github.com/ambientetravel/boutimar/pull/23) Agent 2 draft: Alamut Castle: The Complete Visit; [boutimar#24](https://github.com/ambientetravel/boutimar/pull/24) Agent 2 draft: Dariush Grand Hotel, Kish Island ; [boutimar#25](https://github.com/ambientetravel/boutimar/pull/25) Agent 2 draft: Shahsevan Nomadic Life: Seasonal ; [boutimar#26](https://github.com/ambientetravel/boutimar/pull/26) Agent 2 draft: Halal Travel in Iran: What to Exp; [boutimar#27](https://github.com/ambientetravel/boutimar/pull/27) Agent 2 draft: Joybar Boutique Hotel, Yazd: Room"
+  "5 social post(s) blocked for **missing media** — no image source is wired, so these can never ship"
  ],
  "warn": [],
  "fine": [
   "5 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
  "numbers": {
-  "briefs": 7,
+  "briefs": 9,
   "candidates": 84,
   "dlq": 0,
   "degraded": 0,
-  "ledger_skipped": 71,
+  "ledger_skipped": 57,
   "sites_scanned": 10,
-  "scout_run": "run_20260920T0917Z_8d39",
-  "articles": 6,
+  "scout_run": "run_20260926T2223Z_ef4c",
+  "articles": 9,
   "writer_failed": 0,
   "deferred": 0,
-  "briefs_seen": 7,
-  "cost_usd": 0.615147,
-  "prev_cost_usd": 0.103773,
-  "prev_articles": 1,
+  "briefs_seen": 9,
+  "cost_usd": 1.077273,
+  "prev_cost_usd": 0.615147,
+  "prev_articles": 6,
   "posts": 10,
   "posts_held": 5,
   "posts_no_media": 5,
   "campaigns": 5,
-  "open_prs": 19
+  "open_prs": 9
  },
  "agents": [
   {
    "agent": "Scout",
    "result": "success",
-   "age_days": 6.1,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35501856934",
-   "run": 44
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36276106859",
+   "run": 45
   },
   {
    "agent": "Writer",
    "result": "success",
-   "age_days": 6.1,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35502016697",
-   "run": 57
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36276280149",
+   "run": 58
   },
   {
    "agent": "Broadcaster",
-   "result": "success",
-   "age_days": 6.1,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35502261327",
-   "run": 56
+   "result": "in_progress",
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36276792299",
+   "run": 57
   },
   {
    "agent": "Closer",
@@ -61,21 +60,21 @@
   {
    "agent": "Auditor+Analyst",
    "result": "success",
-   "age_days": 5.1,
+   "age_days": 5.5,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35588751207",
    "run": 9
   },
   {
    "agent": "Cartographer",
    "result": "success",
-   "age_days": 5.0,
+   "age_days": 5.5,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35591602659",
    "run": 11
   },
   {
    "agent": "Watcher",
    "result": "success",
-   "age_days": 6.1,
+   "age_days": 6.5,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35505090018",
    "run": 9
   },
@@ -88,21 +87,21 @@
   {
    "agent": "Merge-watch",
    "result": "success",
-   "age_days": 0.0,
+   "age_days": 0.4,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36240730322",
    "run": 45
   },
   {
    "agent": "PR gate",
    "result": "success",
-   "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36237434068",
-   "run": 87
+   "age_days": 0.1,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36270659405",
+   "run": 89
   },
   {
    "agent": "Dashboard",
    "result": "success",
-   "age_days": 5.0,
+   "age_days": 5.4,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35598196884",
    "run": 12
   }
