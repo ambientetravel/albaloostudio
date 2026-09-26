@@ -726,9 +726,28 @@ def _analysis_system_prompt(site: Site) -> str:
     ])
 
 
+# Per-run: what each site's audience-group siblings already briefed, set at the
+# ledger-filter step and read here. A module dict rather than a new parameter
+# because four provider paths build this prompt and all four must see it.
+_SIBLING_COVERAGE: dict[str, list[dict[str, str]]] = {}
+
+
 def _analysis_user_prompt(site: Site, candidates: list[dict[str, Any]], limit: int) -> str:
+    sib = _SIBLING_COVERAGE.get(site.domain) or []
+    extra = {}
+    if sib:
+        extra = {
+            "sibling_sites_already_cover": sib[:40],
+            "sibling_rule": (
+                "These topics are already briefed on sister sites that serve the SAME "
+                "audience. Do not brief the same topic or intent here — pick a clearly "
+                "different angle that this site's catalogue supports, or reject the "
+                "candidate. Two of our own sites competing for one search is a loss."
+            ),
+        }
     return json.dumps(
         {
+            **extra,
             "site": {
                 "domain": site.domain, "brand": site.brand, "locale": site.locale,
                 "market": site.market, "base_url": site.base_url,
@@ -1685,7 +1704,10 @@ def process_site(
         # the run move to NEW gaps instead of re-proposing the same keywords it
         # proposed last week — the loop that had «لانزاروته» briefed ten times.
         if ledger is not None:
-            kept, skipped = _ledger.filter_candidates(candidates, ledger, site.domain)
+            siblings = config.audience_siblings(site)
+            kept, skipped = _ledger.filter_candidates(candidates, ledger, site.domain,
+                                                      siblings=siblings)
+            _SIBLING_COVERAGE[site.domain] = _ledger.sibling_topics(ledger, siblings)
             stat["skipped_recent"] = len(skipped)
             stat["skipped_queries"] = skipped[:20]
             if skipped:

@@ -164,6 +164,9 @@ jobs:
           ASTRO_REPO_CRUISE24_IR: ${{ vars.ASTRO_REPO_CRUISE24_IR }}
           ASTRO_REPO: ${{ vars.ASTRO_REPO }}
           ASTRO_GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+          # base44 (cruisebaz.com, ambientetravel.com): one workspace personal
+          # access token. Absent → base44_entity stages to disk and says so.
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
           # WordPress. Absent until set, in which case the adapter stages the
           # draft and says so rather than pretending to publish. An Application
           # Password, never the account password — revocable on its own and

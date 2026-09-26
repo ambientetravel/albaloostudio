@@ -87,15 +87,61 @@ def recently_briefed(doc: dict[str, Any], domain: str, now: datetime | None = No
     return skip
 
 
+# Spellings of one name that must compare equal. AROYA alone is written five
+# ways across the three Farsi sites' queries; without this «کشتی aroya» on
+# boutimar.ir and «کروز آروآ» on cruisebaz never register as the same topic.
+_ALIASES = {"آرویا": "aroya", "آروآ": "aroya", "آروآیا": "aroya", "آروا": "aroya",
+            "اروا": "aroya", "آرویا،": "aroya", "keruz": "cruise", "kroz": "cruise",
+            "کروز": "cruise", "کشتی": "cruise", "ship": "cruise", "cruises": "cruise"}
+_STOP = {"the", "a", "of", "for", "to", "in", "and", "و", "در", "از", "به", "برای", "با"}
+
+
+def topic_key(query: str) -> frozenset[str]:
+    """A spelling-insensitive identity for a query: its token SET after
+    normalising Arabic/Persian letter forms, ZWNJ and known aliases. Word order
+    and filler words do not make a different topic."""
+    import unicodedata
+    q = unicodedata.normalize("NFKC", str(query)).lower()
+    q = q.replace("\u200c", " ").replace("ي", "ی").replace("ك", "ک")
+    toks = [t.strip(".,:;!?؟،()«»\"'") for t in q.split()]
+    return frozenset(_ALIASES.get(t, t) for t in toks if t and t not in _STOP)
+
+
+def sibling_topics(doc: dict[str, Any], siblings: list[str] | tuple[str, ...],
+                   now: datetime | None = None) -> list[dict[str, str]]:
+    """What the sibling sites of an audience group briefed inside the cooldown —
+    the topics this site must not duplicate."""
+    now = now or datetime.now(timezone.utc)
+    cooldown = int(doc.get("cooldown_days", DEFAULT_COOLDOWN_DAYS))
+    out = []
+    for e in doc.get("entries", []):
+        if e.get("domain") not in siblings:
+            continue
+        last = _parse(e.get("last_briefed"))
+        if last is None or (now - last).days < cooldown:
+            out.append({"domain": e["domain"], "query": e["query"],
+                        "target_url_path": e.get("target_url_path") or ""})
+    return out
+
+
 def filter_candidates(candidates: list[dict[str, Any]], doc: dict[str, Any],
-                      domain: str, now: datetime | None = None
+                      domain: str, now: datetime | None = None,
+                      siblings: list[str] | tuple[str, ...] = ()
                       ) -> tuple[list[dict[str, Any]], list[str]]:
-    """Return (kept, skipped_queries). Order preserved."""
+    """Return (kept, skipped_queries). Order preserved.
+
+    `siblings` are the other sites of this one's audience group: a query one of
+    them briefed inside the cooldown is skipped here too — first site to brief a
+    topic owns it — matched by topic_key so spelling variants count."""
     skip = recently_briefed(doc, domain, now)
+    sib_keys = {topic_key(t["query"]) for t in sibling_topics(doc, siblings, now)}
     kept, skipped = [], []
     for c in candidates:
-        if c.get("query") in skip:
-            skipped.append(c["query"])
+        q = c.get("query")
+        if q in skip:
+            skipped.append(q)
+        elif sib_keys and topic_key(q) in sib_keys:
+            skipped.append(f"{q} (owned by a sibling site)")
         else:
             kept.append(c)
     return kept, skipped

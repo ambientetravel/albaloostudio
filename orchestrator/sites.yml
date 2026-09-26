@@ -148,6 +148,7 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.ir/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: fa-IR
+    audience_group: fa_cruise   # one Farsi cruise audience + the «دریانامه» Telegram — a topic is briefed on ONE of these sites
     market: IR
     base_url: "https://boutimar.ir"
     # Where the bytes actually live. Recorded because it was tribal
@@ -228,6 +229,19 @@ sites:
       - "Uzbekistan cultural tour guide"
       - "Caucasus multi-country itinerary"
       - "Central Asia visa guide for travellers"
+      # 26 Sep: the first five were all written (4 live). Each below maps to a tour the
+      # site SELLS (offer.json) with no journal article yet — so the writer has a real
+      # product to ground on and the page earns demand for it. Informational intent only.
+      - Darvaza gas crater Turkmenistan travel guide        # /tour/door-to-hell-expedition/
+      - AlUla travel guide Saudi Arabia                     # /tour/alula-and-the-kingdom/
+      - Nile dahabiya cruise guide                          # /tour/nile-dahabiya-odyssey/
+      - Kyrgyzstan nomad yurt stay guide                    # /tour/nomad-summer/
+      - Petra and Wadi Rum itinerary                        # /tour/petra-rum-and-the-dead-sea/
+      - Oman frankincense trail Dhofar travel guide         # /tour/frankincense-and-fjords/
+      - Lycian coast gulet cruise guide                     # /tour/lycian-gulet-odyssey/
+      - Azerbaijan travel guide Baku and the fire temples   # /tour/land-of-fire/
+      - Armenia monasteries tour guide                      # /tour/monasteries-and-brandy/
+      - Morocco kasbah route travel guide                   # /tour/kasbahs-and-caravans/
     locale: en
     market: INT
     base_url: "https://exploreorient.com"
@@ -354,6 +368,8 @@ sites:
     cms:
       type: base44
       adapter: base44_entity
+      app_id: "69a62d9872bf72a85738b6f8"      # from the live page's appId — not a secret
+      entity: Article                    # created by the owning site session (contract: _push_base44_entity)
       content_root: "/"
       publish_mode: draft
     channels:
@@ -395,6 +411,7 @@ sites:
     gsc_account: "UNCONFIRMED"
     brand: CruiseBaz
     locale: fa-IR
+    audience_group: fa_cruise   # one Farsi cruise audience + the «دریانامه» Telegram — a topic is briefed on ONE of these sites
     market: IR
     base_url: "https://cruisebaz.com"
     # Where the bytes actually live. Recorded because it was tribal
@@ -408,6 +425,8 @@ sites:
     cms:
       type: base44
       adapter: base44_entity
+      app_id: "69a20a26965079a660bdda58"      # from the live page's appId — not a secret
+      entity: Article                    # created by the owning site session (contract: _push_base44_entity)
       content_root: "/"
       publish_mode: draft
     channels:
@@ -441,6 +460,7 @@ sites:
     # THIS LINE MUST BECOME fa-IR. Declaring fa-IR early would flag every page
     # as a language mismatch for a week and train everyone to ignore the rule.
     locale: fa-IR              # Farsi build shipped — live <html lang="fa" dir="rtl">; was `en`, so 17 Sep's 4 guides came out English (fixed 25 Sep)
+    audience_group: fa_cruise   # one Farsi cruise audience + the «دریانامه» Telegram — a topic is briefed on ONE of these sites
     market: IR
     status: active
     base_url: "https://cruise24.ir"

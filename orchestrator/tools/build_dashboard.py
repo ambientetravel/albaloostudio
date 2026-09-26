@@ -99,6 +99,8 @@ def _latest_scout(root: Path) -> dict | None:
 # active sites, and on 16 Aug exactly one of them could take an article.
 _LIVE_ADAPTERS = {"astro_pr", "bundle_pr", "boutimar_ir_static", "wordpress_rest"}
 _STAGE_ADAPTERS = {"static_bundle"}
+# Writes a DRAFT record into the site's base44 app (published by hand there).
+_CMS_DRAFT_ADAPTERS = {"base44_entity"}
 
 
 def _coverage() -> list[dict[str, str]]:
@@ -115,6 +117,8 @@ def _coverage() -> list[dict[str, str]]:
             verdict, cls = "on hold", "hold"
         elif adapter in _LIVE_ADAPTERS:
             verdict, cls = "opens a pull request", "ok"
+        elif adapter in _CMS_DRAFT_ADAPTERS:
+            verdict, cls = "creates a draft in its CMS", "ok"
         elif adapter in _STAGE_ADAPTERS:
             verdict, cls = "stages a bundle — manual deploy", "warn"
         elif unsupported:

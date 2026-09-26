@@ -443,6 +443,13 @@ class Site:
     # nothing real to ground on and hedged generically. Empty = the writer never
     # sees access data (unchanged behaviour). See bridge/OFFER-FEED-CONTRACT.md.
     access_feed: str = ""
+    # Sites that serve ONE audience from shared content — the Farsi cruise
+    # storefronts (boutimar.ir, cruisebaz.com, cruise24.ir) all feed the single
+    # «دریانامه» Telegram channel. Within a group a topic is briefed once: 8 of
+    # cruisebaz's 10 drafts were AROYA, the same demand boutimar.ir and
+    # cruise24.ir target, so the three sites were competing for one search
+    # result. Empty = no group, unchanged behaviour.
+    audience_group: str = ""
 
     @property
     def on_hold(self) -> bool:
@@ -510,6 +517,7 @@ def load_sites(
                 seed_keywords=[str(k).strip() for k in (merged.get("seed_keywords") or []) if str(k).strip()],
                 offer_feed=str(merged.get("offer_feed", "") or "").strip(),
                 access_feed=str(merged.get("access_feed", "") or "").strip(),
+                audience_group=str(merged.get("audience_group", "") or "").strip(),
             )
         )
 
@@ -522,6 +530,15 @@ def load_sites(
             sites = [s for s in sites if not s.on_hold]
             _log_hold(held)
     return sites
+
+
+def audience_siblings(site: "Site", path: Path | None = None) -> list[str]:
+    """Other domains in this site's audience_group (held ones included — a held
+    site's briefed topics are still taken). Empty when the site has no group."""
+    if not site.audience_group:
+        return []
+    return [s.domain for s in load_sites(path, include_hold=True)
+            if s.audience_group == site.audience_group and s.domain != site.domain]
 
 
 def _log_hold(domains: list[str]) -> None:

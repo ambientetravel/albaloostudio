@@ -2480,8 +2480,12 @@ ok("coverage covers the whole registry",
    len(_cov) == len(config.load_sites(include_hold=True)))
 ok("held sites are marked held, not broken",
    any(r["cls"] == "hold" for r in _cov))
-ok("a site with no adapter is marked as such",
-   any(r["cls"] == "bad" for r in _cov))
+# No site is red any more: the last gap (base44) got its adapter on 26 Sep.
+# What must hold instead is that the base44 pair reads as a CMS draft path,
+# not as "opens a pull request" (it does not) and not as a gap.
+ok("the base44 sites are a CMS-draft path, not a gap and not a PR",
+   all(r["cls"] == "ok" and "draft in its CMS" in r["verdict"]
+       for r in _cov if r["domain"] in ("cruisebaz.com", "ambientetravel.com")))
 ok("escapes its inputs", "&lt;" in _dm.render(
     None, {"outcomes": [{"domain": "<script>", "keyword": "x", "status": "drafted",
                          "words": 1}]}, None))
@@ -3310,10 +3314,7 @@ ok("the reason reaches the rendered page",
    "GoDaddy Website Builder has no publishing API" in _bd.render(None, None, None, None, None))
 # The count that matters must now be the genuinely missing ones only.
 _gaps = [r["domain"] for r in _cov if r["cls"] == "bad"]
-ok("only genuinely missing adapters are still red",
-   sorted(_gaps) == ["ambientetravel.com", "cruisebaz.com"], _gaps)
-ok("and those two are the base44 pair, blocked on one credential",
-   all(_by[d]["adapter"] == "base44_entity" for d in _gaps), _gaps)
+ok("no publishing adapter is missing any more", _gaps == [], _gaps)
 # on_hold must still outrank an unsupported_reason: a held site is held.
 ok("on-hold still reads as on hold, not as a decision",
    _by["dmciran.ir"]["verdict"] == "on hold")
@@ -3461,6 +3462,137 @@ ok("it explains that either half alone is fine",
 ok("it requires the full path, not the word public_html",
    "alone is not a location on it" in _dbt and "/domains/<name>/public_html" in _dbt)
 
+
+
+print("\n=== base44_entity adapter (cruisebaz.com / ambientetravel.com) ===")
+# Until 26 Sep base44_entity fell through to "not implemented" and 12 drafts
+# piled up as downloads. The adapter writes a DRAFT record; these run it against
+# a fake base44 so the four branches that matter are exercised without a network.
+import tempfile as _tf
+_b44 = json.loads(json.dumps(payload))
+_b44["site"]["cms"] = {"type": "base44", "adapter": "base44_entity",
+                       "app_id": "app123", "entity": "Article", "publish_mode": "publish"}
+_b44m = a2.ContentBrief.model_validate(_b44)
+_b44d = {"title": "T", "meta_description": "M", "body_markdown": "B", "faq": []}
+
+class _B44Resp:
+    def __init__(self, code, body=None):
+        self.status_code, self._b = code, body
+        self.content = b"x" if body is not None else b""
+        self.ok = code < 400
+    def json(self): return self._b
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            e = a2.requests.HTTPError(f"{self.status_code}"); e.response = self; raise e
+
+def _b44run(get_body, get_code=200):
+    calls = []
+    def g(url, **k): calls.append(("GET", url, k)); return _B44Resp(get_code, get_body)
+    def po(url, **k): calls.append(("POST", url, k)); return _B44Resp(201, {"id": "new1"})
+    def pu(url, **k): calls.append(("PUT", url, k)); return _B44Resp(200, {"id": "old1"})
+    saved = (a2.requests.get, a2.requests.post, a2.requests.put, os.environ.get("BASE44_ACCESS_TOKEN"))
+    a2.requests.get, a2.requests.post, a2.requests.put = g, po, pu
+    os.environ["BASE44_ACCESS_TOKEN"] = "tok"
+    try:
+        return a2._push_base44_entity(_b44m, _b44d, "https://x.test/p"), calls
+    finally:
+        a2.requests.get, a2.requests.post, a2.requests.put = saved[:3]
+        if saved[3] is None: os.environ.pop("BASE44_ACCESS_TOKEN", None)
+        else: os.environ["BASE44_ACCESS_TOKEN"] = saved[3]
+
+_r, _c = _b44run([])
+_post = [c for c in _c if c[0] == "POST"]
+ok("a new slug is CREATED as a draft record, even when publish_mode says publish",
+   _r["record_id"] == "new1" and _post and _post[0][2]["json"]["status"] == "draft"
+   and _post[0][1].endswith("/apps/app123/entities/Article/records")
+   and _r["live_url"] is None)
+ok("the bearer token is sent, and slug is the upsert key",
+   _post[0][2]["headers"]["Authorization"] == "Bearer tok"
+   and _post[0][2]["json"]["slug"] == _b44m.brief.target_url_path)
+_r, _c = _b44run([{"id": "old1", "status": "draft"}])
+ok("an existing DRAFT is updated in place (redelivery-safe), not duplicated",
+   [c[0] for c in _c] == ["GET", "PUT"] and _c[1][1].endswith("/records/old1"))
+_r, _c = _b44run([{"id": "old1", "status": "published"}])
+ok("a PUBLISHED record is never overwritten",
+   [c[0] for c in _c] == ["GET"] and "not overwritten" in _r["note"])
+_r, _c = _b44run({"message": "Entity schema Article not found"}, get_code=404)
+ok("a missing entity stages the draft and names the fix, never a false live_url",
+   _r["live_url"] is None and "has not created it yet" in _r["note"] and _r.get("staged_path"))
+_saved_tok = os.environ.pop("BASE44_ACCESS_TOKEN", None)
+_r = a2._push_base44_entity(_b44m, _b44d, "https://x.test/p")
+if _saved_tok is not None: os.environ["BASE44_ACCESS_TOKEN"] = _saved_tok
+ok("no token stages the draft and says base44 is not configured",
+   "not configured" in _r["note"] and _r["live_url"] is None)
+
+# The boutimar.ir adapter read site.cms.get("repo") — CMS is a pydantic model,
+# so its first real draft would have died with AttributeError.
+_bi = json.loads(json.dumps(payload))
+_bi["site"]["cms"] = {"type": "static", "adapter": "boutimar_ir_static",
+                      "repo": "ambientetravel/boutimarfarsi", "articles_path": "data/articles.json"}
+_bim = a2.ContentBrief.model_validate(_bi)
+_saved_at = os.environ.pop("ASTRO_GITHUB_TOKEN", None)
+try:
+    _r = a2._push_boutimar_ir_article(_bim.site, _bim, _b44d, "https://boutimar.ir/x")
+    _bi_ok = _r.get("live_url") is None
+except AttributeError:
+    _bi_ok = False
+finally:
+    if _saved_at is not None: os.environ["ASTRO_GITHUB_TOKEN"] = _saved_at
+ok("the boutimar.ir adapter reads its cms block without crashing", _bi_ok)
+
+
+print("\n=== audience group: one topic, one Farsi cruise site ===")
+import _ledger as _lg
+from datetime import datetime, timezone
+import agent1_seo_scout as _a1g
+ok("spellings of one topic share a key (AROYA written five ways, word order, ZWNJ)",
+   _lg.topic_key("کشتی aroya") == _lg.topic_key("کروز آروآ") == _lg.topic_key("aroya cruise")
+   and _lg.topic_key("قیمت کروز آرویا") == _lg.topic_key("aroya cruise قیمت")
+   and _lg.topic_key("aroya cruise") != _lg.topic_key("aroya cruise price"))
+_now = datetime.now(timezone.utc)
+_gdoc = {"cooldown_days": 45, "entries": [
+    {"domain": "boutimar.ir", "query": "کشتی aroya", "last_briefed": _now.isoformat()},
+    {"domain": "boutimar.com", "query": "aroya cruise price", "last_briefed": _now.isoformat()}]}
+_kept, _sk = _lg.filter_candidates(
+    [{"query": "کروز آروآ"}, {"query": "aroya cruise price"}, {"query": "نوروز ۱۴۰۶"}],
+    _gdoc, "cruisebaz.com", siblings=["boutimar.ir", "cruise24.ir"])
+ok("a topic a sibling briefed is skipped; a non-sibling's topic is not",
+   [c["query"] for c in _kept] == ["aroya cruise price", "نوروز ۱۴۰۶"]
+   and any("owned by a sibling" in s for s in _sk))
+ok("no group, no change — a site without siblings keeps everything",
+   len(_lg.filter_candidates([{"query": "کروز آروآ"}], _gdoc, "cruisebaz.com")[0]) == 1)
+_gsite = [s for s in config.load_sites(include_hold=True) if s.domain == "cruisebaz.com"][0]
+ok("the three Farsi cruise storefronts are one group",
+   sorted(config.audience_siblings(_gsite)) == ["boutimar.ir", "cruise24.ir"])
+_a1g._SIBLING_COVERAGE["cruisebaz.com"] = _lg.sibling_topics(_gdoc, ["boutimar.ir"])
+_gp = json.loads(_a1g._analysis_user_prompt(_gsite, [], 3))
+_a1g._SIBLING_COVERAGE.pop("cruisebaz.com", None)
+ok("the scout's model is told what the siblings already cover",
+   _gp.get("sibling_sites_already_cover", [{}])[0].get("query") == "کشتی aroya"
+   and "same" in _gp.get("sibling_rule", "").lower())
+
+
+print("\n=== one account, many sites (the «دریانامه» channel) ===")
+import agent3_broadcaster_batch as _b3a
+_acc = {}
+_k = _b3a._account_key({"account_ref": "tg-daryanameh"}, "https://cruisebaz.com/a", "telegram")
+ok("a connected account is keyed by its account_ref, not the site",
+   _k == "tg-daryanameh"
+   and _b3a._account_key({"account_ref": "tg-daryanameh"}, "https://boutimar.ir/b", "telegram") == _k
+   and _b3a._account_key({}, "https://cruise24.ir/c", "telegram") == "cruise24.ir:telegram")
+_b3a.record_account_post(_acc, _k, "کروز آروآ", "2026-10-01", "cruisebaz.com")
+ok("the same topic from a SISTER site is not queued to the same account",
+   "already queued" in (_b3a.account_guard(_acc, _k, "کشتی aroya", "2026-10-02", 3) or "")
+   and "cruisebaz.com" in _b3a.account_guard(_acc, _k, "aroya cruise", "2026-10-02", 3))
+ok("a different topic on the same account is fine",
+   _b3a.account_guard(_acc, _k, "نوروز ۱۴۰۶", "2026-10-01", 3) is None)
+for _q in ("a1", "a2"):
+    _b3a.record_account_post(_acc, _k, _q, "2026-10-01", "boutimar.ir")
+ok("the per-account daily cap holds (3 on one day), the next day is clear",
+   "daily cap" in (_b3a.account_guard(_acc, _k, "b9", "2026-10-01", 3) or "")
+   and _b3a.account_guard(_acc, _k, "b9", "2026-10-02", 3) is None)
+ok("--no-llm (accounts=None) never blocks or records",
+   _b3a.account_guard(None, _k, "کروز آروآ", "2026-10-01", 3) is None)
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

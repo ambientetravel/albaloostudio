@@ -38,6 +38,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import _ledger
 import compliance
 import config
 import llm
@@ -73,6 +74,10 @@ class Outcome:
     blocked_media: int = 0
     error: str = ""
     violations: list[dict[str, Any]] = field(default_factory=list)
+    # Posts that must not exist: same topic already on this account, or its
+    # daily cap reached. Kept out of the campaign log (a post record there means
+    # a post) and reported here instead.
+    account_skipped: list[dict[str, str]] = field(default_factory=list)
 
 
 def _stub_copy(event: PublishingEvent, channels: list[str]) -> tuple[list[dict], dict]:
@@ -102,8 +107,67 @@ def _stub_copy(event: PublishingEvent, channels: list[str]) -> tuple[list[dict],
     )
 
 
+# ── per-ACCOUNT guard ────────────────────────────────────────────────────────
+# The campaign ledger dedupes per ARTICLE. That is not enough once several sites
+# post to ONE account: boutimar.ir, cruisebaz.com, cruise24.ir (and later
+# daryanameh.com) all feed the single «دریانامه» Telegram channel, so two sites'
+# articles on the same AROYA topic are two campaigns — both would be queued, and
+# a busy week would flood one channel from four directions. Keyed on the
+# account, not the site: `account_ref` when connected, else domain:channel.
+ACCOUNT_TOPIC_DAYS = 60     # one topic per account inside this window
+DEFAULT_DAILY_CAP = 3       # per account; sites.yml channel `max_posts_per_day`
+
+
+def urlparse_netloc(u: str) -> str:
+    from urllib.parse import urlparse
+    return urlparse(u or "").netloc
+
+
+def _account_key(cfg: dict[str, Any], live_url: str, channel: str) -> str:
+    from urllib.parse import urlparse
+    ref = str(cfg.get("account_ref") or "").strip()
+    return ref or f"{urlparse(live_url or '').netloc}:{channel}"
+
+
+def account_guard(doc: dict[str, Any] | None, key: str, topic: str, day: str,
+                  cap: int, now: datetime | None = None) -> str | None:
+    """Why this post must NOT be queued to this account, or None if it may."""
+    if doc is None:
+        return None
+    acct = (doc.get("accounts") or {}).get(key) or {}
+    now = now or datetime.now(timezone.utc)
+    tk = " ".join(sorted(_ledger.topic_key(topic))) if topic else ""
+    if tk:
+        seen = (acct.get("topics") or {}).get(tk)
+        if seen:
+            try:
+                age = (now - datetime.fromisoformat(seen["at"])).days
+            except (KeyError, ValueError, TypeError):
+                age = 0
+            if age < ACCOUNT_TOPIC_DAYS:
+                return (f"topic already queued to this account {age}d ago "
+                        f"(from {seen.get('site', '?')}) — one topic per account per "
+                        f"{ACCOUNT_TOPIC_DAYS} days")
+    if int((acct.get("days") or {}).get(day, 0)) >= cap:
+        return f"daily cap reached for this account ({cap} posts on {day})"
+    return None
+
+
+def record_account_post(doc: dict[str, Any] | None, key: str, topic: str, day: str,
+                        site: str) -> None:
+    if doc is None:
+        return
+    acct = doc.setdefault("accounts", {}).setdefault(key, {"topics": {}, "days": {}})
+    tk = " ".join(sorted(_ledger.topic_key(topic))) if topic else ""
+    if tk and tk not in acct["topics"]:
+        acct["topics"][tk] = {"at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                              "site": site}
+    acct["days"][day] = int(acct["days"].get(day, 0)) + 1
+
+
 def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
-                  already: set[str] | None = None) -> Outcome:
+                  already: set[str] | None = None,
+                  accounts: dict[str, Any] | None = None) -> Outcome:
     """Compose, gate, schedule and record one publishing event. Never raises."""
     name = payload.get("envelope", {}).get("message_id", "unknown")
     oc = Outcome(event_file=name)
@@ -193,8 +257,19 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
         by_name = {c["name"]: c for c in channel_cfgs}
         posts: list[dict[str, Any]] = []
 
+        topic = event.content_summary.primary_keyword or event.content_summary.title
         for d, when in zip(drafts, times):
             cfg = by_name.get(d["channel"], {"name": d["channel"], "autopost": False})
+            akey = _account_key(cfg, event.publication.live_url, d["channel"])
+            aday = str(when)[:10]
+            why_not = account_guard(accounts, akey, topic, aday,
+                                    int(cfg.get("max_posts_per_day") or DEFAULT_DAILY_CAP))
+            if why_not:
+                # Not an error and not a hold for a human — this post simply
+                # must not exist. Recorded so the campaign log says why.
+                oc.account_skipped.append({"channel": d["channel"], "account": akey,
+                                           "reason": why_not})
+                continue
             post = {
                 "channel": d["channel"],
                 "audience": d["audience"],
@@ -229,6 +304,8 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
             )
             post.update(status=result.status, external_id=result.external_id,
                         permalink=result.permalink, error=result.error)
+            record_account_post(accounts, akey, topic, aday,
+                                urlparse_netloc(event.publication.live_url))
 
             # Most specific reason first: a missing image is a harder stop than
             # a closed autopost gate. No flag flips an Instagram post live with
@@ -372,7 +449,8 @@ def main(argv: list[str] | None = None) -> int:
             outcomes.append(Outcome(event_file=path.name, status="failed",
                                     error=f"unreadable: {exc}"))
             continue
-        oc = broadcast_one(payload, out_dir, no_llm=args.no_llm, already=seen)
+        oc = broadcast_one(payload, out_dir, no_llm=args.no_llm, already=seen,
+                           accounts=None if args.no_llm else ledger)
         outcomes.append(oc)
         # Remember only a real, successful compose, so a blocked or failed one
         # retries next run.

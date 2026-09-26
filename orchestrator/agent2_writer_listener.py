@@ -1251,6 +1251,11 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
     if adapter == "boutimar_ir_static":
         return _push_boutimar_ir_article(site, brief, draft, url)
 
+    if adapter == "base44_entity":
+        # cruisebaz.com / ambientetravel.com. Until 26 Sep this fell through to
+        # "not implemented" and 12 drafts piled up as downloads.
+        return _push_base44_entity(brief, draft, url)
+
     # A missing_page brief whose path already exists is a hard error, never an
     # overwrite (ARCHITECTURE.md §5, Agent 2).
     if brief.opportunity.gap_type == "missing_page" and _url_exists(url):
@@ -1686,8 +1691,12 @@ def _push_boutimar_ir_article(
         empty string in a data file renders a card without a picture — it does
         not redden a build and block every other merge into the repo.
     """
-    repo = str(site.cms.get("repo") or "").strip()
-    path = str(site.cms.get("articles_path") or "data/articles.json").strip("/")
+    # site.cms is a pydantic model, not a dict — `.get` raised AttributeError, so
+    # this adapter would have crashed on its first real draft. It never had one:
+    # every boutimar.ir brief was degraded and skipped upstream (fixed 25 Sep).
+    cms = _cms_dict(site)
+    repo = str(cms.get("repo") or "").strip()
+    path = str(cms.get("articles_path") or "data/articles.json").strip("/")
     token = config.optional_env("ASTRO_GITHUB_TOKEN")
     if not repo or not token:
         return _write_static_bundle(site, brief, draft, url)
@@ -1817,6 +1826,104 @@ def _push_boutimar_ir_article(
         return {"status": "draft", "live_url": None, "intended_url": url,
                 "record_id": None, "published_at": None, "scheduled_for": None,
                 "note": f"daryanameh error: {detail}" + (f" — {hint}" if hint else "")}
+
+
+def _cms_dict(site: SiteBlock) -> dict[str, Any]:
+    """The site's cms block as a plain dict, extra sites.yml keys included."""
+    return site.cms.model_dump() if hasattr(site.cms, "model_dump") else dict(site.cms or {})
+
+
+BASE44_API = "https://app.base44.com/api"
+
+
+def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) -> dict[str, Any]:
+    """
+    Create the article as a DRAFT record in the site's base44 app.
+
+    Contract (the owning site session builds the entity and the page that renders it):
+      entity  `Article` (sites.yml cms.entity overrides), fields
+        slug (== target_url_path, the upsert key), title, meta_description,
+        body_markdown, faq [{q, a}], language, status ("draft" | "published"),
+        source ("albaloo"), generated_at, valid_until
+      RLS: public read only where status == "published".
+    Auth: BASE44_ACCESS_TOKEN — a workspace personal access token, sent as
+    Bearer (base44 stops accepting account API keys after 15 Oct 2026).
+
+    Always writes status "draft", whatever publish_mode says — same reason as
+    _push_wordpress: an unattended run must not put a page live on a commercial
+    site. A record that already exists and is PUBLISHED is never overwritten; a
+    draft is updated in place (redelivery-safe). Unconfigured or failed, it
+    stages to disk and reports no live_url — an adapter never reports a URL it
+    did not create.
+    """
+    site = brief.site
+    cms = _cms_dict(site)
+    app_id = str(cms.get("app_id") or "").strip()
+    entity = str(cms.get("entity") or "Article").strip()
+    token = config.optional_env("BASE44_ACCESS_TOKEN")
+    if not app_id or not token:
+        res = _write_static_bundle(site, brief, draft, url)
+        res["note"] = ("base44 not configured (cms.app_id + BASE44_ACCESS_TOKEN) — "
+                       f"draft staged at {res.get('staged_path')}, NOT published")
+        return res
+
+    slug = brief.brief.target_url_path
+    record = {
+        "slug": slug,
+        "title": draft.get("title", brief.brief.working_title),
+        "meta_description": draft.get("meta_description", ""),
+        "body_markdown": draft.get("body_markdown", ""),
+        "faq": draft.get("faq", []),
+        "language": brief.brief.language,
+        "status": "draft",
+        "source": "albaloo",
+        "generated_at": rfc3339(utc_now()),
+    }
+    if draft.get("valid_until"):
+        record["valid_until"] = draft["valid_until"]
+    base = f"{BASE44_API}/apps/{app_id}/entities/{entity}/records"
+    hdr = {"Authorization": f"Bearer {token}", "Content-Type": "application/json",
+           "User-Agent": config.USER_AGENT}
+    try:
+        r = requests.get(base, headers=hdr, params={"q": json.dumps({"slug": slug}), "limit": 1},
+                         timeout=config.WEBHOOK_TIMEOUT_S)
+        r.raise_for_status()
+        found = r.json()
+        found = found if isinstance(found, list) else (found.get("records") or found.get("items") or [])
+        if found:
+            existing = found[0]
+            rid = existing.get("id") or existing.get("_id")
+            if str(existing.get("status", "")).lower() == "published":
+                return {"status": "draft", "live_url": None, "intended_url": url,
+                        "record_id": rid, "published_at": None, "scheduled_for": None,
+                        "note": f"base44 {entity} {rid} is already PUBLISHED at {slug} — "
+                                "not overwritten; review the new draft by hand"}
+            r = requests.put(f"{base}/{rid}", headers=hdr, json=record,
+                             timeout=config.WEBHOOK_TIMEOUT_S)
+            r.raise_for_status()
+            note = f"base44 draft {entity} {rid} updated — publish it in base44"
+        else:
+            r = requests.post(base, headers=hdr, json=record, timeout=config.WEBHOOK_TIMEOUT_S)
+            r.raise_for_status()
+            body = r.json() if r.content else {}
+            rid = body.get("id") or body.get("_id")
+            note = f"base44 draft {entity} {rid} created — publish it in base44"
+        log.info("%s — %s", site.domain, note)
+        return {"status": "draft", "live_url": None, "intended_url": url,
+                "record_id": rid, "published_at": None, "scheduled_for": None, "note": note}
+    except requests.RequestException as exc:
+        code = getattr(getattr(exc, "response", None), "status_code", None)
+        hint = {401: "BASE44_ACCESS_TOKEN rejected — expired/revoked, or an old account API key.",
+                403: "the token's user cannot write this entity (RLS / not an app editor).",
+                404: f"no entity {entity!r} in app {app_id} — the site session has not created it yet."
+                }.get(code, "")
+        detail = config.redact(str(exc))[:160]
+        log.error("%s — base44 write failed: %s%s; staging instead", site.domain, detail,
+                  f" — {hint}" if hint else "")
+        res = _write_static_bundle(site, brief, draft, url)
+        res["note"] = f"base44 error: {detail}" + (f" — {hint}" if hint else "") + \
+                      f"; draft staged at {res.get('staged_path')}"
+        return res
 
 
 def _bundle_record_id(brief: ContentBrief) -> str:
