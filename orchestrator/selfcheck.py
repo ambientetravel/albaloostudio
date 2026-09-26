@@ -3639,5 +3639,18 @@ ok("the scout does not brief improvement gaps unless a site opts in",
    a1._improves_existing(site) is False
    and "improvements" in pathlib.Path("agent1_seo_scout.py").read_text(encoding="utf-8"))
 
+
+print("\n=== a subject that does not exist is never briefed ===")
+_at = [x for x in config.load_sites(include_hold=True) if x.domain == "ambientetravel.com"][0]
+_ex = a1._excluded(_at, [{"query": q} for q in
+      ("avintura", "Avintura luxury cruise", "ambient travel", "travel",
+       "iran dmc services for tour operators", "gulf destination management")])
+ok("'avintura' (misspelled Avantura) and brand-navigational noise are excluded",
+   {"avintura", "Avintura luxury cruise", "ambient travel", "travel"} <= _ex)
+ok("real trade queries are not", not ({"iran dmc services for tour operators",
+                                       "gulf destination management"} & _ex))
+ok("the scout's model is told to reject a misspelled or unverifiable named subject",
+   "never brief a misspelling" in a1._analysis_user_prompt(_at, [], 1))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

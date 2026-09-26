@@ -450,6 +450,9 @@ class Site:
     # cruise24.ir target, so the three sites were competing for one search
     # result. Empty = no group, unchanged behaviour.
     audience_group: str = ""
+    # Regexes of GSC queries this site must never brief — misspelled third-party
+    # names, brand-navigational noise. See agent1_seo_scout._excluded.
+    exclude_queries: list[str] = field(default_factory=list)
 
     @property
     def on_hold(self) -> bool:
@@ -518,6 +521,7 @@ def load_sites(
                 offer_feed=str(merged.get("offer_feed", "") or "").strip(),
                 access_feed=str(merged.get("access_feed", "") or "").strip(),
                 audience_group=str(merged.get("audience_group", "") or "").strip(),
+                exclude_queries=[str(x) for x in (merged.get("exclude_queries") or [])],
             )
         )
 

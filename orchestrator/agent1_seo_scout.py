@@ -541,6 +541,17 @@ def find_gaps(site: Site, gsc: dict[str, Any], sitemap_urls: set[str]) -> list[d
     return candidates[:MAX_CANDIDATES_TO_LLM]
 
 
+def _excluded(site: Site, candidates: list[dict[str, Any]]) -> set[str]:
+    """Candidate queries matching the site's exclude_queries patterns."""
+    pats = []
+    for raw in getattr(site, "exclude_queries", None) or []:
+        try:
+            pats.append(re.compile(str(raw), re.I))
+        except re.error:
+            log.warning("%s — bad exclude_queries pattern %r ignored", site.domain, raw)
+    return {c["query"] for c in candidates if any(p.search(c["query"]) for p in pats)}
+
+
 def _improves_existing(site: Site) -> bool:
     """True only when this site's adapter can edit an existing page in place.
     None can today; a site opts in with cms.improve_existing: true once one does."""
@@ -764,7 +775,14 @@ def _analysis_user_prompt(site: Site, candidates: list[dict[str, Any]], limit: i
                 "do not justify more. Score priority 0-100 using volume, position "
                 "proximity, commercial value and effort. Reject candidates that are "
                 "brand-navigational, and MERGE any that share an intent — two "
-                "spellings of one query are one page, not two."
+                "spellings of one query are one page, not two. NAMED SUBJECTS: if a "
+                "candidate is built around a specific company, ship, hotel, venue or "
+                "product, brief it ONLY if you are certain it exists exactly as "
+                "spelled and is something this site can speak to. Search queries are "
+                "often misspellings of a real name ('avintura' for the yacht "
+                "Avantura): never brief a misspelling, and never 'correct' it into a "
+                "guess — a page about a subject that does not exist as named invents "
+                "every fact in it. Reject it instead."
             ),
             "candidates": candidates,
         },
@@ -1666,6 +1684,17 @@ def process_site(
                      "little search footprint to gap-find from",
                      site.domain, len(seeds), len(candidates) - len(seeds))
         stat["seed_candidates"] = len(seeds)
+        # Queries this site must never brief (sites.yml exclude_queries, regex).
+        # Added 27 Sep after "avintura" — a GSC misspelling of Avantura, ONE
+        # 49 m yacht sailing Croatia — produced an 8.6 KB ambientetravel draft
+        # inventing a fleet, hull types and Seychelles/Persian Gulf itineraries.
+        # The visa gate passed it: it cannot catch a subject that was never real.
+        excl = _excluded(site, candidates)
+        if excl:
+            candidates = [c for c in candidates if c["query"] not in excl]
+            stat["excluded_queries"] = sorted(excl)
+            log.info("%s — %d excluded query(ies) dropped: %s", site.domain,
+                     len(excl), ", ".join(sorted(excl)[:5]))
         stat["candidates"] = len(candidates)
 
         # Pages Google already ranks that the sitemap never mentions. Both

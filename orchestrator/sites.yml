@@ -355,6 +355,15 @@ sites:
     brand: Ambiente Travel
     compliance_profile: orient_v1   # non-cruise: no AROYA/Seychelles/Schengen rules injected
     locale: en
+    # Never brief these (regex, case-insensitive). 'avintura' is a GSC misspelling of
+    # Avantura — ONE 49 m yacht, Split–Dubrovnik; a 13 Aug draft invented a fleet and
+    # Seychelles/Gulf itineraries for it. The rest are brand-navigational noise that
+    # got briefed as pages (/travel, /ambient-travel …).
+    exclude_queries:
+      - "avintura"
+      - "^(ambient|ambiente)\\s+(travel|experiences?)$"
+      - "^travel$"
+      - "(?:^|\\s)(after|before|site|inurl):"
     market: DACH
     base_url: "https://ambientetravel.com"
     # Where the bytes actually live. Recorded because it was tribal
