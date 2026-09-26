@@ -1286,6 +1286,20 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
                           f"at {result.get('staged_path')}, NOT published")
         return result
 
+    # Belt and braces for the scout rule: an improvement brief never becomes a
+    # NEW page. Five boutimar.com drafts did (26 Sep) — each a twin of a live
+    # page — because every adapter below only creates. Staged, with the reason.
+    if (brief.opportunity.gap_type != "missing_page"
+            and not _cms_dict(site).get("improve_existing")):
+        log.warning("%s — %s brief for %s is an IMPROVEMENT of an existing page; "
+                    "not creating a new one", site.domain, brief.opportunity.gap_type,
+                    brief.brief.target_url_path)
+        res = _write_static_bundle(site, brief, draft, url)
+        res["note"] = (f"{brief.opportunity.gap_type} brief improves the EXISTING page "
+                       f"{brief.brief.target_url_path} — staged for a human to fold in, "
+                       "never published as a second page")
+        return res
+
     if adapter == "wordpress_rest":
         return _push_wordpress(brief, draft, url)
 

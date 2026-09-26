@@ -3612,5 +3612,32 @@ ok("an FAQ answer that is only process talk goes, with its question",
    a2._scrub_faq([{"q": "Rates?", "a": "We do not have a sourced figure."},
                   {"q": "Where?", "a": "North Tehran."}]) == [{"q": "Where?", "a": "North Tehran."}])
 
+
+print("\n=== an improvement brief never becomes a second page ===")
+# 26 Sep: five merged boutimar.com drafts were twins of live pages — thin_content
+# / serp_feature_loss briefs for /experience/faith-halal/ etc. published as NEW
+# journal articles. Reverted before deploy; these hold the line.
+_imp = json.loads(json.dumps(payload))
+_imp["opportunity"]["gap_type"] = "thin_content"
+_imp["site"]["cms"] = {"type": "astro", "adapter": "astro_pr", "publish_mode": "draft"}
+_impm = a2.ContentBrief.model_validate(_imp)
+_saved_at2 = os.environ.pop("ASTRO_GITHUB_TOKEN", None)
+_called = []
+_orig_astro = a2._push_astro_pr
+a2._push_astro_pr = lambda *a_, **k_: _called.append(1) or {"status": "draft", "live_url": None}
+try:
+    _r = a2.push_to_cms(_impm, _b44d)
+    _new = json.loads(json.dumps(_imp)); _new["opportunity"]["gap_type"] = "missing_page"
+    a2.push_to_cms(a2.ContentBrief.model_validate(_new), _b44d)
+finally:
+    a2._push_astro_pr = _orig_astro
+    if _saved_at2 is not None: os.environ["ASTRO_GITHUB_TOKEN"] = _saved_at2
+ok("a thin_content brief is staged with the reason, and no PR adapter is called for it",
+   "improves the EXISTING page" in (_r.get("note") or "") and _r.get("live_url") is None)
+ok("a missing_page brief still reaches the PR adapter", _called == [1])
+ok("the scout does not brief improvement gaps unless a site opts in",
+   a1._improves_existing(site) is False
+   and "improvements" in pathlib.Path("agent1_seo_scout.py").read_text(encoding="utf-8"))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

@@ -541,6 +541,12 @@ def find_gaps(site: Site, gsc: dict[str, Any], sitemap_urls: set[str]) -> list[d
     return candidates[:MAX_CANDIDATES_TO_LLM]
 
 
+def _improves_existing(site: Site) -> bool:
+    """True only when this site's adapter can edit an existing page in place.
+    None can today; a site opts in with cms.improve_existing: true once one does."""
+    return bool((site.cms or {}).get("improve_existing"))
+
+
 def seed_candidates(site: Site, sitemap_urls: set[str],
                     existing: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
@@ -1719,6 +1725,32 @@ def process_site(
                                 "cooldown; nothing new to write this run")
                 return stat
 
+        # An improvement gap (thin_content, serp_feature_loss, cannibalisation)
+        # says "this EXISTING page underperforms". Every publishing adapter can
+        # only CREATE a page, so briefing one produced a second page on the same
+        # query: on 26 Sep five merged boutimar.com drafts turned out to be twins
+        # of live pages (/experience/faith-halal/, /hotels/tehran-espinas-palace-
+        # hotel/ …) and had to be reverted. Unless the site's cms declares
+        # improve_existing, those gaps go to a report for a human/site session
+        # to act on, never to the writer. missing_page gaps and seeds brief as before.
+        if not _improves_existing(site):
+            improvements = [c for c in candidates if c.get("gap_type") != "missing_page"]
+            if improvements:
+                candidates = [c for c in candidates if c.get("gap_type") == "missing_page"]
+                stat["improvements"] = len(improvements)
+                imp_dir = run_dir / "improvements"
+                imp_dir.mkdir(parents=True, exist_ok=True)
+                (imp_dir / f"{site.domain}.json").write_text(json.dumps(
+                    {"domain": site.domain, "note": "existing pages that underperform — "
+                     "improve them in place; not briefed to the writer",
+                     "candidates": improvements}, ensure_ascii=False, indent=2),
+                    encoding="utf-8")
+                log.info("%s — %d improvement gap(s) reported, not briefed "
+                         "(adapter can only create pages)", site.domain, len(improvements))
+            if not candidates:
+                stat["note"] = "only improvement gaps this run — see improvements/"
+                return stat
+
         by_query = {c["query"]: c for c in candidates}
         analyses = (
             analyse_gaps(site, candidates, limit)
@@ -1728,6 +1760,13 @@ def process_site(
         )
 
         for analysis in analyses:
+            # The model may re-type a gap; a re-typed improvement is still not a
+            # new page, so the same rule applies after analysis.
+            if not _improves_existing(site) and analysis.get("gap_type") not in (None, "missing_page"):
+                log.info("%s — model typed %r as %s; not briefed (improvement, not a new page)",
+                         site.domain, analysis.get("primary_keyword"), analysis.get("gap_type"))
+                stat["improvements"] = stat.get("improvements", 0) + 1
+                continue
             candidate = by_query.get(analysis["primary_keyword"]) or candidates[0]
             payload = build_brief_payload(
                 site, analysis, candidate, gsc, run_id, callback_url, dry_run
