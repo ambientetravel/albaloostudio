@@ -17,6 +17,31 @@ legal entity on the imprint, privacy and booking conditions pages. cruise24.ir
 is still the Farsi B2C twin. The chat produced two artifacts; both are in this
 folder.
 
+| File | What | Status |
+|---|---|---|
+| `conditions.html` | Booking conditions / Reisebedingungen, drafted for both roles (Reisevermittlung under § 651v BGB, own package under §§ 651a ff.), with §§ 651e/f/h/p referenced where they bind. 18 highlighted placeholders: deposit and balance terms, change and cancellation fees, insurer, jurisdiction. Linked from every footer and from the imprint. | Drafted; needs the same facts as the imprint plus a travel-law read |
+| `assets/logo*.png`, `favicon-*.png`, `og-image.jpg` | The logo Alireza supplied on 27 Sep (kept as `logo-as-supplied.png`, 1080²; corrected master `logo-master.png`), cut into transparent ink and white lockups, a nav mark without the tagline, favicons at 32/180/512 and a 1200×630 Open Graph card. Every page links the icons and the OG image; the home page's JSON-LD carries `logo` and `sameAs` for the Facebook and Instagram pages. | Done |
+| `imprint.html`, `privacy.html` | Impressum under § 5 DDG / § 18 MStV and a GDPR Art. 13 notice, in English with the German terms. Every fact not in the source is a highlighted `[placeholder]`: 19 on the imprint, 12 on the privacy page. The privacy text describes what the site really does: no cookies, no analytics, fonts and GSAP self-hosted, server logs, the form, and media loading from Explora's servers until `download_media.py` has run. Supervisory authority named as LfDI Rheinland-Pfalz, Mainz, since the GmbH sits in Rennerod. Linked from every footer. | Drafted; not publishable until the placeholders are filled |
+| `destinations.html`, `contact.html` | Added last on 27 Sep. Twelve region cards (the home page's eleven Explora regions plus the rivers), each with season, lines and the visa position under the house rule; contact page with the request form, the three offices from v1 and a three-step "what happens next". Nav on every page now points at these instead of the home-page anchors. | Verified with the rest, below |
+| `ships.html`, `lines.html`, `itineraries.html`, `journal.html` | **v1's inner views, now real pages** (added later on 27 Sep). Fleet with the on-board notes, eight line profiles, the Aegean worked example day by day plus seven routes each with its visa line, the Kuşadası port guide in full. Share `assets/site.css` and `assets/site.js` with the home page; the nav marks the current page. Hero images reuse URLs already in the media set, so the download list is unchanged at 47. | Verified with the home page, below |
+| `index.html` | **v2, the one to ship.** Single page, full-screen video hero, stacked "life on board" panels, 11 destination tiles with hover video, horizontal ship rail, Explora inclusions list, journal, request form. Media referenced from Explora Journeys' CDN via `data-media` attributes. | Renders clean; media not yet local (see below) |
+| `_v1-illustrated.html` | v1, the earlier hash-routed SPA with **no external media** (SVG ships, waves, deck cut-away, route map) and five inner views: Ships, Cruise lines, Itineraries (worked Aegean example day by day), Journal (Kuşadası port guide in full), Contact. | Reference and content source; not linked, blocked in robots.txt |
+| `download_media.py` | The tool the chat could not run: fetches every `data-media` / `data-media-mobile` / `data-poster` URL into `media/` and writes `media/index.json`, which the page's resolver reads at load. Stdlib only. `--check` verifies the index against the page. Since 27 Sep it also carries three ideas from the chat's own original script, which Alireza uploaded: full-size Scene7 renditions (`?wid=2560&fmt=jpeg&qlt=90` on `dm.explorajourneys.com/is/image/…`), a `Referer: https://explorajourneys.com/` header sent only to Explora's hosts, and six parallel downloads (`--workers`). That script needed a `media_manifest.json` of ~400 files that never reached the repo; this one reads the URLs from the pages. | Tested end to end against a local fixture server (same-basename URLs, suffix-less URLs, 404s, re-runs) |
+| `assets/site.css`, `assets/site.js` | The page CSS and the media resolver / nav script, pulled out of `index.html` so five pages share one copy. The home-page GSAP choreography stays inline in `index.html`. | Done |
+| `assets/fonts/` | Cormorant Garamond + Manrope, **self-hosted** (6 woff2, 204 KB, latin + latin-ext). No call to Google on page load. Ambiente Tours GmbH is a German company; LG München (2022) fined a site for hot-linking Google Fonts. | Done, verified loading in Chromium |
+| `assets/vendor/` | GSAP 3.12.5 + ScrollTrigger from the npm package, replacing the cdnjs links. | Done, verified `gsap` and `ScrollTrigger` defined |
+| `robots.txt`, `sitemap.xml` | Ten URLs. cruise24.me today serves a GoDaddy sitemap *index* resolving to 2 URLs; this replaces it once the site moves. | Written |
+
+Changes made to `index.html` versus the artifact, all in `<head>` or the
+resolver script, none in the copy:
+
+- Google Fonts `<link>`s → `assets/fonts/fonts.css`; cdnjs → `assets/vendor/`.
+- Added `rel=canonical`, Open Graph tags, `theme-color`, and a JSON-LD
+  `TravelAgency` block (name, URL, parent Ambiente Tours GmbH, Rennerod). No
+  phone, email, rate or date was added — none exists in the source.
+- The "Preview: photos and video load from the media folder" badge now
+  removes itself once `media/index.json` has entries.
+
 ## Design, restyled around the logo (27 Sep, later)
 
 The logo is monochrome line art: near-black navy ink (#0c1824) on white with
