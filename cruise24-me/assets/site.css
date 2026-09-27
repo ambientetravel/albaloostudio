@@ -69,11 +69,11 @@ p{margin:0}
 .film{position:relative;min-height:90svh;display:grid;place-items:center;overflow:hidden;background:#000}
 .film-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7}
 .film-shade{position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 50%,rgba(7,21,34,.2),rgba(7,21,34,.85))}
-.film-t{position:relative;text-align:center;max-width:26ch;padding:0 24px}
-.rotating{list-style:none;margin:0 0 26px;padding:0;position:relative;height:1.2em;font-family:var(--serif);font-size:clamp(2rem,5.5vw,4.6rem);line-height:1.1}
-.rotating li{position:absolute;inset:0;opacity:0;transform:translateY(14px);transition:opacity 700ms ease,transform 700ms var(--ease-out)}
+.film-t{position:relative;text-align:center;width:min(100%,1040px);padding:0 24px}
+.rotating{list-style:none;margin:0 0 26px;padding:0;display:grid;font-family:var(--serif);font-size:clamp(2rem,5vw,4.2rem);line-height:1.1;text-wrap:balance}
+.rotating li{grid-area:1/1;align-self:center;opacity:0;transform:translateY(14px);transition:opacity 700ms ease,transform 700ms var(--ease-out)}
 .rotating li.on{opacity:1;transform:none}
-.film-t .lede{color:var(--muted-on-ink)}
+.film-t .lede{color:var(--muted-on-ink);max-width:44ch;margin:0 auto}
 /* stacked panels */
 .stack{position:relative;height:340svh}
 .stack .stage{position:sticky;top:0;height:100svh;overflow:hidden}
