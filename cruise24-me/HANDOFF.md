@@ -108,22 +108,28 @@ invented by this session; the inclusions list is Explora's own.
 
 ## NOT done, and why
 
-**1. Media is not downloaded.** This container's network policy denies
-`explorajourneys.com` and `dm.explorajourneys.com` (403 on CONNECT). The ten
-pages share 47 distinct media URLs (the inner pages reuse the home page's).
-Run on any machine with normal internet:
+**1. Media: downloaded and web-sized, 27 Sep.** Alireza allowed
+`explorajourneys.com` and `dm.explorajourneys.com` in the environment's network
+settings. `download_media.py` fetched all 47 URLs (1.1 GB; one Scene7 image
+refuses 2560px and is taken at 1920px). `optimize_media.py` then made them
+web-sized: 1.1 GB -> 49.7 MB, every file under the preview's 15 MB cap.
 
-    cd cruise24-me
-    python3 download_media.py --no-videos     # images first, ~1 min
-    python3 download_media.py                 # then the ~20 mp4s
-    python3 download_media.py --check         # must print OK
+| | before | after |
+|---|---:|---:|
+| largest photo (F1-44.jpg) | 50.9 MB | 513 KB |
+| hero video, 1920x1080, full 24.6 s loop | 87.7 MB | 8.1 MB |
+| 4K destination loops, now 1280x720, 11 s | ~26 MB each | 1.3–2.4 MB |
+| Endless Worlds film, first 12 s only | 377 MB | 895 KB |
 
-Videos are gitignored (`cruise24-me/media/*` except `index.json` and
-`.gitkeep`); commit `index.json`, upload `media/` to the host with the site.
-Expect the videos to be large — Explora serves desktop hero clips at tens of
-MB each. If total is uncomfortable, `ffmpeg -i in.mp4 -vf scale=1920:-2 -crf 28
--an out.mp4` on the hero and panel clips is the usual fix; the resolver does
-not care what is inside the file.
+Photos are committed (`media/*.jpg|jpeg|webp`, longest edge 2000px).
+Videos stay gitignored, 18 files: upload `media/` to the host with the site.
+The CDN masters are kept locally in `media-originals/` (gitignored), so
+`optimize_media.py --force` can re-encode with different settings.
+Verified in Chromium on all content pages at 1440 and 390 wide: every photo
+loads from `media/`, zero requests go to Explora. The test browser has no
+H.264 decoder, so playback was proven on a throwaway VP9 copy: hero autoplays,
+panels play on scroll, destination cards play on hover and stop on leave. The
+real files are H.264 High, no audio, index first (`faststart`), 18/18.
 
 **2. Hosting: the site cannot go where cruise24.me currently is.**
 `orchestrator/sites.yml` records cruise24.me on **GoDaddy Website Builder** —

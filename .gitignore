@@ -92,3 +92,9 @@ orchestrator/closed/
 cruise24-me/media/*
 !cruise24-me/media/.gitkeep
 !cruise24-me/media/index.json
+# web-sized photos (optimize_media.py) are committed; videos are not
+!cruise24-me/media/*.jpg
+!cruise24-me/media/*.jpeg
+!cruise24-me/media/*.webp
+# print-sized masters from the CDN, kept locally so optimize_media.py can re-run
+cruise24-me/media-originals/

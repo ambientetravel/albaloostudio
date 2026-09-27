@@ -113,11 +113,18 @@ def is_video(url: str) -> bool:
 SCENE7_PARAMS = "wid=2560&fmt=jpeg&qlt=90"
 
 
-def request_url(url: str) -> str:
+def request_urls(url: str) -> list[str]:
+    """URLs to try, best first. Scene7 answers 403 when asked for more pixels than
+    the master has (EXPLORA-INCIDENTALS-7 refuses wid=2560, serves wid=1920), so
+    step down in size before falling back to the bare URL."""
     p = urllib.parse.urlparse(url)
     if p.netloc == "dm.explorajourneys.com" and p.path.startswith("/is/image/") and not p.query:
-        return f"{url}?{SCENE7_PARAMS}"
-    return url
+        return [f"{url}?{SCENE7_PARAMS}", f"{url}?wid=1920&fmt=jpeg&qlt=90", url]
+    return [url]
+
+
+def request_url(url: str) -> str:
+    return request_urls(url)[0]
 
 
 def headers_for(url: str) -> dict[str, str]:
@@ -131,9 +138,10 @@ def headers_for(url: str) -> dict[str, str]:
 def fetch(url: str, dest_dir: Path, timeout: int, retries: int = 3) -> tuple[Path, int]:
     """Stream url to dest_dir. Returns (path, bytes). Raises on final failure."""
     last: Exception | None = None
-    for attempt in range(1, retries + 1):
+    candidates = request_urls(url)
+    for attempt in range(1, retries + len(candidates)):
         try:
-            req = urllib.request.Request(request_url(url), headers=headers_for(url))
+            req = urllib.request.Request(candidates[0], headers=headers_for(url))
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 ct = r.headers.get("Content-Type", "")
                 name = local_name(url, ct)
@@ -158,8 +166,11 @@ def fetch(url: str, dest_dir: Path, timeout: int, retries: int = 3) -> tuple[Pat
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, IOError) as e:
             last = e
             if isinstance(e, urllib.error.HTTPError) and e.code in (403, 404, 410):
+                if len(candidates) > 1:
+                    candidates.pop(0)  # try the next, smaller rendition
+                    continue
                 break  # not going to change on retry
-            time.sleep(2 ** attempt)
+            time.sleep(2 ** min(attempt, 4))
     raise RuntimeError(f"{type(last).__name__}: {last}")
 
 
