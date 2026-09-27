@@ -42,65 +42,78 @@ resolver script, none in the copy:
 - The "Preview: photos and video load from the media folder" badge now
   removes itself once `media/index.json` has entries.
 
-## Inventory, search and one page per sailing (27 Sep, late)
+## Inventory: CruiseHost direct + Variety's own site (27 Sep, late)
 
-**Why:** Alireza asked where "View journeys" led. It led to the enquiry form;
-nothing on the site was backed by sailing data. He also set the direction: .ir is
-a sales and sanctions barrier, so cruise24.me must not depend on it; focus on
-Explora Journeys, Silversea and similar luxury lines, plus Variety (Greek islands,
-Kuşadası) and Scenic (river), not the mainstream lines; Türkiye, Greece and Italy
-first, every other destination kept.
+**Why:** "View journeys" led to the enquiry form; nothing was backed by sailing data.
+Alireza set the direction: .ir is a sales and sanctions barrier, so cruise24.me must
+not depend on it; focus on Explora Journeys, Silversea and similar luxury lines, plus
+Variety (Greek islands, Kuşadası) and Scenic (river); Türkiye, Greece and Italy first,
+every other destination kept.
 
-**Where the method came from.** boutimar.ir's inventory is built by
-`ambientetravel/boutimarfarsi`: `data/cruisehost/cruisehost_sync.py` pulls
-CruiseHost CPX (`cpx.cruisec.net`, aid 204622, the Ambiente Tours contract) into
-`api/cruises.json`; cards and cabin prices are rendered from that. The feed held
-5,516 sailings on 27 Sep: MSC 5,182, Celestyal 192, Explora 127, AROYA 15. Its
-prices are CruiseHost's lead fare, shown unmarked-up. No Silversea, Scenic or
-Variety in it; Variety exists there only as 28 hand-curated catalogue records.
+**The method** came from boutimar.ir (`ambientetravel/boutimarfarsi`,
+`data/cruisehost/cruisehost_sync.py`): CruiseHost CPX, aid 204622, the Ambiente Tours
+contract. cruise24.me now calls CruiseHost directly; nothing here touches .ir.
 
-**What cruise24.me has now:**
+**What was fetched on 27 Sep** (`sync/cruisehost_sync.py --full --write`, 254 pages,
+3 to 6 s apart, neutral User-Agent):
 
-| File | What |
-|---|---|
-| `sync/cruisehost_sync.py` | The same CruiseHost method rebuilt for cruise24.me: direct to CPX, English, luxury lines only, Türkiye/Greece/Italy areas walked first, merge-never-replace and prune-never-delete kept, rolling vs full kept, neutral User-Agent (no company name), ship photos downloaded to `media/cruisehost/`. `--discover` verifies each line code against CruiseHost before any walk uses it. `--selftest` passes offline. **Not run live: `cpx.cruisec.net` is blocked in this environment.** |
-| `data/sources/cruisehost-explora-snapshot.json` | Interim seed: the 89 live Explora sailings (28 Sep 2026 to May 2027), English, taken once from the boutimar.ir feed on 27 Sep. Replaced automatically when the direct sync writes `cruisehost-sailings.json`. |
-| `data/sources/variety-catalogue-2026-27.json` | Variety's 28 boutimar.ir records translated to English and deduplicated to 22 itineraries. Catalogue "from" fares, no departure dates (none exist in the source). |
-| `data/data-checks.json` | 9 Variety records to verify against varietycruises.com before launch: routes filed under two yachts, one route code used for two routes, a 3-night fare above the 4-night fare, three sea days on a 7-night Adriatic yacht route. Internal; never deployed. |
-| `build_journeys.py` | Builds `data/sailings.json`, `journeys.html`, `journeys/<id>.html` (111), `ports.html`, the home search's month menu and `sitemap.xml`. Refuses to write «Arabian Gulf» or any public mention of boutimar/.ir. `--check` compares against disk. |
-| `journeys.html` | All 111 sailings as cards, filterable by area, month, line, length; sorted Türkiye/Greece/Italy first (77 of 111). The home search lands here pre-filtered via `#<area>.<month>`. |
-| `journeys/<id>.html` | Route (day by day where the source aligns), fares by departure, ship, visa lines per the house rule, "Ask about this sailing" which prefills the contact form. |
-| `ports.html` | Port notes for Istanbul, Kuşadası, Bodrum, Marmaris, Athens, Mykonos, Santorini, Corfu, Nafplion, Olympia, Patmos, Rhodes, Rome, Venice, Naples/Amalfi, Sicily, La Spezia, Malta, each with how many of our sailings call there. Journal links in by country. |
-| `media/variety/` | 8 Variety yacht photos and 14 destination photos from the boutimar.ir repo, web-sized (2.9 MB). |
+| Line | CruiseHost code | Scope | Departures | Itineraries | In Türkiye/Greece/Italy |
+|---|---|---|---:|---:|---:|
+| Explora Journeys | EXP | everywhere | 404 | 352 | 105 |
+| Silversea | SSE | everywhere | 529 | 369 | 77 |
+| Scenic, ocean | SLC | everywhere | 125 | 99 | |
+| Scenic, river | SLC | everywhere | 1,082 | 528 | 49 (Scenic total) |
+| Seabourn | SBN | Mediterranean | 81 | 77 | 74 |
+| Regent Seven Seas | REG | Mediterranean | 71 | 70 | 63 |
+| Ponant | COM | Mediterranean | 107 | 89 | 72 |
+| SeaDream | SDM | Mediterranean | 26 | 24 | 17 |
+| Sea Cloud | SCD | Mediterranean | 26 | 25 | 16 |
+| Star Clippers | CLP | Mediterranean | 75 | 51 | 47 |
+| Variety Cruises | not in CruiseHost | varietycruises.com | 323 | 19 | 8 |
+| **Total** | | | **2,849** | **1,703** | **528** |
 
-Explora photos are matched to sailings by area and checked by eye: the file
-Explora names "An-Invitation-to-celebrate" is a fjord and is not used for Med
-sailings. A line without its own photos gets none rather than another line's.
+Line codes were confirmed from CruiseHost's own line list (`Search/count/json`), not
+guessed. **Trap found:** CruiseHost silently ignores an unknown line name and returns the
+WHOLE catalogue (53,262); `--discover` now rejects any name CruiseHost does not echo back.
+Also: the total lives in `count`, not `allentries` as boutimar.ir's notes say.
 
-Verified: full crawl from the home page on a 390px browser, 123 pages, all 200,
-0 script errors, 0 overflow, 0 links to boutimar or .ir. Home search, filters,
-sort, both sailing-page types and the contact prefill driven in Chromium.
+"Similar lines" are Mediterranean-only on purpose. Growing them into more areas is one
+word per line in `LINES` (`"scope": "focus"` -> `"all"`), then a `--full --write`.
 
-**Blocked, needs these hosts allowed in the environment's network settings:**
+**Variety** is not in CruiseHost. `sync/variety_sync.py` reads its 24 cruise pages: the
+schema.org route, day titles, included / not included, and every departure from the
+page's booking data with EUR fares. The "from" is the cheapest cabin category that still
+has cabins (Variety's own site does the same: 9 Oct 2026 shows Category B because C is
+full); a departure with none left shows "Sold out". One cruise (Croatia island hopping)
+has no booking data on its page, only USD prices, so its dates show and the fare is "on
+request" rather than a converted figure. 5 of 24 cruises show no departures on the site.
 
-| Host | For |
-|---|---|
-| `cpx.cruisec.net` | the direct CruiseHost sync: live prices, and discovering the Silversea, Scenic and Variety codes |
-| `images.cruisec.net` | ship photos CruiseHost supplies per sailing |
-| `www.silversea.com` | Silversea photos and video (the bare domain only redirects here) |
-| `www.varietycruises.com` | Variety photos, video, and checking the 9 flagged records |
-| Scenic's site | none of scenic.co.uk / scenicusa.com / scenic.eu / scenic.com.au answers; which one was added? |
-| `assets.msccruises.com` | the Explora ship-tour videos boutimar.ir links to |
+**Build** (`build_journeys.py`, ~2 s): 1,703 pages in `journeys/`, `journeys.html` (37 KB,
+36 cards in the HTML, the rest paged 24 at a time from `data/journeys-index.json`, 624 KB,
+86 KB gzipped), `ports.html`, home search months, destination counts, sitemap.
+**Generated files are not in git** (`journeys/`, `data/sailings.json`,
+`data/journeys-index.json`): run the build before every deploy bundle.
 
-Once `cpx.cruisec.net` answers: `python3 sync/cruisehost_sync.py --discover`,
-then `--full --limit 2`, read `sync/last-report.json`, then `--full --write`,
-then `python3 build_journeys.py`. Confirm with CruiseHost that systematic
-retrieval under the contract is permitted before scheduling it.
+**Visa accuracy:** `port_countries.py` places 13,642 of 14,208 port calls (96%). What is
+left is mostly names that exist in several countries (St. John, St. Georges, Georgetown,
+Castro, "Pirau"). Any sailing with an unplaced stop says so on its visa list (285 of
+1,703) instead of implying the list is complete. Schengen now includes Romania and
+Bulgaria; Serbia, Cyprus, the UK, Ireland, Greenland, the Faroes, Svalbard and French
+overseas territories are called out as outside it.
 
-**Do not deploy:** `data/sources/`, `data/data-checks.json`, `sync/`,
-`media-originals/`, `build_journeys.py`, `optimize_media.py`,
-`download_media.py`, `HANDOFF.md`, `_v1-illustrated.html`. robots.txt also
-disallows the data and sync folders in case they are uploaded by mistake.
+**Photos:** CruiseHost ship photos (56, 8 MB) in `media/cruisehost/`; Explora keeps its own
+imagery; Variety uses the yacht and destination photos from the boutimar.ir repo.
+
+**Still blocked (network):** Silversea's photo hosts `cdn.sanity.io` and
+`silversea.widen.net`; Variety's `d2koisdtuu1wg4.cloudfront.net` (photos) and
+`varietycruises.app.nelios.com` (video); every Scenic domain tried. `assets.msccruises.com`
+answers 401 (needs a login). Nothing on the site depends on these.
+
+**Before scheduling the sync:** confirm with CruiseHost that systematic retrieval under
+the contract is permitted. Daily: `--rolling 30 --write`; monthly: `--full --write`.
+
+**Do not deploy:** `data/sources/`, `data/data-checks.json`, `data/sailings.json`, `sync/`,
+`media-originals/`, `*.py`, `HANDOFF.md`, `_v1-illustrated.html`.
 
 ## Design, restyled around the logo (27 Sep, later)
 

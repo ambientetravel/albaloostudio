@@ -302,3 +302,6 @@ footer .group{border-top:2px dotted var(--line-on-ink)}
 .yachts figcaption{font-size:.85rem;color:var(--muted);margin-top:6px}
 @media (max-width:900px){.sailing{grid-template-columns:1fr}.farebox{position:static}}
 .noimg{aspect-ratio:16/10;background:linear-gradient(160deg,var(--ink-2),var(--accent) 140%)}
+.fares-wrap{max-height:420px;overflow:auto;margin:0 -4px;padding:0 4px}
+.fares tr.sold td{color:var(--muted);text-decoration:line-through}
+.fares tr.sold td:last-child{text-decoration:none;font-weight:600}

@@ -34,6 +34,9 @@ from collections import Counter, OrderedDict
 from datetime import date
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import port_countries  # noqa: E402  (the wider port -> country rules)
+
 HERE = Path(__file__).resolve().parent
 SRC = HERE / "data" / "sources"
 TODAY = date.today().isoformat()
@@ -101,6 +104,20 @@ PORT_COUNTRY = {
     "Moorea": "PF", "Maupiti": "PF", "Rangiroa": "PF", "Fakarava": "PF", "Anaa": "PF",
 }
 AT_SEA = {"Cruising Day", "At sea"}
+# When an exact spelling is not in PORT_COUNTRY, these word rules place it. Checked top to bottom,
+# so an explicit country in the name ("Kusadasi (Turkey)", "Naples, Italy") wins over a place word.
+KEYWORD_COUNTRY = [
+    (r"\b(turkey|türkiye)\b|kusadasi|kuşadası|istanbul|bodrum|marmaris|fethiye|göcek|gocek|antalya|çanakkale|canakkale|dikili|izmir|cesme|çeşme|bozcaada|kas\b|kaş\b|bartin|amasra|sinop|trabzon|alanya", "TR"),
+    (r"\bitaly\b|sicily|sardinia|sicilia|capri|amalfi|positano|sorrent|naples|napoli|salerno|lipari|stromboli|salina|taormina|catania|syracuse|siracusa|palermo|trapani|messina|civitavecchia|\brome\b|venice|venezia|fusina|trieste|ravenna|ancona|bari|brindisi|otranto|gallipoli|tropea|portofino|genoa|genova|la spezia|livorno|elba|portoferraio|porto santo stefano|monopoli|vieste|ortona|gaeta|ischia|procida|milazzo|crotone|giardini", "IT"),
+    (r"\bmalta\b|valletta|gozo", "MT"),
+    (r"\b(greece|crete)\b|athens|piraeus|\bzeas?\b|lavrio|poros|poliegos|polyaigos|folegandros|antiparos|paros|naxos|syros|mykonos|delos|santorini|thira|milos|sifnos|serifos|kythnos|\bkea\b|tinos|andros|ios\b|amorgos|koufonis|iraklia|levitha|ikaria|samos|patmos|lipsi|leros|kalymnos|kos\b|nisyros|tilos|symi|rhodes|rhodos|karpathos|heraklion|chania|souda|rethymn|agios nikolaos|kythira|monemvasia|gythio|nafplio|mycenae|katakolon|olympia|pylos|kalamata|itea|delphi|corinth|aegina|angistri|hydra|spetses|ermioni|sounion|kefalonia|cephalonia|argostoli|fiskardo|sami\b|ithaca|vathi|lefkada|meganisi|zakynthos|paxos|antipaxos|corfu|kerkyra|parga|preveza|nafpaktos|messolonghi|patras|volos|skiathos|skopelos|alonissos|skyros|evia|chalkida|karystos|thessaloniki|kavala|lesbos|mytilene|chios|limnos|thassos|syme|methoni|elafonisos|galaxidi", "GR"),
+    (r"croatia|dubrovnik|split\b|hvar|lastovo|elaphiti|korcula|korčula|sibenik|šibenik|zadar|rijeka|rovinj|trogir|opatija|mali losinj|vis\b|mljet|makarska|pula|krk\b|cres\b", "HR"),
+    (r"montenegro|kotor|budva|tivat", "ME"), (r"albania|sarand|durr[eë]s|vlor[eë]", "AL"), (r"sloven|koper|piran", "SI"),
+    (r"society islands|tahiti|papeete|mo'?orea|bora bora|huahine|raiatea|taha'?a|maupiti|rangiroa|fakarava|anaa|marquesas|tuamotu|nuku hiva", "PF"),
+    (r"gambia|banjul|kuntaur|janjanbureh|kunta kinteh|tendaba|\bkaur\b|bakau", "GM"), (r"senegal|dakar|djiffer|saloum", "SN"),
+    (r"seychelles|mah[eé]\b|praslin|la digue|felicit|moyenne|cousin island|anse lazio|aride|st\.? anne|inter island quay|curieuse|cerf island|st\.? pierre\b", "SC"),
+    (r"cape verde|cabo verde|\bsal\b|sal rei|boa vista|praia|fogo|mindelo|santo ant[aã]o|s[aã]o vicente|s[aã]o nicolau|maio", "CV"),
+]
 # Cartagena exists in Spain and Colombia; the route decides.
 AMBIGUOUS = {"Cartagena": lambda route: "ES" if any(PORT_COUNTRY.get(p) == "ES" for p in route) else "CO"}
 
@@ -113,9 +130,23 @@ COUNTRY = {
     "AG": "Antigua", "BL": "St Barthélemy", "MQ": "Martinique", "LC": "St Lucia", "VC": "St Vincent and the Grenadines",
     "BB": "Barbados", "TT": "Trinidad and Tobago", "AW": "Aruba", "CW": "Curaçao", "CO": "Colombia", "PA": "Panama",
     "GT": "Guatemala", "SV": "El Salvador", "MX": "Mexico", "GF": "French Guiana", "BR": "Brazil", "CV": "Cape Verde",
-    "SC": "Seychelles", "PF": "French Polynesia",
+    "SC": "Seychelles", "PF": "French Polynesia", "GM": "The Gambia", "SN": "Senegal",
+    "AT": "Austria", "HU": "Hungary", "SK": "Slovakia", "CZ": "Czechia", "NL": "the Netherlands", "CH": "Switzerland",
+    "PL": "Poland", "LT": "Lithuania", "LV": "Latvia", "RS": "Serbia", "RO": "Romania", "BG": "Bulgaria", "CY": "Cyprus",
+    "GG": "Guernsey", "IE": "Ireland", "IS": "Iceland", "FO": "the Faroe Islands", "SJ": "Svalbard", "GL": "Greenland",
+    "VI": "US Virgin Islands", "CA": "Canada", "BZ": "Belize", "HN": "Honduras", "EC": "Ecuador", "PE": "Peru", "CL": "Chile",
+    "AR": "Argentina", "UY": "Uruguay", "FK": "the Falkland Islands", "GS": "South Georgia", "AQ": "Antarctica",
+    "SX": "Sint Maarten", "MF": "Saint-Martin", "GP": "Guadeloupe", "DM": "Dominica", "DO": "the Dominican Republic",
+    "BS": "the Bahamas", "BQ": "Bonaire", "BM": "Bermuda", "MS": "Montserrat", "JP": "Japan", "KR": "South Korea",
+    "CN": "China", "HK": "Hong Kong", "TW": "Taiwan", "VN": "Vietnam", "KH": "Cambodia", "TH": "Thailand", "SG": "Singapore",
+    "MY": "Malaysia", "ID": "Indonesia", "PH": "the Philippines", "IN": "India", "LK": "Sri Lanka", "LA": "Laos",
+    "MU": "Mauritius", "EG": "Egypt", "ZA": "South Africa", "GW": "Guinea-Bissau", "AU": "Australia", "NZ": "New Zealand",
+    "FJ": "Fiji", "PN": "the Pitcairn Islands", "CR": "Costa Rica",
 }
-SCHENGEN = {"GR", "IT", "ES", "FR", "PT", "MT", "HR", "SI", "DE", "BE", "DK", "NO", "SE", "FI", "EE", "MC"}
+# Schengen members as of 2026 (Romania and Bulgaria in full since 1 Jan 2025), plus Monaco in practice.
+# NOT Schengen: UK, Ireland, Cyprus, Serbia, Greenland, the Faroes, Svalbard, French overseas territories.
+SCHENGEN = {"GR", "IT", "ES", "FR", "PT", "MT", "HR", "SI", "DE", "BE", "DK", "NO", "SE", "FI", "EE", "MC",
+            "AT", "HU", "SK", "CZ", "NL", "CH", "PL", "LT", "LV", "IS", "RO", "BG", "LU", "LI"}
 FOCUS = ["TR", "GR", "IT"]
 
 # Search areas: the keys the home-page search and the filter use. Focus areas first.
@@ -123,16 +154,39 @@ AREAS = OrderedDict([
     ("turkiye", "Türkiye"), ("greece", "Greece and the Greek islands"), ("italy", "Italy, Sicily and Malta"),
     ("adriatic", "Croatia and the Adriatic"), ("western-med", "Western Mediterranean"),
     ("northern-europe", "Northern Europe and the fjords"), ("atlantic", "Atlantic islands and crossings"),
-    ("americas", "Caribbean and the Americas"), ("seychelles", "Seychelles"), ("tahiti", "Tahiti and French Polynesia"),
+    ("rivers", "European rivers"), ("americas", "Caribbean and the Americas"), ("polar", "Arctic and Antarctica"),
+    ("asia-pacific", "Asia and the Pacific"), ("africa-arabia", "Africa, the Red Sea and the Indian Ocean"),
+    ("seychelles", "Seychelles"), ("tahiti", "Tahiti and French Polynesia"), ("world", "World and ocean crossings"),
 ])
+# When a port's country is not in the table, CruiseHost's own region still places the sailing.
+REGION_AREA = [
+    (r"alaska|caribbean|america|panama|mexic|hawaii|galapagos|amazon|canada|new england", "americas"),
+    (r"antarc|arctic|greenland|svalbard|north cape|northwest passage", "polar"),
+    (r"asia|far east|japan|australia|pacific|indonesia|polynes", "asia-pacific"),
+    (r"africa|red sea|indian ocean|arabia|gulf", "africa-arabia"),
+    (r"norw|baltic|north europe|northeurope|british|iceland", "northern-europe"),
+    (r"canary|atlantic ocean europe|around western europe|westeurope", "atlantic"),
+    (r"western mediterranean", "western-med"), (r"eastern mediterranean|central mediterranean|mediterranean", "italy"),
+    (r"world|trans", "world"),
+]
 AREA_OF = {"TR": "turkiye", "GR": "greece", "IT": "italy", "MT": "italy", "HR": "adriatic", "SI": "adriatic",
            "ME": "adriatic", "AL": "adriatic", "ES": "western-med", "FR": "western-med", "MC": "western-med",
            "GI": "western-med", "MA": "western-med", "TN": "western-med", "DZ": "western-med",
            "GB": "northern-europe", "DE": "northern-europe", "BE": "northern-europe", "DK": "northern-europe",
            "NO": "northern-europe", "SE": "northern-europe", "FI": "northern-europe", "EE": "northern-europe",
-           "PT": "atlantic", "CV": "atlantic", "SC": "seychelles", "PF": "tahiti"}
-for c in ("US", "PR", "TC", "JM", "VG", "AI", "KN", "AG", "BL", "MQ", "LC", "VC", "BB", "TT", "AW", "CW", "CO", "PA", "GT", "SV", "MX", "GF", "BR"):
+           "PT": "atlantic", "CV": "atlantic", "SC": "seychelles", "PF": "tahiti", "GM": "africa-arabia", "SN": "africa-arabia"}
+for c in ("US", "PR", "TC", "JM", "VG", "AI", "KN", "AG", "BL", "MQ", "LC", "VC", "BB", "TT", "AW", "CW", "CO", "PA", "GT", "SV", "MX", "GF", "BR",
+          "VI", "CA", "BZ", "HN", "EC", "PE", "CL", "AR", "UY", "SX", "MF", "GP", "DM", "DO", "BS", "BQ", "BM", "MS"):
     AREA_OF[c] = "americas"
+for c in ("AT", "HU", "SK", "CZ", "NL", "CH", "PL", "LT", "LV", "RS", "RO", "BG", "IE", "GG", "IS", "FO"):
+    AREA_OF.setdefault(c, "northern-europe")
+AREA_OF.update({"SJ": "polar", "GL": "polar", "AQ": "polar", "FK": "polar", "GS": "polar",
+                "JP": "asia-pacific", "KR": "asia-pacific", "CN": "asia-pacific", "HK": "asia-pacific", "TW": "asia-pacific",
+                "VN": "asia-pacific", "KH": "asia-pacific", "TH": "asia-pacific", "SG": "asia-pacific", "MY": "asia-pacific",
+                "ID": "asia-pacific", "PH": "asia-pacific", "LA": "asia-pacific", "AU": "asia-pacific", "NZ": "asia-pacific",
+                "FJ": "asia-pacific", "PN": "tahiti", "IN": "africa-arabia", "LK": "africa-arabia", "MU": "africa-arabia",
+                "EG": "africa-arabia", "ZA": "africa-arabia", "GW": "africa-arabia", "CR": "americas"})
+AREA_OF["CY"] = "greece"   # Cyprus sits with the eastern Mediterranean sailings
 
 EXPLORA_YEAR = {"Explora I": 2023, "Explora II": 2024, "Explora III": 2026, "Explora IV": 2027}
 
@@ -160,11 +214,16 @@ def esc(s) -> str:
 
 
 def country_of(port: str, route: list[str]) -> str | None:
-    if port in AT_SEA:
+    if port in AT_SEA or port_countries.is_scenery(port):
         return None
     if port in AMBIGUOUS:
         return AMBIGUOUS[port](route)
-    return PORT_COUNTRY.get(port)
+    if port in PORT_COUNTRY:
+        return PORT_COUNTRY[port]
+    for pat, cc in KEYWORD_COUNTRY:
+        if re.search(pat, port, re.I):
+            return cc
+    return port_countries.country(port)
 
 
 DISPLAY = {
@@ -214,10 +273,20 @@ def visa_lines(codes: list[str]) -> list[str]:
         out.append("Schengen visa for non-EU passports, for the whole cruise. Calls in " + ", ".join(dict.fromkeys(sch)) + ".")
     if "TR" in cs:
         out.append("Türkiye: visa-free or e-visa for many passports, not all.")
-    if cs & {"US", "PR"}:
+    if cs & {"US", "PR", "VI"}:
         out.append("United States: visa or ESTA.")
-    if "GB" in cs:
-        out.append("United Kingdom: its own entry rules, separate from Schengen.")
+    if cs & {"GB", "GG"}:
+        out.append("United Kingdom: its own entry rules (an ETA for many passports), separate from Schengen.")
+    if "IE" in cs:
+        out.append("Ireland: outside Schengen, with its own entry rules.")
+    if "RS" in cs:
+        out.append("Serbia is outside Schengen: a Danube cruise through it may need a multiple-entry Schengen visa.")
+    if "CY" in cs:
+        out.append("Cyprus: EU but outside Schengen, with its own entry rules.")
+    if cs & {"GL", "FO", "SJ"}:
+        out.append("Greenland, the Faroes and Svalbard are outside Schengen; the cruise's Schengen visa should be multiple-entry.")
+    if "CA" in cs:
+        out.append("Canada: visa or eTA.")
     if cs & {"BL", "MQ", "GF", "PF"}:
         out.append("French overseas territories on this route are outside Schengen and have their own entry rules.")
     if cs == {"SC"}:
@@ -226,7 +295,25 @@ def visa_lines(codes: list[str]) -> list[str]:
     return out
 
 
+def visa_for(s) -> list[str]:
+    lines = visa_lines(s["countries"])
+    if s.get("unplaced"):
+        lines.insert(-1, "Some stops on this route are not yet matched to a country above, so the list may be incomplete.")
+    return lines
+
+
 # ───────────────────────────── load and merge ─────────────────────────────
+UNKNOWN_PORTS: dict[str, int] = {}
+VARIETY_IMG = {"Greek Islands": "greece.jpg", "Greek Islands & Türkiye": "kusadasi.jpg", "Ionian Islands": "greece-3.jpg",
+               "Greece: Corinth Canal": "greece-2.jpg", "Italy & Malta": "italy.jpg", "Croatia & Adriatic": "croatia-2.jpg",
+               "Seychelles": "sey-1.jpg", "Tahiti & French Polynesia": "grand-borabora.jpg", "Cape Verde": "ship-harmony-v.jpg",
+               "West Africa": "ship-harmony-v.jpg"}
+# Yacht photos from the boutimar.ir repo, keyed by Variety's own spelling ("Pegasus"; boutimar.ir wrote "Pegasos").
+YACHT_IMG = {"Galileo": "ship-galileo.jpg", "Variety Voyager": "ship-variety-voyager.jpg", "Callisto": "ship-callisto.jpg",
+             "Harmony V": "ship-harmony-v.jpg", "Harmony G": "ship-harmony-g.jpg", "Pegasus": "ship-pegasos.jpg",
+             "Pegasos": "ship-pegasos.jpg", "Panorama": "ship-panorama.jpg", "Panorama II": "ship-panorama-ii.jpg"}
+
+
 def load() -> list[dict]:
     sailings = []
     # The direct CruiseHost sync (sync/cruisehost_sync.py) wins; the snapshot is the interim seed.
@@ -235,14 +322,14 @@ def load() -> list[dict]:
     for s in ex["sailings"]:
         if s.get("hidden"):
             continue
-        route = s["route"]
+        route = [html.unescape(r) for r in s["route"]]   # CruiseHost sends "Barca d&#39;Alva"
         sid = s["cruisehostId"]
         deps = [d for d in s["departures"] if d["date"] >= TODAY]
         if not deps:
             continue
         line = s.get("line") or "Explora Journeys"
         sailings.append({
-            "id": sid, "line": line, "lineKey": re.sub(r"[^a-z]+", "-", line.lower()).strip("-").split("-")[0],
+            "id": sid, "line": line, "lineKey": re.sub(r"[^a-z]+", "-", line.lower()).strip("-"), "kind": s.get("kind", "SEA"),
             "ships": [s["ship"]], "nights": s["nights"], "shipImage": s.get("shipImage"),
             "region": s["region"], "route": route, "title": title_for(route),
             "departures": deps, "priceFrom": min(d["priceFrom"] for d in deps if d["priceFrom"]), "currency": "EUR",
@@ -251,11 +338,34 @@ def load() -> list[dict]:
             "itinerary": [[pretty_port(p), ""] for p in route] if len(route) == s["nights"] + 1 else None,
             "flags": [],
         })
-    va = json.loads((SRC / "variety-catalogue-2026-27.json").read_text(encoding="utf-8"))
+    vlive = SRC / "variety-sailings.json"
+    if vlive.exists():
+        vs = json.loads(vlive.read_text(encoding="utf-8"))
+        for v in vs["sailings"]:
+            deps = [d for d in v["departures"] if d["date"] >= TODAY]
+            if not deps:
+                continue
+            fares = [d["priceFrom"] for d in deps if d.get("priceFrom") and not d.get("soldOut")]
+            route = [r for r in v["route"] if not re.match(r"Day \d+\s*\|", r)]
+            if len(route) < 2:
+                route = [p.strip() for d in v["itinerary"] for p in re.split(r"\s+[–-]\s+", d[0]) if p.strip()]
+            sailings.append({
+                "id": v["id"], "line": "Variety Cruises", "lineKey": "variety-cruises", "kind": "SEA", "ships": v["ships"],
+                "nights": v["nights"], "region": v["region"], "route": route, "title": v["title"],
+                "departures": [{"date": d["date"], "priceFrom": d.get("priceFrom"), "soldOut": d.get("soldOut", False), "ship": d.get("ship")} for d in deps],
+                "priceFrom": min(fares) if fares else None, "currency": "EUR",
+                "priceBasis": "Variety Cruises fare: per person, cheapest cabin category with cabins left, port charges excluded",
+                "asOf": vs["synced"], "source": "Variety Cruises", "itinerary": v["itinerary"],
+                "included": v.get("included", []), "notIncluded": v.get("notIncluded", []),
+                "image": "media/variety/" + VARIETY_IMG.get(v["region"], "variety-hero.jpg"), "flags": [],
+            })
+        va = {"itineraries": []}
+    else:
+        va = json.loads((SRC / "variety-catalogue-2026-27.json").read_text(encoding="utf-8"))
     for v in va["itineraries"]:
         route = [d[0] for d in v["itinerary"]]
         sailings.append({
-            "id": v["id"], "line": "Variety Cruises", "lineKey": "variety", "ships": v["ships"], "nights": v["nights"],
+            "id": v["id"], "line": "Variety Cruises", "lineKey": "variety-cruises", "kind": "SEA", "ships": v["ships"], "nights": v["nights"],
             "region": v["region"], "route": route, "title": v["title"], "departures": [],
             "priceFrom": v["priceFrom"], "currency": "EUR", "priceBasis": va["priceBasis"],
             "asOf": None, "source": "Variety Cruises catalogue 2026–27", "itinerary": v["itinerary"],
@@ -263,16 +373,22 @@ def load() -> list[dict]:
         })
     for s in sailings:
         codes = [c for c in (country_of(p, s["route"]) for p in s["route"]) if c]
-        unknown = [p for p in s["route"] if p not in AT_SEA and not country_of(p, s["route"])]
-        if unknown:
-            raise SystemExit(f"{s['id']}: no country for {unknown} — add them to PORT_COUNTRY")
+        unknown = [p for p in s["route"] if p not in AT_SEA and not port_countries.is_scenery(p) and not country_of(p, s["route"])]
+        for u in unknown:
+            UNKNOWN_PORTS[u] = UNKNOWN_PORTS.get(u, 0) + 1
         s["countries"] = list(dict.fromkeys(codes))
         s["focus"] = [c for c in FOCUS if c in s["countries"]]
-        s["areas"] = list(dict.fromkeys(AREA_OF[c] for c in s["countries"]))
+        areas = [AREA_OF[c] for c in s["countries"] if c in AREA_OF]
+        if s.get("kind") == "RIVER":
+            areas = ["rivers"]
+        if not areas:
+            areas = [next((a for pat, a in REGION_AREA if re.search(pat, s.get("region") or "", re.I)), "world")]
+        s["areas"] = list(dict.fromkeys(areas))
         s["months"] = sorted({d["date"][:7] for d in s["departures"]})
-        s["visa"] = visa_lines(s["countries"])
+        s["unplaced"] = unknown
+        s["visa"] = visa_for(s)
         s["url"] = f"journeys/{s['id']}.html"
-        if s["lineKey"] == "explora":
+        if s["lineKey"] == "explora-journeys":
             key = "med" if s["focus"] or "adriatic" in s["areas"] else next((a for a in s["areas"] if a in EXPLORA_IMG), "med")
             pool = EXPLORA_IMG[key]
             s["image"] = m(pool[int(hashlib.sha1(s["id"].encode()).hexdigest(), 16) % len(pool)])
@@ -281,7 +397,7 @@ def load() -> list[dict]:
             # Never borrow a different line's photography.
             s["image"] = s.get("shipImage")
     # Türkiye/Greece/Italy first, then the soonest departure, then price
-    sailings.sort(key=lambda s: (0 if s["focus"] else 1, s["departures"][0]["date"] if s["departures"] else "9999", s["priceFrom"]))
+    sailings.sort(key=lambda s: (0 if s["focus"] else 1, s["departures"][0]["date"] if s["departures"] else "9999", s["priceFrom"] or 10**9))
     return sailings
 
 
@@ -311,21 +427,37 @@ def page(head, nav, foot, *, slug, title, desc, body, base="", canonical=None):
             '<script src="assets/site.js"></script>\n<script src="assets/journeys.js"></script>\n</body>\n</html>\n')
 
 
+STATIC_CARDS = 36   # written into the HTML for crawlers and no-JS; journeys.js renders the rest from the index
+
+
+def index_record(s) -> dict:
+    """Compact per-sailing record for the listing and the contact prefill (the full inventory
+    is ~3 MB; this is what a phone actually downloads)."""
+    open_deps = [d for d in s["departures"] if not d.get("soldOut")]
+    dep = open_deps[0]["date"] if open_deps else (s["departures"][0]["date"] if s["departures"] else None)
+    ports = list(dict.fromkeys(p for p in (pretty_port(x) for x in s["route"]) if p != "At sea"))
+    return {"id": s["id"], "u": s["url"], "t": s["title"], "l": s["line"], "k": s["lineKey"], "s": s["ships"], "n": s["nights"],
+            "d": dep, "dc": len(s["departures"]), "p": s["priceFrom"], "a": s["areas"], "m": s["months"],
+            "f": [COUNTRY[c] for c in s["focus"]], "i": s.get("image"), "r": ports[:9] + (["…"] if len(ports) > 9 else [])}
+
+
 def card(s) -> str:
-    dep = s["departures"][0]["date"] if s["departures"] else None
+    open_deps = [d for d in s["departures"] if not d.get("soldOut")]
+    dep = open_deps[0]["date"] if open_deps else (s["departures"][0]["date"] if s["departures"] else None)
     when = (f"Next departure {date.fromisoformat(dep).strftime('%-d %b %Y')}" if dep else "Departure dates on request")
     more = f" · {len(s['departures'])} dates" if len(s["departures"]) > 1 else ""
     chips = "".join(f'<span class="chip">{esc(COUNTRY[c])}</span>' for c in s["focus"])
     ship = " or ".join(s["ships"])
     return (f'<a class="jcard2" href="{esc(s["url"])}" data-areas="{" ".join(s["areas"])}" data-months="{" ".join(s["months"]) or "request"}" '
-            f'data-line="{s["lineKey"]}" data-nights="{s["nights"]}" data-price="{s["priceFrom"]}" data-date="{dep or "9999"}" data-focus="{1 if s["focus"] else 0}">'
+            f'data-line="{s["lineKey"]}" data-nights="{s["nights"]}" data-price="{s["priceFrom"] or 999999}" data-date="{dep or "9999"}" data-focus="{1 if s["focus"] else 0}">'
             + (f'<img src="{esc(s["image"])}" alt="" loading="lazy">' if s.get("image") else '<div class="noimg"></div>') +
             f'<div class="jc-body"><small>{esc(s["line"])} · {esc(ship)}</small>'
             f'<h3>{esc(s["title"])}</h3>'
             f'<p class="jc-route">{esc(" · ".join(dict.fromkeys(p for p in (pretty_port(x) for x in s["route"]) if p != "At sea")))}</p>'
             f'<div class="jc-chips">{chips}</div>'
             f'<div class="jc-foot"><span>{s["nights"]} nights<br><em>{esc(when)}{more}</em></span>'
-            f'<span class="jc-price">from <b>{euro(s["priceFrom"])}</b><em>per person</em></span></div></div></a>')
+            + (f'<span class="jc-price">from <b>{euro(s["priceFrom"])}</b><em>per person</em></span>' if s["priceFrom"] else '<span class="jc-price"><b style="font-size:1rem">Fare on request</b></span>')
+            + '</div></div></a>')
 
 
 def listing(sailings, head, nav, foot) -> str:
@@ -350,9 +482,10 @@ def listing(sailings, head, nav, foot) -> str:
       <label>Sort <select id="f-sort"><option value="focus">Türkiye, Greece, Italy first</option><option value="date">Soonest departure</option><option value="price">Lowest fare</option></select></label>
     </form>
     <p class="fcount" id="fcount" aria-live="polite">{len(sailings)} sailings</p>
-    <div class="jgrid2" id="jgrid">
-{chr(10).join(card(s) for s in sailings)}
+    <div class="jgrid2" id="jgrid" data-index="data/journeys-index.json">
+{chr(10).join(card(s) for s in sailings[:STATIC_CARDS])}
     </div>
+    <p style="text-align:center;margin-top:28px"><button class="btn" id="fmore" type="button" style="color:var(--text)">Show more sailings</button></p>
     <p class="fine" id="fempty" hidden>Nothing matches those choices. Clear one of them, or <a href="contact.html" style="border-bottom:1px solid var(--accent)">tell us what you have in mind</a>.</p>
     <p class="fine" style="margin-top:32px">Sources: {", ".join(f"{k} ({v})" for k, v in lines.items())}. Silversea and Scenic join when their CruiseHost inventory is connected.</p>
   </div>
@@ -373,21 +506,30 @@ def detail(s, head, nav, foot) -> str:
         itin = ('<p class="fine">Ports in order. The day-by-day schedule comes with your quote.</p><ol class="portlist">' +
                 "".join(f"<li>{esc(pretty_port(p))}</li>" for p in s["route"]) + "</ol>")
     if s["departures"]:
-        fares = ('<table class="fares"><thead><tr><th>Departure</th><th>From, per person</th></tr></thead><tbody>' +
-                 "".join(f'<tr><td>{date.fromisoformat(d["date"]).strftime("%a %-d %B %Y")}</td><td>{euro(d["priceFrom"]) if d["priceFrom"] else "On request"}</td></tr>' for d in s["departures"]) +
-                 "</tbody></table>")
+        multi = len({d.get("ship") for d in s["departures"] if d.get("ship")}) > 1
+        def fare(d):
+            return "Sold out" if d.get("soldOut") else (euro(d["priceFrom"]) if d.get("priceFrom") else "On request")
+        fares = ('<div class="fares-wrap"><table class="fares"><thead><tr><th>Departure</th>' + ("<th>Ship</th>" if multi else "") + '<th>From, per person</th></tr></thead><tbody>' +
+                 "".join(f'<tr{" class=sold" if d.get("soldOut") else ""}><td>{date.fromisoformat(d["date"]).strftime("%a %-d %b %Y")}</td>' + (f'<td>{esc(d.get("ship") or "")}</td>' if multi else "") + f'<td>{fare(d)}</td></tr>' for d in s["departures"]) +
+                 "</tbody></table></div>")
     else:
-        fares = f'<p class="bigfare">from <b>{euro(s["priceFrom"])}</b> per person</p><p class="fine">No departure dates in the source. Dates and the live fare come with your quote.</p>'
+        fares = (f'<p class="bigfare">from <b>{euro(s["priceFrom"])}</b> per person</p>' if s["priceFrom"] else "") + '<p class="fine">No departure dates in the source. Dates and the live fare come with your quote.</p>'
     shipnote = ""
-    if s["lineKey"] not in ("explora", "variety"):
-        shipnote = f'<p>{esc(s["ships"][0])}, {esc(s["line"])}. Ship details and inclusions come with your quote.</p>'
-    elif s["lineKey"] == "explora":
+    if s["lineKey"] not in ("explora-journeys", "variety-cruises"):
+        what = "river ship" if s.get("kind") == "RIVER" else "ship"
+        pic = f'<div class="yachts"><figure><img src="{esc(s["shipImage"])}" alt="{esc(s["ships"][0])}" loading="lazy"><figcaption>{esc(s["ships"][0])}</figcaption></figure></div>' if s.get("shipImage") else ""
+        shipnote = f'{pic}<p>{esc(s["ships"][0])}, a {what} of {esc(s["line"])}. Ship details and what the fare includes come with your quote.</p>'
+    elif s["lineKey"] == "explora-journeys":
         y = EXPLORA_YEAR.get(s["ships"][0])
         shipnote = f'<p>{esc(s["ships"][0])}, all-suite, Explora Journeys{f", in service since {y}" if y and y <= 2026 else f", entering service in {y}" if y else ""}. What the Explora fare includes is <a href="index.html#inclusions" style="border-bottom:1px solid var(--accent)">listed on the home page</a>.</p>'
     else:
-        imgs = "".join(f'<figure><img src="media/variety/ship-{esc(n.lower().replace(" ", "-"))}.jpg" alt="{esc(n)}" loading="lazy"><figcaption>{esc(n)}</figcaption></figure>' for n in s["ships"])
-        which = ("This route is sailed by " + " or ".join(s["ships"]) + "; the yacht is confirmed at booking.") if len(s["ships"]) > 1 else ""
-        shipnote = f'<div class="yachts">{imgs}</div><p>Variety Cruises: small ships of 50 to 72 guests. {esc(which)} Inclusions are confirmed with your quote.</p>'
+        imgs = "".join(f'<figure><img src="media/variety/{esc(YACHT_IMG[n])}" alt="{esc(n)}" loading="lazy"><figcaption>{esc(n)}</figcaption></figure>' for n in s["ships"] if n in YACHT_IMG)
+        which = ("This route is sailed by " + " or ".join(s["ships"]) + "; each departure's yacht is in the fares table.") if len(s["ships"]) > 1 else ""
+        inc = ""
+        if s.get("included"):
+            inc = ('<div class="grid2" style="margin-top:18px"><div><h3 style="font-size:1.1rem">Included</h3><ul class="ticks">' + "".join(f"<li>{esc(x)}</li>" for x in s["included"]) +
+                   '</ul></div><div><h3 style="font-size:1.1rem">Not included</h3><ul class="ticks">' + "".join(f"<li>{esc(x)}</li>" for x in s.get("notIncluded", [])) + "</ul></div></div>")
+        shipnote = f'<div class="yachts">{imgs}</div><p>Variety Cruises: small ships of 50 to 72 guests. {esc(which)}</p>{inc}' + ("" if inc else "<p>Inclusions are confirmed with your quote.</p>")
     flags = ""  # data-quality flags go to data/data-checks.json, never into public HTML
     body = f'''<section class="page-hero" style="min-height:52svh">
   {f'<img src="{esc(s["image"])}" alt="" loading="eager">' if s.get("image") else ""}
@@ -415,7 +557,7 @@ def detail(s, head, nav, foot) -> str:
 '''
     return page(head, nav, foot, slug=f"journeys/{s['id']}.html", base="../",
                 title=f"{s['title']}, {s['nights']} nights · {s['line']} · Cruise24",
-                desc=f"{s['line']} {ship}: {s['nights']} nights, {pretty_port(s['route'][0])} to {pretty_port(s['route'][-1])}. From {euro(s['priceFrom'])} per person.",
+                desc=f"{s['line']} {ship}: {s['nights']} nights, {pretty_port(s['route'][0])} to {pretty_port(s['route'][-1])}." + (f" From {euro(s['priceFrom'])} per person." if s["priceFrom"] else ""),
                 body=body)
 
 
@@ -491,6 +633,16 @@ def ports_page(sailings, head, nav, foot) -> str:
                 body=body)
 
 
+def recount(path: str, sailings) -> str:
+    """Pages that quote "N sailings to book" next to a journeys.html#<area> link get the live count."""
+    html_ = (HERE / path).read_text(encoding="utf-8")
+    def fix(mt):
+        area = mt.group(1)
+        n = sum(1 for s in sailings if area in s["areas"])
+        return mt.group(0).replace(mt.group(2), str(n))
+    return re.sub(r'journeys\.html#([a-z-]+)\.any"[^<]*?(?:<[^>]+>[^<]*?){0,8}?(\d+) sailings to book', fix, html_)
+
+
 def home_search(sailings) -> str:
     """The home page's 'When' menu lists the months that really have departures."""
     idx = (HERE / "index.html").read_text(encoding="utf-8")
@@ -508,10 +660,13 @@ def main() -> int:
     head, nav, foot = chrome()
     public = [{k: v for k, v in s.items() if k != "flags"} for s in sailings]
     checks = {s["id"]: s["flags"] for s in sailings if s["flags"]}
+    checks["_unknownPorts"] = dict(sorted(UNKNOWN_PORTS.items(), key=lambda kv: -kv[1]))
     out = {"data/sailings.json": json.dumps({"generated": TODAY, "count": len(public), "sailings": public}, ensure_ascii=False, indent=1) + "\n",
            "data/data-checks.json": json.dumps({"_about": "Records to verify against the line before launch. Internal: do not deploy.", "checks": checks}, ensure_ascii=False, indent=1) + "\n",
            "journeys.html": listing(sailings, head, nav, foot),
+           "data/journeys-index.json": json.dumps([index_record(s) for s in sailings], ensure_ascii=False, separators=(",", ":")),
            "index.html": home_search(sailings),
+           "destinations.html": recount("destinations.html", sailings),
            "ports.html": ports_page(sailings, head, nav, foot)}
     static = ["", "journeys.html", "destinations.html", "ports.html", "ships.html", "lines.html", "itineraries.html",
               "journal.html", "contact.html", "conditions.html", "imprint.html", "privacy.html"]

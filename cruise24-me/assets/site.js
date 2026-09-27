@@ -52,11 +52,11 @@
   var id = (location.hash || '').replace(/^#/, '');
   var box = document.querySelector('form.form textarea');
   if (!id || !box || box.value) return;
-  fetch('data/sailings.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-    var s = d && (d.sailings || []).filter(function (x) { return x.id === id; })[0];
+  fetch('data/journeys-index.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    var s = d && d.filter(function (x) { return x.id === id; })[0];
     if (!s || box.value) return;
-    var dep = s.departures && s.departures[0] ? ', departing ' + s.departures[0].date : '';
-    box.value = 'About: ' + s.title + ' (' + s.line + ', ' + s.ships.join(' or ') + ', ' + s.nights + ' nights' + dep + '). Ref ' + s.id + '.\n\n';
+    var dep = s.d ? ', departing ' + s.d : '';
+    box.value = 'About: ' + s.t + ' (' + s.l + ', ' + s.s.join(' or ') + ', ' + s.n + ' nights' + dep + '). Ref ' + s.id + '.\n\n';
     box.focus();
   }).catch(function () {});
 })();

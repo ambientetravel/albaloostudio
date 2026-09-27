@@ -66,32 +66,33 @@ BASE = "https://cpx.cruisec.net/api/Search/Results/json"
 COUNT = "https://cpx.cruisec.net/api/Search/count/json"
 UA = "Mozilla/5.0 (compatible; inventory-sync/1.0; aid=%s)" % AID
 
-# Candidate CruiseHost line codes. Only Explora_Journeys is proven (boutimar.ir walks it daily).
-# The rest are the obvious spellings; --discover confirms or rejects each one.
+# Lines, as CruiseHost spells them in the url= path. Codes and names confirmed against the
+# catalogue's own line list (Search/count/json -> cruiselines) on 2026-09-27.
+#   scope "all"   -> every destination       (the lines this site is built around)
+#   scope "focus" -> Mediterranean only      (similar lines, grown into more areas later)
+# Variety Cruises is NOT in CruiseHost; its sailings come from its own catalogue.
 LINES = {
-    "Explora_Journeys":   {"name": "Explora Journeys", "kind": "SEA"},
-    "Silversea_Cruises":  {"name": "Silversea", "kind": "SEA"},
-    "Silversea":          {"name": "Silversea", "kind": "SEA"},
-    "Variety_Cruises":    {"name": "Variety Cruises", "kind": "SEA"},
-    "Scenic_Luxury_Cruises_Tours": {"name": "Scenic", "kind": "RIVER"},
-    "Scenic_Cruises":     {"name": "Scenic", "kind": "RIVER"},
-    "Scenic":             {"name": "Scenic", "kind": "RIVER"},
+    "Explora_Journeys":      {"name": "Explora Journeys",  "code": "EXP", "kinds": ["SEA"],          "scope": "all"},
+    "Silversea":             {"name": "Silversea",         "code": "SSE", "kinds": ["SEA"],          "scope": "all"},
+    "Scenic_Luxury_Cruises": {"name": "Scenic",            "code": "SLC", "kinds": ["SEA", "RIVER"], "scope": "all"},
+    "Seabourn_Cruise_Line":  {"name": "Seabourn",          "code": "SBN", "kinds": ["SEA"],          "scope": "focus"},
+    "Regent_Seven_Seas":     {"name": "Regent Seven Seas", "code": "REG", "kinds": ["SEA"],          "scope": "focus"},
+    "PONANT":                {"name": "Ponant",            "code": "COM", "kinds": ["SEA"],          "scope": "focus"},
+    "Seadream":              {"name": "SeaDream",          "code": "SDM", "kinds": ["SEA"],          "scope": "focus"},
+    "Sea_Cloud":             {"name": "Sea Cloud",         "code": "SCD", "kinds": ["SEA"],          "scope": "focus"},
+    "Star_Clipper":          {"name": "Star Clippers",     "code": "CLP", "kinds": ["SEA"],          "scope": "focus"},
 }
+CODE_NAME = {m["code"]: m["name"] for m in LINES.values()}
 
-# Focus first: Türkiye, Greece and Italy sit in these three. Then everything else.
+# The Mediterranean, where Türkiye, Greece and Italy sit. "all" means every area.
 FOCUS_AREAS = ["Eastern_Mediterranean", "Central_Mediterranean_", "Mediterranean"]
-OTHER_AREAS = ["Western_Mediterranean", "Southeurope", "Northeurope", "North_Europe", "Norwegian_Fjords",
-               "Baltic_Sea_and_Baltic_States", "Iceland_Svalbard", "Westeurope", "Around_western_Europe",
-               "Atlantic_Ocean_Europe", "Canary_Isles", "South_America", "Africa", "South_Africa", "Asia",
-               "Far_East", "Indian_Ocean"]
-AREAS = FOCUS_AREAS + OTHER_AREAS
 RIVER_AREAS = ["all"]
 
 OUT = os.path.join(ROOT, "data", "sources", "cruisehost-sailings.json")
 STATE = os.path.join(HERE, "state.json")
 REPORT = os.path.join(HERE, "last-report.json")
 SHIPS_DIR = os.path.join(ROOT, "media", "cruisehost")
-JITTER = (4.0, 10.0)
+JITTER = (3.0, 6.0)
 TIMEOUT = 25
 PERSIAN_GULF_SRC = re.compile(r"arab(ian|ic)\s+gulf|persian\s+gulf", re.I)
 MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -159,7 +160,8 @@ def map_row(c, line_names):
     code = (c.get("cruiseLineID") or "").strip()
     return {
         "cruisehostId": (c.get("masterCruiseID") or "").strip(),
-        "line": line_names.get(code, code),
+        "line": CODE_NAME.get(code, line_names.get(code, code)),
+        "kind": c.get("_kind", "SEA"),
         "lineCode": code,
         "ship": ship_name(c.get("ship")),
         "nights": int(c.get("duration") or 0),
@@ -173,22 +175,31 @@ def map_row(c, line_names):
     }
 
 
+def itinerary_id(r):
+    import hashlib
+    key = "|".join((r["lineCode"], r["ship"], " - ".join(r["route"]), str(r["nights"]), r.get("kind", "SEA")))
+    return "%s-%s" % (r["lineCode"] or "CH", hashlib.sha1(key.encode()).hexdigest()[:8])
+
+
 def group(rows):
-    """CruiseHost returns one row per departure; keep one sailing per masterCruiseID."""
+    """CruiseHost returns one row per departure. Keep one record per itinerary
+    (same line, ship, route, nights) with every departure and its own CruiseHost id."""
     out = {}
     for r in rows:
-        sid = r["cruisehostId"]
-        if not sid:
+        if not r["cruisehostId"] or not r["route"]:
             continue
-        if sid not in out:
-            out[sid] = r
+        iid = itinerary_id(r)
+        dep = [dict(d, cruisehostId=r["cruisehostId"]) for d in r["departures"]]
+        if iid not in out:
+            out[iid] = dict(r, itineraryId=iid, departures=dep)
             continue
-        have = {d["date"] for d in out[sid]["departures"]}
-        out[sid]["departures"] += [d for d in r["departures"] if d["date"] not in have]
+        have = {d["date"] for d in out[iid]["departures"]}
+        out[iid]["departures"] += [d for d in dep if d["date"] not in have]
     for s in out.values():
         s["departures"].sort(key=lambda d: d["date"])
         prices = [d["priceFrom"] for d in s["departures"] if d["priceFrom"]]
-        s["priceFrom"] = min(prices) if prices else s["priceFrom"]
+        s["priceFrom"] = min(prices) if prices else None
+        s["cruisehostId"] = s["itineraryId"]
     return list(out.values())
 
 
@@ -246,87 +257,107 @@ def fetch_ship_images(sailings, verbose=True):
 
 
 def verified_lines(state):
+    """Only lines, and only kinds, that --discover confirmed."""
     v = state.get("verified") or {}
-    return {k: LINES[k] for k in v if k in LINES and v[k] > 0}
+    return {k: dict(LINES[k], kinds=[kd for kd in LINES[k]["kinds"] if (v.get(k) or {}).get(kd)]) for k in v if k in LINES}
 
 
 def discover(today):
-    """One count request per candidate code. Records what CruiseHost actually answers."""
+    """One count request per line and kind. An unknown slug makes CruiseHost silently drop the
+    filter and count the WHOLE catalogue (53,262 on 2026-09-27), so a slug only counts as
+    verified when the url CruiseHost echoes back still contains it."""
     state = load_json(STATE, {})
     found = {}
-    for code, meta in LINES.items():
-        areas = AREAS if meta["kind"] == "SEA" else RIVER_AREAS
-        try:
-            n = int(get_json(build_url(COUNT, meta["kind"], areas, [code], today)).get("allentries") or 0)
-        except Exception as e:
-            print("  %-30s %-6s error: %s" % (code, meta["kind"], e))
-            continue
-        found[code] = n
-        print("  %-30s %-6s %6d sailings" % (code, meta["kind"], n))
-        time.sleep(random.uniform(1.5, 3.0))
+    for slug, meta in LINES.items():
+        for kind in meta["kinds"]:
+            areas = ["all"] if meta["scope"] == "all" else FOCUS_AREAS
+            try:
+                d = get_json(build_url(COUNT, kind, areas, [slug], today))
+            except Exception as e:
+                print("  %-24s %-5s error: %s" % (slug, kind, e)); continue
+            n, echo = int(d.get("count") or 0), str(d.get("url") or "")
+            ok = slug in echo.split("/")[2].split("+") if echo.count("/") >= 2 else False
+            print("  %-24s %-5s %6d departures  %s" % (slug, kind, n, "ok" if ok else "REJECTED: CruiseHost ignored this name (echo %s)" % echo))
+            if ok:
+                found.setdefault(slug, {})[kind] = n
+            time.sleep(random.uniform(1.5, 3.0))
     state["verified"] = found
-    state["discoveredAt"] = today
+    state["discoveredAt"] = today.isoformat()
     json.dump(state, open(STATE, "w"), indent=1)
-    print("verified:", {k: v for k, v in found.items() if v})
+    print("verified:", found)
+
+
+def groups(lines):
+    """(kind, areas, [slugs]) per request family: one URL per kind and scope."""
+    out = []
+    for kind in ("SEA", "RIVER"):
+        for scope in ("all", "focus"):
+            slugs = [k for k, m in lines.items() if kind in m["kinds"] and m["scope"] == scope]
+            if slugs:
+                out.append((kind, ["all"] if scope == "all" else FOCUS_AREAS, slugs))
+    return out
 
 
 def walk(today, lines, max_pages=None, pages_wanted=None, verbose=True):
-    """Walk each kind (SEA, RIVER) separately. Returns rows, total, and the page count per kind."""
-    rows, total, pages_by_kind = [], 0, {}
-    for kind in ("SEA", "RIVER"):
-        codes = [c for c, m in lines.items() if m["kind"] == kind]
-        if not codes:
-            continue
-        areas = AREAS if kind == "SEA" else RIVER_AREAS
-        first = get_json(build_url(BASE, kind, areas, codes, today, 1))
+    """Walk every request family. Returns rows (each tagged with its kind), total, pages per family."""
+    rows, total, pages_by = [], 0, {}
+    for kind, areas, slugs in groups(lines):
+        fam = kind + ":" + "+".join(slugs)
+        first = get_json(build_url(BASE, kind, areas, slugs, today, 1))
+        echo = str((first.get("search") or {}).get("url") if isinstance(first.get("search"), dict) else first.get("url") or "")
         pages = int(first.get("pages") or 0)
         total += int(first.get("allentries") or 0)
-        pages_by_kind[kind] = pages
-        want = list(range(1, pages + 1)) if pages_wanted is None else [p for p in pages_wanted.get(kind, []) if p <= pages]
+        pages_by[fam] = pages
+        want = list(range(1, pages + 1)) if pages_wanted is None else [p for p in pages_wanted.get(fam, []) if p <= pages]
         if max_pages:
             want = want[:max_pages]
+        tag = lambda rs: [dict(r, _kind=kind) for r in rs]
         if 1 in want:
-            rows += rows_of(first)
+            rows += tag(rows_of(first))
         for n, p in enumerate([p for p in want if p != 1]):
             time.sleep(random.uniform(*JITTER))
             try:
-                rows += rows_of(get_json(build_url(BASE, kind, areas, codes, today, p)))
+                rows += tag(rows_of(get_json(build_url(BASE, kind, areas, slugs, today, p))))
             except Exception as e:
-                print("  ! %s page %d: %s" % (kind, p, e), file=sys.stderr)
+                print("  ! %s page %d: %s" % (fam, p, e), file=sys.stderr)
             if verbose and n and n % 10 == 0:
-                print("  ... %s %d/%d pages" % (kind, n, len(want)))
-    return rows, total, pages_by_kind
+                print("  ... %s %d/%d pages, %d rows" % (fam, n, len(want), len(rows)), flush=True)
+        if verbose:
+            print("  %s: %d pages, %d rows so far" % (fam, pages, len(rows)), flush=True)
+    return rows, total, pages_by
 
 
 def selftest():
     today = "2026-09-27"
-    names = {"EXP": "Explora Journeys", "SIL": "Silversea"}
+    names = {}
     p1 = {"allentries": 3, "pages": 2, "cruises": [
         {"masterCruiseID": "A1", "cruiseLineID": "EXP", "ship": "EXPLORA II", "duration": "7", "cruiseArea": "Eastern_Mediterranean",
          "route": "Piraeus, Athens - Mykonos - Kusadasi, Ephesos - Piraeus, Athens", "departure_raw": "2026-10-03", "priceUnformatted": "4720.00", "shipImage": "//images.cruisec.net/images/ships/ships/M2.jpg"},
         {"masterCruiseID": "A1", "cruiseLineID": "EXP", "ship": "EXPLORA II", "duration": "7", "cruiseArea": "Eastern_Mediterranean",
          "route": "Piraeus, Athens - Mykonos - Kusadasi, Ephesos - Piraeus, Athens", "departure_raw": "2026-10-10", "priceUnformatted": "4390"}]}
-    p2 = {"cruises": {"10": {"masterCruiseID": "B2", "cruiseLineID": "SIL", "ship": "silver nova", "duration": "10", "cruiseArea": "Arabian Gulf",
+    p2 = {"cruises": {"10": {"masterCruiseID": "B2", "cruiseLineID": "SSE", "ship": "silver nova", "duration": "10", "cruiseArea": "Arabian Gulf",
                              "route": "Dubai - Doha - Dubai", "departure_raw": "2027-01-05", "priceUnformatted": "8900"}}}
     rows = rows_of(p1) + rows_of(p2)
     assert all(isinstance(r, dict) for r in rows), "rows_of must yield records, not index keys"
     got = group([map_row(r, names) for r in rows])
-    a = next(s for s in got if s["cruisehostId"] == "A1"); b = next(s for s in got if s["cruisehostId"] == "B2")
+    a = next(s for s in got if s["lineCode"] == "EXP"); b = next(s for s in got if s["lineCode"] == "SSE")
+    assert len(got) == 2 and a["cruisehostId"].startswith("EXP-") and [d["cruisehostId"] for d in a["departures"]] == ["A1", "A1"], got
     assert [d["date"] for d in a["departures"]] == ["2026-10-03", "2026-10-10"] and a["priceFrom"] == 4390, a
     assert a["ship"] == "Explora II" and a["shipImageSource"].startswith("https://"), a
     assert b["region"] == "Persian Gulf" and b["line"] == "Silversea" and b["ship"] == "Silver Nova", b
     assert ship_name("SILVER VISION") == "Silver Vision" and ship_name("explora iv") == "Explora IV"
     existing = [dict(a, departures=[{"date": "2026-09-01", "priceFrom": 1}]), {"cruisehostId": "C3", "departures": [{"date": "2027-02-01", "priceFrom": 5}]}]
+    aid = a["cruisehostId"]
     merged, st = apply([dict(x) for x in existing], [b], today, authoritative=False)
     c3 = next(s for s in merged if s["cruisehostId"] == "C3")
     assert not c3.get("hidden") and st["untouched"] == 2 and st["new"] == 1, (st, c3)
-    a_old = next(s for s in merged if s["cruisehostId"] == "A1")
+    a_old = next(s for s in merged if s["cruisehostId"] == aid)
     assert a_old.get("hidden") and a_old["departures"] == [], a_old          # elapsed -> hidden, never deleted
     merged, st = apply([dict(x) for x in existing], [b], today, authoritative=True)
     assert next(s for s in merged if s["cruisehostId"] == "C3").get("hidden") and st["vanished"] == 2, st
     assert len(merged) == 3, "nothing is ever deleted"
     assert not re.search(r"ambiente|boutimar|albaloo|cruise24", UA, re.I), "no company name in outbound headers"
-    u = build_url(BASE, "SEA", AREAS[:2], ["Explora_Journeys"], date(2026, 9, 27), 2)
+    u = build_url(BASE, "SEA", FOCUS_AREAS[:2], ["Explora_Journeys"], date(2026, 9, 27), 2)
     assert "url=SEA/Eastern_Mediterranean+Central_Mediterranean_/Explora_Journeys/all/September2026/March2028/all" in u and "page=2" in u, u
     print("selftest OK: page shapes, grouping, Persian Gulf, merge/prune, rolling vs full, neutral UA, URL form")
 
@@ -372,8 +403,6 @@ def main():
         authoritative = args.limit is None
 
     fetched = group([map_row(r, names) for r in rows])
-    for s in fetched:          # CruiseHost's line code -> our display name, from the verified table
-        s["line"] = next((m["name"] for c, m in lines.items() if s["lineCode"] and s["lineCode"].lower() in c.lower()), s["line"])
     existing = load_json(OUT, {}).get("sailings", [])
     merged, stats = apply(existing, fetched, today.isoformat(), authoritative)
     report = {"ran": today.isoformat(), "mode": "rolling" if args.rolling else "full", "catalogue": total, "rows": len(rows), "sailings": len(fetched), **stats}
