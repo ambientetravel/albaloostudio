@@ -14,6 +14,8 @@ both are in this folder, unchanged in copy, changed only in plumbing.
 
 | File | What | Status |
 |---|---|---|
+| `conditions.html` | Booking conditions / Reisebedingungen, drafted for both roles (Reisevermittlung under § 651v BGB, own package under §§ 651a ff.), with §§ 651e/f/h/p referenced where they bind. 18 highlighted placeholders: deposit and balance terms, change and cancellation fees, insurer, jurisdiction. Linked from every footer and from the imprint. | Drafted; needs the same facts as the imprint plus a travel-law read |
+| `assets/logo*.png`, `favicon-*.png`, `og-image.jpg` | The logo Alireza supplied on 27 Sep (`logo-original.png`, 1080²), cut into transparent ink and white lockups, a nav mark without the tagline, favicons at 32/180/512 and a 1200×630 Open Graph card. Every page links the icons and the OG image; the home page's JSON-LD carries `logo` and `sameAs` for the Facebook and Instagram pages. | Done |
 | `imprint.html`, `privacy.html` | Impressum under § 5 DDG / § 18 MStV and a GDPR Art. 13 notice, in English with the German terms. Every fact not in the source is a highlighted `[placeholder]`: 19 on the imprint, 12 on the privacy page. The privacy text describes what the site really does: no cookies, no analytics, fonts and GSAP self-hosted, server logs, the form, and media loading from Explora's servers until `download_media.py` has run. Supervisory authority named as LfDI Rheinland-Pfalz, Mainz, since the GmbH sits in Rennerod. Linked from every footer. | Drafted; not publishable until the placeholders are filled |
 | `destinations.html`, `contact.html` | Added last on 27 Sep. Twelve region cards (the home page's eleven Explora regions plus the rivers), each with season, lines and the visa position under the house rule; contact page with the request form, the three offices from v1 and a three-step "what happens next". Nav on every page now points at these instead of the home-page anchors. | Verified with the rest, below |
 | `ships.html`, `lines.html`, `itineraries.html`, `journal.html` | **v1's inner views, now real pages** (added later on 27 Sep). Fleet with the on-board notes, eight line profiles, the Aegean worked example day by day plus seven routes each with its visa line, the Kuşadası port guide in full. Share `assets/site.css` and `assets/site.js` with the home page; the nav marks the current page. Hero images reuse URLs already in the media set, so the download list is unchanged at 47. | Verified with the home page, below |
@@ -23,7 +25,7 @@ both are in this folder, unchanged in copy, changed only in plumbing.
 | `assets/site.css`, `assets/site.js` | The page CSS and the media resolver / nav script, pulled out of `index.html` so five pages share one copy. The home-page GSAP choreography stays inline in `index.html`. | Done |
 | `assets/fonts/` | Cormorant Garamond + Manrope, **self-hosted** (6 woff2, 204 KB, latin + latin-ext). No call to Google on page load. Ambiente Tours GmbH is a German company; LG München (2022) fined a site for hot-linking Google Fonts. | Done, verified loading in Chromium |
 | `assets/vendor/` | GSAP 3.12.5 + ScrollTrigger from the npm package, replacing the cdnjs links. | Done, verified `gsap` and `ScrollTrigger` defined |
-| `robots.txt`, `sitemap.xml` | Nine URLs. cruise24.me today serves a GoDaddy sitemap *index* resolving to 2 URLs; this replaces it once the site moves. | Written |
+| `robots.txt`, `sitemap.xml` | Ten URLs. cruise24.me today serves a GoDaddy sitemap *index* resolving to 2 URLs; this replaces it once the site moves. | Written |
 
 Changes made to `index.html` versus the artifact, all in `<head>` or the
 resolver script, none in the copy:
@@ -35,9 +37,31 @@ resolver script, none in the copy:
 - The "Preview: photos and video load from the media folder" badge now
   removes itself once `media/index.json` has entries.
 
+## Design, restyled around the logo (27 Sep, later)
+
+The logo is monochrome line art: near-black navy ink (#0c1824) on white with
+a pale blue wash (#e2ecf5), heavy geometric numerals, a letterspaced caps
+tagline and dotted rules. `assets/site.css` now follows it: ink and wash as
+the two backgrounds, one steel-blue accent (#1e4d7a on light, #9fbad6 on
+dark) instead of the brass-and-teal pair, Manrope 700 for every heading
+instead of the Cormorant serif, kickers as letterspaced caps with a dotted
+lead line, 10px corners instead of pills, dotted footer rule. The Cormorant
+files stay in `assets/fonts/` but nothing references them; delete when sure.
+
+**Three things the logo says that the copy does not, for Alireza to decide:**
+1. The logo brand is "24" / Cruise24; the copy says AmbiMare by Ambiente
+   Group. The nav now shows the mark beside the AmbiMare wordmark with
+   "by Ambiente · cruise24.me" under it. If Cruise24 is the brand, the
+   rename is a one-pass find-and-replace across ten pages; say so.
+2. The tagline reads "excellent cruise deals of the Middle East"; the site
+   sells twelve regions from Alaska to the Amazon. One of them is wrong.
+3. The tagline in the artwork is misspelled ("EXCCELENT" with a broken C).
+   It is baked into the image; the file needs a corrected export from
+   whoever made it. Every alt text and the OG card use the correct spelling.
+
 ## Verified (headless Chromium, 1440×900 and 390×844, served from this folder)
 
-All nine pages, both widths: 0 JS errors, GSAP and both font families
+All ten pages, both widths: 0 JS errors, GSAP and both font families
 resolve locally, `aria-current` lands on the right nav item, every internal
 link returns 200, no horizontal overflow. Row counts: ships 9, lines 8,
 itineraries 15 (8 days + 7 routes), journal 6. Home page detail:
@@ -65,7 +89,7 @@ invented by this session; the inclusions list is Explora's own.
 ## NOT done, and why
 
 **1. Media is not downloaded.** This container's network policy denies
-`explorajourneys.com` and `dm.explorajourneys.com` (403 on CONNECT). The nine
+`explorajourneys.com` and `dm.explorajourneys.com` (403 on CONNECT). The ten
 pages share 47 distinct media URLs (the inner pages reuse the home page's).
 Run on any machine with normal internet:
 
@@ -115,7 +139,7 @@ guess it. The EU ODR platform was shut down in July 2025, so no ODR link;
 the VSBG statement is there with the choice left open.
 
 **6a. Other placeholders**: `[PHONE] · [EMAIL]` on the contact page, `[licence numbers]` in the footer, and the AmbiMedi / AmbiEvent
-/ Booking conditions links are `href="#"`. Privacy and Imprint now resolve.
+links are `href="#"`. Booking conditions, Privacy and Imprint now resolve.
 
 **7. Three journal pieces are teasers only.** "Seven nights on the Danube",
 "Explora I, deck by deck" and "What a service charge actually is" exist as
