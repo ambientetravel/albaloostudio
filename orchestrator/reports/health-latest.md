@@ -1,6 +1,6 @@
-# Orchestration health — 2026-09-26T22:37 UTC
+# Orchestration health — 2026-09-27T10:14 UTC
 
-**0 broke · 1 need you · 0 to watch.**
+**0 broke · 1 need you · 1 to watch.**
 
 ## 🔴 Broke
 
@@ -10,36 +10,40 @@
 
 - 3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship
 
+## 👀 To watch
+
+- 1 brief(s) dead-lettered by the compliance gate (gate working; review the DLQ for anything worth a human rewrite)
+
 ## Numbers — last cycle
 
 | Metric | This cycle | Previous |
 |---|---:|---:|
 | Sites scanned | 10 | |
-| Gap candidates → briefs | 84 → **9** | |
-| Skipped by ledger (already briefed) | 57 | |
-| Dead-lettered / degraded | 0 / 0 | |
-| Articles drafted (as PRs) | **9** | 6 |
+| Gap candidates → briefs | 94 → **12** | |
+| Skipped by ledger (already briefed) | 60 | |
+| Dead-lettered / degraded | 1 / 0 | |
+| Articles drafted (as PRs) | **7** | 9 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $1.077 | $0.615 |
+| Model spend | $1.015 | $1.077 |
 | Social: campaigns / posts held / no-media | 5 / 3 / 3 | |
-| Article PRs open | 9 | |
+| Article PRs open | 7 | |
 | AI recall (Oracle, monthly) | — | |
 
 ## Agents
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36276106859) |
-| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36276280149) |
-| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36276792299) |
+| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36311094001) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36311399609) |
+| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36311889268) |
 | Closer | · never ran | — |  |
-| Auditor+Analyst | ✓ success | 5.5d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35588751207) |
-| Cartographer | ✓ success | 5.5d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35591602659) |
-| Watcher | ✓ success | 6.5d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35505090018) |
+| Auditor+Analyst | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35588751207) |
+| Cartographer | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35591602659) |
+| Watcher | ✓ success | 7.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35505090018) |
 | Oracle | · never ran | — |  |
-| Merge-watch | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36240730322) |
-| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36270659405) |
-| Dashboard | ✓ success | 5.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35598196884) |
+| Merge-watch | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36240730322) |
+| PR gate | ✓ success | 0.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36293902417) |
+| Dashboard | ✓ success | 5.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/35598196884) |
 
 ## ✓ Fine
 

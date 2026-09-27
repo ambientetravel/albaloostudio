@@ -1,55 +1,57 @@
 {
- "generated": "2026-09-26T22:37+00:00",
+ "generated": "2026-09-27T10:14+00:00",
  "critical": [],
  "needs_you": [
   "3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship"
  ],
- "warn": [],
+ "warn": [
+  "1 brief(s) dead-lettered by the compliance gate (gate working; review the DLQ for anything worth a human rewrite)"
+ ],
  "fine": [
   "3 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
  "numbers": {
-  "briefs": 9,
-  "candidates": 84,
-  "dlq": 0,
+  "briefs": 12,
+  "candidates": 94,
+  "dlq": 1,
   "degraded": 0,
-  "ledger_skipped": 57,
+  "ledger_skipped": 60,
   "sites_scanned": 10,
-  "scout_run": "run_20260926T2223Z_ef4c",
-  "articles": 9,
+  "scout_run": "run_20260927T0959Z_690a",
+  "articles": 7,
   "writer_failed": 0,
   "deferred": 0,
-  "briefs_seen": 9,
-  "cost_usd": 1.077273,
-  "prev_cost_usd": 0.615147,
-  "prev_articles": 6,
+  "briefs_seen": 12,
+  "cost_usd": 1.015158,
+  "prev_cost_usd": 1.077273,
+  "prev_articles": 9,
   "posts": 6,
   "posts_held": 3,
   "posts_no_media": 3,
   "campaigns": 5,
-  "open_prs": 9
+  "open_prs": 7
  },
  "agents": [
   {
    "agent": "Scout",
    "result": "success",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36276106859",
-   "run": 45
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36311094001",
+   "run": 46
   },
   {
    "agent": "Writer",
    "result": "success",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36276280149",
-   "run": 58
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36311399609",
+   "run": 59
   },
   {
    "agent": "Broadcaster",
-   "result": "success",
+   "result": "in_progress",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36276792299",
-   "run": 57
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36311889268",
+   "run": 58
   },
   {
    "agent": "Closer",
@@ -60,21 +62,21 @@
   {
    "agent": "Auditor+Analyst",
    "result": "success",
-   "age_days": 5.5,
+   "age_days": 6.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35588751207",
    "run": 9
   },
   {
    "agent": "Cartographer",
    "result": "success",
-   "age_days": 5.5,
+   "age_days": 6.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35591602659",
    "run": 11
   },
   {
    "agent": "Watcher",
    "result": "success",
-   "age_days": 6.5,
+   "age_days": 7.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35505090018",
    "run": 9
   },
@@ -87,21 +89,21 @@
   {
    "agent": "Merge-watch",
    "result": "success",
-   "age_days": 0.4,
+   "age_days": 0.9,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36240730322",
    "run": 45
   },
   {
    "agent": "PR gate",
    "result": "success",
-   "age_days": 0.1,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36270659405",
-   "run": 89
+   "age_days": 0.2,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36293902417",
+   "run": 90
   },
   {
    "agent": "Dashboard",
    "result": "success",
-   "age_days": 5.4,
+   "age_days": 5.9,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/35598196884",
    "run": 12
   }
