@@ -45,6 +45,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -105,12 +106,34 @@ def is_video(url: str) -> bool:
     return Path(urllib.parse.urlparse(url).path).suffix.lower() in VIDEO_EXT
 
 
+# Scene7 (dm.explorajourneys.com/is/image/...) answers a bare URL with a small
+# default rendition; asking for size and format gets the full image. Taken from
+# the chat's original download_media.py. The index still keys on the bare URL,
+# because that is what the pages carry.
+SCENE7_PARAMS = "wid=2560&fmt=jpeg&qlt=90"
+
+
+def request_url(url: str) -> str:
+    p = urllib.parse.urlparse(url)
+    if p.netloc == "dm.explorajourneys.com" and p.path.startswith("/is/image/") and not p.query:
+        return f"{url}?{SCENE7_PARAMS}"
+    return url
+
+
+def headers_for(url: str) -> dict[str, str]:
+    h = {"User-Agent": UA, "Accept": "*/*"}
+    host = urllib.parse.urlparse(url).netloc
+    if host == "explorajourneys.com" or host.endswith(".explorajourneys.com"):
+        h["Referer"] = "https://explorajourneys.com/"  # their CDN refuses some hotlinked requests without it
+    return h
+
+
 def fetch(url: str, dest_dir: Path, timeout: int, retries: int = 3) -> tuple[Path, int]:
     """Stream url to dest_dir. Returns (path, bytes). Raises on final failure."""
     last: Exception | None = None
     for attempt in range(1, retries + 1):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "*/*"})
+            req = urllib.request.Request(request_url(url), headers=headers_for(url))
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 ct = r.headers.get("Content-Type", "")
                 name = local_name(url, ct)
@@ -167,6 +190,7 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--check", action="store_true", help="verify only; download nothing")
     ap.add_argument("--timeout", type=int, default=120)
+    ap.add_argument("--workers", type=int, default=6, help="parallel downloads (default 6)")
     args = ap.parse_args()
 
     pages = [Path(h) for h in args.html] if args.html else sorted(
@@ -221,16 +245,23 @@ def main() -> int:
         return 0
 
     total, failed = 0, []
-    for i, u in enumerate(todo, 1):
-        print(f"[{i}/{len(todo)}] {u}")
+
+    def one(u: str):
         try:
-            p, n = fetch(u, out, args.timeout)
-            index[u] = rel(p)
-            total += n
-            print(f"          → {p.name}  {human(n)}")
+            return u, *fetch(u, out, args.timeout), None
         except Exception as e:  # keep going; report at the end
-            failed.append((u, str(e)))
-            print(f"          FAILED  {e}")
+            return u, None, 0, str(e)
+
+    # six at a time, as the chat's original script did; results print in completion order
+    with ThreadPoolExecutor(max_workers=args.workers) as ex:
+        for i, (u, p, n, err) in enumerate(ex.map(one, todo), 1):
+            if err:
+                failed.append((u, err))
+                print(f"[{i}/{len(todo)}] FAILED  {u}\n          {err}")
+            else:
+                index[u] = rel(p)
+                total += n
+                print(f"[{i}/{len(todo)}] {human(n):>9}  {p.name}")
 
     # write only successes; a failed URL stays remote in the page
     index = {u: p for u, p in index.items() if (html_path.parent / p).is_file()}
