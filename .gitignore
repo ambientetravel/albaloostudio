@@ -84,3 +84,11 @@ orchestrator/written/*
 
 # Agent 4 batch output — holds redacted customer messages
 orchestrator/closed/
+
+# ── cruise24.me / AmbiMare media ─────────────────────────────────────────
+# Fetched by cruise24-me/download_media.py from the lines' CDNs. Videos are
+# tens of MB each and belong on the web host, not in git; index.json is
+# committed so the page's resolver map is reviewable.
+cruise24-me/media/*
+!cruise24-me/media/.gitkeep
+!cruise24-me/media/index.json

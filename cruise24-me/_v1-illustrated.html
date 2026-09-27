@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AmbiMare · Ocean, river and small-ship journeys by Ambiente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b1f2e; --ink-2:#102a3c; --deep:#071522;
+  --sea:#1f6f78; --sea-2:#2f8f96; --foam:#eef2f0; --foam-2:#dfe6e4;
+  --text:#14262f; --text-on-ink:#e9eef0; --muted:#6d7f89; --muted-on-ink:#9fb0b8;
+  --brass:#b8955a; --line:rgba(20,38,47,.14); --line-on-ink:rgba(233,238,240,.14);
+  --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --sans:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-io:cubic-bezier(.77,0,.175,1);
+  --nav-h:72px;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --foam:#0f2231; --foam-2:#153043; --text:#e9eef0; --muted:#9fb0b8; --line:rgba(233,238,240,.14); } }
+:root[data-theme="dark"]{ --foam:#0f2231; --foam-2:#153043; --text:#e9eef0; --muted:#9fb0b8; --line:rgba(233,238,240,.14); }
+html{scroll-padding-top:env(safe-area-inset-top,0px); scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:var(--sans);font-weight:300;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{max-width:100%}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:300;line-height:1.05;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(3rem,8.5vw,7.5rem)}
+h2{font-size:clamp(2.2rem,5vw,4.4rem)}
+h3{font-size:clamp(1.5rem,2.6vw,2.2rem)}
+p{margin:0}
+.wrap{width:min(1240px,calc(100% - 48px));margin-inline:auto}
+.lede{font-family:var(--serif);font-size:clamp(1.25rem,1.8vw,1.55rem);line-height:1.45;font-weight:300}
+.kicker{font-family:var(--serif);font-style:italic;font-size:1.15rem;color:var(--brass);margin-bottom:14px;display:block}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:999px;border:1px solid currentColor;font:500 .95rem var(--sans);cursor:pointer;background:transparent;color:inherit;transition:transform 160ms var(--ease-out),background 200ms ease,color 200ms ease}
+.btn:active{transform:scale(.97)}
+.btn.solid{background:var(--foam);color:var(--ink);border-color:var(--foam)}
+@media (hover:hover) and (pointer:fine){ .btn:hover{background:rgba(255,255,255,.08)} .btn.solid:hover{background:#fff} }
+.btn:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+
+/* nav */
+.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:50;height:var(--nav-h);padding-top:env(safe-area-inset-top,0px);display:flex;align-items:center;transition:background 300ms ease,backdrop-filter 300ms ease}
+.nav.scrolled{background:rgba(7,21,34,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.logo{font-family:var(--serif);font-size:1.7rem;letter-spacing:.02em;display:flex;align-items:baseline;gap:8px}
+.logo small{font:400 .7rem var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--muted-on-ink)}
+.nav ul{list-style:none;margin:0;padding:0;display:flex;gap:28px}
+.nav ul a{font-size:.95rem;font-weight:400;color:var(--text-on-ink);opacity:.85;padding:10px 0;position:relative}
+.nav ul a::after{content:"";position:absolute;left:0;right:100%;bottom:4px;height:1px;background:var(--brass);transition:right 240ms var(--ease-out)}
+.nav ul a[aria-current="page"]::after,.nav ul a:hover::after{right:0}
+.nav .btn{min-height:42px;padding:0 18px}
+.burger{display:none;background:none;border:0;color:inherit;width:44px;height:44px;cursor:pointer}
+@media (max-width:860px){ .nav ul{display:none} .nav .btn{display:none} .burger{display:block} .nav.open ul{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:rgba(7,21,34,.96);padding:20px 24px 28px;gap:6px} }
+
+/* views */
+.view{display:none}
+.view.active{display:block}
+
+/* hero */
+.hero{position:relative;min-height:100svh;display:grid;place-items:end start;overflow:hidden;background:linear-gradient(180deg,#07131f 0%,#0b1f2e 45%,#123a4a 100%)}
+.hero .sky{position:absolute;inset:0;background:radial-gradient(60% 50% at 70% 20%,rgba(184,149,90,.22),transparent 60%),radial-gradient(40% 30% at 20% 30%,rgba(47,143,150,.18),transparent 70%)}
+.hero .sea{position:absolute;left:0;right:0;bottom:0;height:52%;overflow:hidden}
+.hero .wave{position:absolute;left:0;bottom:0;width:200%;height:100%;fill:none}
+.hero .wave path{fill:currentColor}
+.w1{color:#0e2c3c;animation:drift 26s linear infinite}
+.w2{color:#12384b;bottom:-8%;animation:drift 19s linear infinite reverse;opacity:.9}
+.w3{color:#174a5b;bottom:-16%;animation:drift 14s linear infinite;opacity:.9}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ship{position:absolute;bottom:41%;left:-14%;width:min(520px,60vw);color:#e9eef0;opacity:.85;animation:sail 90s linear infinite}
+@keyframes sail{from{transform:translateX(0)}to{transform:translateX(220vw)}}
+.hero .content{position:relative;z-index:2;width:min(1240px,calc(100% - 48px));margin:0 auto;padding:calc(var(--nav-h) + 40px) 0 clamp(64px,12vh,140px)}
+.hero h1{max-width:12ch}
+.hero h1 em{font-style:italic;font-weight:300}
+.hero .lede{max-width:44ch;margin:28px 0 36px;color:var(--muted-on-ink)}
+.hero .actions{display:flex;gap:14px;flex-wrap:wrap}
+.scroll-cue{position:absolute;right:24px;bottom:28px;z-index:2;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-on-ink);display:flex;align-items:center;gap:12px}
+.scroll-cue span{display:block;width:1px;height:44px;background:currentColor;opacity:.6;transform-origin:top;animation:cue 2.2s var(--ease-io) infinite}
+@keyframes cue{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* sections */
+.section{padding:clamp(80px,12vh,160px) 0;position:relative}
+.section.light{background:var(--foam);color:var(--text)}
+.section.light .kicker{color:var(--sea)}
+.section.deep{background:var(--deep)}
+.head{max-width:60ch;margin-bottom:clamp(40px,6vh,72px)}
+.head p{margin-top:18px;color:var(--muted);max-width:56ch}
+.section:not(.light) .head p{color:var(--muted-on-ink)}
+
+/* stacked "three ways" puzzle */
+.stack{position:relative;height:340svh}
+.stack .stage{position:sticky;top:0;height:100svh;overflow:hidden}
+.panel{position:absolute;inset:0;display:grid;grid-template-columns:1.1fr 1fr;align-items:center;gap:48px;padding:0 max(24px,calc((100% - 1240px)/2));clip-path:inset(100% 0 0 0);will-change:clip-path}
+.panel:first-child{clip-path:inset(0)}
+.panel.ocean{background:linear-gradient(160deg,#0c2434,#144556)}
+.panel.river{background:linear-gradient(160deg,#1f4a3d,#2d6653)}
+.panel.lux{background:linear-gradient(160deg,#2a2431,#4a3a4c)}
+.panel .num{font-family:var(--serif);font-size:clamp(5rem,14vw,11rem);line-height:.9;opacity:.14;position:absolute;right:6%;top:10%}
+.panel h2{max-width:11ch}
+.panel p{margin-top:22px;max-width:46ch;color:var(--muted-on-ink)}
+.panel .art{height:min(62vh,560px);border-radius:24px;overflow:hidden;position:relative;background:rgba(0,0,0,.18)}
+.panel .art svg{position:absolute;inset:0;width:100%;height:100%}
+@media (max-width:860px){ .panel{grid-template-columns:1fr;align-content:center;gap:24px} .panel .art{height:34vh} .panel .num{top:6%} }
+
+/* ships horizontal */
+.hscroll{height:280svh;position:relative}
+.hscroll .pin{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.track{display:flex;gap:28px;padding-left:max(24px,calc((100% - 1240px)/2));will-change:transform}
+.card{flex:0 0 min(420px,78vw);background:var(--ink-2);border-radius:22px;padding:28px;min-height:420px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--line-on-ink);transition:transform 200ms var(--ease-out)}
+@media (hover:hover) and (pointer:fine){ .card:hover{transform:translateY(-4px)} }
+.card .silhouette{height:130px;color:#9fb0b8;opacity:.9}
+.card h3{margin-top:16px}
+.card .meta{color:var(--muted-on-ink);font-size:.95rem;margin-top:8px}
+.card .facts{display:flex;gap:18px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line-on-ink);font-size:.9rem}
+.card .facts b{display:block;font-family:var(--serif);font-size:1.5rem;font-weight:400;line-height:1}
+.card .facts span{color:var(--muted-on-ink)}
+
+/* cruise lines */
+.lines{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.line{background:var(--foam);padding:32px 26px;min-height:190px;display:flex;flex-direction:column;justify-content:space-between;opacity:0;transform:translateY(16px)}
+.line h3{font-size:1.6rem}
+.line p{font-size:.95rem;color:var(--muted);margin-top:10px}
+.line small{color:var(--sea);font-weight:500}
+@media (max-width:980px){ .lines{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:520px){ .lines{grid-template-columns:1fr} }
+
+/* inside the ship */
+.inside{display:grid;grid-template-columns:1.15fr .85fr;gap:64px;align-items:start}
+.inside .cut{position:sticky;top:calc(var(--nav-h) + 24px)}
+.inside .cut svg{width:100%;height:auto;display:block}
+.deck{fill:#132f40;stroke:#2c5568;stroke-width:1.2;transition:fill 300ms ease,stroke 300ms ease}
+.deck.on{fill:#1f6f78;stroke:#8fd3d8}
+.hull{fill:#0e2634;stroke:#2c5568}
+.deck-label{font:500 13px var(--sans);fill:#9fb0b8;letter-spacing:.04em}
+.steps{display:flex;flex-direction:column;gap:38vh;padding:20vh 0}
+.step{opacity:.28;transition:opacity 300ms ease}
+.step.on{opacity:1}
+.step h3{margin-bottom:12px}
+.step p{color:var(--muted-on-ink);max-width:40ch}
+@media (max-width:860px){ .inside{grid-template-columns:1fr} .inside .cut{position:relative;top:0} .steps{gap:56px;padding:16px 0} .step{opacity:1} }
+
+/* itineraries */
+.routes{display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:center}
+.routes .map{background:var(--foam-2);border-radius:24px;padding:24px;position:relative}
+.routes .map svg{width:100%;height:auto;display:block}
+.route-line{fill:none;stroke:var(--sea);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:1600;stroke-dashoffset:1600}
+.port{fill:var(--brass)}
+.port-label{font:500 12px var(--sans);fill:var(--text);letter-spacing:.03em}
+.land{fill:#cbd5d2;opacity:.8}
+.rlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.rlist li{padding:22px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:baseline}
+.rlist li:last-child{border-bottom:1px solid var(--line)}
+.rlist h3{font-size:1.5rem}
+.rlist p{color:var(--muted);font-size:.95rem;margin-top:4px}
+.rlist .nights{font-family:var(--serif);font-size:1.4rem;color:var(--sea)}
+@media (max-width:860px){ .routes{grid-template-columns:1fr} }
+
+/* amenities mosaic */
+.mosaic{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:150px;gap:14px}
+.tile{border-radius:18px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;background:var(--ink-2);border:1px solid var(--line-on-ink);clip-path:inset(30% round 18px);opacity:0;transform:scale(.9);will-change:transform,clip-path,opacity;position:relative;overflow:hidden}
+.tile.a{grid-column:span 3;grid-row:span 2}
+.tile.b{grid-column:span 2}
+.tile.c{grid-column:span 1;grid-row:span 2}
+.tile.d{grid-column:span 2}
+.tile.e{grid-column:span 2}
+.tile.f{grid-column:span 2}
+.tile.g{grid-column:span 2}
+.tile.h{grid-column:span 4}
+.tile h3{font-size:1.45rem}
+.tile p{font-size:.92rem;color:var(--muted-on-ink);margin-top:6px}
+.tile::before{content:"";position:absolute;inset:auto -20% -40% auto;width:60%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(184,149,90,.25),transparent 70%)}
+.tile.sea-tint::before{background:radial-gradient(circle,rgba(47,143,150,.3),transparent 70%)}
+@media (max-width:860px){ .mosaic{grid-template-columns:repeat(2,1fr);grid-auto-rows:150px} .tile.a,.tile.b,.tile.c,.tile.d,.tile.e,.tile.f,.tile.g,.tile.h{grid-column:span 1;grid-row:span 1} .tile.a{grid-column:span 2} .tile.h{grid-column:span 2} }
+
+/* journal */
+.journal{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.post{padding-top:18px;border-top:1px solid var(--line)}
+.post time{font-size:.85rem;color:var(--muted);letter-spacing:.04em}
+.post h3{margin:10px 0 10px;font-size:1.7rem}
+.post p{color:var(--muted);font-size:.98rem}
+.post a{display:inline-block;margin-top:14px;border-bottom:1px solid var(--brass);padding-bottom:2px;font-weight:500;font-size:.95rem}
+@media (max-width:860px){ .journal{grid-template-columns:1fr} }
+
+/* request */
+.request{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--muted-on-ink)}
+.form input,.form select,.form textarea{min-height:48px;border:1px solid var(--line-on-ink);background:rgba(255,255,255,.04);border-radius:12px;padding:12px 14px;color:inherit;font:400 1rem var(--sans)}
+.form textarea{min-height:110px;resize:vertical}
+.form .full{grid-column:1/-1}
+.form .note{grid-column:1/-1;font-size:.85rem;color:var(--muted-on-ink)}
+@media (max-width:860px){ .request{grid-template-columns:1fr} .form{grid-template-columns:1fr} }
+
+/* footer */
+footer{background:var(--deep);padding:64px 0 40px;border-top:1px solid var(--line-on-ink);font-size:.92rem;color:var(--muted-on-ink)}
+footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px}
+footer h4{font-family:var(--sans);font-weight:500;font-size:.9rem;color:var(--text-on-ink);margin-bottom:12px}
+footer ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+footer .group{margin-top:44px;padding-top:24px;border-top:1px solid var(--line-on-ink);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+@media (max-width:860px){ footer .cols{grid-template-columns:1fr 1fr} }
+
+/* inner pages */
+.page-hero{padding:calc(var(--nav-h) + 80px) 0 56px}
+.page-hero p{margin-top:18px;max-width:56ch;color:var(--muted-on-ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+@media (max-width:860px){ .grid2,.grid3{grid-template-columns:1fr} }
+.ship-row{display:grid;grid-template-columns:200px 1fr auto;gap:28px;align-items:center;padding:28px 0;border-top:1px solid var(--line)}
+.ship-row:last-child{border-bottom:1px solid var(--line)}
+.ship-row .silhouette{color:var(--sea);height:70px}
+.ship-row p{color:var(--muted);font-size:.95rem;margin-top:6px;max-width:60ch}
+.ship-row .facts{display:flex;gap:20px;font-size:.85rem;color:var(--muted)}
+.ship-row .facts b{display:block;font-family:var(--serif);font-size:1.4rem;font-weight:400;color:var(--text)}
+@media (max-width:860px){ .ship-row{grid-template-columns:1fr} }
+.days{list-style:none;padding:0;margin:0}
+.days li{display:grid;grid-template-columns:70px 1fr;gap:18px;padding:16px 0;border-top:1px solid var(--line)}
+.days li b{font-family:var(--serif);font-weight:400;font-size:1.3rem;color:var(--sea)}
+.days li p{color:var(--muted);font-size:.95rem;margin-top:4px}
+.article{max-width:68ch}
+.article p{margin-top:18px;color:var(--text);font-size:1.05rem;line-height:1.7}
+.section.light .article p{color:var(--text)}
+.reveal{opacity:0;transform:translateY(18px)}
+
+@media (prefers-reduced-motion:reduce){
+  .ship,.wave,.scroll-cue span{animation:none}
+  .panel{clip-path:none!important;position:relative;min-height:70svh}
+  .stack{height:auto} .stack .stage{position:static;height:auto}
+  .hscroll{height:auto} .hscroll .pin{position:static;height:auto} .track{flex-wrap:wrap;transform:none!important}
+  .line,.tile,.reveal{opacity:1!important;transform:none!important;clip-path:none!important}
+  .route-line{stroke-dashoffset:0}
+  .step{opacity:1}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="logo" href="#/" aria-label="AmbiMare home">AmbiMare <small>by Ambiente</small></a>
+    <ul id="menu">
+      <li><a href="#/ships" data-route="ships">Ships</a></li>
+      <li><a href="#/lines" data-route="lines">Cruise lines</a></li>
+      <li><a href="#/itineraries" data-route="itineraries">Itineraries</a></li>
+      <li><a href="#/journal" data-route="journal">Journal</a></li>
+      <li><a href="#/contact" data-route="contact">Contact</a></li>
+    </ul>
+    <a class="btn" href="#/contact">Plan a voyage</a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ===================== HOME ===================== -->
+<main class="view active" id="view-home">
+
+<section class="hero" id="top">
+  <div class="sky" data-float="-.15"></div>
+  <svg class="ship" viewBox="0 0 520 120" aria-hidden="true">
+    <g fill="currentColor">
+      <path d="M40 78 L480 78 L455 104 L70 104 Z" opacity=".95"/>
+      <path d="M95 62 h300 v16 h-300z" opacity=".9"/>
+      <path d="M130 48 h220 v14 h-220z" opacity=".8"/>
+      <path d="M170 36 h130 v12 h-130z" opacity=".7"/>
+      <rect x="300" y="18" width="14" height="22" rx="2" opacity=".7"/>
+      <rect x="320" y="12" width="12" height="28" rx="2" opacity=".7"/>
+    </g>
+    <g fill="#0b1f2e" opacity=".55">
+      <rect x="110" y="66" width="270" height="4"/><rect x="140" y="52" width="200" height="4"/><rect x="180" y="40" width="110" height="3"/>
+    </g>
+  </svg>
+  <div class="sea" data-float=".08">
+    <svg class="wave w1" viewBox="0 0 1600 200" preserveAspectRatio="none"><path d="M0 90 C200 60 300 130 500 100 S800 60 1000 100 S1300 140 1600 90 V200 H0 Z"/></svg>
+    <svg class="wave w2" viewBox="0 0 1600 200" preserveAspectRatio="none"><path d="M0 110 C250 80 350 150 600 110 S900 70 1150 110 S1450 150 1600 110 V200 H0 Z"/></svg>
+    <svg class="wave w3" viewBox="0 0 1600 200" preserveAspectRatio="none"><path d="M0 120 C180 100 320 160 520 130 S850 90 1080 130 S1400 160 1600 120 V200 H0 Z"/></svg>
+  </div>
+  <div class="content">
+    <span class="kicker reveal" data-float="-.05">Ocean, river and small-ship journeys</span>
+    <h1 class="reveal" data-float="-.12">The sea, <em>taken slowly.</em></h1>
+    <p class="lede reveal" data-float="-.08">We book cabins on ships we have actually walked. Grand ocean liners, quiet river boats, a handful of yachts. One person looks after your file from the first question to the gangway.</p>
+    <div class="actions reveal" data-float="-.04">
+      <a class="btn solid" href="#/itineraries">See the sailings</a>
+      <a class="btn" href="#/contact">Talk to a cruise planner</a>
+    </div>
+  </div>
+  <div class="scroll-cue" aria-hidden="true">Scroll <span></span></div>
+</section>
+
+<!-- three ways: stacked puzzle -->
+<section class="stack" aria-label="Three kinds of journey">
+  <div class="stage">
+    <article class="panel ocean">
+      <div class="num" aria-hidden="true">I</div>
+      <div>
+        <span class="kicker">Ocean</span>
+        <h2>Big ships, long horizons</h2>
+        <p>Seven nights or seventy. The Mediterranean from Genoa, the Gulf in winter, the Norwegian coast under a sun that will not set. Ships with theatres, a dozen restaurants and a quiet deck if you know where to look. We do.</p>
+      </div>
+      <div class="art" data-float=".06">
+        <svg viewBox="0 0 600 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f6f78"/><stop offset="1" stop-color="#0b1f2e"/></linearGradient></defs>
+          <rect width="600" height="500" fill="url(#g1)"/>
+          <circle cx="440" cy="120" r="46" fill="#b8955a" opacity=".8"/>
+          <path d="M0 330 C120 300 200 360 320 330 S520 300 600 330 V500 H0Z" fill="#0e2c3c"/>
+          <path d="M0 380 C150 350 250 410 400 380 S560 350 600 380 V500 H0Z" fill="#071522" opacity=".8"/>
+          <g fill="#e9eef0"><path d="M120 300 L470 300 L450 322 L140 322Z"/><rect x="170" y="284" width="250" height="16"/><rect x="200" y="270" width="190" height="14"/></g>
+        </svg>
+      </div>
+    </article>
+    <article class="panel river">
+      <div class="num" aria-hidden="true">II</div>
+      <div>
+        <span class="kicker">River</span>
+        <h2>A week that moves at walking pace</h2>
+        <p>Danube, Rhine, Rhône, Douro. You wake in a new town and the bakery is two minutes from the gangway. Boats of 150 or so, everyone knows the bar staff by day two. This is the one we recommend to people who say they don't like cruises.</p>
+      </div>
+      <div class="art" data-float=".06">
+        <svg viewBox="0 0 600 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="600" height="500" fill="#1a3f36"/>
+          <path d="M0 200 Q150 120 300 210 T600 190 V500 H0Z" fill="#2d6653"/>
+          <path d="M0 260 Q200 200 380 280 T600 250 V500 H0Z" fill="#23554a"/>
+          <path d="M0 340 C100 320 220 360 320 340 S520 320 600 340 V500 H0Z" fill="#0f2f2a"/>
+          <g fill="#e9eef0"><path d="M150 332 L430 332 L418 348 L162 348Z"/><rect x="185" y="320" width="210" height="12"/></g>
+          <g fill="#b8955a" opacity=".85"><rect x="60" y="160" width="16" height="46"/><path d="M52 160 L68 132 L84 160Z"/><rect x="500" y="150" width="22" height="60"/></g>
+        </svg>
+      </div>
+    </article>
+    <article class="panel lux">
+      <div class="num" aria-hidden="true">III</div>
+      <div>
+        <span class="kicker">Luxury sea journeys</span>
+        <h2>All-suite, all-inclusive, and quiet</h2>
+        <p>Explora Journeys, expedition ships, a 70-guest yacht around the Greek islands. Fewer people than a good hotel. Drinks, most dining and the crew remembering your name are all in the fare. We sail these ourselves, which is the only reason we sell them.</p>
+      </div>
+      <div class="art" data-float=".06">
+        <svg viewBox="0 0 600 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="600" height="500" fill="#2a2431"/>
+          <circle cx="300" cy="180" r="120" fill="#b8955a" opacity=".22"/>
+          <circle cx="300" cy="180" r="70" fill="#b8955a" opacity=".5"/>
+          <path d="M0 300 C120 270 200 330 320 300 S520 270 600 300 V500 H0Z" fill="#1b1720"/>
+          <g fill="#e9eef0"><path d="M210 290 L400 290 L385 306 L225 306Z"/><rect x="250" y="276" width="110" height="14"/><rect x="295" y="240" width="4" height="36"/></g>
+        </svg>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ships horizontal -->
+<section class="hscroll deep" aria-label="Ships">
+  <div class="pin">
+    <div class="wrap head" style="margin-bottom:32px">
+      <span class="kicker">Ships we know by name</span>
+      <h2>Pick the ship first. The route follows.</h2>
+    </div>
+    <div class="track" id="track">
+      <article class="card">
+        <svg class="silhouette" viewBox="0 0 400 120" aria-hidden="true"><g fill="currentColor"><path d="M20 80 L380 80 L360 104 L40 104Z"/><rect x="60" y="60" width="270" height="20"/><rect x="90" y="44" width="200" height="16"/><rect x="120" y="30" width="120" height="14"/><rect x="250" y="16" width="12" height="28"/></g></svg>
+        <div><h3>MSC World Europa</h3><p class="meta">MSC Cruises · Mediterranean, Gulf in winter</p>
+        <div class="facts"><div><b>2022</b><span>Launched</span></div><div><b>6,762</b><span>Guests</span></div><div><b>LNG</b><span>Powered</span></div></div></div>
+      </article>
+      <article class="card">
+        <svg class="silhouette" viewBox="0 0 400 120" aria-hidden="true"><g fill="currentColor"><path d="M30 82 L370 82 L352 104 L48 104Z"/><rect x="70" y="64" width="240" height="18"/><rect x="100" y="50" width="170" height="14"/><rect x="200" y="30" width="10" height="20"/></g></svg>
+        <div><h3>Explora I</h3><p class="meta">Explora Journeys · ocean, all-suite</p>
+        <div class="facts"><div><b>2023</b><span>Launched</span></div><div><b>922</b><span>Guests</span></div><div><b>461</b><span>Suites</span></div></div></div>
+      </article>
+      <article class="card">
+        <svg class="silhouette" viewBox="0 0 400 120" aria-hidden="true"><g fill="currentColor"><path d="M40 84 L360 84 L344 104 L56 104Z"/><rect x="80" y="66" width="220" height="18"/><rect x="110" y="52" width="150" height="14"/><rect x="180" y="34" width="12" height="18"/></g></svg>
+        <div><h3>Celestyal Journey</h3><p class="meta">Celestyal · Aegean, Greek islands, Türkiye</p>
+        <div class="facts"><div><b>1,260</b><span>Guests</span></div><div><b>3–7</b><span>Nights</span></div><div><b>Piraeus</b><span>Homeport</span></div></div></div>
+      </article>
+      <article class="card">
+        <svg class="silhouette" viewBox="0 0 400 120" aria-hidden="true"><g fill="currentColor"><path d="M20 80 L380 80 L362 104 L38 104Z"/><rect x="55" y="62" width="280" height="18"/><rect x="85" y="48" width="220" height="14"/><rect x="115" y="34" width="150" height="14"/><rect x="260" y="18" width="12" height="30"/></g></svg>
+        <div><h3>AROYA</h3><p class="meta">AROYA Cruises · Red Sea from Jeddah, Med in summer</p>
+        <div class="facts"><div><b>2024</b><span>Sailing since</span></div><div><b>3,362</b><span>Guests</span></div><div><b>Jeddah</b><span>Homeport</span></div></div></div>
+      </article>
+      <article class="card">
+        <svg class="silhouette" viewBox="0 0 400 120" aria-hidden="true"><g fill="currentColor"><path d="M70 90 L330 90 L316 104 L84 104Z"/><rect x="110" y="76" width="180" height="14"/><rect x="150" y="66" width="90" height="10"/><rect x="195" y="30" width="4" height="36"/></g></svg>
+        <div><h3>Variety Voyager</h3><p class="meta">Variety Cruises · yacht, Greek islands</p>
+        <div class="facts"><div><b>72</b><span>Guests</span></div><div><b>36</b><span>Cabins</span></div><div><b>7</b><span>Nights</span></div></div></div>
+      </article>
+      <article class="card">
+        <svg class="silhouette" viewBox="0 0 400 120" aria-hidden="true"><g fill="currentColor"><path d="M30 92 L370 92 L356 104 L44 104Z"/><rect x="50" y="78" width="300" height="14"/><rect x="70" y="66" width="260" height="12"/><rect x="180" y="52" width="40" height="14"/></g></svg>
+        <div><h3>A-ROSA Sena</h3><p class="meta">A-ROSA · Rhine, families welcome</p>
+        <div class="facts"><div><b>2022</b><span>Launched</span></div><div><b>280</b><span>Guests</span></div><div><b>Hybrid</b><span>Drive</span></div></div></div>
+      </article>
+      <article class="card">
+        <svg class="silhouette" viewBox="0 0 400 120" aria-hidden="true"><g fill="currentColor"><path d="M30 92 L370 92 L356 104 L44 104Z"/><rect x="50" y="78" width="300" height="14"/><rect x="75" y="66" width="250" height="12"/><rect x="290" y="54" width="30" height="12"/></g></svg>
+        <div><h3>Amadeus Silver III</h3><p class="meta">Amadeus River Cruises · Danube, Rhine</p>
+        <div class="facts"><div><b>168</b><span>Guests</span></div><div><b>Vienna</b><span>Base</span></div><div><b>Danube</b><span>Classic</span></div></div></div>
+      </article>
+      <article class="card" style="justify-content:center;align-items:flex-start;background:transparent;border-style:dashed">
+        <h3>All ships</h3><p class="meta" style="margin-bottom:22px">Eleven ships and boats we book regularly, with the honest notes we keep on each.</p><a class="btn" href="#/ships">Open the fleet</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- cruise lines -->
+<section class="section light" id="lines">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker">Cruise lines</span>
+      <h2>Eight lines. Direct contracts. No middle desk.</h2>
+      <p>We are not a call centre reselling somebody else's inventory. Each of these lines we have a direct agreement with, which is why the price you see is the price the line is quoting today.</p>
+    </div>
+    <div class="lines" id="lines-grid">
+      <div class="line"><div><h3>MSC Cruises</h3><p>The biggest fleet in Europe. Best value for families and first cruises.</p></div><small>Ocean</small></div>
+      <div class="line"><div><h3>Explora Journeys</h3><p>MSC's luxury sibling. All suites, sea-facing, restrained.</p></div><small>Luxury</small></div>
+      <div class="line"><div><h3>Celestyal</h3><p>Short Aegean loops from Athens. The islands, not the ship, are the point.</p></div><small>Ocean</small></div>
+      <div class="line"><div><h3>AROYA Cruises</h3><p>Saudi Arabia's own line. Red Sea in winter, Mediterranean in summer.</p></div><small>Ocean</small></div>
+      <div class="line"><div><h3>Variety Cruises</h3><p>Yachts of 40 to 70 guests. Anchor off a beach and swim.</p></div><small>Yacht</small></div>
+      <div class="line"><div><h3>A-ROSA</h3><p>German river line with the best family offer on the Rhine and Danube.</p></div><small>River</small></div>
+      <div class="line"><div><h3>nicko cruises</h3><p>River and small-ship expeditions, quietly excellent.</p></div><small>River</small></div>
+      <div class="line"><div><h3>Amadeus River Cruises</h3><p>Austrian family-owned. Classic Danube, done properly.</p></div><small>River</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- inside the ship -->
+<section class="section" id="inside">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker">Inside the ship</span>
+      <h2>Decks, explained without the brochure voice</h2>
+    </div>
+    <div class="inside">
+      <div class="cut">
+        <svg viewBox="0 0 700 420" aria-hidden="true">
+          <path class="hull" d="M40 300 L660 300 L620 380 L90 380 Z"/>
+          <g id="deck-cabins"><rect class="deck" x="70" y="250" width="560" height="50" rx="6"/><text class="deck-label" x="90" y="280">Cabin decks</text></g>
+          <g id="deck-dining"><rect class="deck" x="100" y="200" width="500" height="50" rx="6"/><text class="deck-label" x="120" y="230">Dining &amp; theatre</text></g>
+          <g id="deck-spa"><rect class="deck" x="140" y="150" width="420" height="50" rx="6"/><text class="deck-label" x="160" y="180">Spa &amp; wellness</text></g>
+          <g id="deck-pool"><rect class="deck" x="190" y="100" width="320" height="50" rx="6"/><text class="deck-label" x="210" y="130">Pool &amp; sun decks</text></g>
+          <g id="deck-bridge"><rect class="deck" x="250" y="60" width="140" height="40" rx="6"/><text class="deck-label" x="270" y="85">Bridge</text></g>
+          <rect x="470" y="40" width="22" height="60" rx="3" fill="#2c5568"/>
+          <path d="M0 400 C120 380 240 420 360 400 S600 380 700 400 V420 H0Z" fill="#071522"/>
+        </svg>
+      </div>
+      <div class="steps">
+        <div class="step" data-deck="deck-cabins"><h3>Cabins</h3><p>Inside, oceanview, balcony, suite. The cheapest available cabin is not always the inside one; we check every category before we quote, not just the lead-in.</p></div>
+        <div class="step" data-deck="deck-dining"><h3>Dining and theatre</h3><p>Main restaurants and the buffet are in the fare. Speciality restaurants are extra and worth it about half the time. We will tell you which half.</p></div>
+        <div class="step" data-deck="deck-spa"><h3>Spa and wellness</h3><p>Thermal suites sell out on sea days. If it matters to you, we book the pass before the ship does.</p></div>
+        <div class="step" data-deck="deck-pool"><h3>Pool and sun decks</h3><p>Every big ship has a loud pool and a quiet one. Ask us which deck the quiet one is on; it is never in the deck plan.</p></div>
+        <div class="step" data-deck="deck-bridge"><h3>The bridge</h3><p>Officer-led tours exist on most lines and almost nobody asks. We ask.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- itineraries -->
+<section class="section light" id="itineraries">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker">Itineraries</span>
+      <h2>Routes drawn from a real calendar</h2>
+      <p>Departure dates and fares come straight from the lines' systems. What we add is the note on each port: how far the town is from the pier, whether a visa is needed, and whether the stop is worth a tour or a walk.</p>
+    </div>
+    <div class="routes">
+      <div class="map" data-float=".04">
+        <svg viewBox="0 0 700 460" aria-hidden="true">
+          <path class="land" d="M0 0 H700 V120 C620 140 560 110 500 150 C450 180 420 160 380 200 C340 240 300 230 260 260 C200 300 160 280 120 320 C80 350 40 340 0 380 Z"/>
+          <path class="land" d="M700 460 H420 C460 420 520 430 560 390 C600 350 640 370 700 340 Z"/>
+          <path class="route-line" id="route" d="M110 330 C160 300 200 320 250 290 C300 260 320 240 370 250 C420 260 440 300 480 300 C520 300 540 260 590 280 C630 296 650 330 680 320"/>
+          <g>
+            <circle class="port" cx="110" cy="330" r="6"/><text class="port-label" x="96" y="352">Istanbul</text>
+            <circle class="port" cx="250" cy="290" r="6"/><text class="port-label" x="234" y="278">Kuşadası</text>
+            <circle class="port" cx="370" cy="250" r="6"/><text class="port-label" x="356" y="238">Mykonos</text>
+            <circle class="port" cx="480" cy="300" r="6"/><text class="port-label" x="462" y="322">Santorini</text>
+            <circle class="port" cx="590" cy="280" r="6"/><text class="port-label" x="574" y="268">Rhodes</text>
+            <circle class="port" cx="680" cy="320" r="6"/><text class="port-label" x="646" y="342">Limassol</text>
+          </g>
+        </svg>
+      </div>
+      <ul class="rlist">
+        <li><div><h3>Aegean islands from Athens</h3><p>Celestyal · Mykonos, Santorini, Rhodes, Kuşadası</p></div><span class="nights">7 nights</span></li>
+        <li><div><h3>Red Sea in winter</h3><p>AROYA from Jeddah · warm water when Europe is not</p></div><span class="nights">4–7 nights</span></li>
+        <li><div><h3>Danube, Passau to Budapest</h3><p>A-ROSA or Amadeus · Vienna, Bratislava, the Wachau</p></div><span class="nights">7 nights</span></li>
+        <li><div><h3>Western Mediterranean grand loop</h3><p>MSC from Genoa · Barcelona, Marseille, Naples</p></div><span class="nights">7 nights</span></li>
+        <li><div><h3>Norwegian fjords under the midnight sun</h3><p>MSC from Hamburg or Kiel · June to August only</p></div><span class="nights">7–11 nights</span></li>
+      </ul>
+    </div>
+    <div style="margin-top:40px"><a class="btn" style="color:var(--text)" href="#/itineraries">All itineraries</a></div>
+  </div>
+</section>
+
+<!-- amenities mosaic -->
+<section class="section deep" id="amenities">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker">On board</span>
+      <h2>What the fare includes, and what it doesn't</h2>
+      <p>The honest version. Lines differ, so treat this as the pattern; we confirm the specifics for your ship before you pay anything.</p>
+    </div>
+    <div class="mosaic" id="mosaic">
+      <div class="tile a sea-tint"><h3>Main dining, buffet, room service basics</h3><p>Included on every line we sell. Explora and Variety include most speciality dining too.</p></div>
+      <div class="tile b"><h3>Theatre and live music</h3><p>Included.</p></div>
+      <div class="tile c"><h3>Pools</h3><p>Included.</p></div>
+      <div class="tile d sea-tint"><h3>Drinks packages</h3><p>Extra on MSC, Celestyal, AROYA. In the fare on Explora and river lines' evening meals.</p></div>
+      <div class="tile e"><h3>Wi‑Fi</h3><p>Extra on most ocean ships. Included on Explora and most river boats.</p></div>
+      <div class="tile f sea-tint"><h3>Service charge</h3><p>A daily amount the line adds for crew. Not optional. We tell you the figure before booking.</p></div>
+      <div class="tile g"><h3>Shore excursions</h3><p>Extra. Often better and cheaper booked through us or done on foot. We say which.</p></div>
+      <div class="tile h sea-tint"><h3>Spa, casino, speciality restaurants, photos</h3><p>Extra everywhere except the all-inclusive luxury lines. The classic way a €700 week becomes a €1,400 week.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- journal -->
+<section class="section light" id="journal">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker">Journal</span>
+      <h2>Written after the trip, not before</h2>
+    </div>
+    <div class="journal">
+      <article class="post reveal"><time>September 2026</time><h3>Seven nights on the Danube with a nine-year-old</h3><p>What worked on A-ROSA Sena, what didn't, and why the Wachau is the day to skip the excursion.</p><a href="#/journal">Read</a></article>
+      <article class="post reveal"><time>August 2026</time><h3>Kuşadası port guide</h3><p>How far the town is from the pier (five minutes), what to skip, and the honest case for Ephesus versus a swim.</p><a href="#/journal">Read</a></article>
+      <article class="post reveal"><time>July 2026</time><h3>Explora I, deck by deck</h3><p>The quiet corners, the one restaurant to book on day one, and whether the fare is worth double MSC's.</p><a href="#/journal">Read</a></article>
+    </div>
+  </div>
+</section>
+
+<!-- request -->
+<section class="section" id="request">
+  <div class="wrap request">
+    <div>
+      <span class="kicker">Plan a voyage</span>
+      <h2>Tell us roughly when and where</h2>
+      <p class="lede" style="margin-top:22px;color:var(--muted-on-ink)">You get two or three options back within one working day, with real cabin prices rather than the advertised lead-in. Nothing to pay until you say yes.</p>
+    </div>
+    <form class="form" onsubmit="event.preventDefault();this.querySelector('.note').textContent='Thank you. A planner will reply within one working day.';">
+      <label>Name <input type="text" name="name" autocomplete="name" required></label>
+      <label>Email <input type="email" name="email" autocomplete="email" required></label>
+      <label>Travellers <select name="pax"><option>2</option><option>1</option><option>3</option><option>4</option><option>5+</option></select></label>
+      <label>Where <select name="where"><option>Not sure yet</option><option>Mediterranean</option><option>Greek islands</option><option>River (Danube, Rhine, Douro)</option><option>Red Sea / Gulf</option><option>Norway</option><option>Caribbean</option></select></label>
+      <label class="full">Roughly when <input type="text" name="when" placeholder="e.g. Easter 2027, or any week in October"></label>
+      <label class="full">Anything we should know <textarea name="notes" placeholder="Passports on board, a birthday, a wheelchair, a strong dislike of buffets"></textarea></label>
+      <button class="btn solid full" type="submit">Send request</button>
+      <p class="note">No payment now. We check capacity and the final fare with the line before you commit.</p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== SHIPS ===================== -->
+<main class="view" id="view-ships">
+  <section class="page-hero"><div class="wrap"><span class="kicker">The fleet</span><h1 style="font-size:clamp(2.6rem,6vw,5.2rem)">Ships and boats we book</h1><p>Every entry carries a note from someone on our team who has been on board. Guest counts are double occupancy.</p></div></section>
+  <section class="section light" style="padding-top:40px"><div class="wrap">
+    <div class="ship-row"><svg class="silhouette" viewBox="0 0 400 120"><g fill="currentColor"><path d="M20 80 L380 80 L360 104 L40 104Z"/><rect x="60" y="60" width="270" height="20"/><rect x="90" y="44" width="200" height="16"/><rect x="120" y="30" width="120" height="14"/></g></svg><div><h3>MSC World Europa</h3><p>MSC Cruises. The largest ship in the Med and a city block long. Our note: book the Yacht Club if you can, and the aft-facing balconies on deck 10 if you can't.</p></div><div class="facts"><div><b>6,762</b>Guests</div><div><b>22</b>Decks</div><div><b>2022</b>Built</div></div></div>
+    <div class="ship-row"><svg class="silhouette" viewBox="0 0 400 120"><g fill="currentColor"><path d="M30 82 L370 82 L352 104 L48 104Z"/><rect x="70" y="64" width="240" height="18"/><rect x="100" y="50" width="170" height="14"/></g></svg><div><h3>Explora I &amp; Explora II</h3><p>Explora Journeys. All ocean-facing suites, no children's clubs, no buffet queue. Our note: the fare looks high until you add up what MSC charges extra.</p></div><div class="facts"><div><b>922</b>Guests</div><div><b>461</b>Suites</div><div><b>2023</b>Built</div></div></div>
+    <div class="ship-row"><svg class="silhouette" viewBox="0 0 400 120"><g fill="currentColor"><path d="M40 84 L360 84 L344 104 L56 104Z"/><rect x="80" y="66" width="220" height="18"/><rect x="110" y="52" width="150" height="14"/></g></svg><div><h3>Celestyal Journey &amp; Celestyal Discovery</h3><p>Celestyal. Mid-size, Greek-run, in port more than at sea. Our note: the three-night Iconic Aegean is the best first cruise in Europe.</p></div><div class="facts"><div><b>1,260</b>Guests</div><div><b>3–7</b>Nights</div><div><b>Piraeus</b>Homeport</div></div></div>
+    <div class="ship-row"><svg class="silhouette" viewBox="0 0 400 120"><g fill="currentColor"><path d="M20 80 L380 80 L362 104 L38 104Z"/><rect x="55" y="62" width="280" height="18"/><rect x="85" y="48" width="220" height="14"/><rect x="115" y="34" width="150" height="14"/></g></svg><div><h3>AROYA</h3><p>AROYA Cruises. Saudi flag, alcohol-free, family-heavy, very well run. Our note: the Red Sea winter loops are the warm-water option nobody in Europe knows about yet.</p></div><div class="facts"><div><b>3,362</b>Guests</div><div><b>Jeddah</b>Homeport</div><div><b>2024</b>Since</div></div></div>
+    <div class="ship-row"><svg class="silhouette" viewBox="0 0 400 120"><g fill="currentColor"><path d="M70 90 L330 90 L316 104 L84 104Z"/><rect x="110" y="76" width="180" height="14"/><rect x="195" y="30" width="4" height="46"/></g></svg><div><h3>Variety Voyager &amp; Galileo</h3><p>Variety Cruises. A motor yacht and a motor sailer. Our note: cabins are small, the swimming platform is the whole point.</p></div><div class="facts"><div><b>72 / 49</b>Guests</div><div><b>7</b>Nights</div><div><b>Athens</b>Base</div></div></div>
+    <div class="ship-row"><svg class="silhouette" viewBox="0 0 400 120"><g fill="currentColor"><path d="M30 92 L370 92 L356 104 L44 104Z"/><rect x="50" y="78" width="300" height="14"/><rect x="70" y="66" width="260" height="12"/></g></svg><div><h3>A-ROSA Sena, Alva, Flora</h3><p>A-ROSA. Sena has the family cabins and a kids' club; the older boats are quieter. Our note: Sena on the Rhine at Easter, with children, is a very easy week.</p></div><div class="facts"><div><b>190–280</b>Guests</div><div><b>Rhine, Danube</b>Rivers</div><div><b>Cologne</b>Base</div></div></div>
+    <div class="ship-row"><svg class="silhouette" viewBox="0 0 400 120"><g fill="currentColor"><path d="M30 92 L370 92 L356 104 L44 104Z"/><rect x="50" y="78" width="300" height="14"/><rect x="75" y="66" width="250" height="12"/></g></svg><div><h3>nicko Vision &amp; Spirit</h3><p>nicko cruises. German-run, understated, good kitchens. Our note: the Douro programme is the one to look at.</p></div><div class="facts"><div><b>220</b>Guests</div><div><b>Rhine, Douro</b>Rivers</div><div><b>Stuttgart</b>HQ</div></div></div>
+    <div class="ship-row"><svg class="silhouette" viewBox="0 0 400 120"><g fill="currentColor"><path d="M30 92 L370 92 L356 104 L44 104Z"/><rect x="50" y="78" width="300" height="14"/><rect x="75" y="66" width="250" height="12"/><rect x="290" y="54" width="30" height="12"/></g></svg><div><h3>Amadeus Silver III &amp; Cara</h3><p>Amadeus River Cruises. Family-owned in Vienna. Our note: the classic Danube from Passau, done with the least fuss.</p></div><div class="facts"><div><b>162–168</b>Guests</div><div><b>Danube</b>River</div><div><b>Vienna</b>HQ</div></div></div>
+    <div style="margin-top:40px"><a class="btn" style="color:var(--text)" href="#/contact">Ask about a ship</a></div>
+  </div></section>
+</main>
+
+<!-- ===================== LINES ===================== -->
+<main class="view" id="view-lines">
+  <section class="page-hero"><div class="wrap"><span class="kicker">Cruise lines</span><h1 style="font-size:clamp(2.6rem,6vw,5.2rem)">Who we work with, and why</h1><p>Direct contracts with each line. If a ship that suits you isn't on this list, we say so and point you elsewhere rather than sell you something else.</p></div></section>
+  <section class="section light" style="padding-top:40px"><div class="wrap grid2">
+    <article class="post"><time>Ocean · value</time><h3>MSC Cruises</h3><p>Geneva-based, Italian at heart, the largest fleet in Europe. Best for families and anyone who wants a big ship at a fair price. Watch the extras: drinks, Wi‑Fi and service charge add up. We quote the all-in figure.</p></article>
+    <article class="post"><time>Luxury · all-inclusive</time><h3>Explora Journeys</h3><p>MSC's luxury line, launched 2023. Suites only, most restaurants and drinks included, no announcements. The best current answer to "I want a ship that feels like a good hotel".</p></article>
+    <article class="post"><time>Ocean · islands</time><h3>Celestyal</h3><p>Greek line, mid-size ships, itineraries built around long port days in the Aegean. Three-, four- and seven-night loops from Athens. Greek ports mean Schengen; we say it plainly.</p></article>
+    <article class="post"><time>Ocean · Red Sea</time><h3>AROYA Cruises</h3><p>Saudi Arabia's first cruise line, sailing since 2024. Winter in the Red Sea from Jeddah, summer in the eastern Mediterranean from Turkish ports. Alcohol-free, family-focused, well organised.</p></article>
+    <article class="post"><time>Yacht · Greece</time><h3>Variety Cruises</h3><p>Athens-based yachts and motor sailers of 40 to 70 guests. Small ports, swim stops, a crew you know by name. Cabins are compact; nobody spends time in them anyway.</p></article>
+    <article class="post"><time>River · families</time><h3>A-ROSA</h3><p>German river line, Rhine and Danube plus Rhône and Seine. The only river line with proper family cabins and a children's programme on some boats. All-inclusive drinks in the "Premium" fare.</p></article>
+    <article class="post"><time>River · expeditions</time><h3>nicko cruises</h3><p>Stuttgart-based, river and small-ship expedition cruises. Quiet, well-fed, German-language on board with English available. Douro and Rhine are the strong programmes.</p></article>
+    <article class="post"><time>River · classic</time><h3>Amadeus River Cruises</h3><p>Lüftner family, Vienna. Classic Danube itineraries from Passau, plus Rhine, Seine and the Dutch waterways at tulip time. The boats are elegant without trying to be hotels.</p></article>
+  </div></section>
+</main>
+
+<!-- ===================== ITINERARIES ===================== -->
+<main class="view" id="view-itineraries">
+  <section class="page-hero"><div class="wrap"><span class="kicker">Itineraries</span><h1 style="font-size:clamp(2.6rem,6vw,5.2rem)">Sailings we recommend, season by season</h1><p>Fares are live from the lines and quoted per person for the cheapest available cabin, two sharing. The line adds a daily service charge separately.</p></div></section>
+  <section class="section light" style="padding-top:40px"><div class="wrap">
+    <div class="grid2" style="align-items:start">
+      <div>
+        <span class="kicker">Worked example</span>
+        <h2 style="font-size:2.4rem">Aegean islands from Athens, 7 nights</h2>
+        <p style="color:var(--muted);margin:14px 0 26px">Celestyal Journey. Departs Piraeus most Saturdays, April to October. Schengen visa required for non-EU passports; Türkiye stop is visa-free for most nationalities.</p>
+        <ul class="days">
+          <li><b>Day 1</b><div>Athens (Piraeus)<p>Embark from 13:00. Sail 19:00.</p></div></li>
+          <li><b>Day 2</b><div>Thessaloniki<p>Long day in port. Walk the waterfront, skip the bus tour.</p></div></li>
+          <li><b>Day 3</b><div>Kuşadası, Türkiye<p>Ephesus is 20 minutes away and worth it. Town is five minutes from the pier.</p></div></li>
+          <li><b>Day 4</b><div>Rhodes<p>Old town is at the pier. Lindos needs a car.</p></div></li>
+          <li><b>Day 5</b><div>Heraklion, Crete<p>Knossos in the morning, lunch in town.</p></div></li>
+          <li><b>Day 6</b><div>Santorini<p>Tender port. Go early or go late, never at 11:00.</p></div></li>
+          <li><b>Day 7</b><div>Mykonos<p>Overnight in port. The good restaurants are inland.</p></div></li>
+          <li><b>Day 8</b><div>Athens<p>Disembark by 09:00.</p></div></li>
+        </ul>
+      </div>
+      <ul class="rlist">
+        <li><div><h3>Red Sea winter, Jeddah</h3><p>AROYA · Yanbu, AlUla by excursion, Aqaba · Nov–Mar</p></div><span class="nights">4–7 n</span></li>
+        <li><div><h3>Danube classic, Passau–Budapest</h3><p>Amadeus / A-ROSA · Vienna, Bratislava, Wachau · Apr–Oct</p></div><span class="nights">7 n</span></li>
+        <li><div><h3>Western Med grand loop</h3><p>MSC World Europa from Genoa · Barcelona, Marseille, Naples · year-round</p></div><span class="nights">7 n</span></li>
+        <li><div><h3>Norwegian fjords, midnight sun</h3><p>MSC from Hamburg · Geiranger, Flåm, Bergen · Jun–Aug</p></div><span class="nights">7–11 n</span></li>
+        <li><div><h3>Cyclades by yacht</h3><p>Variety Voyager from Athens · Poros, Folegandros, Milos · May–Oct</p></div><span class="nights">7 n</span></li>
+        <li><div><h3>Douro, Porto to the Spanish border</h3><p>nicko · Régua, Pinhão, Salamanca by coach · Apr–Oct</p></div><span class="nights">7 n</span></li>
+        <li><div><h3>Dubai and the Gulf</h3><p>MSC from Dubai · Abu Dhabi, Doha, Bahrain · Nov–Mar</p></div><span class="nights">7 n</span></li>
+      </ul>
+    </div>
+    <div style="margin-top:40px"><a class="btn" style="color:var(--text)" href="#/contact">Get live dates and fares</a></div>
+  </div></section>
+</main>
+
+<!-- ===================== JOURNAL ===================== -->
+<main class="view" id="view-journal">
+  <section class="page-hero"><div class="wrap"><span class="kicker">Journal</span><h1 style="font-size:clamp(2.6rem,6vw,5.2rem)">Notes from the deck</h1><p>Port guides and ship reviews written after we have been. Opinions included.</p></div></section>
+  <section class="section light" style="padding-top:40px"><div class="wrap">
+    <article class="article">
+      <time style="font-size:.85rem;color:var(--muted)">September 2026 · Port guide</time>
+      <h2 style="margin-top:10px">Kuşadası, five minutes from the pier</h2>
+      <p>Most cruise ports are an industrial estate with a shuttle bus. Kuşadası isn't. The ship ties up in the middle of town and you are on the seafront before the gangway crowd has cleared. The bazaar starts at the terminal gate. Prices there are cruise prices; walk three streets in and they halve.</p>
+      <p>The question everyone asks is Ephesus or not. If you have never seen it, yes. It is 20 minutes by taxi, the site takes two hours at a sensible pace, and the Library of Celsus is the picture you have already seen. Go at opening time in summer. By eleven the marble is an oven.</p>
+      <p>If you have seen it, or you'd rather swim, Ladies Beach is a short dolmuş ride south and perfectly good. There is also a pleasant nothing-day option: walk out to Pigeon Island, sit under the castle walls, come back for lunch at one of the fish places on the marina side, and be back on board with time to spare.</p>
+      <p>Visa: Türkiye is visa-free or e-visa for most passports. This is not the Schengen leg of your cruise. The Greek ports either side of it are.</p>
+    </article>
+    <div class="journal" style="margin-top:64px">
+      <article class="post"><time>August 2026</time><h3>Seven nights on the Danube with a nine-year-old</h3><p>A-ROSA Sena, Easter week. The children's club is real, the food is better than it needs to be, and Vienna in one afternoon is a mistake we made so you don't have to.</p></article>
+      <article class="post"><time>July 2026</time><h3>Explora I, deck by deck</h3><p>The quiet corners, the one restaurant to book on day one, and whether the fare is worth double MSC's. Short answer: for two adults, often yes.</p></article>
+      <article class="post"><time>June 2026</time><h3>What a service charge actually is</h3><p>It is not a tip and it is not optional. Here is the daily figure per line, and why we tell you before you book rather than at the gangway.</p></article>
+    </div>
+  </div></section>
+</main>
+
+<!-- ===================== CONTACT ===================== -->
+<main class="view" id="view-contact">
+  <section class="page-hero"><div class="wrap"><span class="kicker">Contact</span><h1 style="font-size:clamp(2.6rem,6vw,5.2rem)">One planner, from first question to gangway</h1><p>Write in English, German, Turkish or Italian. We answer within one working day.</p></div></section>
+  <section class="section" style="padding-top:20px"><div class="wrap request">
+    <div>
+      <h3>Offices</h3>
+      <p style="color:var(--muted-on-ink);margin-top:14px">Ambiente Tours GmbH<br>Rennerod, Germany</p>
+      <p style="color:var(--muted-on-ink);margin-top:14px">Ambiente Turizm Seyahat<br>Kuşadası, Türkiye</p>
+      <p style="color:var(--muted-on-ink);margin-top:14px">Boutique Mare<br>Rome, Italy</p>
+      <p style="color:var(--muted-on-ink);margin-top:22px">[PHONE] · [EMAIL]</p>
+    </div>
+    <form class="form" onsubmit="event.preventDefault();this.querySelector('.note').textContent='Thank you. A planner will reply within one working day.';">
+      <label>Name <input type="text" name="name" autocomplete="name" required></label>
+      <label>Email <input type="email" name="email" autocomplete="email" required></label>
+      <label class="full">Message <textarea name="msg" required></textarea></label>
+      <button class="btn solid full" type="submit">Send</button>
+      <p class="note">We reply from a named person, not a ticket system.</p>
+    </form>
+  </div></section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="logo" style="margin-bottom:12px">AmbiMare <small>by Ambiente</small></div>
+        <p style="max-width:40ch">The sea collection of Ambiente Group: ocean cruises, river weeks and luxury small-ship journeys, booked with direct contracts and one person on your file.</p>
+      </div>
+      <div><h4>Explore</h4><ul><li><a href="#/ships">Ships</a></li><li><a href="#/lines">Cruise lines</a></li><li><a href="#/itineraries">Itineraries</a></li><li><a href="#/journal">Journal</a></li></ul></div>
+      <div><h4>Ambiente Group</h4><ul><li><a href="#">Ambiente Travel</a></li><li><a href="#">Explore Orient · MICE &amp; DMC</a></li><li><a href="#">AmbiMedi · Italy</a></li><li><a href="#">AmbiEvent · Congresses</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#/contact">Contact</a></li><li><a href="#">Booking conditions</a></li><li><a href="#">Privacy</a></li><li><a href="#">Imprint</a></li></ul></div>
+    </div>
+    <div class="group">
+      <span>Ambiente Tours GmbH · Ambiente Turizm Seyahat · [TÜRSAB / licence numbers]</span>
+      <span>Fares shown per person, cheapest available cabin, two sharing. Service charge billed separately by the line.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+  if (hasGsap) gsap.registerPlugin(ScrollTrigger);
+
+  // nav
+  const nav = document.getElementById('nav');
+  const burger = document.getElementById('burger');
+  burger.addEventListener('click', () => { const open = nav.classList.toggle('open'); burger.setAttribute('aria-expanded', open); });
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 40);
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  // router
+  const views = ['home','ships','lines','itineraries','journal','contact'];
+  let triggers = [];
+  function killAll(){ triggers.forEach(t => t.kill()); triggers = []; if (hasGsap) ScrollTrigger.getAll().forEach(t=>t.kill()); }
+  function route(){
+    const h = (location.hash.replace(/^#\/?/,'') || 'home').split('/')[0];
+    const name = views.includes(h) ? h : 'home';
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-'+name));
+    document.querySelectorAll('[data-route]').forEach(a => { if (a.dataset.route === name) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+    nav.classList.remove('open'); burger.setAttribute('aria-expanded','false');
+    window.scrollTo({top:0, behavior:'instant'});
+    killAll();
+    if (name === 'home') setupHome(); else setupInner();
+  }
+  window.addEventListener('hashchange', route);
+
+  function setupInner(){
+    if (!hasGsap || reduce) return;
+    gsap.utils.toArray('#view-'+(location.hash.replace(/^#\/?/,'')||'home')+' .post, .ship-row').forEach(el => {
+      gsap.fromTo(el, {opacity:0, y:14}, {opacity:1, y:0, duration:.7, ease:'power3.out', scrollTrigger:{trigger:el, start:'top 90%', once:true}});
+    });
+  }
+
+  function setupHome(){
+    if (!hasGsap) { document.querySelectorAll('.reveal,.line,.tile').forEach(e=>{e.style.opacity=1;e.style.transform='none';e.style.clipPath='none';}); return; }
+    // hero entrance: one orchestrated moment
+    gsap.fromTo('#view-home .hero .reveal', {opacity:0, y:22, filter:'blur(4px)'}, {opacity:1, y:0, filter:'blur(0px)', duration:1.1, ease:'power3.out', stagger:.09, delay:.15});
+    if (reduce) { document.querySelectorAll('.line,.tile,.journal .reveal').forEach(e=>{e.style.opacity=1;e.style.transform='none';e.style.clipPath='none';}); return; }
+
+    // floating parallax on everything tagged
+    gsap.utils.toArray('[data-float]').forEach(el => {
+      const speed = parseFloat(el.dataset.float) || 0;
+      gsap.to(el, { y: () => speed * 600, ease:'none', scrollTrigger:{ trigger: el.closest('section') || el, start:'top bottom', end:'bottom top', scrub:.6 } });
+    });
+    gsap.to('#view-home .hero .content', { opacity:0, ease:'none', scrollTrigger:{trigger:'#view-home .hero', start:'40% top', end:'bottom top', scrub:true} });
+
+    // stacked panels: puzzle opening
+    const panels = gsap.utils.toArray('.panel');
+    const stackTl = gsap.timeline({ scrollTrigger:{ trigger:'.stack', start:'top top', end:'bottom bottom', scrub:.8 } });
+    panels.forEach((p,i) => { if (i === 0) return; stackTl.fromTo(p, {clipPath:'inset(100% 0 0 0)'}, {clipPath:'inset(0% 0 0 0)', ease:'none', duration:1}, i-1 + .15); stackTl.fromTo(p.querySelectorAll('h2,p,.kicker'), {y:40, opacity:0}, {y:0, opacity:1, ease:'power2.out', duration:.6, stagger:.08}, i-1 + .45); });
+
+    // ships horizontal
+    const track = document.getElementById('track');
+    const dist = () => track.scrollWidth - window.innerWidth + 24;
+    gsap.to(track, { x: () => -dist(), ease:'none', scrollTrigger:{ trigger:'.hscroll', start:'top top', end: () => '+=' + dist(), scrub:.7, invalidateOnRefresh:true } });
+
+    // cruise lines stagger
+    gsap.to('#lines-grid .line', { opacity:1, y:0, duration:.8, ease:'power3.out', stagger:.06, scrollTrigger:{trigger:'#lines-grid', start:'top 82%', once:true} });
+
+    // inside the ship: deck highlight
+    document.querySelectorAll('.step').forEach(step => {
+      ScrollTrigger.create({ trigger: step, start:'top 60%', end:'bottom 40%',
+        onToggle: self => { step.classList.toggle('on', self.isActive); const d = document.getElementById(step.dataset.deck); if (d) d.querySelector('.deck').classList.toggle('on', self.isActive); } });
+    });
+
+    // route drawing
+    gsap.to('#route', { strokeDashoffset:0, ease:'none', scrollTrigger:{trigger:'.routes', start:'top 75%', end:'bottom 45%', scrub:.5} });
+
+    // amenities mosaic: tiles open like a puzzle
+    const tiles = gsap.utils.toArray('#mosaic .tile');
+    gsap.to(tiles, { clipPath:'inset(0% round 18px)', opacity:1, scale:1, ease:'power3.out', duration:1, stagger:{each:.07, from:'center', grid:'auto'}, scrollTrigger:{trigger:'#mosaic', start:'top 78%', end:'bottom 70%', scrub:.6} });
+
+    // journal reveal
+    gsap.to('#journal .reveal', { opacity:1, y:0, duration:.8, ease:'power3.out', stagger:.08, scrollTrigger:{trigger:'#journal', start:'top 80%', once:true} });
+
+    ScrollTrigger.refresh();
+  }
+
+  route();
+  window.addEventListener('load', () => hasGsap && ScrollTrigger.refresh());
+})();
+</script>
+</body>
+</html>

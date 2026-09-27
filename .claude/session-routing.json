@@ -17,12 +17,11 @@
   "ListAgents will NOT show a stopped session — it only lists live peers.",
   "That difference cost a round trip on 26 Aug 2026."
  ],
- "verified": "2026-08-31",
+ "verified": "2026-09-27",
  "routes": [
   {
    "properties": [
     "cruise24.ir",
-    "cruise24.me",
     "book.cruise24.ir"
    ],
    "title": "Cruise24.ir storefront build",
@@ -30,6 +29,18 @@
    "confirmed_by_user": true,
    "repo_paths": [
     "cruise24-ir/"
+   ]
+  },
+  {
+   "properties": [
+    "cruise24.me"
+   ],
+   "title": "Cruise24.me website tools",
+   "sessionId": "session_01YCGvQ6DXzq5u7P4hVwKiMm",
+   "confirmed_by_user": true,
+   "note": "AmbiMare (the English sea collection of Ambiente Group) at cruise24.me. Alireza handed the claude.ai chat 'building a professional cruise website' to this session on 2026-09-27 and asked for it to be built here. Was previously bundled with cruise24.ir; the two are different audiences (world/EN vs Iran/FA).",
+   "repo_paths": [
+    "cruise24-me/"
    ]
   },
   {
