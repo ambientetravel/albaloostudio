@@ -1,4 +1,4 @@
-# cruise24.me — AmbiMare, handoff
+# cruise24.me — Cruise24, handoff
 
 Architecture credit: Albaloo Studio — albaloostudio.com
 Owner: Alireza Mozaffari
@@ -7,35 +7,15 @@ claude.ai chat "building a professional cruise website".
 
 ## What this is
 
-AmbiMare is the sea collection of Ambiente Group, to live at **cruise24.me**:
-ocean, river and all-suite luxury journeys for a world audience (the English
-twin of cruise24.ir, which stays Farsi B2C). The chat produced two artifacts;
-both are in this folder, unchanged in copy, changed only in plumbing.
-
-| File | What | Status |
-|---|---|---|
-| `conditions.html` | Booking conditions / Reisebedingungen, drafted for both roles (Reisevermittlung under § 651v BGB, own package under §§ 651a ff.), with §§ 651e/f/h/p referenced where they bind. 18 highlighted placeholders: deposit and balance terms, change and cancellation fees, insurer, jurisdiction. Linked from every footer and from the imprint. | Drafted; needs the same facts as the imprint plus a travel-law read |
-| `assets/logo*.png`, `favicon-*.png`, `og-image.jpg` | The logo Alireza supplied on 27 Sep (`logo-original.png`, 1080²), cut into transparent ink and white lockups, a nav mark without the tagline, favicons at 32/180/512 and a 1200×630 Open Graph card. Every page links the icons and the OG image; the home page's JSON-LD carries `logo` and `sameAs` for the Facebook and Instagram pages. | Done |
-| `imprint.html`, `privacy.html` | Impressum under § 5 DDG / § 18 MStV and a GDPR Art. 13 notice, in English with the German terms. Every fact not in the source is a highlighted `[placeholder]`: 19 on the imprint, 12 on the privacy page. The privacy text describes what the site really does: no cookies, no analytics, fonts and GSAP self-hosted, server logs, the form, and media loading from Explora's servers until `download_media.py` has run. Supervisory authority named as LfDI Rheinland-Pfalz, Mainz, since the GmbH sits in Rennerod. Linked from every footer. | Drafted; not publishable until the placeholders are filled |
-| `destinations.html`, `contact.html` | Added last on 27 Sep. Twelve region cards (the home page's eleven Explora regions plus the rivers), each with season, lines and the visa position under the house rule; contact page with the request form, the three offices from v1 and a three-step "what happens next". Nav on every page now points at these instead of the home-page anchors. | Verified with the rest, below |
-| `ships.html`, `lines.html`, `itineraries.html`, `journal.html` | **v1's inner views, now real pages** (added later on 27 Sep). Fleet with the on-board notes, eight line profiles, the Aegean worked example day by day plus seven routes each with its visa line, the Kuşadası port guide in full. Share `assets/site.css` and `assets/site.js` with the home page; the nav marks the current page. Hero images reuse URLs already in the media set, so the download list is unchanged at 47. | Verified with the home page, below |
-| `index.html` | **v2, the one to ship.** Single page, full-screen video hero, stacked "life on board" panels, 11 destination tiles with hover video, horizontal ship rail, Explora inclusions list, journal, request form. Media referenced from Explora Journeys' CDN via `data-media` attributes. | Renders clean; media not yet local (see below) |
-| `_v1-illustrated.html` | v1, the earlier hash-routed SPA with **no external media** (SVG ships, waves, deck cut-away, route map) and five inner views: Ships, Cruise lines, Itineraries (worked Aegean example day by day), Journal (Kuşadası port guide in full), Contact. | Reference and content source; not linked, blocked in robots.txt |
-| `download_media.py` | The tool the chat could not run: fetches every `data-media` / `data-media-mobile` / `data-poster` URL into `media/` and writes `media/index.json`, which the page's resolver reads at load. Stdlib only. `--check` verifies the index against the page. | Tested end to end against a local fixture server (same-basename URLs, suffix-less URLs, 404s, re-runs) |
-| `assets/site.css`, `assets/site.js` | The page CSS and the media resolver / nav script, pulled out of `index.html` so five pages share one copy. The home-page GSAP choreography stays inline in `index.html`. | Done |
-| `assets/fonts/` | Cormorant Garamond + Manrope, **self-hosted** (6 woff2, 204 KB, latin + latin-ext). No call to Google on page load. Ambiente Tours GmbH is a German company; LG München (2022) fined a site for hot-linking Google Fonts. | Done, verified loading in Chromium |
-| `assets/vendor/` | GSAP 3.12.5 + ScrollTrigger from the npm package, replacing the cdnjs links. | Done, verified `gsap` and `ScrollTrigger` defined |
-| `robots.txt`, `sitemap.xml` | Ten URLs. cruise24.me today serves a GoDaddy sitemap *index* resolving to 2 URLs; this replaces it once the site moves. | Written |
-
-Changes made to `index.html` versus the artifact, all in `<head>` or the
-resolver script, none in the copy:
-
-- Google Fonts `<link>`s → `assets/fonts/fonts.css`; cdnjs → `assets/vendor/`.
-- Added `rel=canonical`, Open Graph tags, `theme-color`, and a JSON-LD
-  `TravelAgency` block (name, URL, parent Ambiente Tours GmbH, Rennerod). No
-  phone, email, rate or date was added — none exists in the source.
-- The "Preview: photos and video load from the media folder" badge now
-  removes itself once `media/index.json` has entries.
+**Cruise24** is the brand, at **cruise24.me**: it brings the world of cruising to
+the Middle East market. Ocean, river and all-suite luxury journeys worldwide,
+sold to travellers in the region. "Excellent cruise deals of the Middle East"
+in the logo means the market, not the cruising area (Alireza, 27 Sep).
+**AmbiMare** stays only as the wordmark beside the logo in the header, and as
+an `alternateName` in the home page's JSON-LD. Ambiente Tours GmbH remains the
+legal entity on the imprint, privacy and booking conditions pages. cruise24.ir
+is still the Farsi B2C twin. The chat produced two artifacts; both are in this
+folder.
 
 ## Design, restyled around the logo (27 Sep, later)
 
@@ -48,16 +28,20 @@ instead of the Cormorant serif, kickers as letterspaced caps with a dotted
 lead line, 10px corners instead of pills, dotted footer rule. The Cormorant
 files stay in `assets/fonts/` but nothing references them; delete when sure.
 
-**Three things the logo says that the copy does not, for Alireza to decide:**
-1. The logo brand is "24" / Cruise24; the copy says AmbiMare by Ambiente
-   Group. The nav now shows the mark beside the AmbiMare wordmark with
-   "by Ambiente · cruise24.me" under it. If Cruise24 is the brand, the
-   rename is a one-pass find-and-replace across ten pages; say so.
-2. The tagline reads "excellent cruise deals of the Middle East"; the site
-   sells twelve regions from Alaska to the Amazon. One of them is wrong.
-3. The tagline in the artwork is misspelled ("EXCCELENT" with a broken C).
-   It is baked into the image; the file needs a corrected export from
-   whoever made it. Every alt text and the OG card use the correct spelling.
+**The three logo questions, resolved 27 Sep:**
+1. Brand is **Cruise24** on every page. AmbiMare stays as the header wordmark.
+2. "Of the Middle East" is the market. The home page's title, description,
+   kicker, lede, manifesto, footer blurb and JSON-LD `areaServed` now say so.
+3. The misspelled tagline ("EXCCELENT" with a broken C) is fixed in
+   `assets/logo-master.png`: that one line retyped in Lexend Bold, fitted to the
+   original line's measured ink box (210,834)–(874,868), every other pixel
+   verified identical. The file as supplied is kept as `logo-as-supplied.png`;
+   every cut-out, favicon and the OG card are regenerated from the master.
+   If the designer has the source file, their own fix should replace this one.
+
+**Open, raised by the repositioning:** the contact page offers English,
+German, Turkish or Italian. A Middle East market probably expects Arabic
+and Farsi. Not added, because it is a staffing claim, not a copy change.
 
 ## Verified (headless Chromium, 1440×900 and 390×844, served from this folder)
 
@@ -133,7 +117,7 @@ a form that silently drops enquiries.
 `privacy.html` are drafted with every unknown highlighted in brass: street
 address, managing director, register court and HRB number, VAT ID, phone,
 email, TÜRSAB licence, the hosting provider (undecided), log retention, and
-whether AmbiMare acts as Reisevermittler or Reiseveranstalter on a booking.
+whether Cruise24 acts as Reisevermittler or Reiseveranstalter on a booking.
 That last one decides whether a Sicherungsschein must be issued; do not
 guess it. The EU ODR platform was shut down in July 2025, so no ODR link;
 the VSBG statement is there with the choice left open.
@@ -151,5 +135,5 @@ they are articles. The Kuşadası guide is the only full piece.
 
 `.claude/session-routing.json` now routes **cruise24.me** to this session
 (`Cruise24.me website tools`). cruise24.ir and book.cruise24.ir stay with
-`Cruise24.ir storefront build`. Alireza brought the AmbiMare work here
+`Cruise24.ir storefront build`. Alireza brought the Cruise24 work here
 explicitly on 27 Sep 2026.
