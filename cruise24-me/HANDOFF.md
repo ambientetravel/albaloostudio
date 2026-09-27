@@ -39,9 +39,20 @@ files stay in `assets/fonts/` but nothing references them; delete when sure.
    every cut-out, favicon and the OG card are regenerated from the master.
    If the designer has the source file, their own fix should replace this one.
 
-**Open, raised by the repositioning:** the contact page offers English,
-German, Turkish or Italian. A Middle East market probably expects Arabic
-and Farsi. Not added, because it is a staffing claim, not a copy change.
+**Languages, decided 27 Sep:** the contact page stays English, German,
+Turkish or Italian. Alireza: leave Arabic and Farsi out.
+
+**Why the preview has no photos or video, two separate blocks:**
+1. This cloud container's network policy denies `explorajourneys.com` and
+   `dm.explorajourneys.com` (403 on CONNECT), so `download_media.py` cannot
+   fetch anything here.
+2. The claude.ai artifact preview only shows images and video published with
+   the page itself. Its content security policy blocks every other host, so
+   the page's fallback to Explora's URLs never loads there either.
+Fix: add both hosts to this environment's allowed domains (environment menu
+in the session title bar, Edit, Network access), then run the downloader
+here and publish `media/` with the page. Sessions on Alireza's Mac have
+full internet, which is why other projects could place media directly.
 
 ## Verified (headless Chromium, 1440×900 and 390×844, served from this folder)
 
