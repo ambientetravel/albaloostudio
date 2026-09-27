@@ -229,3 +229,16 @@ img.missing,video.missing{visibility:hidden}
 .hours b{display:block;font-family:var(--serif);font-weight:400;font-size:1.5rem;margin-bottom:6px}
 .hours p{color:var(--muted);font-size:.95rem}
 @media (max-width:860px){.hours{grid-template-columns:1fr}}
+
+/* ---------- legal pages ---------- */
+.legal{max-width:72ch}
+.legal h2{font-size:clamp(1.9rem,3.5vw,2.8rem);margin-top:52px}
+.legal h2:first-of-type{margin-top:0}
+.legal h3{font-size:1.35rem;margin-top:30px}
+.legal p,.legal li{color:var(--text);font-size:1rem;line-height:1.7}
+.legal p{margin-top:12px}
+.legal ul{margin:10px 0 0;padding-left:22px}
+.legal .lede{color:var(--muted)}
+.legal address{font-style:normal;margin-top:12px;line-height:1.7}
+.todo{background:rgba(184,149,90,.22);padding:0 6px;border-radius:4px;color:#6b4f1d;font-weight:500}
+.legal .updated{font-size:.85rem;color:var(--muted);margin-top:40px;padding-top:16px;border-top:1px solid var(--line)}
