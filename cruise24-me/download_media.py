@@ -9,7 +9,7 @@ Owner: Alireza Mozaffari
 
 Why
 ---
-index.html carries its imagery as data-media / data-media-mobile / data-poster
+Every page carries its imagery as data-media / data-media-mobile / data-poster
 attributes pointing at explorajourneys.com. Left like that the live site would
 hot-link a cruise line's CDN: slow, fragile (they rename paths), and their
 analytics sees every visitor. This script copies each asset once, names it
@@ -25,8 +25,9 @@ Usage
     python3 download_media.py --no-videos    # images only (fast first pass)
     python3 download_media.py --force        # re-fetch even if the file exists
     python3 download_media.py --dry-run      # list what would be fetched
-    python3 download_media.py --check        # verify index.json covers the HTML
+    python3 download_media.py --check        # verify index.json covers every page
                                              # and every listed file exists on disk
+    python3 download_media.py --html index.html ships.html   # specific pages only
 
 Exit status: 0 when every URL is local, 1 when any is missing or failed.
 Stdlib only — runs on a stock macOS / Linux python3.
@@ -158,7 +159,8 @@ def human(n: int) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--html", default=str(HERE / "index.html"))
+    ap.add_argument("--html", nargs="*", default=None,
+                    help="page(s) to scan; default: every *.html in this folder not starting with _")
     ap.add_argument("--out", default=str(HERE / "media"))
     ap.add_argument("--force", action="store_true", help="re-download files that already exist")
     ap.add_argument("--no-videos", action="store_true", help="skip .mp4/.webm — images only")
@@ -167,12 +169,21 @@ def main() -> int:
     ap.add_argument("--timeout", type=int, default=120)
     args = ap.parse_args()
 
-    html_path, out = Path(args.html), Path(args.out)
-    html = html_path.read_text(encoding="utf-8")
-    urls = urls_in(html)
-    if not urls:
-        print(f"no {'/'.join(ATTRS)} URLs found in {html_path}", file=sys.stderr)
+    pages = [Path(h) for h in args.html] if args.html else sorted(
+        p for p in HERE.glob("*.html") if not p.name.startswith("_"))
+    if not pages:
+        print("no HTML pages to scan", file=sys.stderr)
         return 1
+    html_path, out = pages[0], Path(args.out)  # local paths are written relative to the pages' folder
+    seen: dict[str, None] = {}
+    for pg in pages:
+        for u in urls_in(pg.read_text(encoding="utf-8")):
+            seen.setdefault(u, None)
+    urls = list(seen)
+    if not urls:
+        print(f"no {'/'.join(ATTRS)} URLs found in {', '.join(p.name for p in pages)}", file=sys.stderr)
+        return 1
+    page_names = ", ".join(p.name for p in pages)
     out.mkdir(parents=True, exist_ok=True)
     index_path = out / "index.json"
     index: dict[str, str] = {}
@@ -184,7 +195,7 @@ def main() -> int:
         missing = [u for u in urls if u not in index]
         gone = [u for u, p in index.items() if not (html_path.parent / p).is_file()]
         stale = [u for u in index if u not in urls]
-        print(f"{len(urls)} URLs in {html_path.name}; {len(index)} entries in {index_path.name}")
+        print(f"{len(urls)} URLs across {page_names}; {len(index)} entries in {index_path.name}")
         for u in missing: print(f"  NOT LOCAL   {u}")
         for u in gone:    print(f"  FILE GONE   {index[u]}  ({u})")
         for u in stale:   print(f"  stale entry {index[u]}  (URL no longer in page)")
@@ -203,7 +214,7 @@ def main() -> int:
         else:
             todo.append(u)
 
-    print(f"{len(urls)} URLs in page · {skipped} already local · {len(todo)} to fetch"
+    print(f"{len(urls)} URLs across {len(pages)} page(s) · {skipped} already local · {len(todo)} to fetch"
           + (" (videos skipped)" if args.no_videos else ""))
     if args.dry_run:
         for u in todo: print("  would fetch", u)
