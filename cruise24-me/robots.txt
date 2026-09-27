@@ -1,6 +1,9 @@
 User-agent: *
 Allow: /
-Disallow: /download_media.py
+Disallow: /data/sources/
+Disallow: /data/data-checks.json
+Disallow: /sync/
+Disallow: /media-originals/
 Disallow: /_v1-illustrated.html
 
 Sitemap: https://cruise24.me/sitemap.xml

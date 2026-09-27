@@ -44,3 +44,19 @@
   const r = document.getElementById('route');
   if (r) gsap.to(r, {strokeDashoffset:0, ease:'none', scrollTrigger:{trigger:'.routes', start:'top 75%', end:'bottom 45%', scrub:.5}});
 })();
+
+/* Contact page: arriving from a sailing page as contact.html#<sailing id>, name that
+   sailing in the message so the planner knows what the question is about. */
+(function(){
+  if (document.body.dataset.page !== 'contact') return;
+  var id = (location.hash || '').replace(/^#/, '');
+  var box = document.querySelector('form.form textarea');
+  if (!id || !box || box.value) return;
+  fetch('data/sailings.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    var s = d && (d.sailings || []).filter(function (x) { return x.id === id; })[0];
+    if (!s || box.value) return;
+    var dep = s.departures && s.departures[0] ? ', departing ' + s.departures[0].date : '';
+    box.value = 'About: ' + s.title + ' (' + s.line + ', ' + s.ships.join(' or ') + ', ' + s.nights + ' nights' + dep + '). Ref ' + s.id + '.\n\n';
+    box.focus();
+  }).catch(function () {});
+})();

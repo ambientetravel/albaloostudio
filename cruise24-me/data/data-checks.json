@@ -1,0 +1,32 @@
+{
+ "_about": "Records to verify against the line before launch. Internal: do not deploy.",
+ "checks": {
+  "VAR-b53f1e2": [
+   "boutimar.ir files this route under both Galileo and Harmony G; a third record (greece--galileo) lists the same route with 9 days for 7 nights and was not used"
+  ],
+  "VAR-1c25f3b": [
+   "a second boutimar.ir record for this route adds Kythira and runs to 9 days for 7 nights; the 8-day version is used"
+  ],
+  "VAR-3ad973f": [
+   "filed under both Harmony G and Harmony V; a third record (greece--harmony-g) shows a one-way Corfu to Athens variant via the Corinth Canal with 9 days for 7 nights and was not used"
+  ],
+  "VAR-c0cf074-a": [
+   "boutimar.ir uses one itinerary code (c0cf074) for two different Aegean-and-Kuşadası routes; both are listed, the departure decides which applies"
+  ],
+  "VAR-c0cf074-b": [
+   "see VAR-c0cf074-a"
+  ],
+  "VAR-76d20ee": [
+   "filed under both Galileo and Panorama"
+  ],
+  "VAR-5522b2c": [
+   "the 3-night fare (EUR 2,100) is higher than the 4-night fare (EUR 1,720); check the catalogue before publishing"
+  ],
+  "VAR-b723d03": [
+   "three consecutive sea days on a 7-night Adriatic yacht route is unusual for Variety; check the routing before publishing"
+  ],
+  "VAR-553fca8": [
+   "near-duplicate of VAR-232f487 under a different code; the departure decides which applies"
+  ]
+ }
+}

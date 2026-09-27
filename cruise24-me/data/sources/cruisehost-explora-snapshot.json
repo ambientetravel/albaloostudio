@@ -1,0 +1,2764 @@
+{
+ "_about": "Explora Journeys sailings as synced from CruiseHost CPX (aid 204622, the Ambiente Tours contract). Snapshot taken 2026-09-27 from the boutimar.ir feed, which mirrors CruiseHost's lead fare verbatim (priceFrom = per person, cheapest cabin, two sharing, EUR). Interim only: sync/cruisehost_sync.py replaces this with a direct CruiseHost pull so cruise24.me has no runtime or build dependency on .ir.",
+ "snapshotDate": "2026-09-27",
+ "sailings": [
+  {
+   "cruisehostId": "M2353255261005",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Eastern Mediterranean",
+   "regionSource": "مدیترانه شرقی",
+   "route": [
+    "Piraeus, Athens",
+    "Cruising Day",
+    "Bari",
+    "Nydri, Nisos Lefkada",
+    "Pylos, Peloponnese",
+    "Amorgos",
+    "Mykonos",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-09-28",
+     "priceFrom": 4685
+    }
+   ],
+   "priceFrom": 4685,
+   "currency": "EUR",
+   "syncedAt": "2026-09-22"
+  },
+  {
+   "cruisehostId": "M2353258261129",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Eastern Mediterranean",
+   "regionSource": "مدیترانه شرقی",
+   "route": [
+    "Piraeus, Athens",
+    "Mykonos",
+    "Cruising Day",
+    "Dubrovnik",
+    "Kotor",
+    "Brindisi",
+    "Corfu",
+    "Cruising Day",
+    "Volos",
+    "Cruising Day",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-19",
+     "priceFrom": 16905
+    }
+   ],
+   "priceFrom": 16905,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2353256261119",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Eastern Mediterranean",
+   "regionSource": "مدیترانه شرقی",
+   "route": [
+    "Piraeus, Athens",
+    "Syros, Kyklades",
+    "Paros",
+    "Cruising Day",
+    "Argostoli, Cephalonia",
+    "Kotor",
+    "Bari",
+    "Sarande",
+    "Cruising Day",
+    "Santorini",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-09",
+     "priceFrom": 18110
+    }
+   ],
+   "priceFrom": 18110,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2293402261012",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Paros",
+    "Rhodos",
+    "Cruising Day",
+    "Corfu",
+    "Hvar",
+    "Rijeka",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-05",
+     "priceFrom": 6030
+    }
+   ],
+   "priceFrom": 6030,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M1342728261005",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 7,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Ibiza, Balearic Islands",
+    "Ibiza, Balearic Islands",
+    "La Goulette",
+    "Valletta",
+    "Giardini Naxos",
+    "Sorrent",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2026-09-28",
+     "priceFrom": 5895
+    }
+   ],
+   "priceFrom": 5895,
+   "currency": "EUR",
+   "syncedAt": "2026-09-22"
+  },
+  {
+   "cruisehostId": "M1294505261012",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 7,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Civitavecchia, Rome",
+    "La Spezia, Florence, Pisa, Cinque",
+    "Monte Carlo",
+    "St. Tropez",
+    "Cruising Day",
+    "Mahon, Menorca, Balearic Islands",
+    "Valencia",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-05",
+     "priceFrom": 4845
+    }
+   ],
+   "priceFrom": 4845,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2293405261109",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 11,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Fusina (Venice)",
+    "Zadar",
+    "Dubrovnik",
+    "Corfu",
+    "Cruising Day",
+    "Volos",
+    "Thessaloniki",
+    "Cruising Day",
+    "Mykonos",
+    "Milos",
+    "Nafplion",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-29",
+     "priceFrom": 5320
+    }
+   ],
+   "priceFrom": 5320,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2293403261019",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Fusina (Venice)",
+    "Rovinj",
+    "Dubrovnik",
+    "Brindisi",
+    "Kotor",
+    "Cruising Day",
+    "Milos",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-12",
+     "priceFrom": 5310
+    }
+   ],
+   "priceFrom": 5310,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M1293637261021",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 9,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Marseille",
+    "Villefranche, Nice",
+    "Porto Santo Stefano",
+    "Naples",
+    "Palermo, Sicily",
+    "Cruising Day",
+    "Ibiza, Balearic Islands",
+    "Palma de Mallorca, Balearic Islands",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-12",
+     "priceFrom": 5580
+    }
+   ],
+   "priceFrom": 5580,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2293404261029",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Syros, Kyklades",
+    "Mykonos",
+    "Santorini",
+    "Pylos, Peloponnese",
+    "Cruising Day",
+    "Kotor",
+    "Gallipoli, Apulia",
+    "Hvar",
+    "Rijeka",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-19",
+     "priceFrom": 5950
+    }
+   ],
+   "priceFrom": 5950,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M1293642261101",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 11,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Alicante",
+    "Cruising Day",
+    "Lisbon",
+    "Lisbon",
+    "Casablanca",
+    "Casablanca",
+    "Tanger",
+    "Malaga",
+    "Motril, Andalusia",
+    "Cruising Day",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-21",
+     "priceFrom": 6630
+    }
+   ],
+   "priceFrom": 6630,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2316828261012",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 14,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Cruising Day",
+    "Bari",
+    "Nydri, Nisos Lefkada",
+    "Pylos, Peloponnese",
+    "Amorgos",
+    "Mykonos",
+    "Piraeus, Athens",
+    "Paros",
+    "Rhodos",
+    "Cruising Day",
+    "Corfu",
+    "Hvar",
+    "Rijeka",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2026-09-28",
+     "priceFrom": 80475
+    }
+   ],
+   "priceFrom": 80475,
+   "currency": "EUR",
+   "syncedAt": "2026-09-22"
+  },
+  {
+   "cruisehostId": "M2353257261129",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 20,
+   "region": "Eastern Mediterranean",
+   "regionSource": "مدیترانه شرقی",
+   "route": [
+    "Piraeus, Athens",
+    "Syros, Kyklades",
+    "Paros",
+    "Cruising Day",
+    "Argostoli, Cephalonia",
+    "Kotor",
+    "Bari",
+    "Sarande",
+    "Cruising Day",
+    "Santorini",
+    "Piraeus, Athens",
+    "Mykonos",
+    "Cruising Day",
+    "Dubrovnik",
+    "Kotor",
+    "Brindisi",
+    "Corfu",
+    "Cruising Day",
+    "Volos",
+    "Cruising Day",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-09",
+     "priceFrom": 30380
+    }
+   ],
+   "priceFrom": 30380,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2323216261019",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 14,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Paros",
+    "Rhodos",
+    "Cruising Day",
+    "Corfu",
+    "Hvar",
+    "Rijeka",
+    "Fusina (Venice)",
+    "Rovinj",
+    "Dubrovnik",
+    "Brindisi",
+    "Kotor",
+    "Cruising Day",
+    "Milos",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-05",
+     "priceFrom": 10800
+    }
+   ],
+   "priceFrom": 10800,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M1342729261012",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 14,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Ibiza, Balearic Islands",
+    "Ibiza, Balearic Islands",
+    "La Goulette",
+    "Valletta",
+    "Giardini Naxos",
+    "Sorrent",
+    "Civitavecchia, Rome",
+    "La Spezia, Florence, Pisa, Cinque",
+    "Monte Carlo",
+    "St. Tropez",
+    "Cruising Day",
+    "Mahon, Menorca, Balearic Islands",
+    "Valencia",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-09-28",
+     "priceFrom": 11115
+    }
+   ],
+   "priceFrom": 11115,
+   "currency": "EUR",
+   "syncedAt": "2026-09-22"
+  },
+  {
+   "cruisehostId": "M2323221261119",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 21,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Fusina (Venice)",
+    "Zadar",
+    "Dubrovnik",
+    "Corfu",
+    "Cruising Day",
+    "Volos",
+    "Thessaloniki",
+    "Cruising Day",
+    "Mykonos",
+    "Milos",
+    "Nafplion",
+    "Piraeus, Athens",
+    "Syros, Kyklades",
+    "Paros",
+    "Cruising Day",
+    "Argostoli, Cephalonia",
+    "Kotor",
+    "Bari",
+    "Sarande",
+    "Cruising Day",
+    "Santorini",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-29",
+     "priceFrom": 48560
+    }
+   ],
+   "priceFrom": 48560,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M1316861261021",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 16,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Civitavecchia, Rome",
+    "La Spezia, Florence, Pisa, Cinque",
+    "Monte Carlo",
+    "St. Tropez",
+    "Cruising Day",
+    "Mahon, Menorca, Balearic Islands",
+    "Valencia",
+    "Barcelona",
+    "Marseille",
+    "Villefranche, Nice",
+    "Porto Santo Stefano",
+    "Naples",
+    "Palermo, Sicily",
+    "Cruising Day",
+    "Ibiza, Balearic Islands",
+    "Palma de Mallorca, Balearic Islands",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-05",
+     "priceFrom": 12330
+    }
+   ],
+   "priceFrom": 12330,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2323218261029",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 17,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Fusina (Venice)",
+    "Rovinj",
+    "Dubrovnik",
+    "Brindisi",
+    "Kotor",
+    "Cruising Day",
+    "Milos",
+    "Piraeus, Athens",
+    "Syros, Kyklades",
+    "Mykonos",
+    "Santorini",
+    "Pylos, Peloponnese",
+    "Cruising Day",
+    "Kotor",
+    "Gallipoli, Apulia",
+    "Hvar",
+    "Rijeka",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-12",
+     "priceFrom": 12365
+    }
+   ],
+   "priceFrom": 12365,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2316829261109",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 21,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Syros, Kyklades",
+    "Mykonos",
+    "Santorini",
+    "Pylos, Peloponnese",
+    "Cruising Day",
+    "Kotor",
+    "Gallipoli, Apulia",
+    "Hvar",
+    "Rijeka",
+    "Fusina (Venice)",
+    "Zadar",
+    "Dubrovnik",
+    "Corfu",
+    "Cruising Day",
+    "Volos",
+    "Thessaloniki",
+    "Cruising Day",
+    "Mykonos",
+    "Milos",
+    "Nafplion",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-19",
+     "priceFrom": 13800
+    }
+   ],
+   "priceFrom": 13800,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M1316862261101",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 20,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Marseille",
+    "Villefranche, Nice",
+    "Porto Santo Stefano",
+    "Naples",
+    "Palermo, Sicily",
+    "Cruising Day",
+    "Ibiza, Balearic Islands",
+    "Palma de Mallorca, Balearic Islands",
+    "Barcelona",
+    "Alicante",
+    "Cruising Day",
+    "Lisbon",
+    "Lisbon",
+    "Casablanca",
+    "Casablanca",
+    "Tanger",
+    "Malaga",
+    "Motril, Andalusia",
+    "Cruising Day",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-12",
+     "priceFrom": 14195
+    }
+   ],
+   "priceFrom": 14195,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2359162270124",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 4,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Malaga",
+    "Tanger",
+    "Cruising Day",
+    "Alicante",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-20",
+     "priceFrom": 1960
+    }
+   ],
+   "priceFrom": 1960,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2359164270202",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 4,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Marseille",
+    "Genoa",
+    "Villefranche, Nice",
+    "Livorno",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-29",
+     "priceFrom": 1960
+    }
+   ],
+   "priceFrom": 1960,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2359160270114",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 4,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Valletta",
+    "La Goulette",
+    "Palermo, Sicily",
+    "Cruising Day",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-10",
+     "priceFrom": 2065
+    }
+   ],
+   "priceFrom": 2065,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2359165270227",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 4,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Lisbon",
+    "Lisbon",
+    "Cadiz (Seville)",
+    "Tanger",
+    "Malaga"
+   ],
+   "departures": [
+    {
+     "date": "2027-02-23",
+     "priceFrom": 2100
+    }
+   ],
+   "priceFrom": 2100,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2359154261209",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 4,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Civitavecchia, Rome",
+    "Livorno",
+    "Villefranche, Nice",
+    "Cruising Day",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-05",
+     "priceFrom": 1995
+    }
+   ],
+   "priceFrom": 1995,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2359163270129",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 5,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Valencia",
+    "Palma de Mallorca, Balearic Islands",
+    "Palamos",
+    "Cruising Day",
+    "Marseille"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-24",
+     "priceFrom": 2450
+    }
+   ],
+   "priceFrom": 2450,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2359158261221",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 5,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Santa Cruz de Tenerife",
+    "San Sebastian, La Gomera",
+    "Funchal, Madeira Island",
+    "Funchal, Madeira Island",
+    "Cruising Day",
+    "Lisbon"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-16",
+     "priceFrom": 2765
+    }
+   ],
+   "priceFrom": 2765,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2359159270110",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 6,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Civitavecchia, Rome",
+    "Naples",
+    "Syracuse, Sicily",
+    "Syracuse, Sicily",
+    "Bari",
+    "Cruising Day",
+    "Valletta"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-04",
+     "priceFrom": 2940
+    }
+   ],
+   "priceFrom": 2940,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2359161270120",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 6,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Civitavecchia, Rome",
+    "Amalfi",
+    "Cagliari, Sardinia",
+    "Cruising Day",
+    "Cartagena",
+    "Malaga",
+    "Malaga"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-14",
+     "priceFrom": 3010
+    }
+   ],
+   "priceFrom": 3010,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2365567270215",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 4,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Cruising Day",
+    "Tanger",
+    "Casablanca",
+    "Casablanca"
+   ],
+   "departures": [
+    {
+     "date": "2027-02-11",
+     "priceFrom": 3035
+    }
+   ],
+   "priceFrom": 3035,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2359166270305",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 6,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Malaga",
+    "Malaga",
+    "Cruising Day",
+    "Cagliari, Sardinia",
+    "Trapani, Sicily",
+    "Naples",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2027-02-27",
+     "priceFrom": 3150
+    }
+   ],
+   "priceFrom": 3150,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2359152261205",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 6,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Santorini",
+    "Cruising Day",
+    "Valletta",
+    "Messina, Sicily",
+    "Naples",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-29",
+     "priceFrom": 3150
+    }
+   ],
+   "priceFrom": 3150,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2359167270320",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 6,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Cruising Day",
+    "La Spezia, Florence, Pisa, Cinque",
+    "Civitavecchia, Rome",
+    "Naples",
+    "Syracuse, Sicily",
+    "Valletta"
+   ],
+   "departures": [
+    {
+     "date": "2027-03-14",
+     "priceFrom": 3395
+    }
+   ],
+   "priceFrom": 3395,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2359155261216",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Cruising Day",
+    "Gibraltar",
+    "Casablanca",
+    "Casablanca",
+    "Cruising Day",
+    "Arrecife, Lanzarote",
+    "Santa Cruz de Tenerife"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-09",
+     "priceFrom": 3850
+    }
+   ],
+   "priceFrom": 3850,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2359168270325",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 5,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Valletta",
+    "Cruising Day",
+    "Mykonos",
+    "Patmos",
+    "Santorini",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2027-03-20",
+     "priceFrom": 3745
+    }
+   ],
+   "priceFrom": 3745,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2353264270202",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 9,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Valencia",
+    "Palma de Mallorca, Balearic Islands",
+    "Palamos",
+    "Cruising Day",
+    "Marseille",
+    "Genoa",
+    "Villefranche, Nice",
+    "Livorno",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-24",
+     "priceFrom": 3850
+    }
+   ],
+   "priceFrom": 3850,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2353185270211",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 9,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Civitavecchia, Rome",
+    "Naples",
+    "Palermo, Sicily",
+    "La Goulette",
+    "Cruising Day",
+    "Algier",
+    "Cartagena",
+    "Alicante",
+    "Tarragona",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2027-02-02",
+     "priceFrom": 4060
+    }
+   ],
+   "priceFrom": 4060,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2353182270114",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Central Mediterranean",
+   "regionSource": "مدیترانه مرکزی",
+   "route": [
+    "Civitavecchia, Rome",
+    "Naples",
+    "Syracuse, Sicily",
+    "Syracuse, Sicily",
+    "Bari",
+    "Cruising Day",
+    "Valletta",
+    "La Goulette",
+    "Palermo, Sicily",
+    "Cruising Day",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-04",
+     "priceFrom": 4305
+    }
+   ],
+   "priceFrom": 4305,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2353184270124",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Civitavecchia, Rome",
+    "Amalfi",
+    "Cagliari, Sardinia",
+    "Cruising Day",
+    "Cartagena",
+    "Malaga",
+    "Malaga",
+    "Tanger",
+    "Cruising Day",
+    "Alicante",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-14",
+     "priceFrom": 4305
+    }
+   ],
+   "priceFrom": 4305,
+   "currency": "EUR",
+   "syncedAt": "2026-08-27"
+  },
+  {
+   "cruisehostId": "M2369191261213",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 8,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Civitavecchia, Rome",
+    "Livorno",
+    "Villefranche, Nice",
+    "Cruising Day",
+    "Barcelona",
+    "Cruising Day",
+    "Gibraltar",
+    "Casablanca",
+    "Casablanca"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-05",
+     "priceFrom": 4500
+    }
+   ],
+   "priceFrom": 4500,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2365566261221",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 8,
+   "region": "Canary Islands",
+   "regionSource": "جزایر قناری",
+   "route": [
+    "Casablanca",
+    "Cruising Day",
+    "Arrecife, Lanzarote",
+    "Santa Cruz de Tenerife",
+    "San Sebastian, La Gomera",
+    "Funchal, Madeira Island",
+    "Funchal, Madeira Island",
+    "Cruising Day",
+    "Lisbon"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-13",
+     "priceFrom": 4500
+    }
+   ],
+   "priceFrom": 4500,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M1312255270403",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 10,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Cruising Day",
+    "Civitavecchia, Rome",
+    "Naples",
+    "Cruising Day",
+    "Valletta",
+    "La Goulette",
+    "Trapani, Sicily",
+    "Cruising Day",
+    "Mahon, Menorca, Balearic Islands",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2027-03-24",
+     "priceFrom": 4550
+    }
+   ],
+   "priceFrom": 4550,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M1312257270510",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 7,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Mahon, Menorca, Balearic Islands",
+    "Alghero, Sardinia",
+    "Cruising Day",
+    "St. Tropez",
+    "Cannes",
+    "La Spezia, Florence, Pisa, Cinque",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-03",
+     "priceFrom": 4760
+    }
+   ],
+   "priceFrom": 4760,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M1312386270503",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 10,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Alicante",
+    "Cruising Day",
+    "Lisbon",
+    "Lisbon",
+    "Malaga",
+    "Tanger",
+    "Algier",
+    "Ibiza, Balearic Islands",
+    "Palma de Mallorca, Balearic Islands",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2027-04-23",
+     "priceFrom": 4875
+    }
+   ],
+   "priceFrom": 4875,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2353186270305",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Lisbon",
+    "Lisbon",
+    "Cadiz (Seville)",
+    "Tanger",
+    "Malaga",
+    "Malaga",
+    "Cruising Day",
+    "Cagliari, Sardinia",
+    "Trapani, Sicily",
+    "Naples",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2027-02-23",
+     "priceFrom": 4900
+    }
+   ],
+   "priceFrom": 4900,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M4312424270525",
+   "line": "Explora Journeys",
+   "ship": "Explora IV",
+   "nights": 7,
+   "region": "Northern Europe",
+   "regionSource": "اروپای شمالی",
+   "route": [
+    "Copenhagen",
+    "Aarhus",
+    "Lysekil",
+    "Oslo",
+    "Cruising Day",
+    "Hamburg",
+    "Cruising Day",
+    "Southampton"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-18",
+     "priceFrom": 4985
+    }
+   ],
+   "priceFrom": 4985,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2312278270524",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Istanbul",
+    "Cruising Day",
+    "Marmaris",
+    "Bodrum",
+    "Patmos",
+    "Milos",
+    "Mykonos",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-17",
+     "priceFrom": 5040
+    }
+   ],
+   "priceFrom": 5040,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2312395270503",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 9,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Cruising Day",
+    "Istanbul",
+    "Istanbul",
+    "Mykonos",
+    "Milos",
+    "Cruising Day",
+    "Bari",
+    "Trogir",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2027-04-24",
+     "priceFrom": 5100
+    }
+   ],
+   "priceFrom": 5100,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2312276270424",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Fusina (Venice)",
+    "Cruising Day",
+    "Kotor",
+    "Corfu",
+    "Cruising Day",
+    "Paros",
+    "Rhodos",
+    "Bodrum",
+    "Patmos",
+    "Syros, Kyklades",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2027-04-14",
+     "priceFrom": 5135
+    }
+   ],
+   "priceFrom": 5135,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2312394270414",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Fusina (Venice)",
+    "Zadar",
+    "Dubrovnik",
+    "Cruising Day",
+    "Piraeus, Athens",
+    "Kusadasi, Ephesos",
+    "Syros, Kyklades",
+    "Cruising Day",
+    "Bari",
+    "Trogir",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2027-04-04",
+     "priceFrom": 5135
+    }
+   ],
+   "priceFrom": 5135,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2312277270517",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Nafplion",
+    "Paros",
+    "Skiathos",
+    "Volos",
+    "Kusadasi, Ephesos",
+    "Cruising Day",
+    "Istanbul"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-10",
+     "priceFrom": 5225
+    }
+   ],
+   "priceFrom": 5225,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2359156261221",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 12,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Cruising Day",
+    "Gibraltar",
+    "Casablanca",
+    "Casablanca",
+    "Cruising Day",
+    "Arrecife, Lanzarote",
+    "Santa Cruz de Tenerife",
+    "San Sebastian, La Gomera",
+    "Funchal, Madeira Island",
+    "Funchal, Madeira Island",
+    "Cruising Day",
+    "Lisbon"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-09",
+     "priceFrom": 5320
+    }
+   ],
+   "priceFrom": 5320,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2312279270531",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Paros",
+    "Rhodos",
+    "Syros, Kyklades",
+    "Cruising Day",
+    "Hvar",
+    "Split",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-24",
+     "priceFrom": 5355
+    }
+   ],
+   "priceFrom": 5355,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2312396270510",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Fusina (Venice)",
+    "Koper",
+    "Dubrovnik",
+    "Kotor",
+    "Corfu",
+    "Cruising Day",
+    "Milos",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-03",
+     "priceFrom": 5355
+    }
+   ],
+   "priceFrom": 5355,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2353180270325",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 11,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Cruising Day",
+    "La Spezia, Florence, Pisa, Cinque",
+    "Civitavecchia, Rome",
+    "Naples",
+    "Syracuse, Sicily",
+    "Valletta",
+    "Cruising Day",
+    "Mykonos",
+    "Patmos",
+    "Santorini",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2027-03-14",
+     "priceFrom": 5425
+    }
+   ],
+   "priceFrom": 5425,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2312275270404",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Volos",
+    "Mykonos",
+    "Cruising Day",
+    "Istanbul",
+    "Istanbul",
+    "Cruising Day",
+    "Corfu",
+    "Kotor",
+    "Split",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2027-03-25",
+     "priceFrom": 5510
+    }
+   ],
+   "priceFrom": 5510,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M1312385270423",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 11,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Cruising Day",
+    "Casablanca",
+    "Agadir",
+    "Arrecife, Lanzarote",
+    "Puerto del Rosario, Fuerteventura",
+    "Santa Cruz de Tenerife",
+    "Funchal, Madeira Island",
+    "Cruising Day",
+    "Cadiz (Seville)",
+    "Cruising Day",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2027-04-12",
+     "priceFrom": 5700
+    }
+   ],
+   "priceFrom": 5700,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M4312426270430",
+   "line": "Explora Journeys",
+   "ship": "Explora IV",
+   "nights": 7,
+   "region": "Atlantic crossing",
+   "regionSource": "اقیانوس اطلس",
+   "route": [
+    "Lisbon",
+    "Porto",
+    "La Coruna",
+    "Bilbao",
+    "Pauillac",
+    "Pauillac",
+    "Cruising Day",
+    "Southampton"
+   ],
+   "departures": [
+    {
+     "date": "2027-04-23",
+     "priceFrom": 5775
+    }
+   ],
+   "priceFrom": 5775,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M4312601270510",
+   "line": "Explora Journeys",
+   "ship": "Explora IV",
+   "nights": 8,
+   "region": "Norwegian Fjords",
+   "regionSource": "فیوردهای نروژ",
+   "route": [
+    "Southampton",
+    "Zeebrügge",
+    "Brussels",
+    "Cruising Day",
+    "Stavanger",
+    "Bergen",
+    "Nordfjordeid",
+    "Flåm",
+    "Cruising Day",
+    "Copenhagen"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-02",
+     "priceFrom": 6000
+    }
+   ],
+   "priceFrom": 6000,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2353505270104",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Palma de Mallorca, Balearic Islands",
+    "Palamos",
+    "Fireworks in Cannes",
+    "Fireworks in Cannes",
+    "Villefranche, Nice",
+    "Genoa",
+    "Livorno",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-28",
+     "priceFrom": 6055
+    }
+   ],
+   "priceFrom": 6055,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M4312427270518",
+   "line": "Explora Journeys",
+   "ship": "Explora IV",
+   "nights": 8,
+   "region": "Baltic Sea",
+   "regionSource": "دریای بالتیک",
+   "route": [
+    "Copenhagen",
+    "Cruising Day",
+    "Helsinki",
+    "Stockholm",
+    "Stockholm",
+    "Tallinn",
+    "Visby",
+    "Ronne",
+    "Copenhagen"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-10",
+     "priceFrom": 6260
+    }
+   ],
+   "priceFrom": 6260,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M4312423270423",
+   "line": "Explora Journeys",
+   "ship": "Explora IV",
+   "nights": 8,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Genoa",
+    "Marseille",
+    "Barcelona",
+    "Cruising Day",
+    "Malaga",
+    "Tanger",
+    "Cadiz (Seville)",
+    "Lisbon",
+    "Lisbon"
+   ],
+   "departures": [
+    {
+     "date": "2027-04-15",
+     "priceFrom": 6600
+    }
+   ],
+   "priceFrom": 6600,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M1351223270217",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 12,
+   "region": "South America",
+   "regionSource": "آمریکای جنوبی",
+   "route": [
+    "San Juan",
+    "Gustavia, St. Barthelemy",
+    "Saint-Pierre, Martinique",
+    "Bridgetown",
+    "Port of Spain",
+    "Port of Spain",
+    "Cruising Day",
+    "Cruising Day",
+    "Macapà",
+    "Santarém",
+    "Boca de Valeria",
+    "Manaus",
+    "Manaus"
+   ],
+   "departures": [
+    {
+     "date": "2027-02-05",
+     "priceFrom": 7245
+    }
+   ],
+   "priceFrom": 7245,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M1355908270517",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 14,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Mahon, Menorca, Balearic Islands",
+    "Alghero, Sardinia",
+    "Cruising Day",
+    "St. Tropez",
+    "Cannes",
+    "La Spezia, Florence, Pisa, Cinque",
+    "Civitavecchia, Rome",
+    "Naples",
+    "Lipari",
+    "Cruising Day",
+    "Ajaccio, Corsica",
+    "Monte Carlo",
+    "Marseille",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-03",
+     "priceFrom": 8400
+    }
+   ],
+   "priceFrom": 8400,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2353267270223",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 12,
+   "region": "Canary Islands",
+   "regionSource": "جزایر قناری",
+   "route": [
+    "Barcelona",
+    "Cruising Day",
+    "Tanger",
+    "Casablanca",
+    "Casablanca",
+    "Agadir",
+    "Arrecife, Lanzarote",
+    "San Sebastian, La Gomera",
+    "St. Cruz de La Palma",
+    "Funchal, Madeira Island",
+    "Funchal, Madeira Island",
+    "Cruising Day",
+    "Lisbon"
+   ],
+   "departures": [
+    {
+     "date": "2027-02-11",
+     "priceFrom": 8540
+    }
+   ],
+   "priceFrom": 8540,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2356496270524",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 14,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Nafplion",
+    "Paros",
+    "Skiathos",
+    "Volos",
+    "Kusadasi, Ephesos",
+    "Cruising Day",
+    "Istanbul",
+    "Cruising Day",
+    "Marmaris",
+    "Bodrum",
+    "Patmos",
+    "Milos",
+    "Mykonos",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-10",
+     "priceFrom": 9000
+    }
+   ],
+   "priceFrom": 9000,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2353265270211",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 18,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Valencia",
+    "Palma de Mallorca, Balearic Islands",
+    "Palamos",
+    "Cruising Day",
+    "Marseille",
+    "Genoa",
+    "Villefranche, Nice",
+    "Livorno",
+    "Civitavecchia, Rome",
+    "Naples",
+    "Palermo, Sicily",
+    "La Goulette",
+    "Cruising Day",
+    "Algier",
+    "Cartagena",
+    "Alicante",
+    "Tarragona",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-24",
+     "priceFrom": 9240
+    }
+   ],
+   "priceFrom": 9240,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2353263270202",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 19,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Civitavecchia, Rome",
+    "Amalfi",
+    "Cagliari, Sardinia",
+    "Cruising Day",
+    "Cartagena",
+    "Malaga",
+    "Malaga",
+    "Tanger",
+    "Cruising Day",
+    "Alicante",
+    "Barcelona",
+    "Valencia",
+    "Palma de Mallorca, Balearic Islands",
+    "Palamos",
+    "Cruising Day",
+    "Marseille",
+    "Genoa",
+    "Villefranche, Nice",
+    "Livorno",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-14",
+     "priceFrom": 9730
+    }
+   ],
+   "priceFrom": 9730,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2353183270124",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 20,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Civitavecchia, Rome",
+    "Naples",
+    "Syracuse, Sicily",
+    "Syracuse, Sicily",
+    "Bari",
+    "Cruising Day",
+    "Valletta",
+    "La Goulette",
+    "Palermo, Sicily",
+    "Cruising Day",
+    "Civitavecchia, Rome",
+    "Amalfi",
+    "Cagliari, Sardinia",
+    "Cruising Day",
+    "Cartagena",
+    "Malaga",
+    "Malaga",
+    "Tanger",
+    "Cruising Day",
+    "Alicante",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-04",
+     "priceFrom": 10220
+    }
+   ],
+   "priceFrom": 10220,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M1323261270308",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 19,
+   "region": "South America",
+   "regionSource": "آمریکای جنوبی",
+   "route": [
+    "Manaus",
+    "Parintíns",
+    "Alter do Chao",
+    "Macapà",
+    "Cruising Day",
+    "Devil's Island",
+    "Cruising Day",
+    "Bequia",
+    "Bridgetown",
+    "Castries",
+    "Gustavia, St. Barthelemy",
+    "Basseterre",
+    "San Juan",
+    "St. John´s",
+    "Road Bay (Sandy Ground)",
+    "Spanish Town",
+    "Cruising Day",
+    "Grand Turk",
+    "Cruising Day",
+    "Miami"
+   ],
+   "departures": [
+    {
+     "date": "2027-02-17",
+     "priceFrom": 10220
+    }
+   ],
+   "priceFrom": 10220,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2355914270503",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 19,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Fusina (Venice)",
+    "Cruising Day",
+    "Kotor",
+    "Corfu",
+    "Cruising Day",
+    "Paros",
+    "Rhodos",
+    "Bodrum",
+    "Patmos",
+    "Syros, Kyklades",
+    "Piraeus, Athens",
+    "Cruising Day",
+    "Istanbul",
+    "Istanbul",
+    "Mykonos",
+    "Milos",
+    "Cruising Day",
+    "Bari",
+    "Trogir",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2027-04-14",
+     "priceFrom": 10310
+    }
+   ],
+   "priceFrom": 10310,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2355913270414",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 20,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Volos",
+    "Mykonos",
+    "Cruising Day",
+    "Istanbul",
+    "Istanbul",
+    "Cruising Day",
+    "Corfu",
+    "Kotor",
+    "Split",
+    "Fusina (Venice)",
+    "Zadar",
+    "Dubrovnik",
+    "Cruising Day",
+    "Piraeus, Athens",
+    "Kusadasi, Ephesos",
+    "Syros, Kyklades",
+    "Cruising Day",
+    "Bari",
+    "Trogir",
+    "Fusina (Venice)"
+   ],
+   "departures": [
+    {
+     "date": "2027-03-25",
+     "priceFrom": 10685
+    }
+   ],
+   "priceFrom": 10685,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M4355952270525",
+   "line": "Explora Journeys",
+   "ship": "Explora IV",
+   "nights": 15,
+   "region": "Baltic Sea",
+   "regionSource": "دریای بالتیک",
+   "route": [
+    "Copenhagen",
+    "Cruising Day",
+    "Helsinki",
+    "Stockholm",
+    "Stockholm",
+    "Tallinn",
+    "Visby",
+    "Ronne",
+    "Copenhagen",
+    "Aarhus",
+    "Lysekil",
+    "Oslo",
+    "Cruising Day",
+    "Hamburg",
+    "Cruising Day",
+    "Southampton"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-10",
+     "priceFrom": 11100
+    }
+   ],
+   "priceFrom": 11100,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2359157261228",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 19,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Barcelona",
+    "Cruising Day",
+    "Gibraltar",
+    "Casablanca",
+    "Casablanca",
+    "Cruising Day",
+    "Arrecife, Lanzarote",
+    "Santa Cruz de Tenerife",
+    "San Sebastian, La Gomera",
+    "Funchal, Madeira Island",
+    "Funchal, Madeira Island",
+    "Cruising Day",
+    "Lisbon",
+    "Lisbon",
+    "Gibraltar",
+    "Malaga",
+    "Cruising Day",
+    "Alicante",
+    "Ibiza, Balearic Islands",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-09",
+     "priceFrom": 18270
+    }
+   ],
+   "priceFrom": 18270,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M4355945270518",
+   "line": "Explora Journeys",
+   "ship": "Explora IV",
+   "nights": 16,
+   "region": "Northern Europe",
+   "regionSource": "اروپای شمالی",
+   "route": [
+    "Southampton",
+    "Zeebrügge",
+    "Brussels",
+    "Cruising Day",
+    "Stavanger",
+    "Bergen",
+    "Nordfjordeid",
+    "Flåm",
+    "Cruising Day",
+    "Copenhagen",
+    "Cruising Day",
+    "Helsinki",
+    "Stockholm",
+    "Stockholm",
+    "Tallinn",
+    "Visby",
+    "Ronne",
+    "Copenhagen"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-02",
+     "priceFrom": 11850
+    }
+   ],
+   "priceFrom": 11850,
+   "currency": "EUR",
+   "syncedAt": "2026-08-28"
+  },
+  {
+   "cruisehostId": "M2359153261221",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 22,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Santorini",
+    "Cruising Day",
+    "Valletta",
+    "Messina, Sicily",
+    "Naples",
+    "Civitavecchia, Rome",
+    "Livorno",
+    "Villefranche, Nice",
+    "Cruising Day",
+    "Barcelona",
+    "Cruising Day",
+    "Gibraltar",
+    "Casablanca",
+    "Casablanca",
+    "Cruising Day",
+    "Arrecife, Lanzarote",
+    "Santa Cruz de Tenerife",
+    "San Sebastian, La Gomera",
+    "Funchal, Madeira Island",
+    "Funchal, Madeira Island",
+    "Cruising Day",
+    "Lisbon"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-29",
+     "priceFrom": 12040
+    }
+   ],
+   "priceFrom": 12040,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2353504270104",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 14,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Lisbon",
+    "Lisbon",
+    "Gibraltar",
+    "Malaga",
+    "Cruising Day",
+    "Alicante",
+    "Ibiza, Balearic Islands",
+    "Barcelona",
+    "Palma de Mallorca, Balearic Islands",
+    "Palamos",
+    "Fireworks in Cannes",
+    "Fireworks in Cannes",
+    "Villefranche, Nice",
+    "Genoa",
+    "Livorno",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-21",
+     "priceFrom": 19355
+    }
+   ],
+   "priceFrom": 19355,
+   "currency": "EUR",
+   "syncedAt": "2026-08-29"
+  },
+  {
+   "cruisehostId": "M2359151261228",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 29,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Santorini",
+    "Cruising Day",
+    "Valletta",
+    "Messina, Sicily",
+    "Naples",
+    "Civitavecchia, Rome",
+    "Livorno",
+    "Villefranche, Nice",
+    "Cruising Day",
+    "Barcelona",
+    "Cruising Day",
+    "Gibraltar",
+    "Casablanca",
+    "Casablanca",
+    "Cruising Day",
+    "Arrecife, Lanzarote",
+    "Santa Cruz de Tenerife",
+    "San Sebastian, La Gomera",
+    "Funchal, Madeira Island",
+    "Funchal, Madeira Island",
+    "Cruising Day",
+    "Lisbon",
+    "Lisbon",
+    "Gibraltar",
+    "Malaga",
+    "Cruising Day",
+    "Alicante",
+    "Ibiza, Balearic Islands",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-29",
+     "priceFrom": 27230
+    }
+   ],
+   "priceFrom": 27230,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2353266270223",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 21,
+   "region": "Canary Islands",
+   "regionSource": "جزایر قناری",
+   "route": [
+    "Civitavecchia, Rome",
+    "Naples",
+    "Palermo, Sicily",
+    "La Goulette",
+    "Cruising Day",
+    "Algier",
+    "Cartagena",
+    "Alicante",
+    "Tarragona",
+    "Barcelona",
+    "Cruising Day",
+    "Tanger",
+    "Casablanca",
+    "Casablanca",
+    "Agadir",
+    "Arrecife, Lanzarote",
+    "San Sebastian, La Gomera",
+    "St. Cruz de La Palma",
+    "Funchal, Madeira Island",
+    "Funchal, Madeira Island",
+    "Cruising Day",
+    "Lisbon"
+   ],
+   "departures": [
+    {
+     "date": "2027-02-02",
+     "priceFrom": 14140
+    }
+   ],
+   "priceFrom": 14140,
+   "currency": "EUR",
+   "syncedAt": "2026-08-29"
+  },
+  {
+   "cruisehostId": "M3323270270503",
+   "line": "Explora Journeys",
+   "ship": "Explora III",
+   "nights": 21,
+   "region": "Panama Canal",
+   "regionSource": "کانال پاناما",
+   "route": [
+    "Miami",
+    "Cruising Day",
+    "Ochos Rios",
+    "Cruising Day",
+    "Willemstad, Curacao",
+    "Oranjestad",
+    "Santa Marta",
+    "Cartagena",
+    "Cartagena",
+    "Panama Canal",
+    "Panama City",
+    "Panama City",
+    "Cruising Day",
+    "Cruising Day",
+    "Acjutla",
+    "Puerto Quetzal",
+    "Puerto Madero",
+    "Huatulco",
+    "Cruising Day",
+    "Puerto Vallarta",
+    "Cruising Day",
+    "Cruising Day",
+    "Los Angeles, California"
+   ],
+   "departures": [
+    {
+     "date": "2027-04-12",
+     "priceFrom": 15935
+    }
+   ],
+   "priceFrom": 15935,
+   "currency": "EUR",
+   "syncedAt": "2026-08-29"
+  },
+  {
+   "cruisehostId": "M2353506270114",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 17,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Barcelona",
+    "Palma de Mallorca, Balearic Islands",
+    "Palamos",
+    "Fireworks in Cannes",
+    "Fireworks in Cannes",
+    "Villefranche, Nice",
+    "Genoa",
+    "Livorno",
+    "Civitavecchia, Rome",
+    "Naples",
+    "Syracuse, Sicily",
+    "Syracuse, Sicily",
+    "Bari",
+    "Cruising Day",
+    "Valletta",
+    "La Goulette",
+    "Palermo, Sicily",
+    "Cruising Day",
+    "Civitavecchia, Rome"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-28",
+     "priceFrom": 16310
+    }
+   ],
+   "priceFrom": 16310,
+   "currency": "EUR",
+   "syncedAt": "2026-08-29"
+  },
+  {
+   "cruisehostId": "M2353179270325",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 20,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Civitavecchia, Rome",
+    "Livorno",
+    "Cannes",
+    "Ajaccio, Corsica",
+    "Mahon, Menorca, Balearic Islands",
+    "Cruising Day",
+    "Malaga",
+    "Malaga",
+    "Alicante",
+    "Barcelona",
+    "Cruising Day",
+    "La Spezia, Florence, Pisa, Cinque",
+    "Civitavecchia, Rome",
+    "Naples",
+    "Syracuse, Sicily",
+    "Valletta",
+    "Cruising Day",
+    "Mykonos",
+    "Patmos",
+    "Santorini",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2027-03-05",
+     "priceFrom": 16395
+    }
+   ],
+   "priceFrom": 16395,
+   "currency": "EUR",
+   "syncedAt": "2026-08-29"
+  },
+  {
+   "cruisehostId": "M2353181261228",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 7,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Lisbon",
+    "Lisbon",
+    "Gibraltar",
+    "Malaga",
+    "Cruising Day",
+    "Alicante",
+    "Ibiza, Balearic Islands",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-12-21",
+     "priceFrom": 7945
+    }
+   ],
+   "priceFrom": 7945,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2353178261209",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 10,
+   "region": "Mediterranean",
+   "regionSource": "مدیترانه",
+   "route": [
+    "Piraeus, Athens",
+    "Santorini",
+    "Cruising Day",
+    "Valletta",
+    "Messina, Sicily",
+    "Naples",
+    "Civitavecchia, Rome",
+    "Livorno",
+    "Villefranche, Nice",
+    "Cruising Day",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-29",
+     "priceFrom": 4375
+    }
+   ],
+   "priceFrom": 4375,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2370897261119",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 4,
+   "region": "Eastern Mediterranean",
+   "regionSource": "مدیترانه شرقی",
+   "route": [
+    "Bari",
+    "Sarande",
+    "Cruising Day",
+    "Santorini",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-15",
+     "priceFrom": 2175
+    }
+   ],
+   "priceFrom": 2175,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2370899261129",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 5,
+   "region": "Eastern Mediterranean",
+   "regionSource": "مدیترانه شرقی",
+   "route": [
+    "Brindisi",
+    "Corfu",
+    "Cruising Day",
+    "Volos",
+    "Cruising Day",
+    "Piraeus, Athens"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-24",
+     "priceFrom": 2275
+    }
+   ],
+   "priceFrom": 2275,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2370898261124",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 5,
+   "region": "Central Mediterranean",
+   "regionSource": "مدیترانه مرکزی",
+   "route": [
+    "Piraeus, Athens",
+    "Mykonos",
+    "Cruising Day",
+    "Dubrovnik",
+    "Kotor",
+    "Brindisi"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-19",
+     "priceFrom": 4340
+    }
+   ],
+   "priceFrom": 4340,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M2370896261115",
+   "line": "Explora Journeys",
+   "ship": "Explora II",
+   "nights": 6,
+   "region": "Eastern Mediterranean",
+   "regionSource": "مدیترانه شرقی",
+   "route": [
+    "Piraeus, Athens",
+    "Syros, Kyklades",
+    "Paros",
+    "Cruising Day",
+    "Argostoli, Cephalonia",
+    "Kotor",
+    "Bari"
+   ],
+   "departures": [
+    {
+     "date": "2026-11-09",
+     "priceFrom": 6225
+    }
+   ],
+   "priceFrom": 6225,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  },
+  {
+   "cruisehostId": "M1370895261101",
+   "line": "Explora Journeys",
+   "ship": "Explora I",
+   "nights": 8,
+   "region": "Western Mediterranean",
+   "regionSource": "مدیترانه غربی",
+   "route": [
+    "Lisbon",
+    "Lisbon",
+    "Casablanca",
+    "Casablanca",
+    "Tanger",
+    "Malaga",
+    "Motril, Andalusia",
+    "Cruising Day",
+    "Barcelona"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-24",
+     "priceFrom": 5695
+    }
+   ],
+   "priceFrom": 5695,
+   "currency": "EUR",
+   "syncedAt": "2026-09-27"
+  }
+ ]
+}

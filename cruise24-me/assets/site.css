@@ -259,3 +259,46 @@ footer .brand img{width:min(220px,60%);height:auto;display:block;margin-bottom:1
 .social svg{width:18px;height:18px;fill:currentColor}
 footer .group{border-top:2px dotted var(--line-on-ink)}
 .legal h2,.legal h3,.legal p,.legal li,.legal address{overflow-wrap:anywhere}
+
+/* ---------- journeys: filters, cards, sailing page ---------- */
+.filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:var(--r)}
+.filters label{display:flex;flex-direction:column;gap:6px;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.filters select{min-height:44px;border:1px solid var(--line);border-radius:var(--r);padding:0 10px;font:400 .95rem var(--sans);color:var(--text);background:var(--foam);text-transform:none;letter-spacing:0}
+@media (max-width:980px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.filters{grid-template-columns:1fr}}
+.fcount{margin:22px 0 14px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.jgrid2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+@media (max-width:980px){.jgrid2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.jgrid2{grid-template-columns:1fr}}
+.jcard2{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform 200ms var(--ease-out),box-shadow 200ms ease}
+@media (hover:hover){.jcard2:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(12,24,36,.12)}}
+.jcard2[hidden]{display:none}
+.jcard2 img{aspect-ratio:16/10;width:100%;object-fit:cover;background:var(--foam-2)}
+.jc-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+.jc-body small{font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.jc-body h3{font-size:1.25rem;line-height:1.2}
+.jc-route{font-size:.88rem;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.jc-chips{display:flex;gap:6px;flex-wrap:wrap;min-height:4px}
+.chip{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--wash);color:var(--accent)}
+.jc-foot{margin-top:auto;padding-top:12px;border-top:2px dotted var(--line);display:flex;justify-content:space-between;align-items:flex-end;gap:12px;font-size:.9rem}
+.jc-foot em,.jc-price em{display:block;font-style:normal;font-size:.78rem;color:var(--muted)}
+.jc-price{text-align:right;font-variant-numeric:tabular-nums}
+.jc-price b{font-size:1.3rem;font-weight:700;color:var(--text)}
+.sailing{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:56px;align-items:start}
+.sailing .h-sub{font-size:1.5rem;margin:40px 0 12px}
+.sailing p{color:var(--text);margin-top:8px}
+.portlist{margin:10px 0 0;padding-left:22px;display:grid;gap:6px}
+.farebox{position:sticky;top:calc(var(--nav-h) + 20px);background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px;display:flex;flex-direction:column;gap:14px}
+.farebox .btn{justify-content:center;color:var(--text)}
+.farebox .btn.solid{color:#fff}
+.fares{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.95rem}
+.fares th{text-align:left;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 0 8px}
+.fares td{padding:10px 0;border-top:1px solid var(--line)}
+.fares td+td,.fares th+th{text-align:right}
+.bigfare b{font-size:1.8rem}
+.yachts{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-top:6px}
+.yachts figure{margin:0}
+.yachts img{border-radius:var(--r);aspect-ratio:16/10;object-fit:cover;width:100%}
+.yachts figcaption{font-size:.85rem;color:var(--muted);margin-top:6px}
+@media (max-width:900px){.sailing{grid-template-columns:1fr}.farebox{position:static}}
+.noimg{aspect-ratio:16/10;background:linear-gradient(160deg,var(--ink-2),var(--accent) 140%)}
