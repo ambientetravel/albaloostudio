@@ -19,8 +19,8 @@
   });
   // play non-hero videos only while visible
   const io = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting) v.play().catch(()=>{}); else v.pause(); }), {rootMargin:'200px'});
-  document.querySelectorAll('video:not(.hero-video):not(.dest video)').forEach(v => io.observe(v));
-  document.querySelectorAll('.dest').forEach(d => { const v = d.querySelector('video'); if (!v) return; d.addEventListener('mouseenter', () => v.play().catch(()=>{})); d.addEventListener('mouseleave', () => v.pause()); });
+  document.querySelectorAll('video:not(.hero-video):not(.dest video):not(.region video)').forEach(v => io.observe(v));
+  document.querySelectorAll('.dest, .region').forEach(d => { const v = d.querySelector('video'); if (!v) return; d.addEventListener('mouseenter', () => v.play().catch(()=>{})); d.addEventListener('mouseleave', () => v.pause()); });
 })();
 
 /* Nav: scrolled state, burger, close on tap. Same on every page. */
@@ -37,7 +37,7 @@
 /* Inner pages: soft reveal of rows and cards when GSAP is present; plain otherwise. */
 (function(){
   if (document.body.dataset.page === 'home') return;
-  const els = document.querySelectorAll('.post, .ship-row, .rlist li, .days li, .article');
+  const els = document.querySelectorAll('.post, .ship-row, .rlist li, .days li, .article, .region, .office, .hours > div');
   if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   gsap.registerPlugin(ScrollTrigger);
   els.forEach(el => gsap.fromTo(el, {opacity:0, y:14}, {opacity:1, y:0, duration:.7, ease:'power3.out', scrollTrigger:{trigger:el, start:'top 90%', once:true}}));

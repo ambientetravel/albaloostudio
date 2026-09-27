@@ -199,3 +199,33 @@ img.missing,video.missing{visibility:hidden}
 .notebook{margin-top:64px;padding-top:32px;border-top:1px solid var(--line)}
 .notebook .kicker{margin-bottom:22px}
 @media (prefers-reduced-motion:reduce){.route-line{stroke-dashoffset:0}}
+
+/* ---------- destinations page ---------- */
+.regions{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.region{display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:#fff;border:1px solid var(--line)}
+.region-media{position:relative;aspect-ratio:16/10;overflow:hidden;background:linear-gradient(160deg,#0f2b3b,#1f6f78 140%)}
+.region-media img,.region-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 500ms ease,transform 1.2s var(--ease-out)}
+.region-media video{opacity:0}
+@media (hover:hover){.region:hover .region-media video{opacity:1}.region:hover .region-media img{transform:scale(1.03)}}
+.region-body{padding:22px 24px 26px;display:flex;flex-direction:column;gap:12px;flex:1}
+.region h3{font-size:1.6rem}
+.region>.region-body>p{color:var(--muted);font-size:.95rem}
+.region dl{margin:6px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.9rem;padding-top:14px;border-top:1px solid var(--line)}
+.region dt{color:var(--sea);font-weight:500;letter-spacing:.02em}
+.region dd{margin:0;color:var(--text)}
+.region .more{margin-top:auto;padding-top:14px;font-size:.9rem;font-weight:500;border-bottom:0}
+.region .more a{border-bottom:1px solid var(--brass);padding-bottom:2px}
+@media (max-width:980px){.regions{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.regions{grid-template-columns:1fr}}
+/* ---------- contact page ---------- */
+.offices{display:grid;gap:22px}
+.office{padding:20px 0;border-top:1px solid var(--line-on-ink)}
+.office h3{font-size:1.4rem}
+.office p{color:var(--muted-on-ink);margin-top:6px;font-size:.98rem}
+.office .role{font-size:.85rem;color:var(--brass);letter-spacing:.04em;display:block;margin-bottom:4px}
+.contact-note{margin-top:22px;padding:16px 20px;border-left:2px solid var(--brass);color:var(--muted-on-ink);font-size:.95rem}
+.hours{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.hours div{padding-top:16px;border-top:1px solid var(--line)}
+.hours b{display:block;font-family:var(--serif);font-weight:400;font-size:1.5rem;margin-bottom:6px}
+.hours p{color:var(--muted);font-size:.95rem}
+@media (max-width:860px){.hours{grid-template-columns:1fr}}
