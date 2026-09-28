@@ -116,7 +116,21 @@ Finish with a short report: Part A findings, backup name and size (or "public_ht
 - Disk: 181 MB of 10 GB; 2,218 of 250,000 files.
 - **Blocked:** HTTPS for staging. The hosting's only certificate covers cruise24.me, www and the cPanel
   names, not staging, and expired Feb 2026. Chrome forces https, so http:// does not help.
-  Next: cPanel → SSL/TLS Status → Run AutoSSL (free), then tests 12–17.
+  AutoSSL tried 28 Sep: cPanel answers **"You do not have the feature "autossl"."** GoDaddy has it off
+  on this plan. SSL/TLS Status: cruise24.me, www, mail "expired 25 Feb 2026, will not renew via AutoSSL
+  (not issued via AutoSSL)"; staging and mail.staging "not covered".
+  For the tests: Alireza clicks through Chrome's warning (Advanced → Proceed), then tests 12–17.
+
+## SSL: a go-live blocker, not only staging
+
+With AutoSSL off and the only certificate expired, cruise24.me would show a security warning the moment
+`@` points here. Two routes:
+- **Free, automatic (recommended):** enable SSH for the hosting (GoDaddy hosting settings; it is off),
+  install acme.sh in the home folder, issue Let's Encrypt certificates for cruise24.me, www and staging
+  by HTTP-01 on /public_html, deploy them with acme.sh's `cpanel_uapi` hook, and let its cron renew
+  every 60 days. Needs SSH on; nothing to buy.
+- **Paid:** a GoDaddy SSL certificate for the plan. Alireza's decision (money).
+Go-live order: certificate for cruise24.me + www installed and checked **before** the `@` record moves.
 
 ## DNS for cruise24.me (read 28 Sep; nameservers ns73/ns74.domaincontrol.com)
 

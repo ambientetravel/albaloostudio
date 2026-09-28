@@ -126,6 +126,7 @@ def check(files: list[Path]) -> tuple[list[str], list[str]]:
         "manual: Explora 'used with permission' line, and rights for CruiseHost and line photos (HANDOFF.md §3)",
         "manual: 'Explora I in Port Hercule for the 2027 Grand Prix' and 'twelve years' (HANDOFF.md §4)",
         "server: create api/config.php from config.sample.php (signing_secret, ip_salt, notify_to)",
+        "server: a valid SSL certificate for cruise24.me and www BEFORE the @ record moves (AutoSSL is off on this plan; HANDOFF-godaddy.md)",
     ]
     return blockers, warnings
 
