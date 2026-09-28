@@ -109,8 +109,13 @@ lines' own sites (28 Sep 2026): `arosa-sena.jpg` (a-rosa.de, A-ROSA drone shot, 
 given on the page) and `silver-by-amadeus.jpg` (amadeus-flusskreuzfahrten.de, file credit
 "(c) Martin de Bock", cropped to the ship). Amadeus's own page now calls Silver III
 "Silver by AMADEUS" (same 2016 build, 168 guests, photos still filed as Silver III); the
-site uses the new name. AROYA has no photo: aroya.com sits behind a Cloudflare bot check,
-and the headless browser here does not trust the proxy CA, so it cannot pass it either.
+site uses the new name. AROYA's own site (aroya.com) sits behind a Cloudflare bot check, so
+its card uses `aroya-rhodes.jpg` from Wikimedia Commons instead: "Aroya moored at Quay in
+Port of Rhodes 29 July 2025" by Pjotr Mahhonin, CC BY-SA 4.0, cropped. The licence needs the
+visible credit and licence link on the card (they are there) and keeps the crop under
+CC BY-SA 4.0. Wikipedia confirms the ship's history: built 2017 as World Dream, Manara in
+2023, AROYA since July 2024. Note: the Commons API rate-limits this environment's shared
+address (HTTP 429); the ordinary file pages and upload.wikimedia.org thumbnails work.
 
 **Still blocked (network):** Silversea's photo hosts `cdn.sanity.io` and
 `silversea.widen.net`; Variety's `d2koisdtuu1wg4.cloudfront.net` (photos) and
