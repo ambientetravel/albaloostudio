@@ -140,7 +140,25 @@ point at Website Builder, so only staging.cruise24.me can be issued by the web c
 4. Switch renewal to the automatic web check: re-issue with
    `--issue -d cruise24.me -d www.cruise24.me -w /home/ekrd2r2976p9/public_html --keylength ec-256 --force`,
    deploy again, then delete the two `_acme-challenge` TXT records.
+5. Remove the staging certificate from renewal (`--remove -d staging.cruise24.me --ecc`), then the
+   staging subdomain and its `staging` A record. See "Shared folder = shared certificate slot".
 Manual DNS-mode certificates do not renew on their own; step 4 is what makes them automatic.
+
+**Done 28 Sep:** SSH on (GoDaddy settings "SSH Access: On"; cPanel Terminal opens by direct link,
+not in the menu). acme.sh v3.1.6 in ~/.acme.sh, default CA Let's Encrypt, cron
+`11 5,11,17,23 * * * … acme.sh --cron`. Certificate for staging.cruise24.me issued (Let's Encrypt YE1,
+ECC, ends 27 Dec 2026; next renewal ~26 Nov 2026). Deploy via `cpanel_uapi` succeeded; the
+`install_ssl … exit 255` warnings come from a GoDaddy post-install hook and did not stop it.
+
+**Shared folder = shared certificate slot.** staging shares cruise24.me's document root, so cPanel
+installed the staging certificate on the **cruise24.me** vhost, replacing the old (expired 25 Feb 2026,
+not publicly served) certificate for cruise24.me/www/mail/cpanel/webmail. Harmless now, but it sets
+two go-live rules:
+- The go-live certificate (cruise24.me + www) replaces the staging one on that slot; that is expected.
+- **Then remove staging from renewal**, or its 60-day renewal will re-deploy onto the same slot and
+  knock out the cruise24.me certificate:
+  `~/.acme.sh/acme.sh --remove -d staging.cruise24.me --ecc`
+  and delete the staging subdomain in cPanel and the `staging` A record in DNS.
 
 Prompt for Claude in Chrome (staging certificate + tests):
 
