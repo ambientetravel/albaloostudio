@@ -42,7 +42,7 @@
   gsap.registerPlugin(ScrollTrigger);
   els.forEach(el => gsap.fromTo(el, {opacity:0, y:14}, {opacity:1, y:0, duration:.7, ease:'power3.out', scrollTrigger:{trigger:el, start:'top 90%', once:true}}));
   const r = document.getElementById('route');
-  if (r) gsap.to(r, {strokeDashoffset:0, ease:'none', scrollTrigger:{trigger:'.routes', start:'top 75%', end:'bottom 45%', scrub:.5}});
+  if (r) gsap.to(r, {strokeDashoffset:0, ease:'none', scrollTrigger:{trigger:'.map', start:'top 85%', end:'center 55%', scrub:.5}});
 })();
 
 /* Contact page: arriving from a sailing page as contact.html#<sailing id>, name that

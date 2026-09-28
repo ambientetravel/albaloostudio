@@ -204,11 +204,12 @@ img.missing,video.missing{visibility:hidden}
 .rlist .visa{display:block;margin-top:6px;font-size:.85rem;color:var(--sea)}
 .rlist .nights{font-family:var(--display);font-weight:700;font-size:1.2rem;color:var(--accent);white-space:nowrap}
 .routes{display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:start}
-.routes .map{background:var(--foam-2);border-radius:var(--r);padding:24px;position:sticky;top:calc(var(--nav-h) + 24px)}
+.routes .map{background:var(--foam-2);border-radius:var(--r);padding:24px}
 .routes .map svg{width:100%;height:auto;display:block}
 .route-line{fill:none;stroke:var(--sea);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:1600;stroke-dashoffset:1600}
-.port{fill:var(--brass)} .port-label{font:500 12px var(--sans);fill:var(--text);letter-spacing:.03em} .land{fill:#cbd5d2;opacity:.8}
-@media (max-width:860px){.routes{grid-template-columns:1fr}.routes .map{position:static}}
+.port{fill:var(--brass);stroke:var(--foam-2);stroke-width:2} .port-label{font:600 18px var(--sans);fill:var(--text);letter-spacing:.01em} .port-day{font-weight:400;font-size:14px;fill:var(--muted)} .land{fill:#cbd5d2;opacity:.8}
+.country{font:600 13px var(--sans);letter-spacing:.3em;fill:#51606e}.routes .map{max-width:460px}.map-note{font-size:.8rem;color:#44566a;margin-top:12px}
+@media (max-width:860px){.routes{grid-template-columns:1fr}.routes .map{padding:14px}}
 .article{max-width:68ch}
 .article p{margin-top:18px;color:var(--text);font-size:1.05rem;line-height:1.7}
 .article h2{font-size:clamp(2rem,4vw,3.2rem);margin-top:10px}
