@@ -23,7 +23,10 @@ folder.
 | `assets/logo*.png`, `favicon-*.png`, `og-image.jpg` | The logo Alireza supplied on 27 Sep (kept as `logo-as-supplied.png`, 1080²; corrected master `logo-master.png`), cut into transparent ink and white lockups, a nav mark without the tagline, favicons at 32/180/512 and a 1200×630 Open Graph card. Every page links the icons and the OG image; the home page's JSON-LD carries `logo` and `sameAs` for the Facebook and Instagram pages. | Done |
 | `imprint.html`, `privacy.html` | Impressum under § 5 DDG / § 18 MStV and a GDPR Art. 13 notice, in English with the German terms. Every fact not in the source is a highlighted `[placeholder]`: 19 on the imprint, 12 on the privacy page. The privacy text describes what the site really does: no cookies, no analytics, fonts and GSAP self-hosted, server logs, the form, and media loading from Explora's servers until `download_media.py` has run. Supervisory authority named as LfDI Rheinland-Pfalz, Mainz, since the GmbH sits in Rennerod. Linked from every footer. | Drafted; not publishable until the placeholders are filled |
 | `destinations.html`, `contact.html` | Added last on 27 Sep. Twelve region cards (the home page's eleven Explora regions plus the rivers), each with season, lines and the visa position under the house rule; contact page with the request form, the three offices from v1 and a three-step "what happens next". Nav on every page now points at these instead of the home-page anchors. | Verified with the rest, below |
-| `ships.html`, `lines.html`, `itineraries.html`, `journal.html` | **v1's inner views, now real pages** (added later on 27 Sep). Fleet with the on-board notes, eight line profiles, the Aegean worked example day by day plus seven routes each with its visa line, the Kuşadası port guide in full. Share `assets/site.css` and `assets/site.js` with the home page; the nav marks the current page. Hero images reuse URLs already in the media set, so the download list is unchanged at 47. | Verified with the home page, below |
+| `lines.html`, `journal.html` | **v1's inner views, now real pages** (27 Sep). `lines.html` is **Lines & ships** since 28 Sep: the line profiles, each linking to its own sailings, then the nine ship entries with photos (`#ships`). `journal.html` has the Kuşadası port guide in full. | Verified on mobile 28 Sep |
+| `ships.html`, `itineraries.html` | **Redirects since 28 Sep** (meta refresh + JS + canonical, `noindex`): ships to `lines.html#ships`, itineraries to `destinations.html#itineraries`, where the Aegean worked example, its route map (ports by coordinates) and the seven seasonal routes now live. Kept so old links and bookmarks still land. Not in the sitemap. | Done |
+| `mice.html` | **MICE at sea** (28 Sep): events a ship does well (incl. private celebrations, `#celebrations`), three ways to take a ship (suites, allocation, full charter), Explora Journeys / Silversea / MSC Cruises, the Explore Orient land-and-sea partnership (`#explore-orient`), and brief-to-gangway steps. Explora and Silversea facts are from their own MICE pages, fetched 28 Sep 2026 and cited on the page; MSC's MICE page is not reachable from this environment (`*.msccruises.com` blocked), so the MSC card only uses figures already on the site. | Verified on mobile 28 Sep |
+| `about.html` | **About** (28 Sep): Cruise24, the AmbiMare wordmark, Ambiente Group with Ambiente Tours GmbH (Rennerod, DACH) and Ambiente Turizm Seyahat (Kuşadası, MENAT), and the group companies (Explore Orient, Ambiente Travel, AmbiMedi, AmbiEvent). No dates, sizes or licences claimed. | Verified on mobile 28 Sep |
 | `index.html` | **v2, the one to ship.** Single page, full-screen video hero, stacked "life on board" panels, 11 destination tiles with hover video, horizontal ship rail, Explora inclusions list, journal, request form. Media referenced from Explora Journeys' CDN via `data-media` attributes. | Renders clean; media not yet local (see below) |
 | `_v1-illustrated.html` | v1, the earlier hash-routed SPA with **no external media** (SVG ships, waves, deck cut-away, route map) and five inner views: Ships, Cruise lines, Itineraries (worked Aegean example day by day), Journal (Kuşadası port guide in full), Contact. | Reference and content source; not linked, blocked in robots.txt |
 | `download_media.py` | The tool the chat could not run: fetches every `data-media` / `data-media-mobile` / `data-poster` URL into `media/` and writes `media/index.json`, which the page's resolver reads at load. Stdlib only. `--check` verifies the index against the page. Since 27 Sep it also carries three ideas from the chat's own original script, which Alireza uploaded: full-size Scene7 renditions (`?wid=2560&fmt=jpeg&qlt=90` on `dm.explorajourneys.com/is/image/…`), a `Referer: https://explorajourneys.com/` header sent only to Explora's hosts, and six parallel downloads (`--workers`). That script needed a `media_manifest.json` of ~400 files that never reached the repo; this one reads the URLs from the pages. | Tested end to end against a local fixture server (same-basename URLs, suffix-less URLs, 404s, re-runs) |
@@ -130,7 +133,7 @@ answers 401 (needs a login). Nothing on the site depends on these.
 the contract is permitted. Daily: `--rolling 30 --write`; monthly: `--full --write`.
 
 **Do not deploy:** `data/sources/`, `data/data-checks.json`, `data/sailings.json`, `sync/`,
-`media-originals/`, `*.py`, `HANDOFF.md`, `_v1-illustrated.html`.
+`media-originals/`, `*.py`, `HANDOFF*.md` (incl. `HANDOFF-exploreorient-mice.md`), `_v1-illustrated.html`.
 
 ## Design, restyled around the logo (27 Sep, later)
 
@@ -256,8 +259,13 @@ That last one decides whether a Sicherungsschein must be issued; do not
 guess it. The EU ODR platform was shut down in July 2025, so no ODR link;
 the VSBG statement is there with the choice left open.
 
-**6a. Other placeholders**: `[PHONE] · [EMAIL]` on the contact page, `[licence numbers]` in the footer, and the AmbiMedi / AmbiEvent
-links are `href="#"`. Booking conditions, Privacy and Imprint now resolve.
+**6a. Other placeholders**: `[PHONE] · [EMAIL]` on the contact page. The footer no longer carries `[licence numbers]` (removed on
+Alireza's instruction, 28 Sep); it presents Ambiente Group with its two companies and markets instead. Licence numbers still belong on
+the imprint. AmbiMedi and AmbiEvent are named on the About page without links until their sites exist.
+
+**Menu (28 Sep):** Journeys · Destinations · Lines & ships · MICE at sea · Journal · About · Contact. The menu and footer live
+in `index.html`; `build_journeys.py` copies them into journeys.html, ports.html and every sailing page, so edit them there and
+copy to the other static pages.
 
 **7. Three journal pieces are teasers only.** "Seven nights on the Danube",
 "Explora I, deck by deck" and "What a service charge actually is" exist as

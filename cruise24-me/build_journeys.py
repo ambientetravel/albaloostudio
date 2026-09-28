@@ -668,7 +668,8 @@ def main() -> int:
            "index.html": home_search(sailings),
            "destinations.html": recount("destinations.html", sailings),
            "ports.html": ports_page(sailings, head, nav, foot)}
-    static = ["", "journeys.html", "destinations.html", "ports.html", "ships.html", "lines.html", "itineraries.html",
+    # ships.html and itineraries.html are redirects now (to lines.html#ships, destinations.html#itineraries)
+    static = ["", "journeys.html", "destinations.html", "ports.html", "lines.html", "mice.html", "about.html",
               "journal.html", "contact.html", "conditions.html", "imprint.html", "privacy.html"]
     urls = [f"https://cruise24.me/{p}" for p in static] + [f"https://cruise24.me/{s['url']}" for s in sailings]
     out["sitemap.xml"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
