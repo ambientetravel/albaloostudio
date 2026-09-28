@@ -3713,5 +3713,65 @@ finally:
 ok("an existing (already live) article in a rewritten articles.json is not re-judged; the new one is",
    "فیوردهای نروژ" in _s and "یونانی" not in _s)
 
+
+print("\n=== Content Review board ⇄ GitHub ===")
+import notion_review_sync as _nrs
+import re
+def _nrs_run(board, prs_state, open_prs, comments=None):
+    calls = []
+    comments = comments if comments is not None else {}
+    def fake_gh(method, path, body=None):
+        calls.append((method, path, body))
+        m = re.match(r"/repos/ambientetravel/([^/]+)/pulls/(\d+)$", path)
+        if method == "GET" and m:
+            return 200, prs_state[f"{m.group(1)}#{m.group(2)}"]
+        if method == "GET" and "/comments" in path:
+            return 200, comments.get(path, [])
+        if method == "PUT" and path.endswith("/merge"):
+            return 200, {"merged": True}
+        return 200, {}
+    def fake_notion(method, path, body=None):
+        calls.append(("N" + method, path, body))
+        return 200, {}
+    saved = (_nrs.gh, _nrs.notion, _nrs.rows, _nrs.open_article_prs)
+    _nrs.gh, _nrs.notion = fake_gh, fake_notion
+    _nrs.rows = lambda db: board
+    _nrs.open_article_prs = lambda: open_prs
+    try:
+        log = _nrs.sync(True, "db")
+    finally:
+        _nrs.gh, _nrs.notion, _nrs.rows, _nrs.open_article_prs = saved
+    return log, calls
+_open = {"number": 30, "state": "open", "merged_at": None, "title": "Agent 2 draft: Skiing"}
+_log, _c = _nrs_run({"boutimar#30": {"page_id": "p1", "status": "Approved", "feedback": ""}},
+                    {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "PASS"}])
+ok("Approved on the board squash-merges the PR and marks it Published",
+   any(m == "PUT" and p.endswith("/pulls/30/merge") for m, p, b in _c)
+   and any(m == "NPATCH" and b["properties"]["Status"]["select"]["name"] == "Published" for m, p, b in _c))
+_log, _c = _nrs_run({"boutimar#30": {"page_id": "p1", "status": "Approved", "feedback": ""}},
+                    {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "BLOCK"}])
+ok("Approved but BLOCKed by the house rules is NOT merged, and goes back to Needs edits",
+   not any(m == "PUT" for m, p, b in _c) and any("HOLD" in l for l in _log))
+_fb = {"boutimar#30": {"page_id": "p1", "status": "Needs edits", "feedback": "Cut the second section."}}
+_log, _c = _nrs_run(_fb, {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "PASS"}])
+_posted = [b for m, p, b in _c if m == "POST" and p.endswith("/issues/30/comments")]
+_mk = _nrs.feedback_marker("Needs edits", "Cut the second section.")
+_log2, _c2 = _nrs_run(_fb, {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "PASS"}],
+                      comments={"/repos/ambientetravel/boutimar/issues/30/comments?per_page=100": [{"body": _mk}]})
+ok("Needs-edits feedback is posted to the PR once, and not again on the next run",
+   len(_posted) == 1 and "Cut the second section." in _posted[0]["body"]
+   and not any(m == "POST" and p.endswith("/comments") for m, p, b in _c2))
+ok("the feedback marker is stable across processes", _mk == _nrs.feedback_marker("Needs edits", "Cut the second section."))
+_log, _c = _nrs_run({"boutimar#9": {"page_id": "p9", "status": "To review", "feedback": ""}},
+                    {"boutimar#9": {"number": 9, "state": "closed", "merged_at": "2026-09-26T00:00:00Z", "title": "x"}}, [])
+ok("a PR merged directly on GitHub flips its row to Published",
+   any(m == "NPATCH" and b["properties"]["Status"]["select"]["name"] == "Published" for m, p, b in _c))
+_saved_nt = os.environ.pop("NOTION_TOKEN", None)
+_buf2 = io.StringIO()
+with contextlib.redirect_stdout(_buf2):
+    _rc2 = _nrs.main(["--apply"])
+if _saved_nt is not None: os.environ["NOTION_TOKEN"] = _saved_nt
+ok("with no NOTION_TOKEN the sync is a no-op, not a failure", _rc2 == 0 and "not configured" in _buf2.getvalue())
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

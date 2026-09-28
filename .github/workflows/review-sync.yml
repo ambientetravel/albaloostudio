@@ -1,0 +1,49 @@
+name: Content Review sync (Notion ⇄ GitHub)
+
+# Keeps the Notion "Content Review" board and the article PRs in step:
+# new drafts appear on the board; Approved merges, Needs edits relays the
+# feedback to the PR, Rejected closes it. Hourly through the Istanbul working
+# day, and straight after the writer finishes. Missing NOTION_TOKEN = no-op.
+
+on:
+  schedule:
+    - cron: "15 4-19 * * *"        # 07:15–22:15 Istanbul, hourly
+  workflow_run:
+    workflows: ["Agent 2 — Writer"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Apply (unticked = dry run)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Sync
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
+          # merge/comment/close on the site repos: the writer's PR token covers all four
+          GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply }}" != "true" ]; then
+            python3 tools/notion_review_sync.py | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            python3 tools/notion_review_sync.py --apply | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
