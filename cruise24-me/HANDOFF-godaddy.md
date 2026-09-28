@@ -27,16 +27,89 @@ I want to know what GoDaddy products hold the domain cruise24.me. READ ONLY: do 
 Then stop. Change nothing.
 ```
 
-## Step 2: depends on the answer
+## Found on 28 Sep (Claude in Chrome, read-only)
 
-- **cPanel hosting exists:** I build the bundle (`python3 build_bundle.py`) and write the upload
-  prompt: File Manager upload, extract into `public_html`, create `api/config.php`, check PHP
-  version, verify every page against the `.sha256` manifest. The DNS switch away from Website
-  Builder replaces the current live site, so that step waits for the legal gaps to be filled
-  (`build_bundle.py` refuses until then).
-- **Only Website Builder:** the choices are to buy GoDaddy cPanel hosting (and point the domain
-  to it), or to host the files elsewhere while the domain stays registered at GoDaddy. The
-  DirectAdmin account that already runs cruise24.ir is one such place, if its plan allows another domain.
+- Account products: domain cruise24.me (auto-renews 12 Nov 2026, top-tier protection), Websites + Marketing
+  "Cruise 24" (cruise24.me) and "Middle East Cruise 24" (middleeastcruise24.godaddysites.com), and
+  **Web Hosting, Economy ("Başlangıç Düzeyi"), cPanel, Linux, PHP 8.3, Europe data centre,
+  IP 92.205.251.216, cPanel user ekrd2r2976p9**, primary domain cruise24.me.
+- Public DNS: cruise24.me and www point to 13.248.243.5 / 76.223.105.230 (Website Builder). So the
+  live site is the builder site; the cPanel hosting serves nothing public yet.
+- Not yet read: the DNS record list (MX included), disk space, public_html contents, the DPA entity.
+
+## Step 2: staging on the cPanel hosting (live site untouched)
+
+The bundle goes into `public_html`, and a subdomain `staging.cruise24.me` shares that folder so the
+site and the request form can be tested on the real server. cruise24.me and www keep pointing at
+Website Builder until the legal gaps are filled. `.htaccess` sends `X-Robots-Tag: noindex` for
+staging.*. Bundle: `dist/DRAFT-cruise24-me-20260928-d065d49.zip` (71.5 MB, 1,882 files).
+
+Prompt for Claude in Chrome (logged in to GoDaddy and cPanel):
+
+```text
+You are putting a new version of the Cruise24 website on our GoDaddy cPanel hosting, for testing at staging.cruise24.me. The live site at cruise24.me must NOT change.
+
+Account facts: Web Hosting Economy, cPanel user ekrd2r2976p9, server IP 92.205.251.216, primary domain cruise24.me.
+
+HARD RULES
+- Never change, delete or add the DNS records for "@" (cruise24.me), "www", MX, TXT or nameservers. The only DNS change allowed is ADDING one A record named "staging" (Part E).
+- Do not buy, renew, upgrade or accept any offer. Do not disconnect the Websites + Marketing site.
+- Never delete anything in public_html unless this prompt says so, and never before the backup in Part B exists.
+- If GoDaddy asks me to log in, stop and wait for me. When a file-upload dialog opens, stop and let me pick the file.
+- If anything is different from what this prompt expects, stop, describe it, and ask me.
+
+PART A — READ FIRST (change nothing)
+1. GoDaddy DNS for cruise24.me: copy me EVERY record (type, name, value, TTL), MX and TXT included, and the nameservers. If the nameservers are not GoDaddy's (domaincontrol.com), stop after reporting.
+2. cPanel: tell me the disk usage and the disk limit.
+3. cPanel File Manager: open public_html (turn on "Show Hidden Files" in Settings) and list everything in it, with sizes.
+
+PART B — BACKUP (only if public_html contains anything other than cgi-bin and .well-known)
+4. Select everything in public_html, Compress as Zip Archive named public_html-backup-20260928.zip, then Move that zip to the home folder (/home/ekrd2r2976p9/). Confirm it is there and tell me its size.
+
+PART C — UPLOAD AND EXTRACT
+5. In public_html, click Upload. Stop and let me choose the file: DRAFT-cruise24-me-20260928-d065d49.zip (71.5 MB). Wait until the upload shows 100 %.
+6. Back in File Manager, select that zip in public_html, click Extract, and extract into /public_html. If it asks to overwrite existing files, tell me which ones before agreeing.
+7. Check, and report each number:
+   - public_html/journeys contains 1,703 files
+   - public_html/index.html is 39,770 bytes
+   - public_html/contact.html is 10,070 bytes
+   - public_html/data/journeys-index.json is 638,404 bytes
+   - public_html/api/enquiry.php is 5,533 bytes
+   - public_html/.htaccess and public_html/api/data/.htaccess exist
+8. Delete the zip DRAFT-cruise24-me-20260928-d065d49.zip from public_html (only that zip).
+
+PART D — SERVER SETTINGS FILE
+9. In public_html/api, create a new file named config.php with exactly this content:
+
+<?php
+return [
+    'signing_secret' => '',
+    'notify_to'      => '',
+    'notify_from'    => '',
+    'ip_salt'        => '037c69b6d0f58afdcbe7a0bc3f522470',
+];
+
+PART E — STAGING ADDRESS
+10. cPanel → Domains → Create A New Domain: staging.cruise24.me. TICK "Share document root (/home/ekrd2r2976p9/public_html) with cruise24.me". Submit.
+11. GoDaddy DNS for cruise24.me: ADD one record: type A, name staging, value 92.205.251.216, TTL 1 hour. If a "staging" record already exists, stop and tell me. Change nothing else.
+
+PART F — TEST (wait 10–15 minutes after step 11)
+12. Open https://staging.cruise24.me/ (if HTTPS fails, use http:// and tell me). Report: does the home page load with its photos and video? Any error page?
+13. Open /journeys.html: how many sailings does it say it shows? Open any one sailing page: does it load?
+14. Open /contact.html and send the form with name "TEST delete me", email test@example.com, anything in the other fields. Report the exact message shown under the button.
+15. Open https://staging.cruise24.me/api/data/leads.ndjson.php in the browser: it must show "Not Found" or an empty page, NOT the test data. Report what you see.
+16. In File Manager, open public_html/api/data: confirm leads.ndjson.php exists (the test request). Then delete leads.ndjson.php and ratelimit.json.php (only those two files there; keep .htaccess).
+17. If every page shows "500 Internal Server Error": rename public_html/.htaccess to htaccess-off, reload, and tell me whether that fixed it.
+
+Finish with a short report: Part A findings, backup name and size (or "public_html was empty"), the step 7 numbers, and the results of steps 12–17.
+```
+
+## Step 3: go live (later)
+
+When `python3 build_bundle.py` passes (no `--draft`): upload the final bundle the same way, then
+change the `@` and `www` records from Website Builder to 92.205.251.216, keep MX/TXT as they are,
+and disconnect the Websites + Marketing site from the domain. That replaces the live site, so it
+waits for the legal facts.
 
 ## For the privacy page once hosting is settled
 
