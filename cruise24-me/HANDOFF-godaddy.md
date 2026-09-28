@@ -229,6 +229,16 @@ so the domain has no DMARC policy in effect, and one says `none` while the other
 This predates the website work and touches email delivery, so it is not changed here. Decide which
 policy is wanted (usually the `p=none` one first, with reports, then tighten) and delete the other.
 
+## Form fix deployed to staging (28 Sep)
+
+The first staging form test lost an enquiry while resetting the form: consistent with the honeypot
+field (then named `website`) being filled, which made the server answer ok and discard it. Fixed in
+9fa8938: honeypot hits are stored with `suspect: honeypot`, the pipeline skips them, the field is now
+`c24_nb`. Replaced on the server: index.html 39,805, contact.html 10,105, api/enquiry.php 5,685,
+api/leads.php 2,974 bytes (old copies in /home/ekrd2r2976p9/c24-backup-20260928b). Retest on
+https://staging.cruise24.me/contact.html: thank-you shown, lead stored clean (no "suspect"), test data
+deleted. Staging is complete; only the hero video playing has not been seen by a person yet.
+
 ## Step 3: go live (later)
 
 When `python3 build_bundle.py` passes (no `--draft`): upload the final bundle the same way, then
