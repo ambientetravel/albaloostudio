@@ -19,9 +19,9 @@ folder.
 
 | File | What | Status |
 |---|---|---|
-| `conditions.html` | Booking conditions / Reisebedingungen, drafted for both roles (Reisevermittlung under § 651v BGB, own package under §§ 651a ff.), with §§ 651e/f/h/p referenced where they bind. 18 highlighted placeholders: deposit and balance terms, change and cancellation fees, insurer, jurisdiction. Linked from every footer and from the imprint. | Drafted; needs the same facts as the imprint plus a travel-law read |
+| `conditions.html` | Booking conditions, English only (rewritten 28 Sep: no German headings, no notes to the owner on the page). Covers both roles: travel agent for a cruise on its own, Ambiente Tours GmbH as organiser for packages. No gaps left; terms that vary by booking are stated as "in the offer and the confirmation". Decisions taken in the text are listed in `HANDOFF-legal.md`. | Drafted; needs a travel-law read |
 | `assets/logo*.png`, `favicon-*.png`, `og-image.jpg` | The logo Alireza supplied on 27 Sep (kept as `logo-as-supplied.png`, 1080²; corrected master `logo-master.png`), cut into transparent ink and white lockups, a nav mark without the tagline, favicons at 32/180/512 and a 1200×630 Open Graph card. Every page links the icons and the OG image; the home page's JSON-LD carries `logo` and `sameAs` for the Facebook and Instagram pages. | Done |
-| `imprint.html`, `privacy.html` | Impressum under § 5 DDG / § 18 MStV and a GDPR Art. 13 notice, in English with the German terms. Every fact not in the source is a highlighted `[placeholder]`: 19 on the imprint, 12 on the privacy page. The privacy text describes what the site really does: no cookies, no analytics, fonts and GSAP self-hosted, server logs, the form, and media loading from Explora's servers until `download_media.py` has run. Supervisory authority named as LfDI Rheinland-Pfalz, Mainz, since the GmbH sits in Rennerod. Linked from every footer. | Drafted; not publishable until the placeholders are filled |
+| `imprint.html`, `privacy.html` | Imprint (§ 5 DDG / § 18 MStV) and GDPR Art. 13 notice, English only since 28 Sep. Missing company facts show as short highlighted labels: 9 on the imprint, 4 on the privacy page, all listed in `HANDOFF-legal.md`. The privacy page now says all media, fonts and scripts are self-hosted (true since `media/index.json` covers every `data-media` URL). | Not publishable until the labels are filled |
 | `destinations.html`, `contact.html` | Added last on 27 Sep. Twelve region cards (the home page's eleven Explora regions plus the rivers), each with season, lines and the visa position under the house rule; contact page with the request form, the three offices from v1 and a three-step "what happens next". Nav on every page now points at these instead of the home-page anchors. | Verified with the rest, below |
 | `lines.html`, `journal.html` | **v1's inner views, now real pages** (27 Sep). `lines.html` is **Lines & ships** since 28 Sep: the line profiles, each linking to its own sailings, then the nine ship entries with photos (`#ships`). `journal.html` has the Kuşadası port guide in full. | Verified on mobile 28 Sep |
 | `ships.html`, `itineraries.html` | **Redirects since 28 Sep** (meta refresh + JS + canonical, `noindex`): ships to `lines.html#ships`, itineraries to `destinations.html#itineraries`, where the Aegean worked example, its route map (ports by coordinates) and the seven seasonal routes now live. Kept so old links and bookmarks still land. Not in the sitemap. | Done |
@@ -250,18 +250,14 @@ Wire it to whatever the host provides (the boutimar.ir sites use a PHP
 endpoint writing `leads.json.php`; that pattern is in the repo). Do not launch
 a form that silently drops enquiries.
 
-**6. Legal pages need facts only the company has.** `imprint.html` and
-`privacy.html` are drafted with every unknown highlighted in brass: street
-address, managing director, register court and HRB number, VAT ID, phone,
-email, TÜRSAB licence, the hosting provider (undecided), log retention, and
-whether Cruise24 acts as Reisevermittler or Reiseveranstalter on a booking.
-That last one decides whether a Sicherungsschein must be issued; do not
-guess it. The EU ODR platform was shut down in July 2025, so no ODR link;
-the VSBG statement is there with the choice left open.
+**6. Legal pages need facts only the company has.** The full list, and the
+decisions already written into the text (both roles, insolvency protection,
+dispute resolution, no data protection officer), is in `HANDOFF-legal.md`.
+Search the three pages for `class="todo"` before go-live: there must be no matches left. The
+EU ODR platform was shut down in July 2025, so there is no ODR link.
 
 **6a. Other placeholders**: `[PHONE] · [EMAIL]` on the contact page. The footer no longer carries `[licence numbers]` (removed on
-Alireza's instruction, 28 Sep); it presents Ambiente Group with its two companies and markets instead. Licence numbers still belong on
-the imprint. AmbiMedi and AmbiEvent are named on the About page without links until their sites exist.
+Alireza's instruction, 28 Sep); it presents Ambiente Group with its two companies and markets instead. The TÜRSAB licence line was dropped from the imprint too; the German GmbH is the provider. AmbiMedi and AmbiEvent are named on the About page without links until their sites exist.
 
 **Menu (28 Sep):** Journeys · Destinations · Lines & ships · MICE at sea · Journal · About · Contact. The menu and footer live
 in `index.html`; `build_journeys.py` copies them into journeys.html, ports.html and every sailing page, so edit them there and
