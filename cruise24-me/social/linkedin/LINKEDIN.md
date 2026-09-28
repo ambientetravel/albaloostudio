@@ -62,6 +62,49 @@ Cruise24 is a brand of Ambiente Group: Ambiente Tours GmbH in Rennerod, Germany,
 
 **Not set, on purpose:** company size, company type, founded year, phone. They are not in any source; fill them in yourself if you want them shown.
 
+## Applied 28 September 2026 (Claude in Chrome)
+
+### Backup: values before the change
+
+| Field | Before |
+|---|---|
+| Name | Cruise24 |
+| Tagline | Excellent Cruise deals of the Middle East |
+| Overview | empty |
+| Website | www.cruise24.me |
+| Industry | Travel Arrangements |
+| Company size | 2-10 employees |
+| Company type | Partnership |
+| Phone | empty |
+| Year founded | empty |
+| Specialties | none |
+| Locations | none |
+| Message button | on |
+| Custom button | "Visit website" → http://www.cruise24.me |
+| Logo | the "24" logo |
+| Cover | LinkedIn's plain beige placeholder |
+
+### Now live
+
+- Tagline, overview, 19 specialties: as in this file, word for word.
+- Website: https://cruise24.me. The custom button's link followed it (it was already "Visit website").
+- Locations: Rennerod, Germany (primary, named "Ambiente Tours GmbH"); Kuşadası, Türkiye (named
+  "Ambiente Turizm Seyahat"). "My organization doesn't have a street address" ticked on both.
+- Unchanged: name, industry, company size, company type, message button. Phone and year founded still empty.
+- Nothing was posted: LinkedIn's "share in a post" prompt was declined after every save.
+
+### Still to do
+
+- Upload `cruise24-linkedin-logo.png` and `cruise24-linkedin-cover.png` (Page info tab).
+- **Company type says "Partnership".** Ambiente Tours GmbH is a limited company. On LinkedIn that is
+  "Privately held". Change it in Details if Cruise24 is operated by the GmbH.
+- Check that https://cruise24.me (without www) opens the site. DNS for both names points to the same
+  GoDaddy servers (13.248.243.5, 76.223.105.230), but the build environment cannot load the site to confirm.
+
+Notes for next time: LinkedIn saves each tab on its own (you cannot switch tabs with unsaved changes), and
+most saves failed the first time with "Another admin is trying to make changes to this page at the
+same time". Reloading and saving again worked.
+
 ## Prompt for Claude in Chrome
 
 Open the LinkedIn page in Chrome while logged in as a page admin, open Claude in Chrome, and paste everything in the box.
