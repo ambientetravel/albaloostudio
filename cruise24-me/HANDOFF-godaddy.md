@@ -42,7 +42,7 @@ Then stop. Change nothing.
 The bundle goes into `public_html`, and a subdomain `staging.cruise24.me` shares that folder so the
 site and the request form can be tested on the real server. cruise24.me and www keep pointing at
 Website Builder until the legal gaps are filled. `.htaccess` sends `X-Robots-Tag: noindex` for
-staging.*. Bundle: `dist/DRAFT-cruise24-me-20260928-d065d49.zip` (71.5 MB, 1,882 files).
+staging.*. Bundle: `python3 build_bundle.py --draft --parts-mb 28` → three standalone zips of ≤ 28 MiB (the chat's file limit is 30 MiB), 1,882 files in total; verified equal to the single zip.
 
 Prompt for Claude in Chrome (logged in to GoDaddy and cPanel):
 
@@ -67,8 +67,8 @@ PART B — BACKUP (only if public_html contains anything other than cgi-bin and 
 4. Select everything in public_html, Compress as Zip Archive named public_html-backup-20260928.zip, then Move that zip to the home folder (/home/ekrd2r2976p9/). Confirm it is there and tell me its size.
 
 PART C — UPLOAD AND EXTRACT
-5. In public_html, click Upload. Stop and let me choose the file: DRAFT-cruise24-me-20260928-d065d49.zip (71.5 MB). Wait until the upload shows 100 %.
-6. Back in File Manager, select that zip in public_html, click Extract, and extract into /public_html. If it asks to overwrite existing files, tell me which ones before agreeing.
+5. The site comes in THREE zip files whose names end in -part1of3.zip, -part2of3.zip and -part3of3.zip (about 28, 28 and 13 MB). In public_html, click Upload. Stop and let me choose the three files. Wait until every upload shows 100 %.
+6. Back in File Manager, extract each of the three zips, one at a time, into /public_html (select the zip, click Extract, path /public_html). Each part holds different files, so order does not matter. If it asks to overwrite existing files, tell me which ones before agreeing.
 7. Check, and report each number:
    - public_html/journeys contains 1,703 files
    - public_html/index.html is 39,770 bytes
@@ -76,7 +76,7 @@ PART C — UPLOAD AND EXTRACT
    - public_html/data/journeys-index.json is 638,404 bytes
    - public_html/api/enquiry.php is 5,533 bytes
    - public_html/.htaccess and public_html/api/data/.htaccess exist
-8. Delete the zip DRAFT-cruise24-me-20260928-d065d49.zip from public_html (only that zip).
+8. Delete the three part zips from public_html (only those three files).
 
 PART D — SERVER SETTINGS FILE
 9. In public_html/api, create a new file named config.php with exactly this content:

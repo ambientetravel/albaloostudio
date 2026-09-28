@@ -133,6 +133,8 @@ def check(files: list[Path]) -> tuple[list[str], list[str]]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--draft", action="store_true", help="build even with blockers open")
+    ap.add_argument("--parts-mb", type=float, default=0,
+                    help="also split into standalone zips of at most this size (each extracts on its own)")
     args = ap.parse_args()
 
     files = deployable()
@@ -160,6 +162,30 @@ def main() -> int:
             m.write(f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {rel}\n")
     print(f"\n{zpath.relative_to(HERE)}  {zpath.stat().st_size / 1e6:.1f} MB")
     print(f"{mpath.relative_to(HERE)}")
+
+    if args.parts_mb:
+        # Greedy packing on uncompressed size: conservative, so every part stays under the cap.
+        cap = int(args.parts_mb * 1024 * 1024)
+        parts: list[list[Path]] = [[]]
+        used = 0
+        for p in sorted(files, key=lambda q: q.stat().st_size, reverse=True):
+            size = p.stat().st_size
+            if size > cap:
+                print(f"cannot split: {p.relative_to(HERE)} alone is {size / 1048576:.1f} MiB")
+                return 1
+            placed = False
+            for part in parts:
+                if sum(q.stat().st_size for q in part) + size <= cap:
+                    part.append(p); placed = True; break
+            if not placed:
+                parts.append([p])
+        for i, part in enumerate(parts, 1):
+            pz = dist / f"{name}-part{i}of{len(parts)}.zip"
+            with zipfile.ZipFile(pz, "w") as z:
+                for p in sorted(part):
+                    rel = p.relative_to(HERE).as_posix()
+                    z.write(p, rel, zipfile.ZIP_STORED if p.suffix.lower() in STORED else zipfile.ZIP_DEFLATED)
+            print(f"{pz.relative_to(HERE)}  {pz.stat().st_size / 1048576:.1f} MiB  {len(part)} files")
     return 0
 
 
