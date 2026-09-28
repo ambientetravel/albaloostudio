@@ -16,7 +16,7 @@ Not deployed (matches `HANDOFF*.md`).
 | imprint | register court and HRB number |
 | imprint | VAT ID (DE…) |
 | imprint | person responsible for editorial content (§ 18 (2) MStV) |
-| privacy | hosting provider, name and address (hosting still undecided) |
+| privacy | hosting provider: GoDaddy (decided 28 Sep). The contracting GoDaddy entity, its address and the basis for the US transfer come from GoDaddy's Data Processing Addendum for the account; see `HANDOFF-godaddy.md` |
 | privacy | server-log retention, in days (depends on the host) |
 | privacy | deletion period, in months, for enquiries that do not lead to a booking |
 

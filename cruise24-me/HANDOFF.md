@@ -224,13 +224,11 @@ H.264 decoder, so playback was proven on a throwaway VP9 copy: hero autoplays,
 panels play on scroll, destination cards play on hover and stop on leave. The
 real files are H.264 High, no audio, index first (`faststart`), 18/18.
 
-**2. Hosting: the site cannot go where cruise24.me currently is.**
-`orchestrator/sites.yml` records cruise24.me on **GoDaddy Website Builder** —
-no file access, no API, `adapter: unimplemented`. A static folder with a media
-directory needs real hosting: the DirectAdmin account that carries
-boutimar.ir / cruise24.ir is the obvious place (add the domain, point DNS).
-That is a decision and a DNS change, not a build step. Until then there is
-nothing to write a DirectAdmin prompt for.
+**2. Hosting: stays at GoDaddy (Alireza, 28 Sep).** The domain points today to GoDaddy Website
+Builder (13.248.243.5, 76.223.105.230), which takes no uploaded files and runs no PHP, so this
+site needs GoDaddy **Web Hosting (cPanel)**, where the bundle runs as built. Whether the account
+already has it is unknown: `HANDOFF-godaddy.md` has a read-only Claude-in-Chrome prompt that finds
+out, and the next steps for either answer.
 
 **3. Explora Journeys media rights.** The footer says "Explora Journeys
 imagery used with permission of the line". That sentence came from the chat,
