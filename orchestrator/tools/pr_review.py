@@ -135,8 +135,42 @@ def _added_text(patch: str) -> str:
     return "\n".join(out)
 
 
+def _raw(repo: str, path: str, ref: str) -> str | None:
+    code, body = _curl(["-H", "Accept: application/vnd.github.raw",
+                        f"{API}/repos/{repo}/contents/{path}?ref={ref}"])
+    return body if code == 200 else None
+
+
+def _json_new_items(repo: str, path: str, base: str, head: str) -> str | None:
+    """For a JSON list file, only the items this PR adds or changes. boutimar.ir's
+    adapter rewrites the whole data/articles.json, so the patch shows every line
+    as added and the gate re-judged articles already live (27 Sep: an existing,
+    correct visa explainer BLOCKed both new دریانامه PRs). None = not a list file."""
+    try:
+        before = json.loads(_raw(repo, path, base) or "null")
+        after = json.loads(_raw(repo, path, head) or "null")
+    except ValueError:
+        return None
+    def _items(doc):   # a bare list, or the list inside {"_note": …, "articles": [...]}
+        if isinstance(doc, list):
+            return doc
+        if isinstance(doc, dict):
+            lists = [v for v in doc.values() if isinstance(v, list)]
+            return lists[0] if len(lists) == 1 else None
+        return None
+    after = _items(after)
+    if after is None:
+        return None
+    old = [json.dumps(x, sort_keys=True, ensure_ascii=False) for x in (_items(before) or [])]
+    new = [x for x in after if json.dumps(x, sort_keys=True, ensure_ascii=False) not in old]
+    return compliance.assertive_surface(new)
+
+
 def review_pr(repo: str, num: int, profile: str) -> dict:
     files = _gh(f"/repos/{repo}/pulls/{num}/files?per_page=100")
+    meta = _gh(f"/repos/{repo}/pulls/{num}")
+    base_sha = (meta.get("base") or {}).get("sha", "") if isinstance(meta, dict) else ""
+    head_sha = (meta.get("head") or {}).get("sha", "") if isinstance(meta, dict) else ""
     blocks, warns, scanned, internal = [], [], 0, 0
     for f in files if isinstance(files, list) else []:
         name = f.get("filename", "")
@@ -147,7 +181,11 @@ def review_pr(repo: str, num: int, profile: str) -> dict:
             internal += 1
             continue
         scanned += 1
-        text = _surface(name, _added_text(patch))
+        text = None
+        if name.lower().endswith(".json") and base_sha and head_sha:
+            text = _json_new_items(repo, name, base_sha, head_sha)
+        if text is None:
+            text = _surface(name, _added_text(patch))
         for v in compliance.check(text, profile_for(name, profile)):
             row = {"file": name, "rule": v.rule, "excerpt": v.excerpt, "fix": v.message,
                    "profile": profile_for(name, profile)}

@@ -3699,5 +3699,19 @@ ok("both deploy scripts refuse to build or ship anything but main",
 ok("the cruise24 deploy pulls before it builds, fast-forward only",
    'pull --ff-only origin main' in pathlib.Path("tools/deploy-cruise24-ir.sh").read_text())
 
+
+print("\n=== the PR gate judges only the articles a JSON PR adds ===")
+_docs = {"base": {"_note": "x", "articles": [{"slug": "visa", "dek": "کدام مسیرها واقعاً بدون ویزا هستند و چرا یک بندرِ یونانی"}]},
+         "head": {"_note": "x", "articles": [{"slug": "visa", "dek": "کدام مسیرها واقعاً بدون ویزا هستند و چرا یک بندرِ یونانی"},
+                                             {"slug": "new", "dek": "راهنمای فیوردهای نروژ"}]}}
+_orig_raw = _prg._raw
+_prg._raw = lambda repo, path, ref: json.dumps(_docs[ref], ensure_ascii=False)
+try:
+    _s = _prg._json_new_items("r", "data/articles.json", "base", "head")
+finally:
+    _prg._raw = _orig_raw
+ok("an existing (already live) article in a rewritten articles.json is not re-judged; the new one is",
+   "فیوردهای نروژ" in _s and "یونانی" not in _s)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
