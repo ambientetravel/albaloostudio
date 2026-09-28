@@ -121,16 +121,71 @@ Finish with a short report: Part A findings, backup name and size (or "public_ht
   (not issued via AutoSSL)"; staging and mail.staging "not covered".
   For the tests: Alireza clicks through Chrome's warning (Advanced → Proceed), then tests 12–17.
 
-## SSL: a go-live blocker, not only staging
+## SSL: free route chosen (Alireza, 28 Sep): Let's Encrypt via acme.sh
 
-With AutoSSL off and the only certificate expired, cruise24.me would show a security warning the moment
-`@` points here. Two routes:
-- **Free, automatic (recommended):** enable SSH for the hosting (GoDaddy hosting settings; it is off),
-  install acme.sh in the home folder, issue Let's Encrypt certificates for cruise24.me, www and staging
-  by HTTP-01 on /public_html, deploy them with acme.sh's `cpanel_uapi` hook, and let its cron renew
-  every 60 days. Needs SSH on; nothing to buy.
-- **Paid:** a GoDaddy SSL certificate for the plan. Alireza's decision (money).
-Go-live order: certificate for cruise24.me + www installed and checked **before** the `@` record moves.
+AutoSSL is off on this plan and the only certificate expired 25 Feb 2026, so cruise24.me would show a
+security warning the moment `@` points here. The route: SSH on, acme.sh in the home folder, certificates
+installed into cPanel with acme.sh's `cpanel_uapi` deploy hook, renewed by acme.sh's own cron (60 days).
+
+**Now: staging only.** Let's Encrypt's HTTP check must reach this server, and cruise24.me / www still
+point at Website Builder, so only staging.cruise24.me can be issued by the web check today. Prompt below.
+
+**At go-live, in this order:**
+1. Issue cruise24.me + www by DNS check (they still point at Website Builder):
+   `~/.acme.sh/acme.sh --issue --dns -d cruise24.me -d www.cruise24.me --keylength ec-256 --yes-I-know-dns-manual-mode-enough-go-ahead-please`
+   It prints two `_acme-challenge` TXT values; add them in GoDaddy DNS, wait ~10 min, then run the
+   same command with `--renew` instead of `--issue`. Deploy with `--deploy -d cruise24.me --ecc --deploy-hook cpanel_uapi`.
+2. Check in SSL/TLS Status that cruise24.me and www are covered.
+3. Move the `@` A record to 92.205.251.216. Check https://cruise24.me/ loads without a warning.
+4. Switch renewal to the automatic web check: re-issue with
+   `--issue -d cruise24.me -d www.cruise24.me -w /home/ekrd2r2976p9/public_html --keylength ec-256 --force`,
+   deploy again, then delete the two `_acme-challenge` TXT records.
+Manual DNS-mode certificates do not renew on their own; step 4 is what makes them automatic.
+
+Prompt for Claude in Chrome (staging certificate + tests):
+
+```text
+Set up free, auto-renewing SSL (Let's Encrypt, via acme.sh) on our GoDaddy cPanel hosting, for staging.cruise24.me only. Then run the staging tests.
+
+Account facts: Web Hosting Economy, cPanel user ekrd2r2976p9, home /home/ekrd2r2976p9, document root /home/ekrd2r2976p9/public_html, server IP 92.205.251.216.
+
+HARD RULES
+- Do not buy, renew, upgrade or accept any offer or paid certificate.
+- Do not change any DNS record. Do not touch cruise24.me or www in any way.
+- Only type the commands below, exactly as written, one at a time. Do not add sudo or change any path.
+- After each command, copy me its last lines of output. If a command prints an error, stop and paste the whole error.
+- If GoDaddy asks me to log in or for a 2FA code, stop and wait for me.
+
+PART 1 — TURN ON SSH
+1. In GoDaddy: My Products → Web Hosting (cPanel) → Settings (or the hosting dashboard). Find "SSH access" and switch it ON. Tell me what the page says after saving.
+2. Open cPanel → Advanced → Terminal. If a warning appears, click "I understand and want to proceed". If there is no Terminal in cPanel, stop and tell me.
+
+PART 2 — INSTALL acme.sh (in the cPanel Terminal)
+3.  curl -fsSL https://get.acme.sh | sh
+4.  ~/.acme.sh/acme.sh --version
+5.  ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
+6.  crontab -l | grep acme
+    (step 6 must show one line containing "acme.sh --cron". If it shows nothing, tell me.)
+
+PART 3 — CERTIFICATE FOR staging.cruise24.me
+7.  ~/.acme.sh/acme.sh --issue -d staging.cruise24.me -w /home/ekrd2r2976p9/public_html --keylength ec-256
+    (Success ends with lines like "Your cert is in:" and "Full-chain cert is in:".)
+8.  ~/.acme.sh/acme.sh --deploy -d staging.cruise24.me --ecc --deploy-hook cpanel_uapi
+    (Success says "Success" / "Certificate successfully deployed".)
+9.  ~/.acme.sh/acme.sh --list
+10. In cPanel → SSL/TLS Status: tell me the status line for staging.cruise24.me and the certificate's expiry date.
+11. Open https://staging.cruise24.me/ in a new tab. It must load with NO privacy warning. Tell me what you see.
+
+PART 4 — STAGING TESTS (only once step 11 loads without a warning)
+12. On https://staging.cruise24.me/ : does the home page load with its photos and video? Any error?
+13. Open /journeys.html: how many sailings does it say it shows? Open any one sailing page: does it load?
+14. Open /contact.html and send the form with name "TEST delete me", email test@example.com, anything in the other fields. Copy me the exact message shown under the button.
+15. Open https://staging.cruise24.me/api/data/leads.ndjson.php : it must show "Not Found" or an empty page, NOT the test data. Tell me what you see.
+16. In cPanel File Manager, open public_html/api/data: confirm leads.ndjson.php exists. Then delete leads.ndjson.php and ratelimit.json.php (only those two; keep .htaccess).
+17. If every page shows "500 Internal Server Error": rename public_html/.htaccess to htaccess-off, reload, and tell me whether that fixed it.
+
+Finish with a short report: SSH status, the output of steps 4, 6, 7 (last lines), 8 and 9, the step 10 status and expiry, and the results of steps 11–17.
+```
 
 ## DNS for cruise24.me (read 28 Sep; nameservers ns73/ns74.domaincontrol.com)
 
