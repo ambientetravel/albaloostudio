@@ -10,11 +10,11 @@ is written from the site itself: nothing in it is a fact the site does not alrea
 
 | File | Use | Size |
 |---|---|---|
-| `cruise24-linkedin-cover.png` | Cover image | 2256 x 382 (1128 x 191 at 2x) |
+| `cruise24-linkedin-cover.png` | Cover image | 3168 x 792 (4:1). All text sits in a centred band that survives LinkedIn's 6:1 desktop crop and the narrower phone crop |
 | `cruise24-linkedin-logo.png` | Page logo | 400 x 400 |
 | `_render.html` | Source of both images (brand fonts and colours); re-render with Playwright if the copy changes | |
 
-Cover: the left 280 px are left empty because LinkedIn places the logo over the lower left of the cover.
+Cover: rebuilt 28 Sep after the first 1128 x 191 version was cut off in LinkedIn's cropper. Upload it as it is and keep the crop centred.
 
 ## Copy
 
@@ -172,7 +172,7 @@ Cruise24 is a brand of Ambiente Group: Ambiente Tours GmbH in Rennerod, Germany,
 
 6. IMAGES
    - Logo: cruise24-linkedin-logo.png (400 x 400).
-   - Cover: cruise24-linkedin-cover.png (2256 x 382, LinkedIn's 1128 x 191 at double resolution).
+   - Cover: cruise24-linkedin-cover.png (3168 x 792; keep LinkedIn's crop centred).
    - When you reach an upload dialog, STOP and ask me to pick the file myself. Do not try to open files on my computer.
 
 7. BEFORE SAVING: show me a short before/after list of every field you changed and wait for me to say "save". Only then click Save.
