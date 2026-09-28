@@ -133,7 +133,7 @@ answers 401 (needs a login). Nothing on the site depends on these.
 the contract is permitted. Daily: `--rolling 30 --write`; monthly: `--full --write`.
 
 **Do not deploy:** `data/sources/`, `data/data-checks.json`, `data/sailings.json`, `sync/`,
-`media-originals/`, `*.py`, `HANDOFF*.md` (incl. `HANDOFF-exploreorient-mice.md`), `_v1-illustrated.html`.
+`media-originals/`, `*.py`, `HANDOFF*.md` (incl. `HANDOFF-exploreorient-mice.md`, `HANDOFF-legal.md`), `_v1-illustrated.html`, `social/` (LinkedIn images, copy and Chrome prompt).
 
 ## Design, restyled around the logo (27 Sep, later)
 
