@@ -107,19 +107,46 @@ Finish with a short report: Part A findings, backup name and size (or "public_ht
 ## Staging progress (28 Sep, Claude in Chrome)
 
 - Backup: `/home/ekrd2r2976p9/public_html-backup-20260928.zip`, 4,073 bytes (original public_html:
-  cgi-bin, 404.shtml, home.html, layout-styles.css).
-- The eight parts were extracted into `/home/ekrd2r2976p9/c24-extract` first (outside the docroot) to
-  check for overwrites: none. Step 7 numbers all matched there. `api/config.php` created (162 bytes).
-- cPanel subdomain staging.cruise24.me created, document root /public_html.
-- Waiting on Alireza: GoDaddy 2FA code to save the `staging` A record → 92.205.251.216, and approval
-  of the move from c24-extract into public_html (the agent's move was held by a safety check).
-- Still to run: step 8 (delete the part zips), Part A (DNS list, disk), tests 12–17.
+  cgi-bin, 404.shtml, home.html, layout-styles.css; those four are still in public_html, harmless).
+- Extracted into `/home/ekrd2r2976p9/c24-extract` first, no collisions, moved into public_html (22 items,
+  hidden files included). Checked in place: journeys 1,703 files, index.html 39,770, contact.html 10,070,
+  data/journeys-index.json 638,404, api/enquiry.php 5,533, .htaccess 322, api/.htaccess 279,
+  api/data/.htaccess 183, api/config.php 162 bytes. The part zips and c24-extract are in cPanel Trash.
+- cPanel subdomain staging.cruise24.me → /public_html. DNS: A `staging` → 92.205.251.216 (saved, resolves).
+- Disk: 181 MB of 10 GB; 2,218 of 250,000 files.
+- **Blocked:** HTTPS for staging. The hosting's only certificate covers cruise24.me, www and the cPanel
+  names, not staging, and expired Feb 2026. Chrome forces https, so http:// does not help.
+  Next: cPanel → SSL/TLS Status → Run AutoSSL (free), then tests 12–17.
+
+## DNS for cruise24.me (read 28 Sep; nameservers ns73/ns74.domaincontrol.com)
+
+| Type | Name | Value | Note |
+|---|---|---|---|
+| A | @ | "WebsiteBuilder Site" | **change at go-live** to 92.205.251.216 |
+| A | staging | 92.205.251.216 | added 28 Sep |
+| CNAME | www | cruise24.me. | follows @, no change needed |
+| CNAME | email | email.secureserver.net. | GoDaddy mail, keep |
+| CNAME | pic, res | apps.odysol.com. | third-party app, keep |
+| CNAME | _domainconnect | _domainconnect.gd.domaincontrol.com. | keep |
+| CNAME | bounces.cloud2.em, sable.cloud2._domainkey | GoDaddy email-marketing (600 s) | keep |
+| CNAME | secureserver1/2._domainkey | s1/s2.dkim.cruise24_me.970.onsecureserver.net. | DKIM, keep |
+| MX | @ | smtp.secureserver.net. (0), mailstore1.secureserver.net. (10) | keep |
+| TXT | @ | google-site-verification=Y7YD…LhIMU | keep |
+| TXT | @ | v=spf1 include:secureserver.net -all | keep |
+| TXT | _dmarc | v=DMARC1; p=none; rua=…@dmarc.cloud2.em.secureserver.net (600 s) | **duplicate, see below** |
+| TXT | _dmarc | v=DMARC1; p=reject; rua=mailto:dmarc_rua@onsecureserver.net; | **duplicate, see below** |
+| SRV | _autodiscover._tcp | 0 0 443 autodiscover.secureserver.net. | keep |
+
+**Two DMARC records.** The DMARC standard allows exactly one; with two, receiving servers ignore both,
+so the domain has no DMARC policy in effect, and one says `none` while the other says `reject`.
+This predates the website work and touches email delivery, so it is not changed here. Decide which
+policy is wanted (usually the `p=none` one first, with reports, then tighten) and delete the other.
 
 ## Step 3: go live (later)
 
 When `python3 build_bundle.py` passes (no `--draft`): upload the final bundle the same way, then
-change the `@` and `www` records from Website Builder to 92.205.251.216, keep MX/TXT as they are,
-and disconnect the Websites + Marketing site from the domain. That replaces the live site, so it
+change the `@` A record from "WebsiteBuilder Site" to 92.205.251.216 (`www` is a CNAME to @ and
+follows), keep every other record, and disconnect the Websites + Marketing site from the domain. That replaces the live site, so it
 waits for the legal facts.
 
 ## For the privacy page once hosting is settled
