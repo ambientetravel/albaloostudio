@@ -270,7 +270,7 @@ def visa_lines(codes: list[str]) -> list[str]:
     out = []
     sch = [COUNTRY[c] for c in codes if c in SCHENGEN]
     if sch:
-        out.append("Schengen visa for non-EU passports, for the whole cruise. Calls in " + ", ".join(dict.fromkeys(sch)) + ".")
+        out.append("Schengen rules for the whole cruise: a Schengen visa, unless your passport is Schengen visa-exempt. Calls in " + ", ".join(dict.fromkeys(sch)) + ".")
     if "TR" in cs:
         out.append("Türkiye: visa-free or e-visa for many passports, not all.")
     if cs & {"US", "PR", "VI"}:
@@ -280,11 +280,11 @@ def visa_lines(codes: list[str]) -> list[str]:
     if "IE" in cs:
         out.append("Ireland: outside Schengen, with its own entry rules.")
     if "RS" in cs:
-        out.append("Serbia is outside Schengen: a Danube cruise through it may need a multiple-entry Schengen visa.")
+        out.append("Serbia is outside Schengen: if you need a Schengen visa, it should be multiple-entry.")
     if "CY" in cs:
         out.append("Cyprus: EU but outside Schengen, with its own entry rules.")
     if cs & {"GL", "FO", "SJ"}:
-        out.append("Greenland, the Faroes and Svalbard are outside Schengen; the cruise's Schengen visa should be multiple-entry.")
+        out.append("Greenland, the Faroes and Svalbard are outside Schengen: if you need a Schengen visa, it should be multiple-entry and valid for them.")
     if "CA" in cs:
         out.append("Canada: visa or eTA.")
     if cs & {"BL", "MQ", "GF", "PF"}:
