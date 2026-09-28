@@ -1,0 +1,8 @@
+# cruise24.me, Apache (GoDaddy cPanel hosting).
+# staging.cruise24.me shares this document root for testing before the domain moves
+# off Website Builder. Search engines must never index it.
+<IfModule mod_headers.c>
+  <If "%{HTTP_HOST} =~ /^staging\./">
+    Header set X-Robots-Tag "noindex, nofollow"
+  </If>
+</IfModule>
