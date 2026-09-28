@@ -1,7 +1,8 @@
 /* Cruise24 journeys: filter, sort and page through every sailing on journeys.html.
    The first cards are plain HTML (crawlers, no-JS). With JS, the full list comes from
-   data/journeys-index.json and is shown 24 at a time. The area and month choice travel in
-   the hash as one token, "<area>.<month>" (e.g. #greece.2027-05). */
+   data/journeys-index.json and is shown 24 at a time. The area, month and line choice travel
+   in the hash as one token, "<area>.<month>[.<line>]" (e.g. #greece.2027-05, or
+   #all.any.silversea from the lines page). */
 (function () {
   var grid = document.getElementById('jgrid');
   if (!grid) return;
@@ -32,11 +33,14 @@
   function readHash() {
     var t = (location.hash || '').replace(/^#/, '').split('.');
     var has = function (sel, v) { return [].some.call(sel.options, function (o) { return o.value === v; }); };
-    if (t[0] && has(f.area, t[0])) f.area.value = t[0];
-    if (t[1] && has(f.month, t[1])) f.month.value = t[1];
+    // Every part of the hash sets its filter, and a missing, "all" or "any" part clears it: an
+    // in-page hash change (back/forward, a second link) must not keep the previous area or line.
+    f.area.value = t[0] && has(f.area, t[0]) ? t[0] : '';
+    f.month.value = t[1] && has(f.month, t[1]) ? t[1] : '';
+    f.line.value = t[2] && has(f.line, t[2]) ? t[2] : '';
   }
   function writeHash() {
-    var tok = (f.area.value || 'all') + '.' + (f.month.value || 'any');
+    var tok = (f.area.value || 'all') + '.' + (f.month.value || 'any') + (f.line.value ? '.' + f.line.value : '');
     var want = tok === 'all.any' ? '' : '#' + tok;
     if (location.hash !== want) { try { history.replaceState(null, '', location.pathname + location.search + want); } catch (e) {} }
   }

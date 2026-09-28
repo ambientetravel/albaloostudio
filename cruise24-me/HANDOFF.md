@@ -91,6 +91,10 @@ request" rather than a converted figure. 5 of 24 cruises show no departures on t
 **Build** (`build_journeys.py`, ~2 s): 1,703 pages in `journeys/`, `journeys.html` (37 KB,
 36 cards in the HTML, the rest paged 24 at a time from `data/journeys-index.json`, 624 KB,
 86 KB gzipped), `ports.html`, home search months, destination counts, sitemap.
+**Filter links:** `journeys.html#<area>.<month>[.<line>]`, e.g. `#greece.2027-05`,
+`#all.any.silversea`, `#rivers.any.scenic` (`all`/`any` = no filter; line values are the
+`f-line` option slugs). `lines.html` links each line this way; an in-page hash change resets
+any part it leaves out.
 **Generated files are not in git** (`journeys/`, `data/sailings.json`,
 `data/journeys-index.json`): run the build before every deploy bundle.
 
