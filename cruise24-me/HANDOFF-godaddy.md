@@ -104,6 +104,17 @@ PART F — TEST (wait 10–15 minutes after step 11)
 Finish with a short report: Part A findings, backup name and size (or "public_html was empty"), the step 7 numbers, and the results of steps 12–17.
 ```
 
+## Staging progress (28 Sep, Claude in Chrome)
+
+- Backup: `/home/ekrd2r2976p9/public_html-backup-20260928.zip`, 4,073 bytes (original public_html:
+  cgi-bin, 404.shtml, home.html, layout-styles.css).
+- The eight parts were extracted into `/home/ekrd2r2976p9/c24-extract` first (outside the docroot) to
+  check for overwrites: none. Step 7 numbers all matched there. `api/config.php` created (162 bytes).
+- cPanel subdomain staging.cruise24.me created, document root /public_html.
+- Waiting on Alireza: GoDaddy 2FA code to save the `staging` A record → 92.205.251.216, and approval
+  of the move from c24-extract into public_html (the agent's move was held by a safety check).
+- Still to run: step 8 (delete the part zips), Part A (DNS list, disk), tests 12–17.
+
 ## Step 3: go live (later)
 
 When `python3 build_bundle.py` passes (no `--draft`): upload the final bundle the same way, then
