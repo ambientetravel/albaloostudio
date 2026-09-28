@@ -95,7 +95,8 @@ Cruise24 is a brand of Ambiente Group: Ambiente Tours GmbH in Rennerod, Germany,
 
 ### Still to do
 
-- Upload `cruise24-linkedin-logo.png` and `cruise24-linkedin-cover.png` (Page info tab).
+- Upload `cruise24-linkedin-cover.png` (Page info tab, camera icon on the banner).
+- Logo: the existing "24" logo stays (Alireza, 28 Sep). `cruise24-linkedin-logo.png` is the same mark on navy, kept as an alternative.
 - **Company type says "Partnership".** Ambiente Tours GmbH is a limited company. On LinkedIn that is
   "Privately held". Change it in Details if Cruise24 is operated by the GmbH.
 - Check that https://cruise24.me (without www) opens the site. DNS for both names points to the same
