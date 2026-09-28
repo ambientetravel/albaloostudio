@@ -60,3 +60,41 @@
     box.focus();
   }).catch(function () {});
 })();
+
+/* Request forms: post to api/enquiry.php and say "thank you" only when the
+   server confirms it stored the request. A failure is shown as a failure. */
+(function(){
+  document.querySelectorAll('form[data-enquiry]').forEach(function (form) {
+    var note = form.querySelector('.note'), btn = form.querySelector('button[type=submit]');
+    var idle = note ? note.textContent : '', label = btn ? btn.textContent : '';
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      var data = new FormData(form);
+      data.append('page', location.pathname);
+      if (document.body.dataset.page === 'contact') data.append('sailing', (location.hash || '').replace(/^#/, ''));
+      btn.disabled = true; btn.textContent = 'Sending…';
+      note.classList.remove('ok', 'err'); note.textContent = idle;
+      fetch(form.getAttribute('action'), { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { status: r.status, body: j }; }); })
+        .then(function (res) {
+          if (res.body && res.body.ok) {
+            form.reset();
+            note.classList.add('ok');
+            note.textContent = 'Thank you. Your request has reached us, and a planner will reply within one working day.';
+            btn.textContent = 'Sent';
+            return;
+          }
+          var msg = res.status === 429 ? 'Too many requests from this connection. Please wait a few minutes and send it again.'
+                  : res.status === 400 ? 'Please check your name and email address, then send it again.'
+                  : 'Your request did not go through. Please try again in a moment.';
+          throw { user: msg };
+        })
+        .catch(function (err) {
+          note.classList.add('err');
+          note.textContent = (err && err.user) || 'Your request did not go through. Please check your connection and try again.';
+          btn.disabled = false; btn.textContent = label;
+        });
+    });
+  });
+})();

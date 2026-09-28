@@ -245,10 +245,25 @@ photos in `media/lines/`: agency terms usually allow them, but nobody has checke
 `f1-2027/` suggests Explora has such a programme, but a departure is a
 departure), and "Ambiente has planned quiet European travel for twelve years".
 
-**5. The request form posts nowhere**, on the home page and on `contact.html`. `onsubmit` swaps in a thank-you line.
-Wire it to whatever the host provides (the boutimar.ir sites use a PHP
-endpoint writing `leads.json.php`; that pattern is in the repo). Do not launch
-a form that silently drops enquiries.
+**5. Request form: wired (28 Sep).** Both forms (home, `contact.html`) post to `api/enquiry.php`, which
+validates, rate-limits (5 per address per 10 min, address stored hashed), drops bots via a hidden
+honeypot, and appends one NDJSON line to `api/data/leads.ndjson.php` in the lead shape the pipeline
+reads (`channel: site_form`, `from_ref`, `message`, `landing_path`, `received_at`, plus `sailing_ref`
+when the visitor came from a sailing page). The page says "thank you" only when the server confirms;
+a failure is shown as a failure, and on the static preview (no PHP) that is what you will see.
+`api/leads.php` hands new leads to agent 4, HMAC-signed exactly like every other hop
+(`--leads-url https://cruise24.me/api/leads.php`); without a secret it answers 503, never unsigned data.
+Stored files cannot be read over the web (the `.php` guard line answers 404 even without `.htaccess`).
+On the server: copy `api/config.sample.php` to `api/config.php` and set `signing_secret`, `ip_salt`,
+and optionally `notify_to` for a copy to our inbox. Tested on PHP 8.4: all paths, and the signed pull
+with the orchestrator's own `config.signed_headers`.
+
+**5a. Deploy bundle: `python3 build_bundle.py`.** It runs a pre-launch check first and refuses to build
+while a blocker is open: highlighted gaps, bracket placeholders, "Arabian Gulf", broken internal links,
+sitemap pages missing. On 28 Sep the check found 1,881 files, 0 broken links, and two blockers: the
+12 legal gaps and `[PHONE]` / `[EMAIL]` on the contact page. `--draft` builds anyway for a staging
+upload. The zip stores paths relative to the docroot (extract INTO `public_html`) and a `.sha256`
+manifest sits next to it, for diffing the live server after upload.
 
 **6. Legal pages need facts only the company has.** The full list, and the
 decisions already written into the text (both roles, insolvency protection,

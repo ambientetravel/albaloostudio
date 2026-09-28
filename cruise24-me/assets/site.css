@@ -145,6 +145,10 @@ p{margin:0}
 .form label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--muted-on-ink)}
 .form input,.form select,.form textarea{min-height:48px;border:1px solid var(--line-on-ink);background:rgba(255,255,255,.04);border-radius:var(--r);padding:12px 14px;color:inherit;font:400 1rem var(--sans)}
 .form textarea{min-height:110px;resize:vertical} .form .full{grid-column:1/-1} .form .note{grid-column:1/-1;font-size:.85rem;color:var(--muted-on-ink)}
+.form .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form .note.ok{color:var(--text-on-ink);font-weight:600}
+.form .note.err{color:#ffb4a8;font-weight:600}
+.form button[disabled]{opacity:.6;cursor:progress}
 @media (max-width:860px){.request{grid-template-columns:1fr}.form{grid-template-columns:1fr}}
 footer{background:var(--deep);padding:64px 0 40px;border-top:1px solid var(--line-on-ink);font-size:.92rem;color:var(--muted-on-ink)}
 footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px}

@@ -2,8 +2,7 @@
 
 `conditions.html`, `imprint.html` and `privacy.html` are English only. Nothing on
 them addresses the site owner any more. Facts only the company can supply show as
-short highlighted labels (`<span class="todo">`). Before go-live, search the three
-files for `class="todo"`: there must be no matches left.
+short highlighted labels (`<span class="todo">`). Before go-live, `python3 build_bundle.py` must pass: it refuses to build while any `class="todo"` is left.
 
 Not deployed (matches `HANDOFF*.md`).
 
@@ -19,7 +18,6 @@ Not deployed (matches `HANDOFF*.md`).
 | imprint | person responsible for editorial content (§ 18 (2) MStV) |
 | privacy | hosting provider, name and address (hosting still undecided) |
 | privacy | server-log retention, in days (depends on the host) |
-| privacy | how the request form reaches you: email or a named form service. Today the form sends nothing. |
 | privacy | deletion period, in months, for enquiries that do not lead to a booking |
 
 The booking conditions have no gaps left. Deposit, balance date, payment methods,

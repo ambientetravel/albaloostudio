@@ -268,15 +268,16 @@
 <section class="section" id="request">
   <div class="wrap request">
     <div><span class="kicker">Plan a voyage</span><h2>Tell us roughly when and where</h2><p class="lede">Two or three options back within one working day, with real cabin prices rather than the advertised lead-in. Nothing to pay until you say yes.</p></div>
-    <form class="form" onsubmit="event.preventDefault();this.querySelector('.note').textContent='Thank you. A planner will reply within one working day.';">
+    <form class="form" action="api/enquiry.php" method="post" data-enquiry>
       <label>Name <input type="text" name="name" autocomplete="name" required></label>
       <label>Email <input type="email" name="email" autocomplete="email" required></label>
       <label>Travellers <select name="pax"><option>2</option><option>1</option><option>3</option><option>4</option><option>5+</option></select></label>
-      <label>Where <select name="where"><option>Not sure yet</option><option>Mediterranean</option><option>Greek islands</option><option>River</option><option>Red Sea / Gulf</option><option>Northern Europe</option><option>Caribbean</option><option>Alaska</option><option>Asia</option></select></label>
+      <label>Where <select name="where"><option>Not sure yet</option><option>Mediterranean</option><option>Greek islands</option><option>River</option><option>Red Sea / Persian Gulf</option><option>Northern Europe</option><option>Caribbean</option><option>Alaska</option><option>Asia</option></select></label>
       <label class="full">Roughly when <input type="text" name="when" placeholder="e.g. Easter 2027, or any week in October"></label>
       <label class="full">Anything we should know <textarea name="notes" placeholder="Passports on board, a birthday, a wheelchair, a strong dislike of buffets"></textarea></label>
+      <label class="hp" aria-hidden="true">Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
       <button class="btn solid full" type="submit">Send request</button>
-      <p class="note">No payment now. We check capacity and the final fare with the line before you commit.</p>
+      <p class="note" role="status" aria-live="polite">No payment now. We check capacity and the final fare with the line before you commit.</p>
     </form>
   </div>
 </section>

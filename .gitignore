@@ -107,3 +107,11 @@ cruise24-me/media-originals/
 cruise24-me/journeys/
 cruise24-me/data/sailings.json
 cruise24-me/data/journeys-index.json
+
+# cruise24.me form endpoint: the server's own settings and stored requests.
+cruise24-me/api/config.php
+cruise24-me/api/data/*
+!cruise24-me/api/data/.htaccess
+
+# cruise24.me deploy bundles (built by cruise24-me/build_bundle.py)
+cruise24-me/dist/
