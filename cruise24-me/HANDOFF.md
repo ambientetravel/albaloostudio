@@ -101,8 +101,16 @@ Castro, "Pirau"). Any sailing with an unplaced stop says so on its visa list (28
 Bulgaria; Serbia, Cyprus, the UK, Ireland, Greenland, the Faroes, Svalbard and French
 overseas territories are called out as outside it.
 
-**Photos:** CruiseHost ship photos (56, 8 MB) in `media/cruisehost/`; Explora keeps its own
-imagery; Variety uses the yacht and destination photos from the boutimar.ir repo.
+**Photos:** CruiseHost ship photos (61, 8.6 MB) in `media/cruisehost/`, named by CruiseHost
+ship code (MW = MSC World Europa, WE/W9 = Celestyal Journey/Discovery, 03/11 = nickoVision/
+nickoSpirit, all checked by eye); Explora keeps its own imagery; Variety uses the yacht and
+destination photos from the boutimar.ir repo. `media/lines/` holds photos taken from the
+lines' own sites (28 Sep 2026): `arosa-sena.jpg` (a-rosa.de, A-ROSA drone shot, no credit
+given on the page) and `silver-by-amadeus.jpg` (amadeus-flusskreuzfahrten.de, file credit
+"(c) Martin de Bock", cropped to the ship). Amadeus's own page now calls Silver III
+"Silver by AMADEUS" (same 2016 build, 168 guests, photos still filed as Silver III); the
+site uses the new name. AROYA has no photo: aroya.com sits behind a Cloudflare bot check,
+and the headless browser here does not trust the proxy CA, so it cannot pass it either.
 
 **Still blocked (network):** Silversea's photo hosts `cdn.sanity.io` and
 `silversea.widen.net`; Variety's `d2koisdtuu1wg4.cloudfront.net` (photos) and
@@ -217,6 +225,8 @@ imagery used with permission of the line". That sentence came from the chat,
 not from a document. Trade partners normally get an asset library under the
 line's agency terms; if that agreement exists, keep the line. If not, it
 must go before launch — it is a factual claim under the company name.
+The same question now covers the CruiseHost ship photos and the A-ROSA and Amadeus
+photos in `media/lines/`: agency terms usually allow them, but nobody has checked.
 
 **4. Two copy claims to confirm before launch**, both from the chat:
 "Explora I in Port Hercule for the 2027 Grand Prix" (the image path
