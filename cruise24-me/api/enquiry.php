@@ -41,10 +41,9 @@ function field(array $in, string $k, int $max): string {
     return mb_substr($v, 0, $max);
 }
 
-// Honeypot: a field people never see. Bots fill it; pretend success so they move on.
-if (field($in, 'website', 200) !== '') {
-    out(200, ['ok' => true]);
-}
+// Honeypot: a field people never see. Bots fill it, but so can a browser's autofill,
+// so a hit is stored and marked, never thrown away: a real enquiry must not vanish.
+$suspect = field($in, 'c24_nb', 200) !== '' || field($in, 'website', 200) !== '';
 
 $name  = field($in, 'name', 120);
 $email = field($in, 'email', 200);
@@ -113,6 +112,7 @@ $lead = [
     'sailing_ref'  => $ref,
     'received_at'  => gmdate('Y-m-d\TH:i:s\Z'),
 ];
+if ($suspect) $lead['suspect'] = 'honeypot';
 
 // The .php extension and the exit line mean the file cannot be read over the
 // web even if the data folder's .htaccess is ignored.
@@ -127,7 +127,7 @@ if ($ok === false) out(500, ['ok' => false, 'error' => 'storage']);
 // Optional: a copy to our own inbox. Off unless config.php names one.
 // Never to the customer; Reply-To lets the planner answer in one click.
 $to = (string)($cfg['notify_to'] ?? '');
-if ($to !== '' && filter_var($to, FILTER_VALIDATE_EMAIL)) {
+if (!$suspect && $to !== '' && filter_var($to, FILTER_VALIDATE_EMAIL)) {
     $from = (string)($cfg['notify_from'] ?? $to);
     $subject = '=?UTF-8?B?' . base64_encode('Cruise24 request: ' . $name . ($ref ? " ($ref)" : '')) . '?=';
     $body = "Name: $name\nEmail: $email\n" . implode("\n", $lines) . "\n\nPage: $page\nReceived: {$lead['received_at']}\nId: {$lead['id']}\n";

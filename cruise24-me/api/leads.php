@@ -7,7 +7,8 @@
  *   python3 agent4_sales_closer_batch.py --leads-url https://cruise24.me/api/leads.php
  *
  * Returns {"leads":[...]} with the leads not handed out before, then moves the
- * cursor. ?all=1 returns every lead and leaves the cursor alone (re-runs).
+ * cursor. Leads marked "suspect" (honeypot filled) are left out. ?all=1 returns
+ * every lead, suspects included, and leaves the cursor alone (re-runs).
  *
  * No secret configured → 503. Customer messages are never served unsigned.
  */
@@ -53,6 +54,9 @@ if (is_file($file)) {
 
 if (($_GET['all'] ?? '') === '1') out(200, ['leads' => $leads, 'total' => count($leads)]);
 
+// Honeypot hits stay in the file for a human to review; the pipeline only gets clean ones.
+$clean = fn(array $rows) => array_values(array_filter($rows, fn($r) => empty($r['suspect'])));
+
 $curFile = $dataDir . '/cursor.json.php';
 $fh = fopen($curFile, 'c+');
 if (!$fh || !flock($fh, LOCK_EX)) out(500, ['error' => 'storage']);
@@ -63,4 +67,4 @@ ftruncate($fh, 0); rewind($fh);
 fwrite($fh, "<?php http_response_code(404); exit; ?>\n" . json_encode(['served' => count($leads), 'at' => gmdate('c')]));
 flock($fh, LOCK_UN); fclose($fh);
 
-out(200, ['leads' => $new, 'total' => count($leads)]);
+out(200, ['leads' => $clean($new), 'total' => count($leads)]);
