@@ -6,3 +6,12 @@
     Header set X-Robots-Tag "noindex, nofollow"
   </If>
 </IfModule>
+
+# Live domain: one address, https://cruise24.me/. staging.* is left alone.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on [OR]
+  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteCond %{HTTP_HOST} ^(www\.)?cruise24\.me$ [NC]
+  RewriteRule ^ https://cruise24.me%{REQUEST_URI} [R=301,L]
+</IfModule>

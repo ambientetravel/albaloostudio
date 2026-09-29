@@ -32,7 +32,7 @@ service in Frankfurt, say); that costs money and is Alireza's call.
 
 | Page | Field |
 |---|---|
-| privacy | the contracting GoDaddy company and its address, from GoDaddy's data processing addendum (prompt in HANDOFF-godaddy.md) |
+| — | none. GoDaddy filled 29 Sep: the DPA's party is "the GoDaddy legal entity that is a party to the Universal Terms of Service" = GoDaddy.com, LLC (UTOS rev. 6/3/2026); transfers per DPA Schedule 4 §2.2: EU–US Data Privacy Framework first, then EU SCCs (DPA rev. 9/13/2024). Paraphrased by Claude in Chrome; have the data-protection adviser confirm. |
 
 ## Decisions taken in the text: check these
 
