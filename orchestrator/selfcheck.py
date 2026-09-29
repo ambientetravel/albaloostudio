@@ -3788,5 +3788,31 @@ ok("Agent 7 runs Trends without letting it fail the agent",
    "trends_scan.py" in pathlib.Path("../.github/workflows/agent7-keyword-geo.yml").read_text()
    and "continue-on-error: true" in pathlib.Path("../.github/workflows/agent7-keyword-geo.yml").read_text())
 
+
+print("\n=== IndexNow + page speed ===")
+import indexnow_ping as _inp, tempfile as _tf2
+with _tf2.TemporaryDirectory() as _d:
+    _d = pathlib.Path(_d); (_d / "prev").mkdir(); (_d / "now").mkdir()
+    for _n, _u in (("old.json", "https://exploreorient.com/journal/a/"), ("new.json", "https://exploreorient.com/journal/b/")):
+        (_d / "now" / _n).write_text(json.dumps({"publication": {"live_url": _u}}))
+    (_d / "prev" / "old.json").write_text("{}")
+    ok("only pages that went live THIS run are submitted",
+       _inp.new_live_urls(_d / "now", _d / "prev") == ["https://exploreorient.com/journal/b/"])
+_saved_kh = _inp.key_hosted
+_inp.key_hosted = lambda host, key: False
+_lg = _inp.ping(["https://cruisebaz.com/x"], {s.domain: s for s in config.load_sites(include_hold=True)})
+_inp.key_hosted = _saved_kh
+ok("a site whose key file is not served (e.g. base44 answering 200 for anything) is skipped, not pinged",
+   _lg and _lg[0].startswith("skip") and "not served" in _lg[0])
+ok("every live site has an IndexNow key", all(s.indexnow_key for s in config.load_sites() if s.domain in
+   ("boutimar.com", "boutimar.ir", "cruise24.ir", "exploreorient.com", "cruisebaz.com", "ambientetravel.com")))
+import pagespeed_check as _psc
+_md = _psc.to_md({"generated_at": "2026-09-29T00:00:00+00:00", "sites": [{"domain": "x", "pages": [
+    {"url": "https://x/", "field": {"LCP": {"p75": 3100, "rating": "AVERAGE"}, "_scope": "this page"},
+     "lab_score": 71, "top_savings": [{"fix": "Reduce unused JavaScript", "ms": 900}]},
+    {"url": "https://x/a", "error": "HTTP 429 (quota — set PAGESPEED_API_KEY)"}]}]})
+ok("the speed report shows field data, lab score, fixes, and a quota error as a note",
+   "3100ms average" in _md and "| 71 |" in _md and "Reduce unused JavaScript" in _md and "PAGESPEED_API_KEY" in _md)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

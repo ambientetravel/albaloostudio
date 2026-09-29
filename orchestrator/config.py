@@ -456,6 +456,8 @@ class Site:
     # Short head terms for Google Trends (tools/trends_scan.py). Long seed
     # phrases have too little volume for Trends to register anything.
     trend_terms: list[str] = field(default_factory=list)
+    # IndexNow key (public by design); the site must serve /<key>.txt with it.
+    indexnow_key: str = ""
 
     @property
     def on_hold(self) -> bool:
@@ -526,6 +528,7 @@ def load_sites(
                 audience_group=str(merged.get("audience_group", "") or "").strip(),
                 exclude_queries=[str(x) for x in (merged.get("exclude_queries") or [])],
                 trend_terms=[str(x) for x in (merged.get("trend_terms") or [])],
+                indexnow_key=str(merged.get("indexnow_key", "") or "").strip(),
             )
         )
 

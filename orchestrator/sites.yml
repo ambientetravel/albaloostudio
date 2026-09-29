@@ -60,6 +60,7 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.com/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: en
+    indexnow_key: "df15c8e37a36b2f11481c4112661278c"   # public by design; site must serve /df15c8e37a36b2f11481c4112661278c.txt containing it
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - Iran tour
       - Iran travel
@@ -166,6 +167,7 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.ir/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: fa-IR
+    indexnow_key: "4122355951fb72bf9ee8ccc04ab5d484"   # public by design; site must serve /4122355951fb72bf9ee8ccc04ab5d484.txt containing it
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - کروز دبی        # bare «کروز» = Land Cruiser / Penélope Cruz / cruise missile noise (29 Sep)
       - تور کشتی
@@ -275,6 +277,7 @@ sites:
       - Armenia monasteries tour guide                      # /tour/monasteries-and-brandy/
       - Morocco kasbah route travel guide                   # /tour/kasbahs-and-caravans/
     locale: en
+    indexnow_key: "acec5a04bb01c7c7c9cd861334eb46cb"   # public by design; site must serve /acec5a04bb01c7c7c9cd861334eb46cb.txt containing it
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - Uzbekistan tour
       - Silk Road tour
@@ -392,6 +395,7 @@ sites:
     brand: Ambiente Travel
     compliance_profile: orient_v1   # non-cruise: no AROYA/Seychelles/Schengen rules injected
     locale: en
+    indexnow_key: "1abeb52849005e0d08847e405b2e2e76"   # public by design; site must serve /1abeb52849005e0d08847e405b2e2e76.txt containing it
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - Iran Reise
       - Usbekistan Rundreise
@@ -461,6 +465,7 @@ sites:
     gsc_account: "UNCONFIRMED"
     brand: CruiseBaz
     locale: fa-IR
+    indexnow_key: "6ee0c8e240f47be5d7e63ad224835a79"   # public by design; site must serve /6ee0c8e240f47be5d7e63ad224835a79.txt containing it
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - آرویا
       - کروز خلیج فارس
@@ -520,6 +525,7 @@ sites:
       - برنامه‌ریزی کروز نوروز ۱۴۰۶                         # cruise-nowruz-1406.html
       - انتخاب کشتی مناسب در ناوگان MSC                      # msc.html
     locale: fa-IR              # Farsi build shipped — live <html lang="fa" dir="rtl">; was `en`, so 17 Sep's 4 guides came out English (fixed 25 Sep)
+    indexnow_key: "afe2aa16ad7cad86fee55eb79893deb2"   # public by design; site must serve /afe2aa16ad7cad86fee55eb79893deb2.txt containing it
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - کشتی کروز
       - تور دبی
@@ -564,6 +570,7 @@ sites:
       - "Akdeniz gemi turu rehberi"
       - "ilk kez gemi turu ipuclari"
     locale: en
+    indexnow_key: "32848188bc802588ccb8b2f6b390a74f"   # public by design; site must serve /32848188bc802588ccb8b2f6b390a74f.txt containing it
     market: INT                # the world-audience twin of cruise24.ir
     base_url: "https://cruise24.me"
     # Where the bytes actually live. Recorded because it was tribal

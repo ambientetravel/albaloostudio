@@ -142,6 +142,12 @@ jobs:
             --format json --out "reports/merge-watch-$STAMP.json"
           cat "reports/merge-watch-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: IndexNow — tell Bing/Yandex about pages that just went live
+        # Only pages merge-watch verified LIVE this run (promoted/ minus
+        # promoted_prev/). A failed ping is a note, never a red run.
+        continue-on-error: true
+        run: python3 tools/indexnow_ping.py --promoted promoted --previous promoted_prev | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Say what is stuck between merge and server
         if: always()
         run: |

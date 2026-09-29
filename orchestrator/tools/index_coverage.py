@@ -49,6 +49,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import logging
 import sys
 from pathlib import Path
@@ -242,7 +243,11 @@ def assess(service, site: config.Site, session: requests.Session,
         "sample_undeclared": undeclared[:15],
     }
     if inspect and never:
-        row["inspection"] = inspect_urls(service, site, never[:inspect])
+        # Pipeline articles first: whether a page the writer shipped actually got
+        # indexed is the question this quota is best spent on.
+        art = re.compile(r"/(journal|daryanameh|blog|guides)/")
+        order = [u for u in never if art.search(u)] + [u for u in never if not art.search(u)]
+        row["inspection"] = inspect_urls(service, site, order[:inspect])
     return row
 
 
