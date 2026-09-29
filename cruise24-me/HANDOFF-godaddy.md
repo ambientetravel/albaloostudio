@@ -239,6 +239,19 @@ api/leads.php 2,974 bytes (old copies in /home/ekrd2r2976p9/c24-backup-20260928b
 https://staging.cruise24.me/contact.html: thank-you shown, lead stored clean (no "suspect"), test data
 deleted. Staging is complete; only the hero video playing has not been seen by a person yet.
 
+## The last legal gap: GoDaddy's contracting company (29 Sep)
+
+The privacy page must name the GoDaddy company that hosts the site. The build environment cannot reach
+godaddy.com. Read-only prompt for Claude in Chrome:
+
+```text
+Read only; change nothing and accept nothing. Open https://www.godaddy.com/legal/agreements/data-processing-addendum (if it redirects, follow it; if there is a country selector, choose Germany / Deutschland). Copy me, word for word:
+1. The sentence that names the GoDaddy company that is the party to the addendum (the "GoDaddy" / processor entity), with its address if given.
+2. The sentence(s) saying how personal data transferred outside the EU/EEA is protected (for example Standard Contractual Clauses or the EU-US Data Privacy Framework).
+3. The addendum's "last revised" date.
+Then open https://www.godaddy.com/legal/agreements/universal-terms-of-service-agreement and copy me the sentence that names the contracting GoDaddy company for customers in Germany or the EU.
+```
+
 ## Step 3: go live (later)
 
 When `python3 build_bundle.py` passes (no `--draft`): upload the final bundle the same way, then

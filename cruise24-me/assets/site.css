@@ -41,8 +41,8 @@ p{margin:0}
 .hero-video.ready{opacity:1}
 .hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,15,24,.62) 0%,rgba(7,15,24,.18) 22%,rgba(7,15,24,.12) 45%,rgba(7,15,24,.88) 100%)}
 .hero .content{position:relative;z-index:2;width:min(1240px,calc(100% - 48px));margin:0 auto;padding:calc(var(--nav-h) + 40px) 0 clamp(64px,10vh,120px)}
-.hero h1{max-width:12ch} .hero h1 em{font-style:italic}
-.hero .lede{max-width:44ch;margin:24px 0 32px;color:var(--muted-on-ink)}
+.hero h1{max-width:12ch;font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;font-weight:500;font-size:clamp(3.3rem,7.6vw,7rem);line-height:.96;letter-spacing:-.01em} .hero h1 em{font-style:italic;font-weight:400}
+.hero .lede{max-width:52ch;margin:22px 0 32px;color:var(--muted-on-ink);font-size:clamp(1rem,1.2vw,1.15rem);line-height:1.65}
 .search{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;background:rgba(12,24,36,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line-on-ink);border-radius:var(--r);padding:16px;max-width:760px}
 .search label{display:flex;flex-direction:column;gap:6px;font-size:.8rem;color:var(--muted-on-ink);flex:1 1 180px}
 .search select{min-height:46px;border:1px solid var(--line-on-ink);background:rgba(255,255,255,.05);border-radius:10px;padding:0 12px;color:inherit;font:400 1rem var(--sans)}
@@ -220,6 +220,10 @@ img.missing,video.missing{visibility:hidden}
 .article .meta{font-size:.85rem;color:var(--sea);letter-spacing:.04em}
 .article .fact{margin-top:22px;padding:16px 20px;border-left:2px solid var(--brass);background:var(--foam-2);font-size:.95rem;color:#44566a}
 .notebook{margin-top:64px;padding-top:32px;border-top:1px solid var(--line)}
+.art-photo{margin:22px 0 4px}
+.art-photo img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--r);display:block}
+.art-photo figcaption{margin-top:10px;font-size:.85rem;color:#44566a}
+.post .post-photo{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:var(--r);display:block;margin-bottom:14px}
 .notebook .kicker{margin-bottom:22px}
 @media (prefers-reduced-motion:reduce){.route-line{stroke-dashoffset:0}}
 

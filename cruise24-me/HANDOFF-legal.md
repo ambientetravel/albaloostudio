@@ -6,23 +6,33 @@ short highlighted labels (`<span class="todo">`). Before go-live, `python3 build
 
 Not deployed (matches `HANDOFF*.md`).
 
-## Facts to fill in
+## Facts filled in (29 Sep, from Alireza)
+
+- Imprint: Ambiente Tours GmbH, Hauptstr. 81, 56477 Rennerod; managing directors Cyrus Martin Nurischad
+  and Alireza Mozaffari; +49 (0) 2664 9931 821, res@cruise24.me (also on the contact page).
+- Privacy: server logs 14 days, unbooked enquiries 6 months. Hosting: GoDaddy, European data centre.
+
+**Rennerod appears only in the imprint.** Alireza does not want the town in the marketing. The imprint must
+show the full address where the company can be served (§ 5 DDG), so it stays there; everywhere else says
+"Germany", and the contact and about pages say "Westerwald, between Frankfurt and Cologne". If a city
+address is wanted, it has to be a real business address that accepts legal mail (a registered-office
+service in Frankfurt, say); that costs money and is Alireza's call.
+
+**Judgement calls to confirm:**
+1. Register court written as **Amtsgericht Montabaur** (Rennerod is in the Westerwaldkreis, whose register
+   is kept in Montabaur). Only "HRB 24620" was given.
+2. Company name kept as **Ambiente Tours GmbH**, as everywhere else. The message said "Ambientetours GmbH";
+   the imprint must match the register exactly.
+3. **Responsible for editorial content: Alireza Mozaffari.** "admin" was given, but § 18 (2) MStV needs a
+   named person with an address.
+4. **VAT ID left off** at Alireza's request. § 5 DDG requires it where the company has one; leaving it off
+   is a warning-letter (Abmahnung) risk.
+
+## Still open
 
 | Page | Field |
 |---|---|
-| imprint | street and number, postcode (Rennerod) |
-| imprint | managing director |
-| imprint | telephone, email |
-| imprint | register court and HRB number |
-| imprint | VAT ID (DE…) |
-| imprint | person responsible for editorial content (§ 18 (2) MStV) |
-| privacy | hosting provider: GoDaddy (decided 28 Sep). The contracting GoDaddy entity, its address and the basis for the US transfer come from GoDaddy's Data Processing Addendum for the account; see `HANDOFF-godaddy.md` |
-| privacy | server-log retention, in days (depends on the host) |
-| privacy | deletion period, in months, for enquiries that do not lead to a booking |
-
-The booking conditions have no gaps left. Deposit, balance date, payment methods,
-change fees and the organiser's cancellation scale are now stated as "in the offer
-and the confirmation", because they vary by line and by booking.
+| privacy | the contracting GoDaddy company and its address, from GoDaddy's data processing addendum (prompt in HANDOFF-godaddy.md) |
 
 ## Decisions taken in the text: check these
 

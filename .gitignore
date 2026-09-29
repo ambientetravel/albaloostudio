@@ -99,6 +99,8 @@ cruise24-me/media/*
 !cruise24-me/media/variety/
 !cruise24-me/media/cruisehost/
 !cruise24-me/media/lines/
+# Hero video trimmed to open on the balcony (29 Sep): made here, not downloaded.
+!cruise24-me/media/hero-balcony-*
 # print-sized masters from the CDN, kept locally so optimize_media.py can re-run
 cruise24-me/media-originals/
 

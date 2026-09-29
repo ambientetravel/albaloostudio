@@ -50,7 +50,28 @@ def deployable() -> list[Path]:
         if rel.startswith("api/data/") and p.name != ".htaccess":
             continue  # stored requests stay on the server that received them
         out.append(p)
-    return out
+    return drop_unused_media(out)
+
+
+def drop_unused_media(files: list[Path]) -> list[Path]:
+    """Leave out files under media/ that no page, script, stylesheet or data file refers to,
+    either by path or through a data-media URL mapped in media/index.json."""
+    import json
+    index = json.loads((HERE / "media/index.json").read_text(encoding="utf-8"))
+    text = "\n".join(p.read_text(encoding="utf-8", errors="ignore") for p in files
+                     if p.suffix in {".html", ".js", ".css", ".json"} and p.name != "index.json")
+    used = {v for k, v in index.items() if k in text}
+    keep, dropped = [], []
+    for p in files:
+        rel = p.relative_to(HERE).as_posix()
+        if rel.startswith("media/") and rel != "media/index.json" and rel not in used and rel not in text:
+            dropped.append(rel)
+            continue
+        keep.append(p)
+    if dropped:
+        print(f"left out {len(dropped)} unused media files ({sum((HERE / d).stat().st_size for d in dropped) / 1e6:.1f} MB): "
+              + ", ".join(d.split("/")[-1] for d in dropped[:8]) + (" …" if len(dropped) > 8 else ""))
+    return keep
 
 
 class Links(HTMLParser):
