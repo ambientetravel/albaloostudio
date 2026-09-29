@@ -29,8 +29,9 @@
    "sessionId": "local_dd38a73a-fdf4-4ba3-8ac8-b9dab001294a",
    "confirmed_by_user": true,
    "repo_paths": [
-    "cruise24-ir/"
-   ]
+    "/Users/alimozzy/cruise24.ir/"
+   ],
+   "note": "29 Sep 2026: repo_paths corrected. The live tree is /Users/alimozzy/cruise24.ir/ (GitHub ambientetravel/cruise24-ir, auto-deploy via the deploy branch). claude websitebuilder/cruise24-ir/ is the DEAD tree from August — never build or deploy from it. cruise24.me: staging.cruise24.me (GoDaddy, 92.205.251.216) was NOT built by this session and its source is not on this Mac; ask Alireza where it lives before changing it."
   },
   {
    "properties": [
