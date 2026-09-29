@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>مجله · کروزنامه</title>
-<meta name="description" content="نخستین رسانهٔ فارسی‌زبان سفر دریایی">
+<meta name="description" content="مجلهٔ کروزنامه: مقصدها، سفرها، کشتی‌ها و یادداشت‌ها، به فارسی.">
 <link rel="canonical" href="https://cruisenameh.com/journal/">
 <meta property="og:type" content="website"><meta property="og:locale" content="fa_IR">
 <meta property="og:site_name" content="کروزنامه">
-<meta property="og:title" content="مجله · کروزنامه"><meta property="og:description" content="نخستین رسانهٔ فارسی‌زبان سفر دریایی">
+<meta property="og:title" content="مجله · کروزنامه"><meta property="og:description" content="مجلهٔ کروزنامه: مقصدها، سفرها، کشتی‌ها و یادداشت‌ها، به فارسی.">
 <meta name="theme-color" content="#0b1220">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/img/icon.svg" type="image/svg+xml">
@@ -19,31 +19,1342 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <script>/* motion only when the reader allows it; without this class every page rests fully visible */
 if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('js-story')</script>
-<link rel="stylesheet" href="/css/hub.css?v=2026-09-23">
+<link rel="stylesheet" href="/css/hub.css?v=2026-09-29">
 
 </head>
-<body class="page">
+<body class="page journal">
 <a class="skip" href="#main">پرش به محتوا</a>
 <header class="nav" id="nav">
   <div class="nav__in">
     <a class="brand" href="/"><span class="brand__fa">کروزنامه</span><span class="brand__latin">CRUISENAMEH</span></a>
     <nav class="nav__links" aria-label="بخش‌ها">
-      <a href="/news/">اخبار</a><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/excursions/">گشت و اقامت</a><a href="/unesco/">میراث جهانی</a><a href="/offers/">پیشنهادها</a><a href="/journal/">مجله</a>
+      <a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a><a href="/journal/">مجله</a><a href="/guides/">راهنماها</a>
     </nav>
     <div class="nav__tools">
-      <a class="nav__tg" href="https://t.me/cruisenameh" rel="noopener" target="_blank" aria-label="تلگرام">تلگرام</a>
+      <button class="nav__search" id="searchBtn" type="button" aria-label="جست‌وجو" aria-controls="searchPanel" aria-expanded="false"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <a class="nav__tg" href="/#newsletter">خبرنامه</a>
       <button class="nav__burger" id="burger" aria-label="منو" aria-expanded="false"><span></span><span></span></button>
     </div>
   </div>
   <div class="nav__sheet" id="sheet">
-    <a href="/news/">اخبار</a><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/excursions/">گشت و اقامت</a><a href="/unesco/">میراث جهانی</a><a href="/offers/">پیشنهادها</a><a href="/journal/">مجله</a>
+    <a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a><a href="/journal/">مجله</a><a href="/guides/">راهنماها</a>
     <a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامه</a><a href="/policy/">سیاست تحریریه</a>
   </div>
 </header>
+<div class="search" id="searchPanel" role="dialog" aria-label="جست‌وجو در کروزنامه" hidden>
+  <div class="wrap search__in">
+    <form class="search__form" action="/journal/" role="search" onsubmit="return window.hubSearch && hubSearch(this)">
+      <input type="search" name="q" placeholder="بندر، کشتی، رودخانه، داستان…" aria-label="جست‌وجو" autocomplete="off">
+      <button type="submit">جست‌وجو</button>
+    </form>
+    <div class="search__results" id="searchResults"></div>
+    <button class="search__x" type="button" data-close-search>بستن</button>
+  </div>
+</div>
 <main id="main">
 
-<section class="pagehead"><div class="wrap"><p class="kicker">مجله</p><h1 class="display display--md">کروزنامه می‌نویسد</h1></div></section>
-<section class="sec"><div class="wrap grid3"><a class="tile" href="/journal/avalin-cruise-visa/"><p class="kicker">مدرسهٔ کروز · <time class="dt dt--c" datetime="2026-09-06"><span class="dt__j">۱۵ شهریور ۱۴۰۵</span><span class="dt__g">۶ سپتامبر ۲۰۲۶</span></time></p><h3>پیش از اولین کروز، سه چیز را روشن کنید</h3><p>ویزا، پرواز، و ساعت سوارشدن؛ سه جایی که سفر اول معمولاً خراب می‌شود.</p></a><a class="tile" href="/journal/chera-cruisenameh/"><p class="kicker">سرمقاله · <time class="dt dt--c" datetime="2026-09-06"><span class="dt__j">۱۵ شهریور ۱۴۰۵</span><span class="dt__g">۶ سپتامبر ۲۰۲۶</span></time></p><h3>چرا کروزنامه</h3><p>یک رسانهٔ فارسی که چیزی نمی‌فروشد، تا بتواند همه‌چیز را بگوید.</p></a></div></section>
+<header class="jhead"><div class="wrap">
+  <p class="kicker">رسانهٔ فارسی‌زبان کروز و سفر دریایی</p>
+  <h1 class="jhead__t">مجلهٔ کروزنامه</h1>
+  <p class="lede">دریا به روایت فارسی: هر بندر، هر کشتی و هر مسیر، با یک پرسش ثابت — برای گذرنامهٔ ایرانی چه معنایی دارد؟</p>
+</div></header>
+<section class="jcover"><div class="wrap"><a class="sc sc--lead st st--card" data-i="0" data-dept="journeys" href="/journal/avalin-cruise-visa/">
+  <figure class="sc__img"><img src="/img/scene-galataport.webp" alt="گالاتاپورت، استانبول" loading="lazy" decoding="async" width="1600" height="900"></figure>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">مدرسهٔ کروز</span></p>
+    <h3 class="sc__title">پیش از اولین کروز، سه چیز را روشن کنید</h3>
+    <p class="sc__dek">ویزا، پرواز، و ساعت سوارشدن؛ سه جایی که سفر اول معمولاً خراب می‌شود.</p>
+    <p class="sc__foot"><span>۱ دقیقه خواندن</span><time class="dt dt--c" datetime="2026-09-06"><span class="dt__j">۱۵ شهریور ۱۴۰۵</span><span class="dt__g">۶ سپتامبر ۲۰۲۶</span></time></p>
+  </div>
+</a></div></section>
+<section class="sec sec--tight" id="all"><div class="wrap">
+  <div class="chips" role="tablist" aria-label="بخش‌ها" data-chips="#stories">
+    <button class="chip2 is-on" data-f="" role="tab" aria-selected="true">همه <small>۱۰۸</small></button>
+    <button class="chip2" data-f="destinations" role="tab" aria-selected="false">مقصدها <small>۷۵</small></button><button class="chip2" data-f="journeys" role="tab" aria-selected="false">سفرها <small>۱۱</small></button><button class="chip2" data-f="vessels" role="tab" aria-selected="false">کشتی‌ها <small>۲۱</small></button><button class="chip2" data-f="notes" role="tab" aria-selected="false">یادداشت <small>۱</small></button>
+  </div>
+  <div class="sgrid" id="stories"><a class="sc sc--std st st--card" data-i="1" data-dept="notes" href="/journal/chera-cruisenameh/">
+  <figure class="sc__img"><img src="/img/scene-balcony.webp" alt="بالکن کابین، رو به دریا" loading="lazy" decoding="async" width="1600" height="900"></figure>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">یادداشت</span><span class="sc__kick">سرمقاله</span></p>
+    <h3 class="sc__title">چرا کروزنامه</h3>
+    <p class="sc__dek">یک رسانهٔ فارسی که چیزی نمی‌فروشد، تا بتواند همه‌چیز را بگوید.</p>
+    <p class="sc__foot"><span>۱ دقیقه خواندن</span><time class="dt dt--c" datetime="2026-09-06"><span class="dt__j">۱۵ شهریور ۱۴۰۵</span><span class="dt__g">۶ سپتامبر ۲۰۲۶</span></time></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/ports/kusadasi/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">کوش‌آداسی</span>
+  <span class="cover__la">Kuşadası</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">ترکیه · دریای اژه</span></p>
+    <h3 class="sc__title">کوش‌آداسی</h3>
+    <p class="sc__dek">پرترددترین بندر کروز ترکیه؛ ترمینال در دلِ شهر است و افسوس در بیست دقیقه.</p>
+    <p class="sc__foot"><span>۱ دقیقه خواندن</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/ports/istanbul-galataport/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">استانبول</span>
+  <span class="cover__la">Galataport, Istanbul</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">ترکیه · بسفر</span></p>
+    <h3 class="sc__title">استانبول · گالاتاپورت</h3>
+    <p class="sc__dek">ترمینالی زیرزمینی در کاراکوی که وقتی کشتی نیست، اسکله‌اش پیاده‌روی شهر می‌شود.</p>
+    <p class="sc__foot"><span>۱ دقیقه خواندن</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/ports/dubai/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">دبی</span>
+  <span class="cover__la">Dubai</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">امارات · خلیج فارس</span></p>
+    <h3 class="sc__title">دبی</h3>
+    <p class="sc__dek">بندر خانگی کروزهای زمستانی خلیج فارس؛ دو ترمینال، پورت راشد و دبی هاربر.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/ports/doha/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">دوحه</span>
+  <span class="cover__la">Doha</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">قطر · خلیج فارس</span></p>
+    <h3 class="sc__title">دوحه</h3>
+    <p class="sc__dek">ترمینال بزرگ کروز در بندر قدیم دوحه، چند دقیقه تا سوق واقف.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/ports/abu-dhabi/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">ابوظبی</span>
+  <span class="cover__la">Abu Dhabi</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">امارات · خلیج فارس</span></p>
+    <h3 class="sc__title">ابوظبی</h3>
+    <p class="sc__dek">ترمینال کروز بندر زاید؛ مسجد شیخ زاید و لوور ابوظبی در یک روز.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/ports/muscat/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">مسقط</span>
+  <span class="cover__la">Muscat</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">عمان · دریای عمان</span></p>
+    <h3 class="sc__title">مسقط</h3>
+    <p class="sc__dek">بندر سلطان قابوس در مطرح؛ بازار مطرح درست روبه‌روی اسکله.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/ports/piraeus/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">پیره‌آس</span>
+  <span class="cover__la">Piraeus</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">یونان · دریای اژه</span></p>
+    <h3 class="sc__title">پیره‌آس (آتن)</h3>
+    <p class="sc__dek">بندر آتن و مبدأ بیشتر کروزهای جزایر یونان؛ آکروپولیس در نیم ساعت.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/ports/santorini/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">سانتورینی</span>
+  <span class="cover__la">Santorini</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">یونان · دریای اژه</span></p>
+    <h3 class="sc__title">سانتورینی</h3>
+    <p class="sc__dek">لنگرگاه در دهانهٔ آتشفشان؛ با قایق به ساحل، با تله‌کابین به فیرا.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/ports/rhodes/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">رودس</span>
+  <span class="cover__la">Rhodes</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">یونان · دریای اژه</span></p>
+    <h3 class="sc__title">رودس</h3>
+    <p class="sc__dek">کشتی کنار دیوارهای شهر قرون‌وسطایی پهلو می‌گیرد؛ میراث جهانی در پنج دقیقه پیاده.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/ports/jeddah/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">جده</span>
+  <span class="cover__la">Jeddah</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">عربستان · دریای سرخ</span></p>
+    <h3 class="sc__title">جده</h3>
+    <p class="sc__dek">بندر خانگی AROYA؛ البلد، جدهٔ تاریخی، در فهرست یونسکو.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/ports/bodrum/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">بدروم</span>
+  <span class="cover__la">Bodrum</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">ترکیه · دریای اژه</span></p>
+    <h3 class="sc__title">بدروم</h3>
+    <p class="sc__dek">قلعهٔ سن‌پیتر روبه‌روی اسکله؛ جای آرامگاه هالیکارناس، یکی از عجایب هفتگانه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/ports/izmir/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">ازمیر</span>
+  <span class="cover__la">İzmir</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">ترکیه · دریای اژه</span></p>
+    <h3 class="sc__title">ازمیر</h3>
+    <p class="sc__dek">بندر آلسانجاک در مرکز شهر؛ افسوس و پرگامون هر دو در دسترس یک روز.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/ports/safaga/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">سفاگا</span>
+  <span class="cover__la">Safaga</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">مصر · دریای سرخ</span></p>
+    <h3 class="sc__title">سفاگا</h3>
+    <p class="sc__dek">دروازهٔ دریایی اقصر؛ درهٔ پادشاهان با یک روزِ طولانی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/ports/mahe/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">بندر</span>
+  <span class="cover__fa">ماهه</span>
+  <span class="cover__la">Mahé, Seychelles</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">سیشل · اقیانوس هند</span></p>
+    <h3 class="sc__title">ماهه (سیشل)</h3>
+    <p class="sc__dek">ویکتوریا، یکی از کوچک‌ترین پایتخت‌های جهان؛ بدون ویزا برای همه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="vessels" href="/ships/msc-world-europa/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی</span>
+  <span class="cover__fa">MSC World Europa</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">MSC · کلاس World</span></p>
+    <h3 class="sc__title">MSC World Europa</h3>
+    <p class="sc__dek">نخستین کشتی کلاس World؛ سوخت LNG، ۲۲ عرشه، و «گذرگاه» ۱۰۴ متری روباز در قلب کشتی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="vessels" href="/ships/msc-euribia/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی</span>
+  <span class="cover__fa">MSC Euribia</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">MSC · Meraviglia-Plus</span></p>
+    <h3 class="sc__title">MSC Euribia</h3>
+    <p class="sc__dek">بدنهٔ نقاشی‌شده و سوخت LNG؛ کشتی شمال اروپا و مدیترانهٔ MSC.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="vessels" href="/ships/msc-bellissima/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی</span>
+  <span class="cover__fa">MSC Bellissima</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">MSC · Meraviglia</span></p>
+    <h3 class="sc__title">MSC Bellissima</h3>
+    <p class="sc__dek">کشتی آشنای زمستان‌های خلیج فارس؛ گالری سرپوشیده با سقف LED.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="vessels" href="/ships/costa-smeralda/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی</span>
+  <span class="cover__fa">Costa Smeralda</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">Costa · Excellence</span></p>
+    <h3 class="sc__title">Costa Smeralda</h3>
+    <p class="sc__dek">طراحی داخلی به دست آدام تیهانی؛ سوخت LNG؛ کشتی ایتالیایی مدیترانه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="vessels" href="/ships/aroya/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی</span>
+  <span class="cover__fa">AROYA</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">AROYA Cruises · جده</span></p>
+    <h3 class="sc__title">AROYA</h3>
+    <p class="sc__dek">نخستین کشتی خط کروز سعودی؛ ساخت ۲۰۱۷، بازآفرینی ۲۰۲۴، بدون الکل، آشپزی خاورمیانه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="vessels" href="/ships/explora-i/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی</span>
+  <span class="cover__fa">Explora I</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">Explora Journeys</span></p>
+    <h3 class="sc__title">Explora I</h3>
+    <p class="sc__dek">۴۶۱ سوئیت، همه با تراس رو به دریا؛ نسخهٔ لوکس گروه MSC.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="vessels" href="/ships/explora-ii/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی</span>
+  <span class="cover__fa">Explora II</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">Explora Journeys</span></p>
+    <h3 class="sc__title">Explora II</h3>
+    <p class="sc__dek">خواهرِ Explora I، از ۲۰۲۴ در مدیترانه و خلیج فارس.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="vessels" href="/ships/celestyal-journey/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی</span>
+  <span class="cover__fa">Celestyal Journey</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">Celestyal · جزایر یونان و خلیج فارس</span></p>
+    <h3 class="sc__title">Celestyal Journey</h3>
+    <p class="sc__dek">کشتی میان‌قامت یونانی؛ تابستان اژه، زمستان خلیج فارس.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="vessels" href="/river-ships/viking-longship/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی رودخانه‌ای</span>
+  <span class="cover__fa">کلاس Viking Longship</span>
+  <span class="cover__la">Viking Longship class</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">Viking · راین، دانوب، سن</span></p>
+    <h3 class="sc__title">کلاس Viking Longship</h3>
+    <p class="sc__dek">استاندارد کشتی رودخانه‌ای اروپا؛ ۱۳۵ متر، چون قفل‌ها بلندتر را راه نمی‌دهند.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="vessels" href="/river-ships/amamagna/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی رودخانه‌ای</span>
+  <span class="cover__fa">AmaMagna</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">AmaWaterways · دانوب</span></p>
+    <h3 class="sc__title">AmaMagna</h3>
+    <p class="sc__dek">دو برابر پهن‌تر از کشتی‌های رودخانه‌ای معمول؛ استخر، چهار رستوران، فقط ۱۹۶ مهمان.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="vessels" href="/river-ships/viking-osiris/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی رودخانه‌ای</span>
+  <span class="cover__fa">Viking Osiris</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">Viking · نیل</span></p>
+    <h3 class="sc__title">Viking Osiris</h3>
+    <p class="sc__dek">کشتی نیلِ وایکینگ، ۸۲ مهمان، میان اقصر و اسوان.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="vessels" href="/river-ships/oberoi-zahra/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی رودخانه‌ای</span>
+  <span class="cover__fa">Oberoi Zahra</span>
+  <span class="cover__la">The Oberoi Zahra</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">Oberoi · نیل</span></p>
+    <h3 class="sc__title">Oberoi Zahra</h3>
+    <p class="sc__dek">۲۷ کابین، اسپا، و سرویس هتل‌های اوبروی روی نیل.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="vessels" href="/river-ships/ss-maria-theresa/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">کشتی رودخانه‌ای</span>
+  <span class="cover__fa">S.S. Maria Theresa</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">Uniworld · دانوب</span></p>
+    <h3 class="sc__title">S.S. Maria Theresa</h3>
+    <p class="sc__dek">کشتی «قصر شناور» یونی‌ورلد؛ دکور باروک، ۱۵۰ مهمان.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="vessels" href="/lines/msc/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">خط کروز</span>
+  <span class="cover__fa">MSC Cruises</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">ژنو · بزرگ‌ترین خط کروز خصوصی جهان</span></p>
+    <h3 class="sc__title">MSC Cruises</h3>
+    <p class="sc__dek">کشتی‌های بزرگ، سبک اروپایی، و پرتکرارترین نام در کروزهای خلیج فارس برای مسافر ایرانی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="vessels" href="/lines/costa/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">خط کروز</span>
+  <span class="cover__fa">Costa Cruises</span>
+  <span class="cover__la">Costa Crociere</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">جنوا · کروز به سبک ایتالیایی</span></p>
+    <h3 class="sc__title">Costa Cruises</h3>
+    <p class="sc__dek">قدیمی‌ترین خط کروز ایتالیا؛ مدیترانه، خلیج فارس، و آشپزی ایتالیایی روی آب.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="vessels" href="/lines/aroya/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">خط کروز</span>
+  <span class="cover__fa">AROYA Cruises</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">جده · نخستین خط کروز سعودی</span></p>
+    <h3 class="sc__title">AROYA Cruises</h3>
+    <p class="sc__dek">از دسامبر ۲۰۲۴؛ بدون الکل، آشپزی خاورمیانه، و معدود مسیرهای واقعاً بدون ویزا برای ایرانیان.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="vessels" href="/lines/explora-journeys/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">خط کروز</span>
+  <span class="cover__fa">Explora Journeys</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">ژنو · لوکس، گروه MSC</span></p>
+    <h3 class="sc__title">Explora Journeys</h3>
+    <p class="sc__dek">کشتی‌های ۹۲۲ نفره، همه‌سوئیت، برای مسافری که کشتی بزرگ نمی‌خواهد.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="vessels" href="/lines/celestyal/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">خط کروز</span>
+  <span class="cover__fa">Celestyal</span>
+  <span class="cover__la">Celestyal Cruises</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">یونان · جزایر اژه و خلیج فارس</span></p>
+    <h3 class="sc__title">Celestyal</h3>
+    <p class="sc__dek">کشتی‌های میان‌قامت، مسیرهای کوتاه جزایر یونان، و زمستان‌های خلیج فارس.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="vessels" href="/lines/viking/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">خط کروز</span>
+  <span class="cover__fa">Viking</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">بازل · رودخانه و اقیانوس، بدون کودک</span></p>
+    <h3 class="sc__title">Viking</h3>
+    <p class="sc__dek">بزرگ‌ترین خط کروز رودخانه‌ای جهان؛ بدون کازینو، بدون کودک، بدون بوفهٔ شبانه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="vessels" href="/lines/amawaterways/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">خط کروز</span>
+  <span class="cover__fa">AmaWaterways</span>
+  
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">کالیفرنیا · رودخانه‌ای، خانوادگی</span></p>
+    <h3 class="sc__title">AmaWaterways</h3>
+    <p class="sc__dek">کشتی‌های رودخانه‌ای با آشپزی و دوچرخه؛ مالک AmaMagna.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="vessels" href="/lines/uniworld/">
+  <div class="sc__cover cover cover--vessels" aria-hidden="true">
+  <span class="cover__coll">خط کروز</span>
+  <span class="cover__fa">Uniworld</span>
+  <span class="cover__la">Uniworld Boutique River Cruises</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">کشتی‌ها</span><span class="sc__kick">لس‌آنجلس · رودخانه‌ای بوتیک</span></p>
+    <h3 class="sc__title">Uniworld</h3>
+    <p class="sc__dek">کشتی‌های رودخانه‌ای تزئین‌شده مثل هتل‌های بوتیک؛ همه‌چیز شامل.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="journeys" href="/rivers/danube/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">رودخانه</span>
+  <span class="cover__fa">دانوب</span>
+  <span class="cover__la">Danube</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">اروپای مرکزی · ۱۰ کشور</span></p>
+    <h3 class="sc__title">دانوب</h3>
+    <p class="sc__dek">پرکروزترین رودخانهٔ جهان؛ چهار پایتخت روی یک آب.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="journeys" href="/rivers/rhine/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">رودخانه</span>
+  <span class="cover__fa">راین</span>
+  <span class="cover__la">Rhine</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">سوئیس تا هلند</span></p>
+    <h3 class="sc__title">راین</h3>
+    <p class="sc__dek">قلعه‌ها، تاکستان‌ها، و درهٔ راینِ میانی در فهرست یونسکو.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="journeys" href="/rivers/nile/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">رودخانه</span>
+  <span class="cover__fa">نیل</span>
+  <span class="cover__la">Nile</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">مصر · اقصر تا اسوان</span></p>
+    <h3 class="sc__title">نیل</h3>
+    <p class="sc__dek">قدیمی‌ترین مسیر کروز جهان؛ معبدها میان دو ساحل.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="journeys" href="/rivers/douro/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">رودخانه</span>
+  <span class="cover__fa">دورو</span>
+  <span class="cover__la">Douro</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">پرتغال · پورتو تا مرز اسپانیا</span></p>
+    <h3 class="sc__title">دورو</h3>
+    <p class="sc__dek">رودخانهٔ شراب پورت؛ تراس‌های تاکستان در یونسکو.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="journeys" href="/rivers/mekong/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">رودخانه</span>
+  <span class="cover__fa">مکونگ</span>
+  <span class="cover__la">Mekong</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">ویتنام و کامبوج</span></p>
+    <h3 class="sc__title">مکونگ</h3>
+    <p class="sc__dek">از دلتای مکونگ تا انگکور؛ کروز رودخانه‌ای آسیا.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="journeys" href="/rivers/seine/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">رودخانه</span>
+  <span class="cover__fa">سن</span>
+  <span class="cover__la">Seine</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">فرانسه · پاریس تا نرماندی</span></p>
+    <h3 class="sc__title">سن</h3>
+    <p class="sc__dek">از پاریس تا سواحل نرماندی و صومعهٔ مون‌سن‌میشل.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/river-ports/vienna/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">وین</span>
+  <span class="cover__la">Vienna</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اتریش · دانوب</span></p>
+    <h3 class="sc__title">وین</h3>
+    <p class="sc__dek">کشتی در کنار جزیرهٔ دانوب می‌ایستد؛ مرکز تاریخی با مترو ۱۵ دقیقه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/river-ports/budapest/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">بوداپست</span>
+  <span class="cover__la">Budapest</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">مجارستان · دانوب</span></p>
+    <h3 class="sc__title">بوداپست</h3>
+    <p class="sc__dek">زیباترین پهلوگیری اروپا: زیر قلعه، روبه‌روی پارلمان.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/river-ports/passau/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">پاساو</span>
+  <span class="cover__la">Passau</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">آلمان · تلاقی سه رودخانه</span></p>
+    <h3 class="sc__title">پاساو</h3>
+    <p class="sc__dek">شهر سه رودخانه؛ نقطهٔ شروع کلاسیک کروز دانوب.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/river-ports/bratislava/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">براتیسلاوا</span>
+  <span class="cover__la">Bratislava</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اسلواکی · دانوب</span></p>
+    <h3 class="sc__title">براتیسلاوا</h3>
+    <p class="sc__dek">پایتختی کوچک که در سه ساعت پیاده تمام می‌شود.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/river-ports/amsterdam/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">آمستردام</span>
+  <span class="cover__la">Amsterdam</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">هلند · راین و کانال‌ها</span></p>
+    <h3 class="sc__title">آمستردام</h3>
+    <p class="sc__dek">پایان کروز راین؛ کشتی پشت ایستگاه مرکزی می‌ایستد.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/river-ports/cologne/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">کلن</span>
+  <span class="cover__la">Cologne</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">آلمان · راین</span></p>
+    <h3 class="sc__title">کلن</h3>
+    <p class="sc__dek">کلیسای جامع از عرشه دیده می‌شود.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/river-ports/basel/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">بازل</span>
+  <span class="cover__la">Basel</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">سوئیس · راین</span></p>
+    <h3 class="sc__title">بازل</h3>
+    <p class="sc__dek">سرِ راین برای کشتی‌ها؛ آغاز کروز راین.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/river-ports/porto/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">پورتو</span>
+  <span class="cover__la">Porto</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">پرتغال · دورو</span></p>
+    <h3 class="sc__title">پورتو</h3>
+    <p class="sc__dek">کشتی روبه‌روی انبارهای شراب پورت پهلو می‌گیرد.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/river-ports/luxor/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">اقصر</span>
+  <span class="cover__la">Luxor</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">مصر · نیل</span></p>
+    <h3 class="sc__title">اقصر</h3>
+    <p class="sc__dek">بزرگ‌ترین موزهٔ روباز جهان؛ کارناک در شرق، درهٔ پادشاهان در غرب.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/river-ports/aswan/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">اسوان</span>
+  <span class="cover__la">Aswan</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">مصر · نیل</span></p>
+    <h3 class="sc__title">اسوان</h3>
+    <p class="sc__dek">جنوبی‌ترین توقف کروز نیل؛ فیله و پرواز به ابوسمبل.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/river-ports/paris/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">شهر رودخانه‌ای</span>
+  <span class="cover__fa">پاریس</span>
+  <span class="cover__la">Paris</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">فرانسه · سن</span></p>
+    <h3 class="sc__title">پاریس</h3>
+    <p class="sc__dek">کشتی‌های سن از نزدیک برج ایفل حرکت می‌کنند.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/excursions/ephesus-half-day/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">افسوس، نیم روز از کوش‌آداسی</span>
+  <span class="cover__la">Ephesus from Kuşadası</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">گشت بندری · تاریخی</span></p>
+    <h3 class="sc__title">افسوس، نیم روز از کوش‌آداسی</h3>
+    <p class="sc__dek">بیست کیلومتر جاده، سه ساعت در شهر رومی، و کتابخانهٔ سلسوس در انتها.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/excursions/istanbul-old-city/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">شهر قدیم استانبول از گالاتاپورت</span>
+  <span class="cover__la">Istanbul Old City from Galataport</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">گشت بندری · پیاده و تراموا</span></p>
+    <h3 class="sc__title">شهر قدیم استانبول از گالاتاپورت</h3>
+    <p class="sc__dek">با تراموا تا سلطان‌احمد؛ ایاصوفیه، مسجد آبی، توپکاپی، بازار بزرگ.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/excursions/luxor-from-safaga/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">اقصر، یک روز کامل از سفاگا</span>
+  <span class="cover__la">Luxor from Safaga</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">گشت بندری · طولانی</span></p>
+    <h3 class="sc__title">اقصر، یک روز کامل از سفاگا</h3>
+    <p class="sc__dek">سه ساعت و نیم رفت، سه ساعت و نیم برگشت، و میانش کارناک و درهٔ پادشاهان.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/excursions/petra-from-aqaba/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">پترا از عقبه</span>
+  <span class="cover__la">Petra from Aqaba</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">گشت بندری · طولانی</span></p>
+    <h3 class="sc__title">پترا از عقبه</h3>
+    <p class="sc__dek">دو ساعت جاده تا شهر سنگی نبطی‌ها.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/excursions/athens-acropolis/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">آکروپولیس از پیره‌آس</span>
+  <span class="cover__la">Acropolis from Piraeus</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">گشت بندری · تاریخی</span></p>
+    <h3 class="sc__title">آکروپولیس از پیره‌آس</h3>
+    <p class="sc__dek">مترو یا تاکسی تا پلاکا؛ پارتنون بالای سر.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/excursions/pamukkale-from-kusadasi/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">پاموکاله از کوش‌آداسی</span>
+  <span class="cover__la">Pamukkale from Kuşadası</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">گشت بندری · طولانی</span></p>
+    <h3 class="sc__title">پاموکاله از کوش‌آداسی</h3>
+    <p class="sc__dek">تراس‌های سفید و هیراپولیس؛ روزی طولانی اما فراموش‌نشدنی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/excursions/muscat-muttrah/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">مطرح و مسقط قدیم</span>
+  <span class="cover__la">Muttrah and Old Muscat</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">گشت بندری · پیاده</span></p>
+    <h3 class="sc__title">مطرح و مسقط قدیم</h3>
+    <p class="sc__dek">بازار مطرح روبه‌روی کشتی، قصر العلم با تاکسی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/excursions/istanbul-pre-stay/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">دو شب استانبول پیش از کروز</span>
+  <span class="cover__la">Istanbul pre-cruise stay</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اقامت کوتاه · پیش از سفر</span></p>
+    <h3 class="sc__title">دو شب استانبول پیش از کروز</h3>
+    <p class="sc__dek">هتل در کاراکوی یا بی‌اوغلو، پیاده تا ترمینال.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/excursions/dubai-post-stay/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">دو شب دبی پس از کروز</span>
+  <span class="cover__la">Dubai post-cruise stay</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اقامت کوتاه · پس از سفر</span></p>
+    <h3 class="sc__title">دو شب دبی پس از کروز</h3>
+    <p class="sc__dek">پیاده‌شدن صبح، هتل تا شب، پرواز کوتاه به خانه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/excursions/bodrum-peninsula-stay/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">گشت</span>
+  <span class="cover__fa">سه شب شبه‌جزیرهٔ بدروم</span>
+  <span class="cover__la">Bodrum peninsula stay</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اقامت کوتاه · لوکس</span></p>
+    <h3 class="sc__title">سه شب شبه‌جزیرهٔ بدروم</h3>
+    <p class="sc__dek">آمان‌رویا، ماندارین اورینتال یا سیکس‌سنسز؛ پیش از سوارشدن در بدروم یا کوش‌آداسی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/unesco/ephesus/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">افسوس</span>
+  <span class="cover__la">Ephesus</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">ترکیه · ثبت ۲۰۱۵</span></p>
+    <h3 class="sc__title">افسوس</h3>
+    <p class="sc__dek">شهر رومیِ ایونیا؛ کتابخانهٔ سلسوس، تئاتر ۲۴ هزار نفره، و خانهٔ مریم.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/unesco/istanbul-historic/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">محدوده‌های تاریخی استانبول</span>
+  <span class="cover__la">Historic Areas of Istanbul</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">ترکیه · ثبت ۱۹۸۵</span></p>
+    <h3 class="sc__title">محدوده‌های تاریخی استانبول</h3>
+    <p class="sc__dek">ایاصوفیه، توپکاپی، مسجد سلیمانیه، دیوارهای تئودوسیوس.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/unesco/acropolis/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">آکروپولیس آتن</span>
+  <span class="cover__la">Acropolis, Athens</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">یونان · ثبت ۱۹۸۷</span></p>
+    <h3 class="sc__title">آکروپولیس آتن</h3>
+    <p class="sc__dek">پارتنون و معابد قرن پنجم پیش از میلاد.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/unesco/rhodes-medieval/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">شهر قرون‌وسطایی رودس</span>
+  <span class="cover__la">Medieval City of Rhodes</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">یونان · ثبت ۱۹۸۸</span></p>
+    <h3 class="sc__title">شهر قرون‌وسطایی رودس</h3>
+    <p class="sc__dek">شهر شوالیه‌های سن‌ژان، کنار اسکله.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/unesco/historic-jeddah/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">جدهٔ تاریخی، دروازهٔ مکه</span>
+  <span class="cover__la">Historic Jeddah</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">عربستان · ثبت ۲۰۱۴</span></p>
+    <h3 class="sc__title">جدهٔ تاریخی، دروازهٔ مکه</h3>
+    <p class="sc__dek">البلد؛ خانه‌های مرجانی و مشربیه‌های چوبی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/unesco/thebes-luxor/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">تِب باستان و گورستان‌هایش</span>
+  <span class="cover__la">Ancient Thebes with its Necropolis</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">مصر · ثبت ۱۹۷۹</span></p>
+    <h3 class="sc__title">تِب باستان و گورستان‌هایش</h3>
+    <p class="sc__dek">کارناک، معبد اقصر، درهٔ پادشاهان.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/unesco/nubian-monuments/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">آثار نوبی از ابوسمبل تا فیله</span>
+  <span class="cover__la">Nubian Monuments from Abu Simbel to Philae</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">مصر · ثبت ۱۹۷۹</span></p>
+    <h3 class="sc__title">آثار نوبی از ابوسمبل تا فیله</h3>
+    <p class="sc__dek">معبدهایی که برای سد اسوان جابه‌جا شدند.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/unesco/pergamon/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">پرگامون</span>
+  <span class="cover__la">Pergamon</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">ترکیه · ثبت ۲۰۱۴</span></p>
+    <h3 class="sc__title">پرگامون</h3>
+    <p class="sc__dek">آکروپولیس هلنیستی بالای برگاما.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/unesco/pamukkale/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">هیراپولیس و پاموکاله</span>
+  <span class="cover__la">Hierapolis-Pamukkale</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">ترکیه · ثبت ۱۹۸۸</span></p>
+    <h3 class="sc__title">هیراپولیس و پاموکاله</h3>
+    <p class="sc__dek">تراس‌های سفید آهکی و شهر رومی بالای آن.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/unesco/budapest-danube-banks/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">کرانه‌های دانوب و محلهٔ قلعهٔ بودا</span>
+  <span class="cover__la">Budapest, Banks of the Danube</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">مجارستان · ثبت ۱۹۸۷</span></p>
+    <h3 class="sc__title">کرانه‌های دانوب و محلهٔ قلعهٔ بودا</h3>
+    <p class="sc__dek">پارلمان، پل زنجیر، قلعهٔ بودا؛ همه از عرشه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/unesco/vienna-historic/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">مرکز تاریخی وین</span>
+  <span class="cover__la">Historic Centre of Vienna</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اتریش · ثبت ۲۰۰۱</span></p>
+    <h3 class="sc__title">مرکز تاریخی وین</h3>
+    <p class="sc__dek">هوفبورگ، اشتفان‌دوم، رینگ‌اشتراسه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/unesco/upper-middle-rhine/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">درهٔ راین میانی</span>
+  <span class="cover__la">Upper Middle Rhine Valley</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">آلمان · ثبت ۲۰۰۲</span></p>
+    <h3 class="sc__title">درهٔ راین میانی</h3>
+    <p class="sc__dek">۶۵ کیلومتر قلعه، تاکستان و صخرهٔ لورلای.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/unesco/cologne-cathedral/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">کلیسای جامع کلن</span>
+  <span class="cover__la">Cologne Cathedral</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">آلمان · ثبت ۱۹۹۶</span></p>
+    <h3 class="sc__title">کلیسای جامع کلن</h3>
+    <p class="sc__dek">گوتیکِ ششصدساله، چند صد متر از اسکله.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/unesco/porto-historic/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">مرکز تاریخی پورتو</span>
+  <span class="cover__la">Historic Centre of Porto</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">پرتغال · ثبت ۱۹۹۶</span></p>
+    <h3 class="sc__title">مرکز تاریخی پورتو</h3>
+    <p class="sc__dek">ریبیرا، پل دون لوئیس، انبارهای شراب پورت.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/unesco/petra/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">پترا</span>
+  <span class="cover__la">Petra</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اردن · ثبت ۱۹۸۵</span></p>
+    <h3 class="sc__title">پترا</h3>
+    <p class="sc__dek">شهر سنگی نبطی‌ها، دو ساعت از عقبه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/unesco/dubrovnik/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">شهر قدیم دوبروونیک</span>
+  <span class="cover__la">Old City of Dubrovnik</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">کرواسی · ثبت ۱۹۷۹</span></p>
+    <h3 class="sc__title">شهر قدیم دوبروونیک</h3>
+    <p class="sc__dek">دیوارهای دو کیلومتری بر فراز آدریاتیک.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/unesco/valletta/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">میراث جهانی</span>
+  <span class="cover__fa">شهر والتا</span>
+  <span class="cover__la">City of Valletta</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">مالت · ثبت ۱۹۸۰</span></p>
+    <h3 class="sc__title">شهر والتا</h3>
+    <p class="sc__dek">شهر شوالیه‌ها، درست بالای بندر بزرگ.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/hotels/peninsula-istanbul/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">پنینسولا استانبول</span>
+  <span class="cover__la">The Peninsula Istanbul</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Peninsula · درون گالاتاپورت</span></p>
+    <h3 class="sc__title">پنینسولا استانبول</h3>
+    <p class="sc__dek">هتلی که در خودِ ترمینال کروز است؛ از تراس تا پلهٔ کشتی چند صد متر.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/hotels/four-seasons-bosphorus/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">فورسیزنز بسفر</span>
+  <span class="cover__la">Four Seasons Hotel Istanbul at the Bosphorus</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Four Seasons · کاخ عثمانی</span></p>
+    <h3 class="sc__title">فورسیزنز بسفر</h3>
+    <p class="sc__dek">کاخ قرن نوزدهم کنار آب؛ تا گالاتاپورت ۱۵ دقیقه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/hotels/amanruya/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">آمان‌رویا</span>
+  <span class="cover__la">Amanruya</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Aman · شبه‌جزیرهٔ بدروم</span></p>
+    <h3 class="sc__title">آمان‌رویا</h3>
+    <p class="sc__dek">سی‌وشش کلبهٔ سنگی با استخر خصوصی، میان درختان زیتون.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/hotels/mandarin-oriental-bodrum/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">ماندارین اورینتال بدروم</span>
+  <span class="cover__la">Mandarin Oriental, Bodrum</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Mandarin Oriental · خلیج پارادایز</span></p>
+    <h3 class="sc__title">ماندارین اورینتال بدروم</h3>
+    <p class="sc__dek">دو ساحل خصوصی و رستوران‌هایی که مسافر کروز برایشان یک شب زودتر می‌آید.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/hotels/six-senses-kaplankaya/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">سیکس‌سنسز کاپلانکایا</span>
+  <span class="cover__la">Six Senses Kaplankaya</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Six Senses · میان بدروم و کوش‌آداسی</span></p>
+    <h3 class="sc__title">سیکس‌سنسز کاپلانکایا</h3>
+    <p class="sc__dek">اسپای بزرگ و خلیج خلوت؛ در راه کوش‌آداسی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/hotels/burj-al-arab/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">برج العرب</span>
+  <span class="cover__la">Burj Al Arab Jumeirah</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Jumeirah · دبی</span></p>
+    <h3 class="sc__title">برج العرب</h3>
+    <p class="sc__dek">شبِ پس از پیاده‌شدن، در نشان‌شده‌ترین هتل دبی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/hotels/atlantis-the-royal/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">آتلانتیس د رویال</span>
+  <span class="cover__la">Atlantis The Royal</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Kerzner · نخل جمیرا</span></p>
+    <h3 class="sc__title">آتلانتیس د رویال</h3>
+    <p class="sc__dek">جدیدترین نشانِ لوکس دبی، با استخرهای طبقه‌ای.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/hotels/mandarin-oriental-doha/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">ماندارین اورینتال دوحه</span>
+  <span class="cover__la">Mandarin Oriental, Doha</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Mandarin Oriental · مشیرب</span></p>
+    <h3 class="sc__title">ماندارین اورینتال دوحه</h3>
+    <p class="sc__dek">در قلب مشیرب، ده دقیقه تا ترمینال کروز.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/hotels/chedi-muscat/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">چدی مسقط</span>
+  <span class="cover__la">The Chedi Muscat</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">GHM · مسقط</span></p>
+    <h3 class="sc__title">چدی مسقط</h3>
+    <p class="sc__dek">معماری عمانی‌ژاپنی و طولانی‌ترین استخر خاورمیانه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/hotels/grande-bretagne/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">گراند برتانی آتن</span>
+  <span class="cover__la">Hotel Grande Bretagne</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Luxury Collection · میدان سینتاگما</span></p>
+    <h3 class="sc__title">گراند برتانی آتن</h3>
+    <p class="sc__dek">از تراس رستوران، آکروپولیس؛ پیش از سوارشدن در پیره‌آس.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/hotels/aman-venice/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">آمان ونیز</span>
+  <span class="cover__la">Aman Venice</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Aman · کانال بزرگ</span></p>
+    <h3 class="sc__title">آمان ونیز</h3>
+    <p class="sc__dek">کاخ قرن شانزدهم روی کانال بزرگ؛ کشتی‌های بزرگ دیگر به ونیز نمی‌آیند، اما شهر پیش و پس از کروز می‌ماند.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/landmarks/celsus-library/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">کتابخانهٔ سلسوس</span>
+  <span class="cover__la">Library of Celsus</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">افسوس · قرن دوم میلادی</span></p>
+    <h3 class="sc__title">کتابخانهٔ سلسوس</h3>
+    <p class="sc__dek">نمای دوطبقهٔ رومی که نماد افسوس است.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/landmarks/hagia-sophia/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">ایاصوفیه</span>
+  <span class="cover__la">Hagia Sophia</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">استانبول · ۵۳۷ میلادی</span></p>
+    <h3 class="sc__title">ایاصوفیه</h3>
+    <p class="sc__dek">گنبدی که هزار سال بزرگ‌ترین کلیسای جهان بود؛ امروز مسجد.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/landmarks/topkapi/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">کاخ توپکاپی</span>
+  <span class="cover__la">Topkapı Palace</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">استانبول · عثمانی</span></p>
+    <h3 class="sc__title">کاخ توپکاپی</h3>
+    <p class="sc__dek">چهار حیاط و حرم‌سرا بر دماغهٔ سرای‌بورنو.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/landmarks/acropolis-hill/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">پارتنون</span>
+  <span class="cover__la">Parthenon</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">آتن · ۴۴۷ پیش از میلاد</span></p>
+    <h3 class="sc__title">پارتنون</h3>
+    <p class="sc__dek">معبد آتنا بر فراز آکروپولیس.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/landmarks/valley-of-kings/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">درهٔ پادشاهان</span>
+  <span class="cover__la">Valley of the Kings</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اقصر · پادشاهی نو</span></p>
+    <h3 class="sc__title">درهٔ پادشاهان</h3>
+    <p class="sc__dek">مقبرهٔ توت‌عنخ‌آمون و ده‌ها فرعون دیگر در کرانهٔ غربی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/landmarks/karnak/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">معبد کارناک</span>
+  <span class="cover__la">Karnak</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اقصر · بزرگ‌ترین مجموعهٔ معبدی</span></p>
+    <h3 class="sc__title">معبد کارناک</h3>
+    <p class="sc__dek">تالار ستون‌دار با ۱۳۴ ستون.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/landmarks/giza/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">اهرام جیزه</span>
+  <span class="cover__la">Pyramids of Giza</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">قاهره · تنها عجیبهٔ باقی‌مانده</span></p>
+    <h3 class="sc__title">اهرام جیزه</h3>
+    <p class="sc__dek">از اسکندریه یا پورت‌سعید، سه ساعت جاده.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/landmarks/petra-treasury/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">خزانهٔ پترا</span>
+  <span class="cover__la">Al-Khazneh, Petra</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">اردن · نبطی</span></p>
+    <h3 class="sc__title">خزانهٔ پترا</h3>
+    <p class="sc__dek">نمای تراشیده در صخرهٔ گلی، در انتهای تنگهٔ سیق.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/landmarks/halicarnassus/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">آرامگاه هالیکارناس</span>
+  <span class="cover__la">Mausoleum at Halicarnassus</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">بدروم · عجایب هفتگانه</span></p>
+    <h3 class="sc__title">آرامگاه هالیکارناس</h3>
+    <p class="sc__dek">از آرامگاهِ ماوسولوس فقط پی مانده؛ سنگ‌هایش در قلعهٔ روبه‌رو.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/landmarks/pompeii/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">پمپئی</span>
+  <span class="cover__la">Pompeii</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">ناپل · ۷۹ میلادی</span></p>
+    <h3 class="sc__title">پمپئی</h3>
+    <p class="sc__dek">شهری که زیر خاکستر وزوویوس ماند.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/landmarks/sagrada-familia/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">ساگرادا فامیلیا</span>
+  <span class="cover__la">Sagrada Família</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">بارسلون · گائودی</span></p>
+    <h3 class="sc__title">ساگرادا فامیلیا</h3>
+    <p class="sc__dek">کلیسایی که از ۱۸۸۲ ساخته می‌شود.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/landmarks/house-of-mary/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">مکان تاریخی</span>
+  <span class="cover__fa">خانهٔ مریم مقدس</span>
+  <span class="cover__la">House of the Virgin Mary</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">افسوس · زیارتگاه</span></p>
+    <h3 class="sc__title">خانهٔ مریم مقدس</h3>
+    <p class="sc__dek">خانهٔ سنگی بر کوه بلبل، کنار افسوس.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="journeys" href="/gatherings/nowruz-1406/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">گردهمایی</span>
+  <span class="cover__fa">کروز نوروز ۱۴۰۶</span>
+  <span class="cover__la">Nowruz 1406 cruise</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">نوروز · در حال برنامه‌ریزی</span></p>
+    <h3 class="sc__title">کروز نوروز ۱۴۰۶</h3>
+    <p class="sc__dek">سفرهٔ هفت‌سین روی آب، سال تحویل در دریا. تاریخ و کشتی هنوز اعلام نشده؛ برای اطلاع، نام‌نویسی کنید.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="0" data-dept="journeys" href="/gatherings/yalda-persian-gulf/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">گردهمایی</span>
+  <span class="cover__fa">شب یلدا روی خلیج فارس</span>
+  <span class="cover__la">Yalda on the Persian Gulf</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">یلدا · در حال برنامه‌ریزی</span></p>
+    <h3 class="sc__title">شب یلدا روی خلیج فارس</h3>
+    <p class="sc__dek">بلندترین شب سال، روی آب‌های خلیج فارس.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="1" data-dept="journeys" href="/gatherings/kusadasi-cruise-night/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">گردهمایی</span>
+  <span class="cover__fa">شب کروز در کوش‌آداسی</span>
+  <span class="cover__la">Kuşadası cruise night</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">گردهمایی · در حال برنامه‌ریزی</span></p>
+    <h3 class="sc__title">شب کروز در کوش‌آداسی</h3>
+    <p class="sc__dek">دورهمی ایرانیان کروزدوست در بندر شمارهٔ یک ترکیه؛ بازدید کشتی و گفت‌وگو با کاپیتان.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a><a class="sc sc--std st st--card" data-i="2" data-dept="journeys" href="/gatherings/diaspora-cruise-nights/">
+  <div class="sc__cover cover cover--journeys" aria-hidden="true">
+  <span class="cover__coll">گردهمایی</span>
+  <span class="cover__fa">شب‌های کروز در شهرهای دیاسپورا</span>
+  <span class="cover__la">Diaspora cruise nights</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">سفرها</span><span class="sc__kick">گردهمایی · تورنتو، ونکوور، لس‌آنجلس، دبی، هامبورگ</span></p>
+    <h3 class="sc__title">شب‌های کروز در شهرهای دیاسپورا</h3>
+    <p class="sc__dek">شب‌های معرفی کروز برای ایرانیان خارج از کشور، با همکاری CruiseBaz.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div>
+  <p class="sgrid__more"><button class="btn btn--ghost" hidden data-more="#stories">داستان‌های بیشتر</button></p>
+</div></section>
 
 </main>
 <footer class="foot">
@@ -54,8 +1365,8 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
       <p class="foot__policy">آگهی‌های خانگی با برچسب «آگهی» و راهنماهای حمایت‌شده با برچسب «با حمایت» مشخص می‌شوند. نقد و امتیازِ خوانندگان هرگز فروخته نمی‌شود.</p>
     </div>
     <div class="foot__cols">
-      <div><h4>بخش‌ها</h4><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/river-ships/">کشتی‌های رودخانه‌ای</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/river-ports/">شهرهای رودخانه‌ای</a><a href="/excursions/">گشت و اقامت کوتاه</a><a href="/unesco/">میراث جهانی نزدیک بندرها</a><a href="/hotels/">هتل‌ها و زنجیره‌های مهمان‌نوازی</a><a href="/landmarks/">مکان‌های تاریخی در دسترس با کروز</a><a href="/gatherings/">نوروز و گردهمایی‌ها</a></div>
-      <div><h4>راهنما</h4><a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/journal/">مجله</a><a href="/offers/">پیشنهادها</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
+      <div><h4>مجله</h4><a href="/journal/">همهٔ داستان‌ها</a><a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a></div>
+      <div><h4>راهنما</h4><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/river-ships/">کشتی‌های رودخانه‌ای</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/river-ports/">شهرهای رودخانه‌ای</a><a href="/excursions/">گشت و اقامت کوتاه</a><a href="/unesco/">میراث جهانی نزدیک بندرها</a><a href="/hotels/">هتل‌ها و زنجیره‌های مهمان‌نوازی</a><a href="/landmarks/">مکان‌های تاریخی در دسترس با کروز</a><a href="/gatherings/">نوروز و گردهمایی‌ها</a><a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
       <div><h4>همراهان تجاری <span class="tag">آگهی</span></h4><a href="https://cruise24.ir" rel="sponsored noopener" target="_blank">کروز۲۴ <small>· قیمت و رزرو، داخل ایران</small></a><a href="https://cruisebaz.com" rel="sponsored noopener" target="_blank">CruiseBaz <small>· ایرانیان خارج از کشور</small></a><a href="https://boutimar.ir" rel="sponsored noopener" target="_blank">بوتیمار <small>· آژانس‌ها و همکاران</small></a></div>
     </div>
     <div class="foot__kunye">
@@ -65,8 +1376,8 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
     </div>
   </div>
 </footer>
-<script src="/js/hub.js?v=2026-09-23" defer></script>
-<script src="/js/pwa.js?v=2026-09-23" defer></script>
+<script src="/js/hub.js?v=2026-09-29" defer></script>
+<script src="/js/pwa.js?v=2026-09-29" defer></script>
 
 </body>
 </html>

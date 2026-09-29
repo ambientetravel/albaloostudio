@@ -31,20 +31,40 @@
   /* ---------- listing filter ---------- */
   $$('[data-filter]').forEach(inp => { const list = $(inp.dataset.filter); inp.addEventListener('input', () => { const q = inp.value.trim().toLowerCase(); $$('[data-text]', list).forEach(el => el.hidden = q && !el.dataset.text.toLowerCase().includes(q)); }); });
 
-  /* ---------- hero search over the sitemap of built pages ---------- */
+  /* ---------- search: a panel under the masthead, over every built page ---------- */
   let idx = null;
   const loadIdx = () => idx || (idx = fetch('/data/search.json').then(r => r.json()).catch(() => []));
-  const results = $('#searchResults'), input = $('.hero__search input');
+  const panel = $('#searchPanel'), sbtn = $('#searchBtn'), results = $('#searchResults'), input = panel && $('input', panel);
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const openSearch = on => { if (!panel) return; panel.hidden = !on; sbtn && sbtn.setAttribute('aria-expanded', on); if (on) { loadIdx(); setTimeout(() => input.focus(), 30); } };
+  sbtn && sbtn.addEventListener('click', () => openSearch(panel.hidden));
+  panel && $('[data-close-search]', panel).addEventListener('click', () => openSearch(false));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && panel && !panel.hidden) openSearch(false); });
   if (input) {
     input.addEventListener('input', async () => {
-      const q = input.value.trim(); if (q.length < 2) { results.hidden = true; return; }
-      const list = await loadIdx(); const hits = list.filter(p => (p.t + ' ' + (p.l || '') + ' ' + (p.k || '')).toLowerCase().includes(q.toLowerCase())).slice(0, 8);
-      results.innerHTML = hits.map(h => `<a href="${h.u}">${h.t}<small>${h.c}</small></a>`).join('') || '<a>چیزی پیدا نشد</a>';
-      results.hidden = false;
+      const q = input.value.trim().toLowerCase(); if (q.length < 2) { results.innerHTML = ''; return; }
+      const list = await loadIdx(); const hits = list.filter(p => (p.t + ' ' + (p.l || '') + ' ' + (p.k || '')).toLowerCase().includes(q)).slice(0, 10);
+      results.innerHTML = hits.map(h => `<a href="${esc(h.u)}"><small>${esc(h.c)}</small>${esc(h.t)}</a>`).join('') || '<p>چیزی پیدا نشد.</p>';
     });
-    document.addEventListener('click', e => { if (!e.target.closest('.hero__search')) results.hidden = true; });
-    window.hubSearch = f => { const q = f.q.value.trim(); if (!q) return false; loadIdx().then(l => { const h = l.find(p => (p.t + ' ' + (p.l || '')).toLowerCase().includes(q.toLowerCase())); location.href = h ? h.u : '/ports/'; }); return false; };
+    window.hubSearch = f => { const q = f.q.value.trim(); if (!q) return false; loadIdx().then(l => { const h = l.find(p => (p.t + ' ' + (p.l || '')).toLowerCase().includes(q.toLowerCase())); location.href = h ? h.u : '/journal/'; }); return false; };
   }
+
+  /* ---------- magazine: department chips and "more stories" ---------- */
+  $$('[data-chips]').forEach(bar => {
+    const grid = $(bar.dataset.chips), more = $(`[data-more="${bar.dataset.chips}"]`), PAGE = 12; let shown = PAGE, f = '';
+    const cards = $$('.sc', grid);
+    const apply = () => {
+      let n = 0; cards.forEach(c => { const ok = !f || c.dataset.dept === f; c.hidden = !ok || (ok && ++n > shown); });
+      if (more) more.hidden = n <= shown;
+    };
+    $$('.chip2', bar).forEach(b => b.addEventListener('click', () => {
+      $$('.chip2', bar).forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-selected', x === b); });
+      f = b.dataset.f; shown = PAGE; apply();
+    }));
+    more && more.addEventListener('click', () => { shown += PAGE; apply(); });
+    apply();
+  });
+
   /* ---------- longform: reading bar, hero + figure parallax, reveals ---------- */
   const bar = $('#readingBar'), art = $('.lf__body');
   if (bar && art && !reduce) {

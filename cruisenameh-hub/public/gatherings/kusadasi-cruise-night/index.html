@@ -19,7 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <script>/* motion only when the reader allows it; without this class every page rests fully visible */
 if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('js-story')</script>
-<link rel="stylesheet" href="/css/hub.css?v=2026-09-23">
+<link rel="stylesheet" href="/css/hub.css?v=2026-09-29">
 
 </head>
 <body class="page">
@@ -28,30 +28,42 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
   <div class="nav__in">
     <a class="brand" href="/"><span class="brand__fa">کروزنامه</span><span class="brand__latin">CRUISENAMEH</span></a>
     <nav class="nav__links" aria-label="بخش‌ها">
-      <a href="/news/">اخبار</a><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/excursions/">گشت و اقامت</a><a href="/unesco/">میراث جهانی</a><a href="/offers/">پیشنهادها</a><a href="/journal/">مجله</a>
+      <a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a><a href="/journal/">مجله</a><a href="/guides/">راهنماها</a>
     </nav>
     <div class="nav__tools">
-      <a class="nav__tg" href="https://t.me/cruisenameh" rel="noopener" target="_blank" aria-label="تلگرام">تلگرام</a>
+      <button class="nav__search" id="searchBtn" type="button" aria-label="جست‌وجو" aria-controls="searchPanel" aria-expanded="false"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <a class="nav__tg" href="/#newsletter">خبرنامه</a>
       <button class="nav__burger" id="burger" aria-label="منو" aria-expanded="false"><span></span><span></span></button>
     </div>
   </div>
   <div class="nav__sheet" id="sheet">
-    <a href="/news/">اخبار</a><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/excursions/">گشت و اقامت</a><a href="/unesco/">میراث جهانی</a><a href="/offers/">پیشنهادها</a><a href="/journal/">مجله</a>
+    <a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a><a href="/journal/">مجله</a><a href="/guides/">راهنماها</a>
     <a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامه</a><a href="/policy/">سیاست تحریریه</a>
   </div>
 </header>
+<div class="search" id="searchPanel" role="dialog" aria-label="جست‌وجو در کروزنامه" hidden>
+  <div class="wrap search__in">
+    <form class="search__form" action="/journal/" role="search" onsubmit="return window.hubSearch && hubSearch(this)">
+      <input type="search" name="q" placeholder="بندر، کشتی، رودخانه، داستان…" aria-label="جست‌وجو" autocomplete="off">
+      <button type="submit">جست‌وجو</button>
+    </form>
+    <div class="search__results" id="searchResults"></div>
+    <button class="search__x" type="button" data-close-search>بستن</button>
+  </div>
+</div>
 <main id="main">
 
 <article class="detail" data-offline="no">
-  <header class="detail__head">
-    <div class="detail__art art art--wide art--1"></div>
-    <div class="wrap detail__title">
-      <p class="kicker"><a href="/gatherings/">نوروز و گردهمایی‌ها</a> · گردهمایی · در حال برنامه‌ریزی</p>
-      <h1 class="display">شب کروز در کوش‌آداسی</h1>
+  <header class="ghead">
+    <div class="wrap ghead__in">
+      <p class="kicker"><a href="/journeys/">سفرها</a> · <a href="/gatherings/">نوروز و گردهمایی‌ها</a> · گردهمایی · در حال برنامه‌ریزی</p>
+      <h1 class="display ghead__t">شب کروز در کوش‌آداسی</h1>
       <p class="latin">Kuşadası cruise night</p>
-      <p class="lede">دورهمی ایرانیان کروزدوست در بندر شمارهٔ یک ترکیه؛ بازدید کشتی و گفت‌وگو با کاپیتان.</p>
+      <p class="ghead__dek">دورهمی ایرانیان کروزدوست در بندر شمارهٔ یک ترکیه؛ بازدید کشتی و گفت‌وگو با کاپیتان.</p>
+      <p class="byline">تحریریهٔ کروزنامه · راهنمای کوتاه</p>
       
     </div>
+    <div class="wrap"><div class="ghead__cover cover cover--journeys" aria-hidden="true"><span class="cover__coll">گردهمایی</span><span class="cover__fa">شب کروز در کوش‌آداسی</span><span class="cover__la">Kuşadası cruise night</span></div></div>
   </header>
   <div class="wrap detail__grid">
     <div class="detail__body">
@@ -66,7 +78,7 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
     </aside>
   </div>
   
-  <section class="sec sec--sand"><div class="wrap"><p class="kicker">مرتبط</p><div class="grid3">
+  <section class="sec sec--sand"><div class="wrap"><p class="kicker">در ادامه بخوانید</p><div class="grid3">
     <a class="tile" href="/ports/kusadasi/"><p class="kicker">بندر</p><h3>کوش‌آداسی</h3></a>
   </div></div></section>
   
@@ -81,8 +93,8 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
       <p class="foot__policy">آگهی‌های خانگی با برچسب «آگهی» و راهنماهای حمایت‌شده با برچسب «با حمایت» مشخص می‌شوند. نقد و امتیازِ خوانندگان هرگز فروخته نمی‌شود.</p>
     </div>
     <div class="foot__cols">
-      <div><h4>بخش‌ها</h4><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/river-ships/">کشتی‌های رودخانه‌ای</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/river-ports/">شهرهای رودخانه‌ای</a><a href="/excursions/">گشت و اقامت کوتاه</a><a href="/unesco/">میراث جهانی نزدیک بندرها</a><a href="/hotels/">هتل‌ها و زنجیره‌های مهمان‌نوازی</a><a href="/landmarks/">مکان‌های تاریخی در دسترس با کروز</a><a href="/gatherings/">نوروز و گردهمایی‌ها</a></div>
-      <div><h4>راهنما</h4><a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/journal/">مجله</a><a href="/offers/">پیشنهادها</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
+      <div><h4>مجله</h4><a href="/journal/">همهٔ داستان‌ها</a><a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a></div>
+      <div><h4>راهنما</h4><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/river-ships/">کشتی‌های رودخانه‌ای</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/river-ports/">شهرهای رودخانه‌ای</a><a href="/excursions/">گشت و اقامت کوتاه</a><a href="/unesco/">میراث جهانی نزدیک بندرها</a><a href="/hotels/">هتل‌ها و زنجیره‌های مهمان‌نوازی</a><a href="/landmarks/">مکان‌های تاریخی در دسترس با کروز</a><a href="/gatherings/">نوروز و گردهمایی‌ها</a><a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
       <div><h4>همراهان تجاری <span class="tag">آگهی</span></h4><a href="https://cruise24.ir" rel="sponsored noopener" target="_blank">کروز۲۴ <small>· قیمت و رزرو، داخل ایران</small></a><a href="https://cruisebaz.com" rel="sponsored noopener" target="_blank">CruiseBaz <small>· ایرانیان خارج از کشور</small></a><a href="https://boutimar.ir" rel="sponsored noopener" target="_blank">بوتیمار <small>· آژانس‌ها و همکاران</small></a></div>
     </div>
     <div class="foot__kunye">
@@ -92,8 +104,8 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
     </div>
   </div>
 </footer>
-<script src="/js/hub.js?v=2026-09-23" defer></script>
-<script src="/js/pwa.js?v=2026-09-23" defer></script>
+<script src="/js/hub.js?v=2026-09-29" defer></script>
+<script src="/js/pwa.js?v=2026-09-29" defer></script>
 
 </body>
 </html>

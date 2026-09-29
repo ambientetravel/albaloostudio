@@ -78,6 +78,48 @@ def build_voyage(ports: list[dict]) -> dict:
         segs.append({"d": f"M{a['x']} {a['y']} Q{cx} {cy} {b['x']} {b['y']}", "level": b["level"]})
     return {"stops": stops, "segs": segs}
 
+# ── The magazine ────────────────────────────────────────────────────────────
+# Cruisenameh is edited as a magazine, not browsed as a catalogue. Every page is a
+# story in one of four departments; the collections (ports, ships, …) are the guide
+# desk behind them. Department words live in site.json; which collection feeds which
+# department is structure, and lives here.
+DEPT_OF_COLLECTION = {
+    "ports": "destinations", "river-ports": "destinations", "unesco": "destinations",
+    "landmarks": "destinations", "excursions": "destinations", "hotels": "destinations",
+    "rivers": "journeys", "gatherings": "journeys",
+    "ships": "vessels", "river-ships": "vessels", "lines": "vessels",
+}
+DEPT_OF_KICKER = {"سرمقاله": "notes", "مدرسهٔ کروز": "journeys"}
+WORDS_PER_MINUTE = 180  # Persian prose, read on a phone
+
+def read_minutes(text: str) -> int:
+    words = len(re.findall(r"\S+", re.sub(r"<[^>]+>", " ", text or "")))
+    return max(1, round(words / WORDS_PER_MINUTE)) if words >= 60 else 0  # too short to promise a read time
+
+def build_stories(collections, data, articles, depts):
+    """One list, newest editorial first: articles, then each collection's entries in
+    the order the content owner keeps them. Nothing here invents a date: guide
+    entries have none, so they carry none."""
+    label = {d["slug"]: d["label"] for d in depts}
+    out = []
+    for a in articles:
+        d = a.get("department") or DEPT_OF_KICKER.get(a.get("kicker", ""), "notes")
+        out.append({"kind": "article", "href": f"/journal/{a['slug']}/", "dept": d, "dept_label": label.get(d, ""),
+                    "kicker": a.get("kicker", ""), "title": a["title"], "latin": "", "dek": a.get("summary", ""),
+                    "minutes": read_minutes(a.get("html", "")), "date": a.get("date"),
+                    "image": {"src": "/" + a["hero"], "alt": a.get("hero_alt") or a["title"], "credit": a.get("hero_credit", "")} if a.get("hero") else None,
+                    "slug": a["slug"], "coll": "journal", "coll_title": "مجله"})
+    for c in collections:
+        d = DEPT_OF_COLLECTION.get(c["slug"], "destinations")
+        for it in data[c["slug"]]:
+            img = it.get("image") if isinstance(it.get("image"), dict) and it["image"].get("src") else None
+            out.append({"kind": "guide", "href": f"/{c['slug']}/{it['slug']}/", "dept": d, "dept_label": label.get(d, ""),
+                        "kicker": it.get("kicker", ""), "title": it["title"], "latin": it.get("latin", ""), "dek": it.get("summary", ""),
+                        "minutes": read_minutes(" ".join(it.get("body") or [])), "date": None, "image": img,
+                        "slug": it["slug"], "coll": c["slug"], "coll_title": c.get("singular") or c["title"],
+                        "visa": (it.get("facts") or {}).get("visa", "")})
+    return out
+
 def fa(n) -> str:
     return str(n).translate(FA_DIGITS)
 
@@ -257,13 +299,28 @@ def build(check_only=False):
         urls.append("/" + path.replace("index.html", ""))
 
     featured = {c["slug"]: data[c["slug"]][:4] for c in collections}
-    write("index.html", "home.html", featured=featured, voyage=build_voyage(data["ports"]), didyouknow=didyouknow, offers=offers[:4],
+    depts = site["departments"]
+    stories = build_stories(collections, data, articles, depts)
+    by_dept = {d["slug"]: [x for x in stories if x["dept"] == d["slug"]] for d in depts}
+    with_img = [x for x in stories if x["kind"] == "article" and x["image"]]
+    cover = next((x for x in with_img if x["slug"] == site.get("cover")), with_img[0] if with_img else stories[0])
+    base.update(depts=depts, guides=[{"slug": c["slug"], "title": c["title"], "n": len(data[c["slug"]]),
+                                      "dept": DEPT_OF_COLLECTION.get(c["slug"])} for c in collections])
+    for d in depts:
+        write(f"{d['slug']}/index.html", "department.html", dept=d, stories=by_dept[d["slug"]],
+              colls=[g for g in base["guides"] if g["dept"] == d["slug"]])
+    write("guides/index.html", "guides.html")
+    write("index.html", "home.html", featured=featured, voyage=build_voyage(data["ports"]), cover=cover,
+          stories=stories, by_dept=by_dept, didyouknow=didyouknow, offers=offers[:4],
           feed_status=feed_status, articles=articles[:3], gatherings=data["gatherings"][:3], news=news[:6])
     for c in collections:
-        write(f"{c['slug']}/index.html", "listing.html", coll=c, items=data[c["slug"]])
+        cs = [x for x in stories if x["coll"] == c["slug"]]
+        dept = next((d for d in depts if d["slug"] == DEPT_OF_COLLECTION.get(c["slug"])), None)
+        write(f"{c['slug']}/index.html", "listing.html", coll=c, items=data[c["slug"]], stories=cs, dept=dept)
         for it in data[c["slug"]]:
             rel = [r for r in (resolve(x) for x in it.get("related", [])) if r]
-            write(f"{c['slug']}/{it['slug']}/index.html", "detail.html", coll=c, item=it, related=rel)
+            st = next(x for x in cs if x["slug"] == it["slug"])
+            write(f"{c['slug']}/{it['slug']}/index.html", "detail.html", coll=c, item=it, related=rel, story=st, dept=dept)
     write("offers/index.html", "offers.html", offers=offers, feed_status=feed_status)
     write("visa/index.html", "visa.html", schengen=sorted(_visa.SCHENGEN_PORTS), free=sorted(_visa.VISA_FREE_PORTS),
           easy=sorted(_visa.EASY_VISA_PORTS), hard=sorted(_visa.HARD_VISA_PORTS))
@@ -273,7 +330,7 @@ def build(check_only=False):
         rel = [r for r in (resolve(x) for x in n.get("related", [])) if r]
         write(f"news/{n['slug']}/index.html", "news-item.html", item=n, related=rel,
               more=[o for o in news if o["slug"] != n["slug"]][:3])
-    write("journal/index.html", "journal.html", articles=articles)
+    write("journal/index.html", "journal.html", articles=articles, stories=stories, cover=cover)
     for a in articles:
         write(f"journal/{a['slug']}/index.html", "article.html", article=a)
     write("policy/index.html", "policy.html")
@@ -352,6 +409,12 @@ def check():
         t = p.read_text(encoding="utf-8")
         for needle, label in banned:
             if needle in t: print(f"HOUSE RULE: {label} in", p.relative_to(HERE)); bad += 1
+    # Every picture a page points at must exist. A deleted image fails the build here,
+    # not silently on the live site (scene-galataport.webp was removed while an
+    # article still used it as its opening photograph).
+    for p in sources:
+        for ref in set(re.findall(r"\bimg/[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|svg)", p.read_text(encoding="utf-8"))):
+            if not (STATIC/ref).exists(): print("MISSING IMAGE:", ref, "in", p.relative_to(HERE)); bad += 1
     for it in load("ports"):
         v = it["facts"].get("visa", "")
         name = port_name(it)

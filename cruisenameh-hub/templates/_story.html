@@ -1,0 +1,39 @@
+{#- One story card for the whole magazine: articles, guide entries, department pages.
+    A story with a photograph shows it; one without gets a typographic cover in its
+    department's colour — never a stock picture standing in for a place it is not. -#}
+{% macro short(s) %}{{ s.title.split(' ·')[0].split(' (')[0] }}{% endmacro %}
+
+{% macro visual(s) -%}
+{% if s.image -%}
+<figure class="sc__img"><img src="{{ s.image.src }}" alt="{{ s.image.alt }}" loading="lazy" decoding="async" width="1600" height="900"></figure>
+{%- else -%}
+<div class="sc__cover cover cover--{{ s.dept }}" aria-hidden="true">
+  <span class="cover__coll">{{ s.coll_title }}</span>
+  <span class="cover__fa">{{ short(s) }}</span>
+  {% if s.latin and s.latin != short(s) %}<span class="cover__la">{{ s.latin }}</span>{% endif %}
+</div>
+{%- endif %}
+{%- endmacro %}
+
+{% macro foot(s) -%}
+<p class="sc__foot">
+  {%- if s.minutes %}<span>{{ s.minutes|fa }} دقیقه خواندن</span>{% elif s.kind == 'guide' %}<span>راهنمای کوتاه</span>{% endif -%}
+  {%- if s.date %}{% with d=s.date, compact=True %}{% include "_date.html" %}{% endwith %}{% endif -%}
+</p>
+{%- endmacro %}
+
+{% macro card(s, size='std', i=0) -%}
+<a class="sc sc--{{ size }} st st--card" data-i="{{ i }}" data-dept="{{ s.dept }}" href="{{ s.href }}">
+  {{ visual(s) }}
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">{{ s.dept_label }}</span>{% if s.kicker %}<span class="sc__kick">{{ s.kicker }}</span>{% endif %}</p>
+    <h3 class="sc__title">{{ s.title }}</h3>
+    {% if size != 'mini' and s.dek %}<p class="sc__dek">{{ s.dek }}</p>{% endif %}
+    {{ foot(s) }}
+  </div>
+</a>
+{%- endmacro %}
+
+{% macro line(s, n) -%}
+<a class="sl" href="{{ s.href }}"><span class="sl__n">{{ n|fa }}</span><span class="sl__b"><span class="sl__k">{{ s.dept_label }}{% if s.kicker %} · {{ s.kicker }}{% endif %}</span><span class="sl__t">{{ s.title }}</span></span></a>
+{%- endmacro %}

@@ -19,7 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <script>/* motion only when the reader allows it; without this class every page rests fully visible */
 if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('js-story')</script>
-<link rel="stylesheet" href="/css/hub.css?v=2026-09-23">
+<link rel="stylesheet" href="/css/hub.css?v=2026-09-29">
 
 </head>
 <body class="page">
@@ -28,90 +28,171 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
   <div class="nav__in">
     <a class="brand" href="/"><span class="brand__fa">کروزنامه</span><span class="brand__latin">CRUISENAMEH</span></a>
     <nav class="nav__links" aria-label="بخش‌ها">
-      <a href="/news/">اخبار</a><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/excursions/">گشت و اقامت</a><a href="/unesco/">میراث جهانی</a><a href="/offers/">پیشنهادها</a><a href="/journal/">مجله</a>
+      <a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a><a href="/journal/">مجله</a><a href="/guides/">راهنماها</a>
     </nav>
     <div class="nav__tools">
-      <a class="nav__tg" href="https://t.me/cruisenameh" rel="noopener" target="_blank" aria-label="تلگرام">تلگرام</a>
+      <button class="nav__search" id="searchBtn" type="button" aria-label="جست‌وجو" aria-controls="searchPanel" aria-expanded="false"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <a class="nav__tg" href="/#newsletter">خبرنامه</a>
       <button class="nav__burger" id="burger" aria-label="منو" aria-expanded="false"><span></span><span></span></button>
     </div>
   </div>
   <div class="nav__sheet" id="sheet">
-    <a href="/news/">اخبار</a><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/excursions/">گشت و اقامت</a><a href="/unesco/">میراث جهانی</a><a href="/offers/">پیشنهادها</a><a href="/journal/">مجله</a>
+    <a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a><a href="/journal/">مجله</a><a href="/guides/">راهنماها</a>
     <a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامه</a><a href="/policy/">سیاست تحریریه</a>
   </div>
 </header>
+<div class="search" id="searchPanel" role="dialog" aria-label="جست‌وجو در کروزنامه" hidden>
+  <div class="wrap search__in">
+    <form class="search__form" action="/journal/" role="search" onsubmit="return window.hubSearch && hubSearch(this)">
+      <input type="search" name="q" placeholder="بندر، کشتی، رودخانه، داستان…" aria-label="جست‌وجو" autocomplete="off">
+      <button type="submit">جست‌وجو</button>
+    </form>
+    <div class="search__results" id="searchResults"></div>
+    <button class="search__x" type="button" data-close-search>بستن</button>
+  </div>
+</div>
 <main id="main">
 
-<section class="pagehead"><div class="wrap"><p class="kicker">کروزنامه</p><h1 class="display display--md">هتل‌ها و زنجیره‌های مهمان‌نوازی</h1><p class="lede">جایی برای شبِ پیش از سوارشدن، یا دو شب پس از پیاده‌شدن.</p>
-<input class="filter" type="search" placeholder="فیلتر…" data-filter="#list" aria-label="فیلتر"></div></section>
-<section class="sec"><div class="wrap"><div class="grid3" id="list">
-
-<a class="tile" href="/hotels/peninsula-istanbul/" data-text="پنینسولا استانبول The Peninsula Istanbul Peninsula · درون گالاتاپورت هتلی که در خودِ ترمینال کروز است؛ از تراس تا پلهٔ کشتی چند صد متر.">
-  <div class="art art--0"></div>
-  <p class="kicker">Peninsula · درون گالاتاپورت</p><h3>پنینسولا استانبول</h3><p>هتلی که در خودِ ترمینال کروز است؛ از تراس تا پلهٔ کشتی چند صد متر.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/four-seasons-bosphorus/" data-text="فورسیزنز بسفر Four Seasons Hotel Istanbul at the Bosphorus Four Seasons · کاخ عثمانی کاخ قرن نوزدهم کنار آب؛ تا گالاتاپورت ۱۵ دقیقه.">
-  <div class="art art--1"></div>
-  <p class="kicker">Four Seasons · کاخ عثمانی</p><h3>فورسیزنز بسفر</h3><p>کاخ قرن نوزدهم کنار آب؛ تا گالاتاپورت ۱۵ دقیقه.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/amanruya/" data-text="آمان‌رویا Amanruya Aman · شبه‌جزیرهٔ بدروم سی‌وشش کلبهٔ سنگی با استخر خصوصی، میان درختان زیتون.">
-  <div class="art art--2"></div>
-  <p class="kicker">Aman · شبه‌جزیرهٔ بدروم</p><h3>آمان‌رویا</h3><p>سی‌وشش کلبهٔ سنگی با استخر خصوصی، میان درختان زیتون.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/mandarin-oriental-bodrum/" data-text="ماندارین اورینتال بدروم Mandarin Oriental, Bodrum Mandarin Oriental · خلیج پارادایز دو ساحل خصوصی و رستوران‌هایی که مسافر کروز برایشان یک شب زودتر می‌آید.">
-  <div class="art art--3"></div>
-  <p class="kicker">Mandarin Oriental · خلیج پارادایز</p><h3>ماندارین اورینتال بدروم</h3><p>دو ساحل خصوصی و رستوران‌هایی که مسافر کروز برایشان یک شب زودتر می‌آید.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/six-senses-kaplankaya/" data-text="سیکس‌سنسز کاپلانکایا Six Senses Kaplankaya Six Senses · میان بدروم و کوش‌آداسی اسپای بزرگ و خلیج خلوت؛ در راه کوش‌آداسی.">
-  <div class="art art--0"></div>
-  <p class="kicker">Six Senses · میان بدروم و کوش‌آداسی</p><h3>سیکس‌سنسز کاپلانکایا</h3><p>اسپای بزرگ و خلیج خلوت؛ در راه کوش‌آداسی.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/burj-al-arab/" data-text="برج العرب Burj Al Arab Jumeirah Jumeirah · دبی شبِ پس از پیاده‌شدن، در نشان‌شده‌ترین هتل دبی.">
-  <div class="art art--1"></div>
-  <p class="kicker">Jumeirah · دبی</p><h3>برج العرب</h3><p>شبِ پس از پیاده‌شدن، در نشان‌شده‌ترین هتل دبی.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/atlantis-the-royal/" data-text="آتلانتیس د رویال Atlantis The Royal Kerzner · نخل جمیرا جدیدترین نشانِ لوکس دبی، با استخرهای طبقه‌ای.">
-  <div class="art art--2"></div>
-  <p class="kicker">Kerzner · نخل جمیرا</p><h3>آتلانتیس د رویال</h3><p>جدیدترین نشانِ لوکس دبی، با استخرهای طبقه‌ای.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/mandarin-oriental-doha/" data-text="ماندارین اورینتال دوحه Mandarin Oriental, Doha Mandarin Oriental · مشیرب در قلب مشیرب، ده دقیقه تا ترمینال کروز.">
-  <div class="art art--3"></div>
-  <p class="kicker">Mandarin Oriental · مشیرب</p><h3>ماندارین اورینتال دوحه</h3><p>در قلب مشیرب، ده دقیقه تا ترمینال کروز.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/chedi-muscat/" data-text="چدی مسقط The Chedi Muscat GHM · مسقط معماری عمانی‌ژاپنی و طولانی‌ترین استخر خاورمیانه.">
-  <div class="art art--0"></div>
-  <p class="kicker">GHM · مسقط</p><h3>چدی مسقط</h3><p>معماری عمانی‌ژاپنی و طولانی‌ترین استخر خاورمیانه.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/grande-bretagne/" data-text="گراند برتانی آتن Hotel Grande Bretagne Luxury Collection · میدان سینتاگما از تراس رستوران، آکروپولیس؛ پیش از سوارشدن در پیره‌آس.">
-  <div class="art art--1"></div>
-  <p class="kicker">Luxury Collection · میدان سینتاگما</p><h3>گراند برتانی آتن</h3><p>از تراس رستوران، آکروپولیس؛ پیش از سوارشدن در پیره‌آس.</p>
-  
-</a>
-
-<a class="tile" href="/hotels/aman-venice/" data-text="آمان ونیز Aman Venice Aman · کانال بزرگ کاخ قرن شانزدهم روی کانال بزرگ؛ کشتی‌های بزرگ دیگر به ونیز نمی‌آیند، اما شهر پیش و پس از کروز می‌ماند.">
-  <div class="art art--2"></div>
-  <p class="kicker">Aman · کانال بزرگ</p><h3>آمان ونیز</h3><p>کاخ قرن شانزدهم روی کانال بزرگ؛ کشتی‌های بزرگ دیگر به ونیز نمی‌آیند، اما شهر پیش و پس از کروز می‌ماند.</p>
-  
-</a>
-
+<header class="dhead dhead--destinations"><div class="wrap">
+  <p class="kicker"><a href="/destinations/">مقصدها</a> · <a href="/guides/">راهنما</a></p>
+  <h1 class="dhead__t">هتل‌ها و زنجیره‌های مهمان‌نوازی</h1>
+  <p class="lede">جایی برای شبِ پیش از سوارشدن، یا دو شب پس از پیاده‌شدن.</p>
+  <input class="filter" type="search" placeholder="فیلتر…" data-filter="#list" aria-label="فیلتر">
+</div></header>
+<section class="sec sec--tight"><div class="wrap"><div class="sgrid" id="list">
+<div class="sgrid__cell" data-text="پنینسولا استانبول The Peninsula Istanbul Peninsula · درون گالاتاپورت هتلی که در خودِ ترمینال کروز است؛ از تراس تا پلهٔ کشتی چند صد متر."><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/hotels/peninsula-istanbul/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">پنینسولا استانبول</span>
+  <span class="cover__la">The Peninsula Istanbul</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Peninsula · درون گالاتاپورت</span></p>
+    <h3 class="sc__title">پنینسولا استانبول</h3>
+    <p class="sc__dek">هتلی که در خودِ ترمینال کروز است؛ از تراس تا پلهٔ کشتی چند صد متر.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="فورسیزنز بسفر Four Seasons Hotel Istanbul at the Bosphorus Four Seasons · کاخ عثمانی کاخ قرن نوزدهم کنار آب؛ تا گالاتاپورت ۱۵ دقیقه."><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/hotels/four-seasons-bosphorus/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">فورسیزنز بسفر</span>
+  <span class="cover__la">Four Seasons Hotel Istanbul at the Bosphorus</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Four Seasons · کاخ عثمانی</span></p>
+    <h3 class="sc__title">فورسیزنز بسفر</h3>
+    <p class="sc__dek">کاخ قرن نوزدهم کنار آب؛ تا گالاتاپورت ۱۵ دقیقه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="آمان‌رویا Amanruya Aman · شبه‌جزیرهٔ بدروم سی‌وشش کلبهٔ سنگی با استخر خصوصی، میان درختان زیتون."><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/hotels/amanruya/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">آمان‌رویا</span>
+  <span class="cover__la">Amanruya</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Aman · شبه‌جزیرهٔ بدروم</span></p>
+    <h3 class="sc__title">آمان‌رویا</h3>
+    <p class="sc__dek">سی‌وشش کلبهٔ سنگی با استخر خصوصی، میان درختان زیتون.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="ماندارین اورینتال بدروم Mandarin Oriental, Bodrum Mandarin Oriental · خلیج پارادایز دو ساحل خصوصی و رستوران‌هایی که مسافر کروز برایشان یک شب زودتر می‌آید."><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/hotels/mandarin-oriental-bodrum/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">ماندارین اورینتال بدروم</span>
+  <span class="cover__la">Mandarin Oriental, Bodrum</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Mandarin Oriental · خلیج پارادایز</span></p>
+    <h3 class="sc__title">ماندارین اورینتال بدروم</h3>
+    <p class="sc__dek">دو ساحل خصوصی و رستوران‌هایی که مسافر کروز برایشان یک شب زودتر می‌آید.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="سیکس‌سنسز کاپلانکایا Six Senses Kaplankaya Six Senses · میان بدروم و کوش‌آداسی اسپای بزرگ و خلیج خلوت؛ در راه کوش‌آداسی."><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/hotels/six-senses-kaplankaya/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">سیکس‌سنسز کاپلانکایا</span>
+  <span class="cover__la">Six Senses Kaplankaya</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Six Senses · میان بدروم و کوش‌آداسی</span></p>
+    <h3 class="sc__title">سیکس‌سنسز کاپلانکایا</h3>
+    <p class="sc__dek">اسپای بزرگ و خلیج خلوت؛ در راه کوش‌آداسی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="برج العرب Burj Al Arab Jumeirah Jumeirah · دبی شبِ پس از پیاده‌شدن، در نشان‌شده‌ترین هتل دبی."><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/hotels/burj-al-arab/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">برج العرب</span>
+  <span class="cover__la">Burj Al Arab Jumeirah</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Jumeirah · دبی</span></p>
+    <h3 class="sc__title">برج العرب</h3>
+    <p class="sc__dek">شبِ پس از پیاده‌شدن، در نشان‌شده‌ترین هتل دبی.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="آتلانتیس د رویال Atlantis The Royal Kerzner · نخل جمیرا جدیدترین نشانِ لوکس دبی، با استخرهای طبقه‌ای."><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/hotels/atlantis-the-royal/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">آتلانتیس د رویال</span>
+  <span class="cover__la">Atlantis The Royal</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Kerzner · نخل جمیرا</span></p>
+    <h3 class="sc__title">آتلانتیس د رویال</h3>
+    <p class="sc__dek">جدیدترین نشانِ لوکس دبی، با استخرهای طبقه‌ای.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="ماندارین اورینتال دوحه Mandarin Oriental, Doha Mandarin Oriental · مشیرب در قلب مشیرب، ده دقیقه تا ترمینال کروز."><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/hotels/mandarin-oriental-doha/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">ماندارین اورینتال دوحه</span>
+  <span class="cover__la">Mandarin Oriental, Doha</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Mandarin Oriental · مشیرب</span></p>
+    <h3 class="sc__title">ماندارین اورینتال دوحه</h3>
+    <p class="sc__dek">در قلب مشیرب، ده دقیقه تا ترمینال کروز.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="چدی مسقط The Chedi Muscat GHM · مسقط معماری عمانی‌ژاپنی و طولانی‌ترین استخر خاورمیانه."><a class="sc sc--std st st--card" data-i="2" data-dept="destinations" href="/hotels/chedi-muscat/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">چدی مسقط</span>
+  <span class="cover__la">The Chedi Muscat</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">GHM · مسقط</span></p>
+    <h3 class="sc__title">چدی مسقط</h3>
+    <p class="sc__dek">معماری عمانی‌ژاپنی و طولانی‌ترین استخر خاورمیانه.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="گراند برتانی آتن Hotel Grande Bretagne Luxury Collection · میدان سینتاگما از تراس رستوران، آکروپولیس؛ پیش از سوارشدن در پیره‌آس."><a class="sc sc--std st st--card" data-i="0" data-dept="destinations" href="/hotels/grande-bretagne/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">گراند برتانی آتن</span>
+  <span class="cover__la">Hotel Grande Bretagne</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Luxury Collection · میدان سینتاگما</span></p>
+    <h3 class="sc__title">گراند برتانی آتن</h3>
+    <p class="sc__dek">از تراس رستوران، آکروپولیس؛ پیش از سوارشدن در پیره‌آس.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div><div class="sgrid__cell" data-text="آمان ونیز Aman Venice Aman · کانال بزرگ کاخ قرن شانزدهم روی کانال بزرگ؛ کشتی‌های بزرگ دیگر به ونیز نمی‌آیند، اما شهر پیش و پس از کروز می‌ماند."><a class="sc sc--std st st--card" data-i="1" data-dept="destinations" href="/hotels/aman-venice/">
+  <div class="sc__cover cover cover--destinations" aria-hidden="true">
+  <span class="cover__coll">هتل</span>
+  <span class="cover__fa">آمان ونیز</span>
+  <span class="cover__la">Aman Venice</span>
+</div>
+  <div class="sc__body">
+    <p class="sc__meta"><span class="sc__dept">مقصدها</span><span class="sc__kick">Aman · کانال بزرگ</span></p>
+    <h3 class="sc__title">آمان ونیز</h3>
+    <p class="sc__dek">کاخ قرن شانزدهم روی کانال بزرگ؛ کشتی‌های بزرگ دیگر به ونیز نمی‌آیند، اما شهر پیش و پس از کروز می‌ماند.</p>
+    <p class="sc__foot"><span>راهنمای کوتاه</span></p>
+  </div>
+</a></div>
 </div></div></section>
 
 </main>
@@ -123,8 +204,8 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
       <p class="foot__policy">آگهی‌های خانگی با برچسب «آگهی» و راهنماهای حمایت‌شده با برچسب «با حمایت» مشخص می‌شوند. نقد و امتیازِ خوانندگان هرگز فروخته نمی‌شود.</p>
     </div>
     <div class="foot__cols">
-      <div><h4>بخش‌ها</h4><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/river-ships/">کشتی‌های رودخانه‌ای</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/river-ports/">شهرهای رودخانه‌ای</a><a href="/excursions/">گشت و اقامت کوتاه</a><a href="/unesco/">میراث جهانی نزدیک بندرها</a><a href="/hotels/">هتل‌ها و زنجیره‌های مهمان‌نوازی</a><a href="/landmarks/">مکان‌های تاریخی در دسترس با کروز</a><a href="/gatherings/">نوروز و گردهمایی‌ها</a></div>
-      <div><h4>راهنما</h4><a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/journal/">مجله</a><a href="/offers/">پیشنهادها</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
+      <div><h4>مجله</h4><a href="/journal/">همهٔ داستان‌ها</a><a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a></div>
+      <div><h4>راهنما</h4><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/river-ships/">کشتی‌های رودخانه‌ای</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/river-ports/">شهرهای رودخانه‌ای</a><a href="/excursions/">گشت و اقامت کوتاه</a><a href="/unesco/">میراث جهانی نزدیک بندرها</a><a href="/hotels/">هتل‌ها و زنجیره‌های مهمان‌نوازی</a><a href="/landmarks/">مکان‌های تاریخی در دسترس با کروز</a><a href="/gatherings/">نوروز و گردهمایی‌ها</a><a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
       <div><h4>همراهان تجاری <span class="tag">آگهی</span></h4><a href="https://cruise24.ir" rel="sponsored noopener" target="_blank">کروز۲۴ <small>· قیمت و رزرو، داخل ایران</small></a><a href="https://cruisebaz.com" rel="sponsored noopener" target="_blank">CruiseBaz <small>· ایرانیان خارج از کشور</small></a><a href="https://boutimar.ir" rel="sponsored noopener" target="_blank">بوتیمار <small>· آژانس‌ها و همکاران</small></a></div>
     </div>
     <div class="foot__kunye">
@@ -134,8 +215,8 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
     </div>
   </div>
 </footer>
-<script src="/js/hub.js?v=2026-09-23" defer></script>
-<script src="/js/pwa.js?v=2026-09-23" defer></script>
+<script src="/js/hub.js?v=2026-09-29" defer></script>
+<script src="/js/pwa.js?v=2026-09-29" defer></script>
 
 </body>
 </html>

@@ -3,15 +3,17 @@
 {% block description %}{{ item.summary }}{% endblock %}
 {% block content %}
 <article class="detail" data-offline="{{ 'yes' if item.offline else 'no' }}">
-  <header class="detail__head">
-    {% if item.image and item.image.src %}<figure class="detail__photo"><img src="{{ item.image.src }}" alt="{{ item.image.alt or item.title }}">{% if item.image.credit %}<figcaption>عکس: {{ item.image.credit }}</figcaption>{% endif %}</figure>{% else %}<div class="detail__art art art--wide art--{{ item.slug|length % 4 }}"></div>{% endif %}
-    <div class="wrap detail__title">
-      <p class="kicker"><a href="/{{ coll.slug }}/">{{ coll.title }}</a> · {{ item.kicker }}</p>
-      <h1 class="display">{{ item.title }}</h1>
-      <p class="latin">{{ item.latin }}</p>
-      <p class="lede">{{ item.summary }}</p>
+  <header class="ghead">
+    <div class="wrap ghead__in">
+      <p class="kicker">{% if dept %}<a href="/{{ dept.slug }}/">{{ dept.label }}</a> · {% endif %}<a href="/{{ coll.slug }}/">{{ coll.title }}</a>{% if item.kicker %} · {{ item.kicker }}{% endif %}</p>
+      <h1 class="display ghead__t">{{ item.title }}</h1>
+      {% if item.latin and item.latin != item.title %}<p class="latin">{{ item.latin }}</p>{% endif %}
+      <p class="ghead__dek">{{ item.summary }}</p>
+      <p class="byline">تحریریهٔ کروزنامه{% if story.minutes %} · {{ story.minutes|fa }} دقیقه خواندن{% else %} · راهنمای کوتاه{% endif %}</p>
       {% if item.offline %}<button class="btn btn--ghost btn--sm" data-save-offline>ذخیره برای خواندن روی کشتی</button>{% endif %}
     </div>
+    {% if item.image and item.image.src %}<figure class="ghead__photo"><img src="{{ item.image.src }}" alt="{{ item.image.alt or item.title }}">{% if item.image.credit %}<figcaption>عکس: {{ item.image.credit }}</figcaption>{% endif %}</figure>
+    {% else %}<div class="wrap"><div class="ghead__cover cover cover--{{ story.dept }}" aria-hidden="true"><span class="cover__coll">{{ story.coll_title }}</span><span class="cover__fa">{{ item.title.split(' ·')[0].split(' (')[0] }}</span>{% if item.latin %}<span class="cover__la">{{ item.latin }}</span>{% endif %}</div></div>{% endif %}
   </header>
   <div class="wrap detail__grid">
     <div class="detail__body">
@@ -26,7 +28,7 @@
     </aside>
   </div>
   {% if related %}
-  <section class="sec sec--sand"><div class="wrap"><p class="kicker">مرتبط</p><div class="grid3">
+  <section class="sec sec--sand"><div class="wrap"><p class="kicker">در ادامه بخوانید</p><div class="grid3">
     {% for r in related %}<a class="tile" href="{{ r.href }}"><p class="kicker">{{ r.kicker }}</p><h3>{{ r.title }}</h3></a>{% endfor %}
   </div></div></section>
   {% endif %}

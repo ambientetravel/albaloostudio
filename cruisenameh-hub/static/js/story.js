@@ -42,7 +42,7 @@
   if (hero) {
     const frame = $('.hero__frame', hero), glass = $('.scene__glass', hero), credit = $('.scene__credit', hero);
     const a = $('.hero__copy--a', hero), b = $('.hero__copy--b', hero), bKids = $$('.hero__copy--b > *', hero);
-    const beats = $$('.hero__beat', hero), chs = $$('.hero__chapters li', hero);
+    const beats = $$('.hero__beat', hero), chs = $$('.hero__chapters li', hero), np = $('.hero__nameplate', hero), chBar = $('.hero__chapters', hero);
     const scenes = $$('.scene', hero).map(fig => ({ fig, id: fig.dataset.scene, img: fig.querySelector('img') }))
       .filter(s => CAM[s.id]);
     let sized = false;
@@ -82,7 +82,10 @@
       const fb = seg(p, .84, .95); b.style.opacity = fb.toFixed(3); b.style.visibility = fb > 0 ? 'visible' : 'hidden';
       bKids.forEach((k, i) => { const t = out(seg(p, .845 + i * .024, .925 + i * .024)); k.style.opacity = t.toFixed(3); k.style.transform = `translate3d(0,${(22 * (1 - t)).toFixed(1)}px,0)`; });
       credit.style.opacity = (.55 * (1 - seg(p, .02, .08)) + .55 * seg(p, .9, 1)).toFixed(2);
-      const n = p > .9; if (n !== navOn) { nav && nav.classList.toggle('is-hidden', !n); navOn = n; }
+      // the nameplate sets on the cover; the masthead waits until the cover has been read past
+      const fn = out(seg(p, .87, .97)); np.style.opacity = fn.toFixed(3); np.style.transform = `translate3d(0,${(-26 * (1 - fn)).toFixed(1)}px,0)`;
+      chBar.style.opacity = (1 - seg(p, .84, .9)).toFixed(3);
+      const n = p > .985; if (n !== navOn) { nav && nav.classList.toggle('is-hidden', !n); navOn = n; }
     };
     scenes.forEach(s => s.img.complete ? null : s.img.addEventListener('load', () => { sized = false; kick(); }, { once: true }));
   }

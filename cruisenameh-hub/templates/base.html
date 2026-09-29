@@ -31,7 +31,8 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
       {% for n in nav %}<a href="/{{ n.href }}">{{ n.label }}</a>{% endfor %}
     </nav>
     <div class="nav__tools">
-      <a class="nav__tg" href="{{ site.channels.telegram }}" rel="noopener" target="_blank" aria-label="تلگرام">تلگرام</a>
+      <button class="nav__search" id="searchBtn" type="button" aria-label="جست‌وجو" aria-controls="searchPanel" aria-expanded="false"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <a class="nav__tg" href="/#newsletter">خبرنامه</a>
       <button class="nav__burger" id="burger" aria-label="منو" aria-expanded="false"><span></span><span></span></button>
     </div>
   </div>
@@ -40,6 +41,16 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
     <a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامه</a><a href="/policy/">سیاست تحریریه</a>
   </div>
 </header>
+<div class="search" id="searchPanel" role="dialog" aria-label="جست‌وجو در کروزنامه" hidden>
+  <div class="wrap search__in">
+    <form class="search__form" action="/journal/" role="search" onsubmit="return window.hubSearch && hubSearch(this)">
+      <input type="search" name="q" placeholder="بندر، کشتی، رودخانه، داستان…" aria-label="جست‌وجو" autocomplete="off">
+      <button type="submit">جست‌وجو</button>
+    </form>
+    <div class="search__results" id="searchResults"></div>
+    <button class="search__x" type="button" data-close-search>بستن</button>
+  </div>
+</div>
 <main id="main">
 {% block content %}{% endblock %}
 </main>
@@ -51,8 +62,8 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElem
       <p class="foot__policy">{{ site.editorial_policy }}</p>
     </div>
     <div class="foot__cols">
-      <div><h4>بخش‌ها</h4>{% for c in collections %}<a href="/{{ c.slug }}/">{{ c.title }}</a>{% endfor %}</div>
-      <div><h4>راهنما</h4><a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/journal/">مجله</a><a href="/offers/">پیشنهادها</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
+      <div><h4>مجله</h4><a href="/journal/">همهٔ داستان‌ها</a><a href="/news/">اخبار</a>{% for d in site.departments %}<a href="/{{ d.slug }}/">{{ d.label }}</a>{% endfor %}</div>
+      <div><h4>راهنما</h4>{% for c in collections %}<a href="/{{ c.slug }}/">{{ c.title }}</a>{% endfor %}<a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
       <div><h4>همراهان تجاری <span class="tag">آگهی</span></h4>{% for p in site.partners %}<a href="{{ p.href }}" rel="sponsored noopener" target="_blank">{{ p.name }} <small>· {{ p.role }}</small></a>{% endfor %}</div>
     </div>
     <div class="foot__kunye">
