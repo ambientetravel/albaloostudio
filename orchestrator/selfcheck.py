@@ -3773,5 +3773,20 @@ with contextlib.redirect_stdout(_buf2):
 if _saved_nt is not None: os.environ["NOTION_TOKEN"] = _saved_nt
 ok("with no NOTION_TOKEN the sync is a no-op, not a failure", _rc2 == 0 and "not configured" in _buf2.getvalue())
 
+
+print("\n=== Google Trends (Agent 7) ===")
+import trends_scan as _ts
+_c24 = [x for x in config.load_sites(include_hold=True) if x.domain == "cruise24.ir"][0]
+ok("Trends uses short head terms, not long seed phrases", _ts.terms_for(_c24)[0] == "کشتی کروز")
+_md = _ts.to_md({"generated_at": "2026-09-29T00:00:00+00:00", "sites": [{"domain": "cruise24.ir", "geo": "IR", "terms": [
+    {"term": "تور دبی", "momentum": "flat", "peak_months": ["Nov"], "avg_interest": 35.6,
+     "rising": [{"query": "تور دبی دی ماه", "growth": "+150%"}]},
+    {"term": "آرویا", "error": "explore HTTP 429 (rate-limited)"}]}]})
+ok("the report shows seasonality, rising searches, and a rate-limit as a note",
+   "Nov" in _md and "تور دبی دی ماه" in _md and "rate-limited" in _md)
+ok("Agent 7 runs Trends without letting it fail the agent",
+   "trends_scan.py" in pathlib.Path("../.github/workflows/agent7-keyword-geo.yml").read_text()
+   and "continue-on-error: true" in pathlib.Path("../.github/workflows/agent7-keyword-geo.yml").read_text())
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

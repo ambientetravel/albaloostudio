@@ -60,6 +60,12 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.com/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: en
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - Iran tour
+      - Iran travel
+      - Iran visa
+      - Persepolis
+      - Iran trade fair
     # 27 Sep: GSC gaps here are almost all improvement-type (now reported, not briefed),
     # so without seeds the site briefs nothing new. Each seed = an informational guide
     # for a tour the site SELLS (offer.json) — the guide links to the tour, never twins it.
@@ -160,6 +166,11 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.ir/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: fa-IR
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - کروز
+      - تور کشتی
+      - کشتی کروز
+      - تور کشتی کروز
     # 27 Sep: informational guides for regions it SELLS (offer.json) — best-time / how-to
     # angles the product pages do not cover. Distinct from cruise24.ir's seeds (fa_cruise).
     seed_keywords:
@@ -264,6 +275,11 @@ sites:
       - Armenia monasteries tour guide                      # /tour/monasteries-and-brandy/
       - Morocco kasbah route travel guide                   # /tour/kasbahs-and-caravans/
     locale: en
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - Uzbekistan tour
+      - Silk Road tour
+      - Georgia travel
+      - Petra tour
     market: INT
     base_url: "https://exploreorient.com"
     # Where the bytes actually live. Recorded because it was tribal
@@ -376,6 +392,10 @@ sites:
     brand: Ambiente Travel
     compliance_profile: orient_v1   # non-cruise: no AROYA/Seychelles/Schengen rules injected
     locale: en
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - Iran Reise
+      - Usbekistan Rundreise
+      - Kreuzfahrt Orient
     # Never brief these (regex, case-insensitive). 'avintura' is a GSC misspelling of
     # Avantura — ONE 49 m yacht, Split–Dubrovnik; a 13 Aug draft invented a fleet and
     # Seychelles/Gulf itineraries for it. The rest are brand-navigational noise that
@@ -441,6 +461,10 @@ sites:
     gsc_account: "UNCONFIRMED"
     brand: CruiseBaz
     locale: fa-IR
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - آرویا
+      - کروز خلیج فارس
+      - تور کشتی
     audience_group: fa_cruise   # one Farsi cruise audience + the «دریانامه» Telegram — a topic is briefed on ONE of these sites
     market: IR
     base_url: "https://cruisebaz.com"
@@ -496,6 +520,11 @@ sites:
       - برنامه‌ریزی کروز نوروز ۱۴۰۶                         # cruise-nowruz-1406.html
       - انتخاب کشتی مناسب در ناوگان MSC                      # msc.html
     locale: fa-IR              # Farsi build shipped — live <html lang="fa" dir="rtl">; was `en`, so 17 Sep's 4 guides came out English (fixed 25 Sep)
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - کشتی کروز
+      - تور دبی
+      - تور ترکیه
+      - آرویا
     audience_group: fa_cruise   # one Farsi cruise audience + the «دریانامه» Telegram — a topic is briefed on ONE of these sites
     market: IR
     status: active

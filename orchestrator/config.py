@@ -453,6 +453,9 @@ class Site:
     # Regexes of GSC queries this site must never brief — misspelled third-party
     # names, brand-navigational noise. See agent1_seo_scout._excluded.
     exclude_queries: list[str] = field(default_factory=list)
+    # Short head terms for Google Trends (tools/trends_scan.py). Long seed
+    # phrases have too little volume for Trends to register anything.
+    trend_terms: list[str] = field(default_factory=list)
 
     @property
     def on_hold(self) -> bool:
@@ -522,6 +525,7 @@ def load_sites(
                 access_feed=str(merged.get("access_feed", "") or "").strip(),
                 audience_group=str(merged.get("audience_group", "") or "").strip(),
                 exclude_queries=[str(x) for x in (merged.get("exclude_queries") or [])],
+                trend_terms=[str(x) for x in (merged.get("trend_terms") or [])],
             )
         )
 
