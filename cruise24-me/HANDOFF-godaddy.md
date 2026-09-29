@@ -252,12 +252,91 @@ Read only; change nothing and accept nothing. Open https://www.godaddy.com/legal
 Then open https://www.godaddy.com/legal/agreements/universal-terms-of-service-agreement and copy me the sentence that names the contracting GoDaddy company for customers in Germany or the EU.
 ```
 
-## Step 3: go live (later)
+## Step 3: go live (prompt ready 29 Sep)
 
-When `python3 build_bundle.py` passes (no `--draft`): upload the final bundle the same way, then
-change the `@` A record from "WebsiteBuilder Site" to 92.205.251.216 (`www` is a CNAME to @ and
-follows), keep every other record, and disconnect the Websites + Marketing site from the domain. That replaces the live site, so it
-waits for the legal facts.
+Final bundle `dist/cruise24-me-20260929-587f349.zip` (66.1 MB, 1,871 files; build_bundle.py passed with no
+blockers), sent as eight parts of ≤ 10 MiB, verified equal to the zip. `.htaccess` redirects http and www
+to https://cruise24.me/ and leaves staging alone (tested on Apache 2.4: 301s, 200 on the final address,
+noindex on staging, 403 on api/data and api/.htaccess). The prompt backs up, uploads, turns on the inbox
+copy to res@cruise24.me, checks staging, issues cruise24.me + www + staging by DNS check, stops for
+Alireza's "yes, switch" before the `@` record moves, checks the live site, then re-issues by web check
+(automatic renewal) and removes staging.
+
+```text
+Go-live for cruise24.me on our GoDaddy cPanel hosting. The new site replaces the Website Builder site. Work through the parts in order and report after each part.
+
+Account facts: Web Hosting Economy, cPanel user ekrd2r2976p9, home /home/ekrd2r2976p9, document root /home/ekrd2r2976p9/public_html, server IP 92.205.251.216. acme.sh is already installed in ~/.acme.sh. cPanel Terminal opens by direct link.
+
+HARD RULES
+- Do not buy, renew, upgrade or accept any offer.
+- DNS: only the changes named in Parts E, F and H. Never touch MX, the SPF/DMARC/google TXT records, the DKIM or email CNAMEs, "pic", "res", or the nameservers.
+- Do not delete the Websites + Marketing site; it is our way back.
+- Type terminal commands exactly as written, one at a time; copy me the last lines of each. If one prints an error, stop and paste it.
+- If GoDaddy asks for a login or 2FA code, or a file-upload dialog opens, stop and wait for me.
+- PART F has a hard stop: do not save the @ change until I say "yes, switch".
+
+PART A — BACKUP
+1. File Manager, Show Hidden Files on. Select everything in public_html, Compress as public_html-backup-20260929.zip, Move it to /home/ekrd2r2976p9/. Report its size.
+
+PART B — UPLOAD THE FINAL SITE
+2. In public_html click Upload; stop and let me pick the eight files cruise24-me-20260929-587f349-part1of8.zip … part8of8.zip. Wait for 100 % on all.
+3. Extract each of the eight zips into /public_html, one at a time. This time existing files WILL be replaced by the new versions; that is intended.
+4. Report each: public_html/index.html 39,239 bytes; imprint.html 9,029; privacy.html 10,961; contact.html 10,216; .htaccess 641; assets/site.css 31,313; api/enquiry.php 5,685; media/hero-balcony-1920.mp4 5,569,586; the journeys folder has 1,703 files; api/config.php still exists.
+5. Delete the eight part zips from public_html. Then delete these 14 unused files (they are in the backup): media/1d6fe463-Cover-video.mp4, media/2752c37b-Hero-video.mp4, media/cruisehost/11.jpg, media/cruisehost/M2.jpg, media/cruisehost/M4.jpg, media/cruisehost/M5.jpg, media/cruisehost/W9.jpg, media/variety/croatia.jpg, media/variety/grand-hero.jpg, media/variety/italy-2.jpg, media/variety/italy-3.jpg, media/variety/sey-2.jpg, media/variety/sey-3.jpg, media/variety/variety-hero.jpg.
+
+PART C — ENQUIRY COPIES BY EMAIL
+6. Edit public_html/api/config.php so it reads exactly:
+
+<?php
+return [
+    'signing_secret' => '',
+    'notify_to'      => 'res@cruise24.me',
+    'notify_from'    => 'res@cruise24.me',
+    'ip_salt'        => '037c69b6d0f58afdcbe7a0bc3f522470',
+];
+
+PART D — CHECK ON STAGING (keep each tab in front while it loads)
+7. https://staging.cruise24.me/ : is the big headline in a serif font ("The sea, taken slowly.")? Any error?
+8. https://staging.cruise24.me/imprint.html : does it show "Hauptstr. 81" and "Amtsgericht Montabaur, HRB 24620"?
+9. https://staging.cruise24.me/contact.html : send the form once, name "TEST go-live", email test@example.com. Copy me the message under the button. Then ask me to check the res@cruise24.me inbox for an email "Cruise24 request: TEST go-live", and wait for my answer.
+
+PART E — CERTIFICATE FOR cruise24.me, www AND staging (cPanel Terminal)
+10. ~/.acme.sh/acme.sh --issue --dns -d cruise24.me -d www.cruise24.me -d staging.cruise24.me --keylength ec-256 --yes-I-know-dns-manual-mode-enough-go-ahead-please
+    It prints three pairs of "Domain:" and "TXT value:". Copy all three to me exactly.
+11. GoDaddy DNS for cruise24.me: ADD three TXT records, TTL 1/2 hour (or the lowest offered):
+    name _acme-challenge          → the TXT value printed for '_acme-challenge.cruise24.me'
+    name _acme-challenge.www      → the value for '_acme-challenge.www.cruise24.me'
+    name _acme-challenge.staging  → the value for '_acme-challenge.staging.cruise24.me'
+    Change nothing else.
+12. Wait 10 minutes, then:
+    ~/.acme.sh/acme.sh --renew -d cruise24.me --ecc --yes-I-know-dns-manual-mode-enough-go-ahead-please
+    Success ends with "Your cert is in". If it says "Verify error", wait 10 more minutes and run it once more; if it fails again, stop and paste the output.
+13. ~/.acme.sh/acme.sh --deploy -d cruise24.me --ecc --deploy-hook cpanel_uapi
+    (The "install_ssl … exit 255" warnings seen last time are expected; it must end with "Success".)
+14. ~/.acme.sh/acme.sh --remove -d staging.cruise24.me --ecc
+15. cPanel → SSL/TLS Status: report the status and expiry for cruise24.me, www.cruise24.me and staging.cruise24.me.
+16. Open https://staging.cruise24.me/ : it must load with no privacy warning.
+
+PART F — THE SWITCH (hard stop)
+17. GoDaddy DNS for cruise24.me: open the A record "@" (value "WebsiteBuilder Site") for editing and set the value to 92.205.251.216, TTL 1/2 hour. DO NOT SAVE YET. Tell me what the dialog says (including any warning about the website being disconnected) and wait until I write "yes, switch". Then save. Do not touch the www CNAME or any other record.
+
+PART G — CHECK THE LIVE SITE (15–30 minutes after the switch; keep tabs in front)
+18. Open https://cruise24.me/ , http://cruise24.me/ and https://www.cruise24.me/ . Each must end at https://cruise24.me/ with NO privacy warning, showing the new site (serif headline "The sea, taken slowly."). If you still see the old Website Builder site, wait 15 minutes and try again (DNS takes up to an hour).
+19. Open https://cruise24.me/imprint.html and https://cruise24.me/journeys.html (how many sailings does it say?).
+20. On https://cruise24.me/contact.html send the form once as "TEST live". Copy me the message. Then in File Manager delete public_html/api/data/leads.ndjson.php and ratelimit.json.php (keep .htaccess).
+
+PART H — MAKE RENEWAL AUTOMATIC AND REMOVE STAGING (only after Part G passed)
+21. ~/.acme.sh/acme.sh --issue -d cruise24.me -d www.cruise24.me -w /home/ekrd2r2976p9/public_html --keylength ec-256 --force
+22. ~/.acme.sh/acme.sh --deploy -d cruise24.me --ecc --deploy-hook cpanel_uapi
+23. ~/.acme.sh/acme.sh --list   (cruise24.me must be listed, staging must not)
+24. GoDaddy DNS: DELETE the three _acme-challenge TXT records and the A record "staging". Nothing else.
+25. cPanel → Domains: remove staging.cruise24.me. If it offers to delete files or the document root, say NO: it shares public_html with the live site.
+26. Open https://cruise24.me/ once more: still loads, no warning.
+
+Finish with one report: backup size, the Part B numbers, Part D answers, Part E outputs (steps 10, 12, 13, 15), the Part G results, and Part H outputs (21–23).
+
+WAY BACK, if the live site misbehaves after Part F: set the A record "@" back to the Website Builder site (GoDaddy: Websites + Marketing → "Cruise 24" → connect domain cruise24.me), then tell me.
+```
 
 ## For the privacy page once hosting is settled
 
