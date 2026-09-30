@@ -539,3 +539,13 @@ html:not(.js-story) .nav{background:rgba(11,18,32,.82);backdrop-filter:blur(14px
 .ghead__photo figcaption{position:absolute;bottom:.6rem;inset-inline-start:1rem;font-size:.7rem;color:rgba(245,240,231,.8)}
 .page:not(.home) .nav{background:rgba(11,18,32,.9);backdrop-filter:blur(14px)}
 
+/* editor's picks — chosen by hand in content/picks.json */
+.sc__pick{color:var(--champagne);font-weight:600;display:inline-flex;align-items:center;gap:.3rem}
+.sc__pick::before{content:"◆";font-size:.55rem}
+.sc__why{margin:.2rem 0 0;font-family:var(--display);font-size:.98rem;line-height:1.8;color:var(--sea);border-inline-start:2px solid var(--champagne);padding-inline-start:.7rem}
+.sc__why span{font-family:var(--fa);font-size:.72rem;color:var(--muted)}
+.chip2--pick{border-color:var(--champagne)}
+.chip2--pick.is-on{background:var(--champagne);border-color:var(--champagne);color:var(--ink)} .chip2--pick.is-on small{color:var(--ink)}
+.sgrid__only-pick{display:contents} .sgrid__only-pick[hidden]{display:none}
+html:not(.js) .chips,html:not(.js) [data-more]{display:none}
+[data-more][hidden]{display:none}

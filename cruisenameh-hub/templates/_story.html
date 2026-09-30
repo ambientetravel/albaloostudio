@@ -23,12 +23,13 @@
 {%- endmacro %}
 
 {% macro card(s, size='std', i=0) -%}
-<a class="sc sc--{{ size }} st st--card" data-i="{{ i }}" data-dept="{{ s.dept }}" href="{{ s.href }}">
+<a class="sc sc--{{ size }} st st--card{% if s.pick %} sc--pick{% endif %}" data-i="{{ i }}" data-dept="{{ s.dept }}"{% if s.pick %} data-pick="{{ s.pick }}"{% endif %} href="{{ s.href }}">
   {{ visual(s) }}
   <div class="sc__body">
-    <p class="sc__meta"><span class="sc__dept">{{ s.dept_label }}</span>{% if s.kicker %}<span class="sc__kick">{{ s.kicker }}</span>{% endif %}</p>
+    <p class="sc__meta">{% if s.pick %}<span class="sc__pick">برگزیدهٔ سردبیر</span>{% endif %}<span class="sc__dept">{{ s.dept_label }}</span>{% if s.kicker %}<span class="sc__kick">{{ s.kicker }}</span>{% endif %}</p>
     <h3 class="sc__title">{{ s.title }}</h3>
     {% if size != 'mini' and s.dek %}<p class="sc__dek">{{ s.dek }}</p>{% endif %}
+    {% if s.pick and s.pick_why %}<p class="sc__why">«{{ s.pick_why }}» <span>— سردبیر</span></p>{% endif %}
     {{ foot(s) }}
   </div>
 </a>

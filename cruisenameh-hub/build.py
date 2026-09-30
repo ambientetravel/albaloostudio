@@ -120,6 +120,23 @@ def build_stories(collections, data, articles, depts):
                         "visa": (it.get("facts") or {}).get("visa", "")})
     return out
 
+def load_picks() -> list[dict]:
+    """Editor's picks, chosen by hand in content/picks.json (the content owner's file).
+    Missing file means no picks; the filter simply does not appear."""
+    f = CONTENT/"picks.json"
+    if not f.exists(): return []
+    return [p for p in json.loads(f.read_text(encoding="utf-8")).get("picks", []) if p.get("story")]
+
+def apply_picks(stories: list[dict], picks: list[dict]) -> list[str]:
+    """Mark picked stories with their rank; return the picks that match no story."""
+    by = {x["href"].strip("/"): x for x in stories}
+    unknown = []
+    for rank, p in enumerate(picks, 1):
+        x = by.get(p["story"].strip().strip("/"))
+        if not x: unknown.append(p["story"]); continue
+        x["pick"], x["pick_why"] = rank, (p.get("why") or "").strip()
+    return unknown
+
 def fa(n) -> str:
     return str(n).translate(FA_DIGITS)
 
@@ -301,6 +318,9 @@ def build(check_only=False):
     featured = {c["slug"]: data[c["slug"]][:4] for c in collections}
     depts = site["departments"]
     stories = build_stories(collections, data, articles, depts)
+    unknown_picks = apply_picks(stories, load_picks())
+    if unknown_picks: print("  editor's picks not found (check the address): " + ", ".join(unknown_picks))
+    picks = sorted((x for x in stories if x.get("pick")), key=lambda x: x["pick"])
     by_dept = {d["slug"]: [x for x in stories if x["dept"] == d["slug"]] for d in depts}
     with_img = [x for x in stories if x["kind"] == "article" and x["image"]]
     cover = next((x for x in with_img if x["slug"] == site.get("cover")), with_img[0] if with_img else stories[0])
@@ -330,7 +350,7 @@ def build(check_only=False):
         rel = [r for r in (resolve(x) for x in n.get("related", [])) if r]
         write(f"news/{n['slug']}/index.html", "news-item.html", item=n, related=rel,
               more=[o for o in news if o["slug"] != n["slug"]][:3])
-    write("journal/index.html", "journal.html", articles=articles, stories=stories, cover=cover)
+    write("journal/index.html", "journal.html", articles=articles, stories=stories, cover=cover, picks=picks)
     for a in articles:
         write(f"journal/{a['slug']}/index.html", "article.html", article=a)
     write("policy/index.html", "policy.html")
@@ -415,6 +435,10 @@ def check():
     for p in sources:
         for ref in set(re.findall(r"\bimg/[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|svg)", p.read_text(encoding="utf-8"))):
             if not (STATIC/ref).exists(): print("MISSING IMAGE:", ref, "in", p.relative_to(HERE)); bad += 1
+    # Every editor's pick must name a page that exists: a typo would silently drop it.
+    real = {f"journal/{a['slug']}" for a in load_articles()} | {f"{c['slug']}/{it['slug']}" for c in load("collections") for it in load(c["slug"])}
+    for p in load_picks():
+        if p["story"].strip().strip("/") not in real: print("PICK: no such story:", p["story"], "in content/picks.json"); bad += 1
     for it in load("ports"):
         v = it["facts"].get("visa", "")
         name = port_name(it)

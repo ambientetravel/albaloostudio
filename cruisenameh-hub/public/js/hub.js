@@ -52,9 +52,15 @@
   /* ---------- magazine: department chips and "more stories" ---------- */
   $$('[data-chips]').forEach(bar => {
     const grid = $(bar.dataset.chips), more = $(`[data-more="${bar.dataset.chips}"]`), PAGE = 12; let shown = PAGE, f = '';
-    const cards = $$('.sc', grid);
+    const cards = $$('.sc', grid).filter(c => !c.closest('[data-only-pick]'));
     const apply = () => {
-      let n = 0; cards.forEach(c => { const ok = !f || c.dataset.dept === f; c.hidden = !ok || (ok && ++n > shown); });
+      let n = 0;
+      cards.forEach(c => {
+        const ok = !f || (f === 'picks' ? !!c.dataset.pick : c.dataset.dept === f);
+        c.hidden = !ok || (ok && ++n > shown);
+        c.style.order = f === 'picks' && c.dataset.pick ? c.dataset.pick : ''; // picks read in the editor's order
+      });
+      $$('[data-only-pick]', grid).forEach(w => { w.hidden = f !== 'picks'; w.style.order = f === 'picks' ? (($('.sc', w) || {}).dataset || {}).pick || '' : ''; });
       if (more) more.hidden = n <= shown;
     };
     $$('.chip2', bar).forEach(b => b.addEventListener('click', () => {
