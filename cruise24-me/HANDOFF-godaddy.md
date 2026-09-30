@@ -338,6 +338,30 @@ Finish with one report: backup size, the Part B numbers, Part D answers, Part E 
 WAY BACK, if the live site misbehaves after Part F: set the A record "@" back to the Website Builder site (GoDaddy: Websites + Marketing → "Cruise 24" → connect domain cruise24.me), then tell me.
 ```
 
+## Live since 29/30 Sep; speed update 30 Sep
+
+cruise24.me, www and staging resolve to 92.205.251.216 (checked 30 Sep 09:25 UTC). Alireza reported
+slow and sometimes missing photos and video in Chrome and Safari. Cause: every video got its file on page
+open (home 17 videos, 35 MB) and held the few connections GoDaddy Economy allows per visitor, starving the
+photos; no compression or cache headers. Fixed in f31f544 (lazy videos, direct photo src, media re-encoded
+72 → 25 MB, gzip + 30-day cache). Update bundle `cruise24-me-20260930-f31f544` (5 parts, 43.7 MB).
+Part H of the go-live prompt (automatic renewal by web check, staging removal) is still to be confirmed.
+
+```text
+Update the live cruise24.me site with a faster version. Same procedure as before; no DNS change, no settings change.
+
+Account: cPanel user ekrd2r2976p9, document root /home/ekrd2r2976p9/public_html.
+Rules: do not buy or accept anything; do not touch DNS; do not edit or delete public_html/api/config.php or anything in public_html/api/data; stop for any login, 2FA code or file-upload dialog.
+
+1. Backup: File Manager, Show Hidden Files on. Select everything in public_html, Compress as public_html-backup-20260930.zip, Move it to /home/ekrd2r2976p9/. Report its size.
+2. In public_html click Upload; stop and let me pick the five files cruise24-me-20260930-f31f544-part1of5.zip … part5of5.zip. Wait for 100 % on all.
+3. Extract each of the five into /public_html, one at a time. Existing files will be replaced; that is intended.
+4. Report the exact sizes: index.html 35,826 bytes; .htaccess 1,765; assets/site.js 7,378; destinations.html 22,270; media/hero-balcony-1920.mp4 2,282,956; media/hero-balcony-1080sq.mp4 601,918; media/variety/kusadasi.jpg 232,737. Confirm api/config.php still exists.
+5. Delete the five part zips from public_html (only those five).
+6. Open https://cruise24.me/ in a new tab kept in front, and reload once with Ctrl+Shift+R (Cmd+Shift+R on Mac). Does the page and its hero video appear? Any error page? Then open https://cruise24.me/destinations.html and https://cruise24.me/journal.html : do the photos appear?
+Finish with a short report of steps 1–6.
+```
+
 ## For the privacy page once hosting is settled
 
 GoDaddy is a US company, so the privacy page must name the GoDaddy contracting entity and the basis
