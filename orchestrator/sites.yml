@@ -462,7 +462,7 @@ sites:
     # A domain property would still be tidier one day; it is not worth a DNS
     # round-trip when this one already has full coverage.
     property_uri: "https://cruisebaz.com/"
-    gsc_account: "UNCONFIRMED"
+    gsc_account: "alimozzarella@gmail.com"   # confirmed 30 Sep 2026 (not under contactmozaffari)
     brand: CruiseBaz
     locale: fa-IR
     indexnow_key: "6ee0c8e240f47be5d7e63ad224835a79"   # public by design; site must serve /6ee0c8e240f47be5d7e63ad224835a79.txt containing it
