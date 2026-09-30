@@ -354,6 +354,15 @@ Part H: steps 21–23 ran on 29 Sep; step 24 stopped at the 2FA prompt, so the T
 staging.cruise24.me still exist (harmless). Before deleting them, confirm `Le_Webroot` in
 ~/.acme.sh/cruise24.me_ecc/cruise24.me.conf is the public_html path, not "dns".
 
+**Go-live complete 30 Sep.** `acme.sh --list`: cruise24.me (SAN www.cruise24.me), ec-256, Let's Encrypt,
+created 2026-09-29T12:34:17Z, renew 2026-11-28T06:04:57Z; `Le_Webroot='/home/ekrd2r2976p9/public_html'`
+(automatic renewal by web check, cron 4×/day). DNS back to its original 20 records with `@` → 92.205.251.216
+(A staging and both `_acme-challenge` TXT deleted; MX, SPF, both DMARC, DKIM, email/pic/res CNAMEs, www,
+nameservers unchanged). cPanel domain staging.cruise24.me removed (document root untouched); cruise24.me is
+the only domain. https://cruise24.me/ loads with no warning, hero video playing.
+Leftovers, harmless: ~/.acme.sh/staging.cruise24.me_ecc (old cert files); cPanel Trash holds replaced zips
+and media; backups public_html-backup-20260928/29/30.zip in the home folder.
+
 ```text
 Update the live cruise24.me site with a faster version. Same procedure as before; no DNS change, no settings change.
 
