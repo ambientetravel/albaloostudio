@@ -213,6 +213,15 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
     # LEADS_SIGNING_SECRET, when set, is used only for pulling leads: it lives in a
     # site's api/config.php, so it should not be the key that signs every other hop.
     secret = config.optional_env("LEADS_SIGNING_SECRET") or config.optional_env("WEBHOOK_SIGNING_SECRET")
+    # A value copied out of a web terminal can carry a line break where the line wrapped;
+    # a signing secret never contains whitespace, so none of it is meant.
+    secret = "".join(secret.split())
+    if secret:
+        # Length and a short hash, never the value: compared with the same two numbers
+        # printed on the server, they show which copy of the secret is the wrong one.
+        import hashlib
+        log.info("lead-pull secret: %d chars, fingerprint %s",
+                 len(secret), hashlib.sha256(secret.encode("utf-8")).hexdigest()[:8])
     body = b""
     headers = (config.signed_headers(secret, body, "agent4-lead-pull")
                if secret else {"User-Agent": config.USER_AGENT})

@@ -500,6 +500,15 @@ Change the cruise24.me leads password. Hard rules: no purchases, no DNS changes,
 5. Only if step 4 succeeded: run clear in the terminal.
 ```
 
+**If step 4 still says 401 `{"error":"signature"}`:** compare fingerprints. Neither shows the password.
+- Server: in the cPanel Terminal run
+  `php -r '$c=require "/home/ekrd2r2976p9/public_html/api/config.php"; $s=$c["signing_secret"]; echo strlen($s)," ",substr(hash("sha256",$s),0,8),"\n";'`
+- GitHub: the Qualify log line `lead-pull secret: N chars, fingerprint xxxxxxxx`.
+
+If the numbers differ, the GitHub copy is wrong. 65 or 66 characters means the "1" line was copied with it.
+Line breaks from a wrapped terminal line no longer matter: the pipeline removes whitespace from the
+secret (since 30 Sep).
+
 **Reading the result**
 
 | Step 3 prints | Step 4 | Meaning |
