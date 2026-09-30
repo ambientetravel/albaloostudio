@@ -565,36 +565,37 @@ sites:
     property_uri: "sc-domain:cruise24.me"
     gsc_account: "contactmozaffari@gmail.com"
     brand: Cruise24
-    seed_keywords:            # starter topics — this site has ~no GSC footprint yet
-      - "gemi turu nedir kapsamli rehber"
-      - "Akdeniz gemi turu rehberi"
-      - "ilk kez gemi turu ipuclari"
+    # 30 Sep 2026: moved OFF the GoDaddy Website Builder onto GoDaddy cPanel
+    # (Apache, 92.205.251.216): 1,715 static English pages, https + www→apex
+    # 301s live, noindex scoped to staging only. Its source repo is not yet
+    # located, so drafts are staged for manual upload (static_bundle); once the
+    # repo exists, switch to bundle_pr like cruise24.ir (PRs, review board,
+    # auto-deploy).
+    seed_keywords:            # English guides for lines/regions the site sells (offer.json)
+      - "Explora Journeys review first cruise"
+      - "Variety Cruises Greek islands small ship"
+      - "small ship cruise Croatia Adriatic"
+      - "Star Clippers tall ship cruise guide"
+      - "European river cruise first time guide"
+    trend_terms:
+      - Explora Journeys
+      - Variety Cruises
+      - Greek islands cruise
+      - river cruise Europe
     locale: en
     indexnow_key: "32848188bc802588ccb8b2f6b390a74f"   # public by design; site must serve /32848188bc802588ccb8b2f6b390a74f.txt containing it
     market: INT                # the world-audience twin of cruise24.ir
     base_url: "https://cruise24.me"
-    # Where the bytes actually live. Recorded because it was tribal
-    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
-    # written for a GoDaddy site. Hosting is NOT the CMS — the two
-    # differ on every property here.
-    hosting: godaddy_website_builder
+    offer_feed: "https://cruise24.me/offer.json"   # offer.v1 — 30 offerings (16 lines, 14 regions)
+    hosting: godaddy_cpanel
     hosting_note: >-
-      GoDaddy's DPS builder. No file access, no API, nothing to deploy to.
-    sitemap: "https://cruise24.me/sitemap.xml"   # a sitemap INDEX, not a urlset
+      Static site on GoDaddy cPanel (Apache). robots.txt + sitemap.xml (1,715 URLs)
+      live; /api/ protected (leads.php is HMAC-signed for Agent 4).
+    sitemap: "https://cruise24.me/sitemap.xml"
     cms:
-      type: godaddy_builder
-      # GoDaddy Website Builder is a closed platform: no REST API, no file
-      # access, no repo. `unimplemented` is deliberate and load-bearing — it
-      # routes Agent 2 down the stage-the-draft path. Any other adapter name
-      # falls through to the generic branch, which returns a live_url for a page
-      # it never created, and an adapter must never report a URL it did not make.
-      adapter: unimplemented
-      # Machine-readable so the dashboard can tell a SETTLED "cannot" apart from
-      # a "nobody has built it yet". Both rendered identically in red, which put
-      # two resolved decisions on the todo list every week.
-      unsupported_reason: >-
-        GoDaddy Website Builder has no publishing API. Not buildable — this site
-        would have to move off the builder to join the pipeline.
+      type: static
+      # Stages the article bundle for a manual upload until the repo is found.
+      adapter: static_bundle
       content_root: "/"
       publish_mode: draft
     channels:
@@ -603,8 +604,7 @@ sites:
         autopost: false
         account_ref: null
     notes:
-      - "Declares lang=\"tr-TR\" while serving English to a world audience."
-      - "Sitemap index resolves to 2 URLs total across both child sitemaps."
+      - "Launched 30 Sep 2026. Open source-side fixes: 952 pages share 269 titles (departures of one route), JSON-LD on the homepage only, 5,214 of 8,307 images without alt, sitemap lastmod all 2026-09-28, no llms.txt."
 
   - domain: albaloostudio.com
     property_uri: "sc-domain:albaloostudio.com"

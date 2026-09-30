@@ -3305,13 +3305,17 @@ print("\n=== a settled 'cannot' is not an unfinished 'todo' ===")
 # put two closed decisions back on the backlog every week.
 _cov = _bd._coverage()
 _by = {r["domain"]: r for r in _cov}
-for _d in ("cruise24.me", "albaloostudio.com"):
+# cruise24.me left the builder on 30 Sep (static site on cPanel), so it is no
+# longer a settled "cannot": it stages bundles until its repo is found.
+for _d in ("albaloostudio.com",):
     ok(f"{_d} is a decision, not a gap",
        _by[_d]["cls"] == "hold" and "by decision" in _by[_d]["verdict"], _by[_d])
     ok(f"{_d} says WHY, in the registry not a comment",
        len(_by[_d]["unsupported_reason"]) > 30, _by[_d]["unsupported_reason"])
 ok("the reason reaches the rendered page",
-   "GoDaddy Website Builder has no publishing API" in _bd.render(None, None, None, None, None))
+   _by["albaloostudio.com"]["unsupported_reason"][:40] in _bd.render(None, None, None, None, None))
+ok("cruise24.me, off the builder, now stages bundles instead of being a closed 'cannot'",
+   _by["cruise24.me"]["adapter"] == "static_bundle" and _by["cruise24.me"]["cls"] != "bad")
 # The count that matters must now be the genuinely missing ones only.
 _gaps = [r["domain"] for r in _cov if r["cls"] == "bad"]
 ok("no publishing adapter is missing any more", _gaps == [], _gaps)
