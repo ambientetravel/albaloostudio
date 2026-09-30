@@ -44,8 +44,20 @@ recall into live retrieval.
 Nothing is invented: the score is computed from the models' actual answers, and
 each answer is kept so a claim can be checked against what was really said.
 
-    python3 tools/ai_visibility.py                  # all configured properties
-    python3 tools/ai_visibility.py --domain boutimar.com --provider anthropic
+CHINESE MODELS (30 Sep 2026)
+────────────────────────────
+Iran and Silk-Road tours sell to Chinese agencies and travellers, and they ask
+DeepSeek, Qwen, ERNIE, Doubao and Kimi — not ChatGPT. All five speak the OpenAI
+chat protocol, so each is one row in PROVIDERS: base URL, key variable, model.
+A provider whose key is not set is reported "not configured" and skipped; one
+that errors is reported with the error — neither fails the run. Only the public
+probe prompts below are sent; no customer or company data leaves the pipeline.
+Model names move fast (Moonshot retired every moonshot-v1 model on 31 Aug
+2026), so each model is overridable by env (DEEPSEEK_MODEL, QWEN_MODEL, …).
+
+    python3 tools/ai_visibility.py                  # all providers with a key
+    python3 tools/ai_visibility.py --provider deepseek,qwen --domain boutimar.com
+    python3 tools/ai_visibility.py --provider cn    # the five Chinese models
     python3 tools/ai_visibility.py --format json --out reports/ai-visibility.json
 """
 
@@ -80,6 +92,9 @@ PROBES: list[dict[str, Any]] = [
             "Who are the best DMCs (destination management companies) in Iran?",
             "Recommend a luxury tour operator for MICE events in Iran.",
             "I want a high-end cultural tour of Persia — which agency should I use?",
+            "伊朗有哪些靠谱的地接社（DMC）推荐？",
+            "我们旅行社想做伊朗团，伊朗当地的地接社找哪家比较好？",
+            "去伊朗办会议或奖励旅游，推荐哪家当地公司？",
         ],
         "rivals": ["Uppersia", "SURFIRAN", "Iran Doostan", "Pars Tourist", "Key2Persia"],
     },
@@ -114,10 +129,12 @@ PROBES: list[dict[str, Any]] = [
     },
     {
         "domain": "exploreorient.com", "brand": "Explore Orient",
-        "aliases": ["explore orient", "exploreorient"],
+        "aliases": ["explore orient", "exploreorient", "探索东方"],
         "prompts": [
             "Recommend a sustainable, carbon-conscious tour operator for Turkey and the eastern Mediterranean.",
             "Which European agency runs curated cultural tours of the Orient with venue and carbon reporting?",
+            "推荐一家做伊朗和土耳其高端定制游的旅行社。",
+            "丝绸之路（伊朗、土耳其）深度文化游，哪家旅行社比较专业？",
         ],
         "rivals": ["Intrepid Travel", "Responsible Travel", "G Adventures", "Exodus"],
     },
@@ -195,6 +212,65 @@ def _ask_gemini(prompt: str, model: str) -> str:
     return (r.text or "").strip()
 
 
+# OpenAI-protocol providers. key: env var holding the API key; model: default,
+# overridable by <NAME>_MODEL; base: overridable by <NAME>_BASE_URL.
+PROVIDERS: dict[str, dict[str, str]] = {
+    "deepseek": {"label": "DeepSeek", "base": "https://api.deepseek.com",
+                 "key": "DEEPSEEK_API_KEY", "model": "deepseek-flash"},
+    "qwen":     {"label": "Qwen (Alibaba)", "base": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+                 "key": "DASHSCOPE_API_KEY", "model": "qwen-plus"},
+    "ernie":    {"label": "ERNIE (Baidu)", "base": "https://qianfan.baidubce.com/v2",
+                 "key": "QIANFAN_API_KEY", "model": "ernie-5.1"},
+    "doubao":   {"label": "Doubao/Seed (ByteDance)", "base": "https://ark.ap-southeast.bytepluses.com/api/v3",
+                 "key": "ARK_API_KEY", "model": "seed-2-0-lite-260228"},
+    "kimi":     {"label": "Kimi (Moonshot)", "base": "https://api.moonshot.ai/v1",
+                 "key": "MOONSHOT_API_KEY", "model": "kimi-k3"},
+}
+NATIVE = {"anthropic": ("ANTHROPIC_API_KEY", "claude-sonnet-5"),
+          "gemini": ("GEMINI_API_KEY", "gemini-flash-latest"),
+          "openai": ("OPENAI_API_KEY", "gpt-4.1")}
+CN = ["deepseek", "qwen", "ernie", "doubao", "kimi"]
+ALL = list(NATIVE) + CN
+
+
+def provider_setup(name: str) -> tuple[str | None, str, str | None]:
+    """(key or None, model, base_url or None) — env first, registry second."""
+    if name in NATIVE:
+        env, model = NATIVE[name]
+        return os.environ.get(env) or None, model, None
+    p = PROVIDERS[name]
+    up = name.upper()
+    return (os.environ.get(p["key"]) or None,
+            os.environ.get(f"{up}_MODEL") or p["model"],
+            os.environ.get(f"{up}_BASE_URL") or p["base"])
+
+
+def _ask_compat(prompt: str, model: str, *, base: str, key: str) -> str:
+    from openai import OpenAI
+    c = OpenAI(api_key=key, base_url=base, timeout=90, max_retries=1)
+    # No temperature: several of these are reasoning models that reject it, and
+    # a generous max_tokens so thinking does not eat the whole answer.
+    r = c.chat.completions.create(
+        model=model, max_tokens=1500,
+        messages=[
+            {"role": "system", "content": ("You are a helpful assistant answering a "
+             "user's question as you normally would. Name specific companies where relevant.")},
+            {"role": "user", "content": prompt}])
+    return (r.choices[0].message.content or "").strip()
+
+
+def resolve_providers(spec: str) -> list[str]:
+    out: list[str] = []
+    for part in (x.strip().lower() for x in spec.split(",") if x.strip()):
+        names = ALL if part == "all" else CN if part == "cn" else [part]
+        for n in names:
+            if n not in ALL:
+                raise SystemExit(f"unknown provider {n!r}; choose from {', '.join(ALL)}, all, cn")
+            if n not in out:
+                out.append(n)
+    return out
+
+
 def _score_answer(answer: str, brand_aliases: list[str], rivals: list[str]) -> dict[str, Any]:
     """Deterministic read of one answer — no second model call, so the score
     cannot itself hallucinate. Position = which mention comes first in the text."""
@@ -214,9 +290,10 @@ def _score_answer(answer: str, brand_aliases: list[str], rivals: list[str]) -> d
             "answer_excerpt": answer[:280]}
 
 
-def probe(domain_cfg: dict[str, Any], provider: str, model: str) -> dict[str, Any]:
-    ask = {"anthropic": _ask_anthropic, "gemini": _ask_gemini,
-           "openai": _ask_openai}[provider]
+def probe(domain_cfg: dict[str, Any], provider: str, model: str,
+          ask=None) -> dict[str, Any]:
+    ask = ask or {"anthropic": _ask_anthropic, "gemini": _ask_gemini,
+                  "openai": _ask_openai}[provider]
     results = []
     for p in domain_cfg["prompts"]:
         try:
@@ -239,49 +316,104 @@ def probe(domain_cfg: dict[str, Any], provider: str, model: str) -> dict[str, An
     }
 
 
+def run_provider(name: str, cfgs: list[dict[str, Any]], model_override: str | None) -> dict[str, Any]:
+    key, model, base = provider_setup(name)
+    model = model_override or model
+    label = PROVIDERS.get(name, {}).get("label", name)
+    if not key:
+        env = NATIVE[name][0] if name in NATIVE else PROVIDERS[name]["key"]
+        return {"provider": name, "label": label, "model": model, "status": "not configured",
+                "note": f"{env} is not set", "properties": []}
+    ask = None
+    if name in PROVIDERS:
+        ask = lambda p, m: _ask_compat(p, m, base=base, key=key)  # noqa: E731
+    props = [probe(c, name, model, ask) for c in cfgs]
+    answered = [r for pr in props for r in pr["results"] if r.get("mentioned") is not None]
+    errors = [r["error"] for pr in props for r in pr["results"] if r.get("error")]
+    status = "ok" if answered else "error"
+    return {"provider": name, "label": label, "model": model, "status": status,
+            "note": (errors[0] if status == "error" and errors else
+                     f"{len(errors)} prompt(s) failed" if errors else ""),
+            "properties": props}
+
+
+def rollup(runs: list[dict[str, Any]], cfgs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    out = []
+    for c in cfgs:
+        by: dict[str, Any] = {}
+        for run in runs:
+            for pr in run["properties"]:
+                if pr["domain"] == c["domain"]:
+                    by[run["provider"]] = pr["presence_rate"]
+        out.append({"domain": c["domain"], "brand": c["brand"],
+                    "mentioned_any": any((v or 0) > 0 for v in by.values()),
+                    "presence_by_provider": by})
+    return out
+
+
+def to_md(report: dict[str, Any]) -> str:
+    runs = [r for r in report["runs"] if r["status"] == "ok"]
+    L = ["# AI visibility — do the assistants name us?", "",
+         f"_{report['measures']}_", "",
+         "| Property | " + " | ".join(r["label"] for r in runs) + " |",
+         "|---|" + "---:|" * len(runs)]
+    for p in report["properties"]:
+        cells = []
+        for r in runs:
+            v = p["presence_by_provider"].get(r["provider"])
+            cells.append("—" if v is None else f"{int(v * 100)}%")
+        L.append(f"| {p['domain']} | " + " | ".join(cells) + " |")
+    rivals = {}
+    for r in runs:
+        for pr in r["properties"]:
+            for res in pr["results"]:
+                for rv in res.get("rivals_named", []):
+                    rivals.setdefault(pr["domain"], set()).add(rv)
+    if rivals:
+        L += ["", "**Named instead of us:**"]
+        L += [f"- {d}: {', '.join(sorted(v)[:6])}" for d, v in rivals.items()]
+    off = [r for r in report["runs"] if r["status"] != "ok"]
+    if off:
+        L += ["", "**Not measured this run:**"]
+        L += [f"- {r['label']} ({r['model']}): {r['status']} — {r['note']}" for r in off]
+    L += ["", "_Presence = share of that property's probe prompts whose answer named the brand._"]
+    return "\n".join(L)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--domain", help="restrict to one domain")
-    ap.add_argument("--provider", choices=["anthropic", "gemini", "openai"], default="anthropic")
-    ap.add_argument("--model", default=None)
+    ap.add_argument("--provider", default="all",
+                    help=f"comma list of {', '.join(ALL)}; or all / cn (default: all with a key)")
+    ap.add_argument("--model", default=None, help="override the model (single provider only)")
     ap.add_argument("--format", choices=["md", "json"], default="md")
     ap.add_argument("--out", type=Path)
     args = ap.parse_args(argv)
-    model = args.model or {"anthropic": "claude-sonnet-5",
-                           "gemini": "gemini-flash-latest",
-                           "openai": "gpt-4.1"}[args.provider]
+    names = resolve_providers(args.provider)
+    if args.model and len(names) != 1:
+        raise SystemExit("--model needs exactly one --provider")
 
     cfgs = [c for c in PROBES if not args.domain or c["domain"] == args.domain]
     if not cfgs:
         print(f"no probe configured for {args.domain}", file=sys.stderr)
         return 2
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=len(names)) as ex:   # providers in parallel
+        runs = list(ex.map(lambda n: run_provider(n, cfgs, args.model), names))
     report = {
         "tool": "ai_visibility", "generated_at": datetime.now(timezone.utc)
         .isoformat(timespec="seconds"),
         "measures": ("base-model training recall (no web access) — how a plain "
                      "assistant answer forms with browsing off. NOT live-retrieval "
                      "(Perplexity / search) visibility, which is a separate surface."),
-        "provider": args.provider, "model": model,
-        "properties": [probe(c, args.provider, model) for c in cfgs],
+        "runs": runs,
+        "properties": rollup(runs, cfgs),
     }
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(json.dumps(report, ensure_ascii=False, indent=1),
                             encoding="utf-8")
-    if args.format == "json":
-        print(json.dumps(report, ensure_ascii=False, indent=1))
-        return 0
-
-    print(f"# AI visibility — {args.provider}/{model}\n")
-    print(f"_{report['measures']}_\n")
-    print("| Property | Presence | Avg position | Prompts | Rivals surfacing instead |")
-    print("|---|---:|---:|---:|---|")
-    for pr in report["properties"]:
-        rivals = sorted({r for res in pr["results"] for r in res.get("rivals_named", [])})
-        pres = f"{int(pr['presence_rate']*100)}%" if pr["presence_rate"] is not None else "—"
-        pos = pr["avg_position"] if pr["avg_position"] is not None else "—"
-        print(f"| {pr['domain']} | {pres} | {pos} | {pr['prompts_asked']} | "
-              f"{'، '.join(rivals[:5]) or '—'} |")
+    print(json.dumps(report, ensure_ascii=False, indent=1) if args.format == "json" else to_md(report))
     return 0
 
 

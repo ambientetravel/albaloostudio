@@ -266,8 +266,12 @@ def build(token: str, bridge_token: str) -> dict:
     art = latest_artifact(token, "ai-visibility")
     aiv = artifact_file(token, art, ".json") if art else None
     if isinstance(aiv, dict) and aiv.get("properties"):
-        named = sum(1 for p in aiv["properties"].values() if p.get("mentioned_any"))
-        numbers.update(ai_recall=f"{named}/{len(aiv['properties'])} properties named")
+        props = aiv["properties"]
+        props = list(props.values()) if isinstance(props, dict) else props
+        named = sum(1 for p in props if isinstance(p, dict) and p.get("mentioned_any"))
+        models = sum(1 for r in aiv.get("runs", []) if r.get("status") == "ok")
+        numbers.update(ai_recall=f"{named}/{len(props)} properties named"
+                       + (f" by ≥1 of {models} models" if models else ""))
 
     return {"generated": _now().isoformat(timespec="minutes"), "critical": critical,
             "needs_you": needs_you, "warn": warn, "fine": fine, "numbers": numbers,

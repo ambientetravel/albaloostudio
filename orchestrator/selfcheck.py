@@ -3834,5 +3834,35 @@ ok("inspection is sent the absolute sitemap URL, never the scheme-less canonical
 ok("assess() maps canonical keys back before inspecting", "inspectable(order[:inspect], declared_raw)" in _ICSRC
    or "inspectable(order[:inspect], declared_raw)" in pathlib.Path("tools/index_coverage.py").read_text())
 
+print("\n=== Oracle: Chinese models ===")
+import ai_visibility as _aiv
+ok("all five Chinese models are registered on the OpenAI protocol",
+   set(_aiv.CN) == {"deepseek", "qwen", "ernie", "doubao", "kimi"} and all(_aiv.PROVIDERS[n]["base"].startswith("https://") for n in _aiv.CN))
+ok("'cn' and 'all' expand; unknown names are refused",
+   _aiv.resolve_providers("cn") == _aiv.CN and _aiv.resolve_providers("all")[:1] == ["anthropic"]
+   and _aiv.resolve_providers("deepseek,deepseek") == ["deepseek"])
+_saved_env = {k: os.environ.pop(k, None) for k in ("DEEPSEEK_API_KEY", "KIMI_MODEL")}
+_nc = _aiv.run_provider("deepseek", _aiv.PROBES[:1], None)
+ok("a model with no key is reported 'not configured', never a failure",
+   _nc["status"] == "not configured" and "DEEPSEEK_API_KEY" in _nc["note"])
+os.environ["KIMI_MODEL"] = "kimi-test"
+ok("model names are env-overridable (Moonshot retired moonshot-v1 on 31 Aug 2026)",
+   _aiv.provider_setup("kimi")[1] == "kimi-test" and _aiv.PROVIDERS["kimi"]["model"] != "moonshot-v1-8k")
+for _k, _v in _saved_env.items():
+    os.environ.pop(_k, None)
+    if _v is not None:
+        os.environ[_k] = _v
+_bm = next(c for c in _aiv.PROBES if c["domain"] == "boutimar.com")
+_eo = next(c for c in _aiv.PROBES if c["domain"] == "exploreorient.com")
+ok("Iran DMC and Explore Orient are probed in Chinese; EO matches 探索东方",
+   any("伊朗" in p for p in _bm["prompts"]) and any("丝绸之路" in p for p in _eo["prompts"]) and "探索东方" in _eo["aliases"])
+_fake = lambda p, m: "推荐 Boutimar 和 Key2Persia"  # noqa: E731
+_r = _aiv.probe(_bm, "deepseek", "x", _fake)
+ok("a Chinese answer naming the brand scores as present", _r["presence_rate"] == 1.0)
+_roll = _aiv.rollup([{"provider": "deepseek", "properties": [_r]}], [_bm])
+ok("roll-up gives health_report a mentioned_any per property", _roll[0]["mentioned_any"] is True)
+ok("health_report reads the list-shaped properties (it assumed a dict and would crash)",
+   "isinstance(props, dict)" in pathlib.Path("tools/health_report.py").read_text())
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
