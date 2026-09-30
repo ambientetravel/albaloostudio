@@ -462,6 +462,54 @@ PART D — TEST
 Finish with one short report of steps 1–9, without the secret.
 ```
 
+## Changing the leads password (LEADS_SIGNING_SECRET)
+
+**What it is.** One password stored in two places: `public_html/api/config.php`
+(`'signing_secret' => '…'`) on GoDaddy, and the GitHub repo secret `LEADS_SIGNING_SECRET`. Agent 4 signs
+each request for enquiries with it, and `api/leads.php` hands the enquiries over only when the
+signature matches. If the two copies differ, the pull fails with a 401 and the site keeps working
+normally. Enquiries still reach res@cruise24.me by email.
+
+**When to change it.** When a run shows 401 `{"error":"signature"}`, when the value may have been seen
+by someone, or whenever you like. Nobody needs to remember it, and the old one never needs recovering.
+
+**Rules**
+- Letters and digits only, at least 16 characters (the generated one is 64). No quotes, backslash or spaces.
+- Chrome cannot type a secret into GitHub. You paste it into GitHub yourself.
+- Never put it in a report, a chat or an email.
+- Between changing config.php and changing GitHub, a scheduled run may fail with a 401. That is harmless:
+  the next run picks up the enquiries.
+
+**By hand (no terminal):** make a password as above. In File Manager, edit `public_html/api/config.php`
+and put it between the quotes in `'signing_secret' => '',` (keep the quotes and the comma). Save.
+Put the same value into GitHub (step 2 below), then run the test (steps 3–4 below).
+
+**Prompt for Claude in Chrome:**
+
+```
+Change the cruise24.me leads password. Hard rules: no purchases, no DNS changes, stop for any login/2FA/sudo dialog, never write the password in a report.
+
+1. cPanel Terminal, run exactly (it replaces whatever password is in config.php with a new random one and prints it once):
+   S=$(openssl rand -hex 32) && sed -i "s/'signing_secret' => '[^']*'/'signing_secret' => '$S'/" ~/public_html/api/config.php && grep -c "signing_secret' => '$S'" ~/public_html/api/config.php && echo "$S"; unset S
+   It must print 1 and then one 64-character line. If it prints 0, stop and tell me.
+2. Open https://github.com/ambientetravel/albaloostudio/settings/secrets/actions , click the pencil (Update) next to LEADS_SIGNING_SECRET (or "New repository secret" with that name if it is not there). Then STOP and tell me: I copy the 64-character line from the terminal (nothing else: not the "1", not the command), paste it and save. Wait until I say "saved".
+3. Server self-test, in the cPanel Terminal, run exactly (prints only the result, never the password):
+   cd ~/public_html/api && S=$(php -r '$c=require "config.php"; echo $c["signing_secret"];') && T=$(date +%s) && curl -s -H "X-Albaloo-Timestamp: $T" -H "X-Albaloo-Signature: sha256=$(printf '%s.' "$T" | openssl dgst -sha256 -hmac "$S" -r | cut -d' ' -f1)" "https://cruise24.me/api/leads.php?all=1" | grep -o '"total":[0-9]*\|"error":"[a-z ]*"'; unset S; cd ~
+   Report the one line it prints.
+4. Open https://github.com/ambientetravel/albaloostudio/actions/workflows/agent4-sales-closer.yml , Run workflow, branch claude/vibrant-hopper-3146an (main once the branch is merged), all fields blank. Wait for it to finish. Report the status; if it failed, copy the "could not load leads" line from the Qualify step.
+5. Only if step 4 succeeded: run clear in the terminal.
+```
+
+**Reading the result**
+
+| Step 3 prints | Step 4 | Meaning |
+|---|---|---|
+| `"total":N` | success | Done. |
+| `"total":N` | 401 `{"error":"signature"}` | The server is fine, but GitHub holds a different value. Repeat step 2 while the terminal still shows the line. |
+| `"error":"unsigned"` | any | GoDaddy strips the X-Albaloo headers. This needs a code fix in `api/leads.php`. |
+| `"error":"stale"` | any | The server clock is more than 5 minutes off. |
+| `"error":"not configured"` | 503 | config.php holds no password (or one under 16 characters). Redo step 1. |
+
 ## For the privacy page once hosting is settled
 
 GoDaddy is a US company, so the privacy page must name the GoDaddy contracting entity and the basis
