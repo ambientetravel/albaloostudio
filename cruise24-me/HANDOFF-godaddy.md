@@ -345,7 +345,14 @@ slow and sometimes missing photos and video in Chrome and Safari. Cause: every v
 open (home 17 videos, 35 MB) and held the few connections GoDaddy Economy allows per visitor, starving the
 photos; no compression or cache headers. Fixed in f31f544 (lazy videos, direct photo src, media re-encoded
 72 → 25 MB, gzip + 30-day cache). Update bundle `cruise24-me-20260930-f31f544` (5 parts, 43.7 MB).
-Part H of the go-live prompt (automatic renewal by web check, staging removal) is still to be confirmed.
+**Speed update live 30 Sep** (Claude in Chrome): backup public_html-backup-20260930.zip 66,010,248 bytes;
+five parts extracted (15 + 38 + 372 + 1,234 + 212 files); all seven check sizes matched; api/config.php
+and api/data untouched; home page and hero video, destinations (16 photos) and journal (6 photos) load
+with no broken files or console errors.
+Part H: steps 21–23 ran on 29 Sep; step 24 stopped at the 2FA prompt, so the TXT records
+`_acme-challenge` and `_acme-challenge.www`, the A record `staging` and the cPanel domain
+staging.cruise24.me still exist (harmless). Before deleting them, confirm `Le_Webroot` in
+~/.acme.sh/cruise24.me_ecc/cruise24.me.conf is the public_html path, not "dns".
 
 ```text
 Update the live cruise24.me site with a faster version. Same procedure as before; no DNS change, no settings change.
