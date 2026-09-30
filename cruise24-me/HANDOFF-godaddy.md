@@ -425,6 +425,43 @@ PART D — TEST THE CONNECTION
 Finish with a short report of steps 1–9, without the secret.
 ```
 
+## Result of the 30 Sep run (Claude in Chrome)
+
+- Part A: nothing to do. The zone was already down to 19 records and the one DMARC record (`p=none`) stays.
+- .htaccess: the CORS block was appended. The file is 2,001 bytes (LF endings after a CRLF fix) and the site still loads.
+- **Not done yet:** `30 SEP.zip` was uploaded as a zip, and Chrome cannot extract it. offer.json is not on the
+  server, and privacy.html is still the old 10,961-byte version.
+- Parts C and D were held until the files are in place.
+- Chrome asked a "brand-group question". There is none: `ambientetravel/albaloostudio` is Alireza's own
+  pipeline repo. The secret only lets that repo's Agent 4 read cruise24.me's own leads, and replies go out
+  signed as Cruise24.
+
+Follow-up prompt:
+
+```
+cruise24.me: finish the 30 Sep upload, then the leads secret. Same hard rules as before (no purchases, no DNS changes, stop for any login/2FA/upload dialog, never write the secret in a report).
+
+PART B2 — THE TWO FILES
+1. File Manager, public_html: right-click "30 SEP.zip" → Extract → to /public_html. It creates the folder public_html/30 SEP/ with offer.json and privacy.html.
+2. Open public_html/30 SEP/, select offer.json and privacy.html, Move to /public_html (replace privacy.html when asked).
+3. Delete the now-empty folder "30 SEP" and the file "30 SEP.zip" from public_html.
+   (If Extract is refused: stop and ask me to upload the two loose files offer.json and privacy.html from my Downloads/30 SEP folder straight into public_html.)
+4. Report sizes: public_html/offer.json 11,764 bytes; privacy.html 11,512 bytes.
+5. Open https://cruise24.me/offer.json : it must start with "schema_version": "offer.v1". Open https://cruise24.me/privacy.html : it must say "Last updated 30 September 2026" and have a paragraph "Drafting our reply".
+
+PART C — THE LEADS SECRET (the repo is ours; no brand-group issue: it only lets our own pipeline read cruise24.me's own enquiries)
+6. cPanel Terminal, run exactly:
+   S=$(openssl rand -hex 32) && sed -i "s/'signing_secret' => ''/'signing_secret' => '$S'/" ~/public_html/api/config.php && grep -c "signing_secret' => '$S'" ~/public_html/api/config.php && echo "$S"
+   It must print 1 and then a 64-character value.
+7. https://github.com/ambientetravel/albaloostudio/settings/secrets/actions → New repository secret. Name LEADS_SIGNING_SECRET, value = the 64 characters from step 6. Save. (If GitHub asks for sign-in or sudo confirmation, stop and wait for me.)
+8. Terminal: clear
+
+PART D — TEST
+9. https://github.com/ambientetravel/albaloostudio/actions/workflows/agent4-sales-closer.yml → Run workflow → branch claude/vibrant-hopper-3146an, all fields blank → Run. Report its status and the first lines of the summary. "no leads waiting" or a table is fine; 401 or 503 means the secret does not match.
+
+Finish with one short report of steps 1–9, without the secret.
+```
+
 ## For the privacy page once hosting is settled
 
 GoDaddy is a US company, so the privacy page must name the GoDaddy contracting entity and the basis
