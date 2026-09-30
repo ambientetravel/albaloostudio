@@ -15,3 +15,28 @@
   RewriteCond %{HTTP_HOST} ^(www\.)?cruise24\.me$ [NC]
   RewriteRule ^ https://cruise24.me%{REQUEST_URI} [R=301,L]
 </IfModule>
+
+# Speed (30 Sep). Text is sent compressed; photos, video and fonts are kept by the browser for
+# 30 days, so the second page does not download them again. CSS and JS for a day, HTML always
+# checked, so an update shows up at once.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript text/javascript application/json image/svg+xml
+</IfModule>
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType video/mp4 "access plus 30 days"
+  ExpiresByType font/woff2 "access plus 30 days"
+  ExpiresByType text/css "access plus 1 day"
+  ExpiresByType application/javascript "access plus 1 day"
+  ExpiresByType text/javascript "access plus 1 day"
+  ExpiresByType application/json "access plus 1 hour"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.(jpe?g|webp|png|mp4|woff2)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>

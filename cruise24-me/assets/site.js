@@ -1,26 +1,50 @@
 /* AmbiMare — shared behaviour for every page. */
 
-/* Resolve data-media / data-poster to local files from media/index.json (written by download_media.py).
-   Falls back to the original URL when no index exists, so the page previews before download. */
-(async function(){
-  let index = {};
-  try { const r = await fetch('media/index.json'); if (r.ok) index = await r.json(); } catch(e){}
-  if (Object.keys(index).length) { const n = document.querySelector('.preview-note'); if (n) n.remove(); }
-  const local = u => (u && index[u]) ? index[u] : u;
+/* Media. Photos carry their own src and use the browser's lazy loading. Videos cost 1–5 MB
+   each and hold a connection while they stream, which on shared hosting starves the photos,
+   so a video gets its file only when it is needed: the hero at once, sticky-panel videos when
+   they come near the screen, destination-card videos on first hover. data-media is a local path;
+   media/index.json is only consulted for an old remote URL that is still somewhere in the pages. */
+(function(){
   const mobile = window.matchMedia('(max-width: 700px)').matches;
-  document.querySelectorAll('[data-media]').forEach(el => {
-    let u = el.dataset.media;
-    if (mobile && el.dataset.mediaMobile) u = el.dataset.mediaMobile;
-    const src = local(u);
-    if (el.tagName === 'IMG') { el.addEventListener('error', () => el.classList.add('missing'), {once:true}); el.src = src; return; }
-    if (el.dataset.poster) el.poster = local(el.dataset.poster);
-    el.src = src; el.addEventListener('error', () => el.classList.add('missing'), {once:true});
-    if (el.classList.contains('hero-video')) { el.addEventListener('canplay', () => el.classList.add('ready'), {once:true}); el.play().catch(()=>{}); }
+  let index = null;
+  const resolve = u => (!u || !/^https?:/.test(u)) ? Promise.resolve(u)
+    : (index ? Promise.resolve(index) : fetch('media/index.json').then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => (index = j)))
+        .then(i => i[u] || u);
+  const load = v => {
+    if (v.dataset.loaded) return Promise.resolve(v);
+    v.dataset.loaded = '1';
+    const u = (mobile && v.dataset.mediaMobile) ? v.dataset.mediaMobile : v.dataset.media;
+    return Promise.all([resolve(u), resolve(v.dataset.poster)]).then(([src, poster]) => {
+      if (poster && !v.poster) v.poster = poster;
+      v.addEventListener('error', () => v.classList.add('missing'), {once:true});
+      v.src = src;
+      return v;
+    });
+  };
+  document.querySelectorAll('img[data-media]').forEach(img => {
+    const u = (mobile && img.dataset.mediaMobile) ? img.dataset.mediaMobile : img.dataset.media;
+    resolve(u).then(src => { img.addEventListener('error', () => img.classList.add('missing'), {once:true}); img.src = src; });
   });
-  // play non-hero videos only while visible
-  const io = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting) v.play().catch(()=>{}); else v.pause(); }), {rootMargin:'200px'});
-  document.querySelectorAll('video:not(.hero-video):not(.dest video):not(.region video)').forEach(v => io.observe(v));
-  document.querySelectorAll('.dest, .region').forEach(d => { const v = d.querySelector('video'); if (!v) return; d.addEventListener('mouseenter', () => v.play().catch(()=>{})); d.addEventListener('mouseleave', () => v.pause()); });
+  const hero = document.querySelector('video.hero-video[data-media]');
+  if (hero) load(hero).then(v => { v.addEventListener('canplay', () => v.classList.add('ready'), {once:true}); v.play().catch(()=>{}); });
+  const near = new IntersectionObserver(es => es.forEach(e => {
+    const v = e.target;
+    if (e.isIntersecting) load(v).then(() => v.play().catch(()=>{})); else if (v.dataset.loaded) v.pause();
+  }), {rootMargin:'200px'});
+  document.querySelectorAll('video[data-media]:not(.hero-video):not(.dest video):not(.region video)').forEach(v => near.observe(v));
+  // destination cards: cover image when near, the film only when someone hovers
+  const posters = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const v = e.target; posters.unobserve(v);
+    resolve(v.dataset.poster).then(p => { if (p && !v.poster) v.poster = p; });
+  }), {rootMargin:'300px'});
+  document.querySelectorAll('.dest video, .region video').forEach(v => {
+    posters.observe(v);
+    const card = v.closest('.dest, .region');
+    card.addEventListener('mouseenter', () => load(v).then(() => v.play().catch(()=>{})));
+    card.addEventListener('mouseleave', () => v.pause());
+  });
 })();
 
 /* Nav: scrolled state, burger, close on tap. Same on every page. */

@@ -43,15 +43,16 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 MEDIA, ORIG = HERE / "media", HERE / "media-originals"
-IMAGE_MAX = 2000              # px, longest edge; full-bleed at 1440 css px x ~1.4
+IMAGE_MAX = 1600              # px, longest edge (30 Sep: 2000 made pages crawl on shared hosting)
+QUALITY = 76                  # JPEG/WebP quality; 76 is not visibly different from 80 at these sizes
 LIMIT = 15 * 1024 * 1024      # claude.ai artifact per-file cap
 
 # role -> (max width, max seconds or None, crf)
 VIDEO_ROLES = {
-    "hero":   (1920, None, 26),   # full-screen, always playing: keep the whole loop
-    "panel":  (1920, 14,   28),   # full-screen sticky panels, stacked film
-    "hover":  (1280, 12,   28),   # destination cards, plays on hover at ~600 css px
-    "mobile": (1080, None, 28),   # data-media-mobile hero
+    "hero":   (1600, None, 28),   # full-screen, always playing: keep the whole loop
+    "panel":  (1280, 12,   30),   # sticky panels, stacked film: loaded only when scrolled to
+    "hover":  (960,  8,    30),   # destination cards, plays on hover at ~600 css px
+    "mobile": (720,  None, 30),   # data-media-mobile hero
 }
 
 
@@ -95,11 +96,11 @@ def do_image(src: Path, dst: Path) -> None:
     im = ImageOps.exif_transpose(Image.open(src))
     im.thumbnail((IMAGE_MAX, IMAGE_MAX), Image.LANCZOS)
     if dst.suffix.lower() == ".webp":
-        im.save(dst, "WEBP", quality=80, method=6)
+        im.save(dst, "WEBP", quality=QUALITY, method=6)
     elif dst.suffix.lower() == ".png":
         im.save(dst, "PNG", optimize=True)
     else:
-        im.convert("RGB").save(dst, "JPEG", quality=80, optimize=True, progressive=True)
+        im.convert("RGB").save(dst, "JPEG", quality=QUALITY, optimize=True, progressive=True)
 
 
 def do_video(src: Path, dst: Path, role: str, ff: str) -> None:
@@ -108,13 +109,38 @@ def do_video(src: Path, dst: Path, role: str, ff: str) -> None:
         cmd = [ff, "-y", "-v", "error", "-i", str(src)]
         if secs:
             cmd += ["-t", str(secs)]
-        cmd += ["-an", "-vf", f"scale='min({width},iw)':-2", "-c:v", "libx264", "-preset", "slow",
+        cmd += ["-an", "-vf", f"fps=30,scale='min({width},iw)':-2", "-c:v", "libx264", "-preset", "slow",
                 "-crf", str(crf + 2 * attempt), "-pix_fmt", "yuv420p", "-profile:v", "high",
                 "-movflags", "+faststart", str(dst)]
         subprocess.run(cmd, check=True)
         if dst.stat().st_size <= LIMIT * 0.9:
             return
     raise RuntimeError(f"{dst.name} still {human(dst.stat().st_size)} after raising crf")
+
+
+# The home hero opens on the balcony shot, which starts 6.34 s into Explora's film (cut found
+# with ffmpeg scene detection, 29 Sep). Rebuilt from the masters so it is never re-encoded twice.
+HERO_CUT = 6.36
+HEROES = {"hero-balcony-1920.mp4": ("2752c37b-Hero-video.mp4", 1600, 28),
+          "hero-balcony-1080sq.mp4": ("1d6fe463-Cover-video.mp4", 720, 30)}
+
+
+def make_hero(ff: str) -> None:
+    for out, (master, width, crf) in HEROES.items():
+        src = ORIG / master
+        if not src.exists():
+            print(f"  hero master missing: {src}")
+            continue
+        dst = MEDIA / out
+        subprocess.run([ff, "-v", "error", "-y", "-ss", str(HERO_CUT), "-i", str(src), "-an",
+                        "-vf", f"fps=30,scale='min({width},iw)':-2", "-c:v", "libx264", "-preset", "slow",
+                        "-crf", str(crf), "-pix_fmt", "yuv420p", "-profile:v", "high",
+                        "-movflags", "+faststart", str(dst)], check=True)
+        print(f"  hero  {human(dst.stat().st_size):>9}  {out}")
+    poster = MEDIA / "hero-balcony-poster.jpg"
+    subprocess.run([ff, "-v", "error", "-y", "-ss", "0.3", "-i", str(MEDIA / "hero-balcony-1920.mp4"),
+                    "-frames:v", "1", "-q:v", "4", str(poster)], check=True)
+    print(f"  hero  {human(poster.stat().st_size):>9}  {poster.name}")
 
 
 def main() -> int:
@@ -124,12 +150,13 @@ def main() -> int:
     args = ap.parse_args()
     ORIG.mkdir(exist_ok=True)
     pages = [p.read_text(encoding="utf-8") for p in HERE.glob("*.html") if not p.name.startswith("_")]
-    files = sorted(p for p in MEDIA.iterdir() if p.is_file() and p.suffix.lower() in
-                   (".jpg", ".jpeg", ".png", ".webp", ".mp4"))
+    files = sorted(p for p in MEDIA.rglob("*") if p.is_file() and p.suffix.lower() in
+                   (".jpg", ".jpeg", ".png", ".webp", ".mp4") and not p.name.startswith("hero-balcony"))
     ff = None if args.report else ffmpeg()
     before = after = 0
     for f in files:
-        orig = ORIG / f.name
+        orig = ORIG / f.relative_to(MEDIA)
+        orig.parent.mkdir(parents=True, exist_ok=True)
         if args.report:
             o = orig.stat().st_size if orig.exists() else f.stat().st_size
             print(f"{human(o):>9} -> {human(f.stat().st_size):>9}  {f.name}")
@@ -153,7 +180,8 @@ def main() -> int:
         tmp.replace(f)
         before += orig.stat().st_size; after += f.stat().st_size
         print(f"{label:>6}  {human(orig.stat().st_size):>9} -> {human(f.stat().st_size):>9}  {f.name}")
-    over = [f.name for f in files if (MEDIA / f.name).stat().st_size > LIMIT]
+    make_hero(ff) if not args.report else None
+    over = [f.name for f in files if f.stat().st_size > LIMIT]
     print(f"\n{len(files)} files: {human(before)} -> {human(after)}"
           + (f"\nOVER 15 MB: {over}" if over else "\nevery file is under the 15 MB artifact cap"))
     return 1 if over else 0
