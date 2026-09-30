@@ -378,6 +378,53 @@ Rules: do not buy or accept anything; do not touch DNS; do not edit or delete pu
 Finish with a short report of steps 1–6.
 ```
 
+## Pipeline sync and DMARC (30 Sep)
+
+Commit 7b561f7: cruise24.me joined the orchestrator (sites.yml: cPanel hosting, offer_feed, lead_source,
+brand-neutral profile, English seeds); Agent 4 reads a lead's `site` for brand and rules; the agent 4
+workflow pulls every lead_source every 4 h once the repo secret LEADS_SIGNING_SECRET exists. The server
+needs offer.json, privacy.html (AI drafting disclosed), the .htaccess CORS block, and the same secret in
+api/config.php. DMARC: keep `p=none` (Alireza, 30 Sep); delete the `p=reject` duplicate.
+The schedule runs from the default branch only, so it starts once this branch is merged into main.
+
+```text
+Three jobs on cruise24.me: remove a duplicate DMARC record, publish the pipeline feed, and connect enquiries to the Agent 4 pipeline.
+Rules: do not buy or accept anything; stop for any login, 2FA code or file-upload dialog; never write the secret from Part C into your report or anywhere except the two places named.
+
+PART A — DMARC (GoDaddy DNS for cruise24.me)
+1. There are two TXT records named _dmarc. DELETE only the one whose value is:
+   v=DMARC1; p=reject; rua=mailto:dmarc_rua@onsecureserver.net;
+   KEEP the one that starts v=DMARC1; p=none; rua=mailto:report@dmarc.cloud2.em.secureserver.net
+   Change nothing else. Report the record count afterwards (it should be 19).
+
+PART B — FILES (cPanel File Manager, public_html, Show Hidden Files on)
+2. Upload offer.json and privacy.html into public_html (stop and let me pick them). Overwrite privacy.html.
+3. Edit public_html/.htaccess and add these lines at the very end, exactly:
+
+# offer.v1 feed for the pipeline's writer (orchestrator/bridge/OFFER-FEED-CONTRACT.md):
+# public, read cross-origin.
+<IfModule mod_headers.c>
+  <Files "offer.json">
+    Header set Access-Control-Allow-Origin "*"
+  </Files>
+</IfModule>
+
+4. Report the sizes: offer.json 11,764 bytes; privacy.html 11,512; .htaccess 2,001.
+5. Open https://cruise24.me/offer.json : it must show JSON starting with "schema_version": "offer.v1". Open https://cruise24.me/ : it must still load normally.
+
+PART C — THE LEADS SECRET
+6. cPanel Terminal, run exactly:
+   S=$(openssl rand -hex 32) && sed -i "s/'signing_secret' => ''/'signing_secret' => '$S'/" ~/public_html/api/config.php && grep -c "signing_secret' => '$S'" ~/public_html/api/config.php && echo "$S"
+   It must print 1 and then a 64-character value. That value is the secret.
+7. On GitHub open https://github.com/ambientetravel/albaloostudio/settings/secrets/actions , click "New repository secret", Name: LEADS_SIGNING_SECRET, Secret: the 64-character value from step 6. Save. (Stop if GitHub asks me to sign in or confirm access.)
+8. Back in the terminal run: clear
+
+PART D — TEST THE CONNECTION
+9. On GitHub open https://github.com/ambientetravel/albaloostudio/actions/workflows/agent4-sales-closer.yml , click "Run workflow", choose branch claude/vibrant-hopper-3146an, leave every field blank, and run it. When it finishes, report its status and the first lines of its summary. "no leads waiting" or a table of leads are both fine; an error "401" or "503" means the secret does not match.
+
+Finish with a short report of steps 1–9, without the secret.
+```
+
 ## For the privacy page once hosting is settled
 
 GoDaddy is a US company, so the privacy page must name the GoDaddy contracting entity and the basis
