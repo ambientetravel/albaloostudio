@@ -3818,5 +3818,21 @@ _md = _psc.to_md({"generated_at": "2026-09-29T00:00:00+00:00", "sites": [{"domai
 ok("the speed report shows field data, lab score, fixes, and a quota error as a note",
    "3100ms average" in _md and "| 71 |" in _md and "Reduce unused JavaScript" in _md and "PAGESPEED_API_KEY" in _md)
 
+print("\n=== URL Inspection gets real addresses ===")
+_calls = []
+class _Ins:
+    def urlInspection(self): return self
+    def index(self): return self
+    def inspect(self, body): _calls.append(body["inspectionUrl"]); return self
+    def execute(self): return {"inspectionResult": {"indexStatusResult": {"verdict": "PASS"}}}
+_st = next(s for s in config.load_sites(include_hold=True) if s.domain == "cruise24.me")
+_r = ic.inspect_urls(_Ins(), _st, ic.inspectable(["cruise24.me/destinations.html"],
+                                                 ["https://cruise24.me/destinations.html"]))
+ok("inspection is sent the absolute sitemap URL, never the scheme-less canonical key "
+   "(a bare key 403s exactly like a Restricted grant)",
+   _calls == ["https://cruise24.me/destinations.html"] and _r["permitted"] and _r["results"][0]["verdict"] == "PASS")
+ok("assess() maps canonical keys back before inspecting", "inspectable(order[:inspect], declared_raw)" in _ICSRC
+   or "inspectable(order[:inspect], declared_raw)" in pathlib.Path("tools/index_coverage.py").read_text())
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
