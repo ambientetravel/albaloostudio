@@ -462,6 +462,19 @@ PART D — TEST
 Finish with one short report of steps 1–9, without the secret.
 ```
 
+## Leads connection live (30 Sep)
+
+- offer.json (11,764 bytes) and privacy.html (11,512 bytes) are on the server, checked live by Chrome.
+  The zip and its folder went to cPanel's Trash.
+- `LEADS_SIGNING_SECRET` is set on GitHub and matches `signing_secret` in `api/config.php`. Alireza made
+  the password on his Mac and pasted it into both places.
+- Agent 4 run #5 (https://github.com/ambientetravel/albaloostudio/actions/runs/36714977982) on
+  `claude/vibrant-hopper-3146an` was green. Log: `lead-pull secret: 64 chars, fingerprint 575d671e`,
+  then `no leads waiting — nothing to qualify`. Runs #2–#4 had failed with 401 `{"error":"signature"}`
+  because the two copies differed after copying out of the web terminal.
+- Still to do: merge the branch into main so the 4-hourly schedule and the sites.yml registry take
+  effect. Until then Agent 4 runs only when started by hand.
+
 ## Changing the leads password (LEADS_SIGNING_SECRET)
 
 **What it is.** One password stored in two places: `public_html/api/config.php`
