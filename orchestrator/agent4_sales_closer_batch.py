@@ -46,8 +46,10 @@ from agent4_sales_closer import (
     LeadRouting,
     _fetch_rates,
     decide_escalation,
+    profile_for,
     qualify,
     redact,
+    site_of,
 )
 from config import rfc3339, utc_now
 
@@ -130,9 +132,7 @@ def close_one(raw: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Outcome:
     # CampaignLog mirrors campaign.log.v1 rather than flattening it.
     oc.attributed_campaign = (str(campaign.campaign.get("campaign_id", "")) if campaign else "")
     routing = campaign.lead_routing if campaign else LeadRouting()
-    profile = str((campaign.compliance.get("profile") if campaign else None) or "boutimar_v1")
-    if profile not in compliance.PROFILES:
-        profile = "boutimar_v1"
+    profile = profile_for(campaign, site_of(lead))
 
     oc.lead_id = f"lead_{utc_now():%Y%m%dT%H%M%S}Z_{abs(hash(lead.from_ref)) % 10**6:06d}"
 
@@ -210,12 +210,14 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
     """
     import requests
 
-    secret = config.optional_env("WEBHOOK_SIGNING_SECRET")
+    # LEADS_SIGNING_SECRET, when set, is used only for pulling leads: it lives in a
+    # site's api/config.php, so it should not be the key that signs every other hop.
+    secret = config.optional_env("LEADS_SIGNING_SECRET") or config.optional_env("WEBHOOK_SIGNING_SECRET")
     body = b""
     headers = (config.signed_headers(secret, body, "agent4-lead-pull")
                if secret else {"User-Agent": config.USER_AGENT})
     if not secret:
-        log.warning("WEBHOOK_SIGNING_SECRET not set — pulling leads unsigned. "
+        log.warning("LEADS_SIGNING_SECRET / WEBHOOK_SIGNING_SECRET not set — pulling leads unsigned. "
                     "The source cannot tell this request from anyone else's.")
 
     resp = requests.get(url, headers=headers, timeout=config.WEBHOOK_TIMEOUT_S)

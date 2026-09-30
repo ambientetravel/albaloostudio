@@ -138,7 +138,7 @@ def check(files: list[Path]) -> tuple[list[str], list[str]]:
     missing = [l for l in locs if (l or "index.html") not in rels]
     if missing:
         blockers.append(f"sitemap lists {len(missing)} pages not in the bundle, first: {missing[:5]}")
-    for must in ("api/enquiry.php", "api/leads.php", "api/data/.htaccess", "robots.txt",
+    for must in ("api/enquiry.php", "api/leads.php", "api/data/.htaccess", "robots.txt", "offer.json",
                  "sitemap.xml", "data/journeys-index.json", "media/index.json"):
         if must not in rels:
             blockers.append(f"missing from bundle: {must}")

@@ -1129,10 +1129,21 @@ _wf4 = (pathlib.Path(__file__).resolve().parents[1]
 import yaml as _yaml
 _wf4y = _yaml.safe_load(_wf4)
 _on4 = _wf4y.get("on") or _wf4y.get(True)
-ok("Agent 4 has NO cron trigger",
-   "schedule" not in _on4,
-   "no lead source is wired; a nightly green no-op teaches people to ignore green")
-ok("it is dispatch-only", list(_on4) == ["workflow_dispatch"])
+# 30 Sep 2026: a lead source now exists (cruise24.me api/leads.php), so Agent 4 is
+# scheduled. The rule it replaced still holds in spirit: the schedule must never
+# produce a green no-op or a red run from missing setup. It pulls only sites with a
+# lead_source, and only once LEADS_SIGNING_SECRET exists; without it, it says so.
+_steps4 = {s.get("name"): s for s in _wf4y["jobs"]["close"]["steps"]}
+ok("Agent 4 is scheduled now that a lead source exists",
+   "schedule" in _on4 and "workflow_dispatch" in _on4)
+ok("and a site in the registry actually has a lead_source",
+   any(s.lead_source for s in config.load_sites()), "a schedule with nothing to pull is the old green no-op")
+ok("the schedule stops, visibly, until LEADS_SIGNING_SECRET is set",
+   "LEADS_SIGNING_SECRET" in _steps4["Choose the lead sources"]["run"]
+   and "skip=true" in _steps4["Choose the lead sources"]["run"]
+   and _steps4["Qualify"].get("if") == "steps.leads.outputs.skip != 'true'")
+ok("a leads file can still be qualified by hand",
+   "leads_path" in (_on4["workflow_dispatch"].get("inputs") or {}))
 ok("its artifact retention is short, not the 90-day default",
    "retention-days: 7" in _wf4,
    "these records hold real customers' words, redacted but still theirs")
@@ -3299,7 +3310,8 @@ ok("boutimar.ir reports the URL the article will really have",
 
 
 print("\n=== a settled 'cannot' is not an unfinished 'todo' ===")
-# cruise24.me is on GoDaddy Website Builder, which has no publishing API, and
+# cruise24.me is a static build uploaded to GoDaddy cPanel by hand (it left the
+# Website Builder on 30 Sep 2026), so it still has no publishing API, and
 # albaloostudio.com is a single-page site with no blog. Both rendered as a red
 # "no adapter — staged only", identical to work nobody had got round to, which
 # put two closed decisions back on the backlog every week.
@@ -3311,7 +3323,7 @@ for _d in ("cruise24.me", "albaloostudio.com"):
     ok(f"{_d} says WHY, in the registry not a comment",
        len(_by[_d]["unsupported_reason"]) > 30, _by[_d]["unsupported_reason"])
 ok("the reason reaches the rendered page",
-   "GoDaddy Website Builder has no publishing API" in _bd.render(None, None, None, None, None))
+   "there is no publishing API" in _bd.render(None, None, None, None, None))
 # The count that matters must now be the genuinely missing ones only.
 _gaps = [r["domain"] for r in _cov if r["cls"] == "bad"]
 ok("no publishing adapter is missing any more", _gaps == [], _gaps)

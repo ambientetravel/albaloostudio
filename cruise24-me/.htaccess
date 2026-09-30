@@ -40,3 +40,11 @@
     Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
 </IfModule>
+
+# offer.v1 feed for the pipeline's writer (orchestrator/bridge/OFFER-FEED-CONTRACT.md):
+# public, read cross-origin.
+<IfModule mod_headers.c>
+  <Files "offer.json">
+    Header set Access-Control-Allow-Origin "*"
+  </Files>
+</IfModule>

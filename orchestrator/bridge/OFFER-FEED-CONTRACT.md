@@ -18,6 +18,7 @@ A single public JSON file per site, at the URL in that site's `offer_feed` in
 | boutimar.com | `/offer.json` | Boutimar.com — from cities/hotels/itineraries JSON |
 | boutimar.ir | `/offer.json` | boutimar cruise — from the cruise feed (`api/cruises.php`) |
 | cruise24.ir | `/offer.json` | Cruise24.ir — from the partner API it already proxies |
+| cruise24.me | `/offer.json` | Cruise24.me website tools — `cruise24-me/build_offer_feed.py` from the sailing index, lines.html and the journeys filter (lines + regions, no per-sailing entries) |
 
 It must be served with permissive CORS (the others already are) and be a real
 static/generated file, not behind auth — the pipeline fetches it unauthenticated

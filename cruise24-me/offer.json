@@ -1,0 +1,413 @@
+{
+ "schema_version": "offer.v1",
+ "site": "cruise24.me",
+ "generated_at": "2026-09-30T10:18:26Z",
+ "offerings": [
+  {
+   "slug": "explora-journeys",
+   "title": "Explora Journeys",
+   "type": "cruise",
+   "summary": "Suites only, most restaurants and drinks included, no announcements. The best current answer to \"I want a ship that feels like a good hotel\".",
+   "url": "https://cruise24.me/journeys.html#all.any.explora-journeys",
+   "regions": [
+    "americas",
+    "italy",
+    "western-med",
+    "greece",
+    "northern-europe",
+    "adriatic",
+    "atlantic",
+    "asia-pacific",
+    "turkiye",
+    "africa-arabia",
+    "polar",
+    "seychelles"
+   ],
+   "countries": [
+    "italy",
+    "greece",
+    "türkiye"
+   ]
+  },
+  {
+   "slug": "silversea",
+   "title": "Silversea",
+   "type": "cruise",
+   "summary": "Monaco-based, all-suite ships with a butler for every suite, and an expedition fleet for the polar regions and the Galápagos. Small enough to use the harbours big ships cannot.",
+   "url": "https://cruise24.me/journeys.html#all.any.silversea",
+   "regions": [
+    "americas",
+    "western-med",
+    "asia-pacific",
+    "northern-europe",
+    "italy",
+    "atlantic",
+    "polar",
+    "adriatic",
+    "africa-arabia",
+    "tahiti",
+    "greece",
+    "turkiye",
+    "seychelles"
+   ],
+   "countries": [
+    "italy",
+    "greece",
+    "türkiye"
+   ]
+  },
+  {
+   "slug": "variety-cruises",
+   "title": "Variety Cruises",
+   "type": "cruise",
+   "summary": "Small ports, swim stops, a crew you know by name. Cabins are compact; nobody spends time in them anyway.",
+   "url": "https://cruise24.me/journeys.html#all.any.variety-cruises",
+   "regions": [
+    "greece",
+    "tahiti",
+    "seychelles",
+    "africa-arabia",
+    "turkiye",
+    "italy",
+    "atlantic",
+    "adriatic"
+   ],
+   "countries": [
+    "greece",
+    "türkiye",
+    "italy"
+   ]
+  },
+  {
+   "slug": "scenic",
+   "title": "Scenic",
+   "type": "cruise",
+   "summary": "Luxury river cruising on the Danube, Rhine, Moselle, Seine, Rhône and Douro, with drinks, excursions and a butler for every suite in the fare.",
+   "url": "https://cruise24.me/journeys.html#all.any.scenic",
+   "regions": [
+    "rivers",
+    "americas",
+    "polar",
+    "northern-europe",
+    "western-med",
+    "atlantic",
+    "italy",
+    "turkiye",
+    "greece",
+    "adriatic",
+    "africa-arabia",
+    "asia-pacific"
+   ],
+   "countries": [
+    "türkiye",
+    "greece",
+    "italy"
+   ]
+  },
+  {
+   "slug": "seabourn",
+   "title": "Seabourn",
+   "type": "cruise",
+   "summary": "Small all-suite ships with a marina at the stern for swimming and water sports; the fare includes drinks and gratuities.",
+   "url": "https://cruise24.me/journeys.html#all.any.seabourn",
+   "regions": [
+    "italy",
+    "adriatic",
+    "greece",
+    "western-med",
+    "turkiye",
+    "atlantic"
+   ],
+   "countries": [
+    "italy",
+    "greece",
+    "türkiye"
+   ]
+  },
+  {
+   "slug": "regent-seven-seas",
+   "title": "Regent Seven Seas",
+   "type": "cruise",
+   "summary": "All-suite ships whose fare includes shore excursions, drinks and gratuities, and on most sailings the flights.",
+   "url": "https://cruise24.me/journeys.html#all.any.regent-seven-seas",
+   "regions": [
+    "italy",
+    "western-med",
+    "greece",
+    "adriatic",
+    "atlantic",
+    "turkiye",
+    "africa-arabia"
+   ],
+   "countries": [
+    "italy",
+    "greece",
+    "türkiye"
+   ]
+  },
+  {
+   "slug": "ponant",
+   "title": "Ponant",
+   "type": "cruise",
+   "summary": "French small ships and expedition yachts, from the Greek islands to the polar regions.",
+   "url": "https://cruise24.me/journeys.html#all.any.ponant",
+   "regions": [
+    "italy",
+    "western-med",
+    "greece",
+    "atlantic",
+    "turkiye",
+    "adriatic",
+    "africa-arabia"
+   ],
+   "countries": [
+    "italy",
+    "greece",
+    "türkiye"
+   ]
+  },
+  {
+   "slug": "seadream",
+   "title": "SeaDream",
+   "type": "cruise",
+   "summary": "SeaDream sailings booked through Cruise24, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#all.any.seadream",
+   "regions": [
+    "western-med",
+    "italy",
+    "greece",
+    "atlantic",
+    "adriatic",
+    "turkiye"
+   ],
+   "countries": [
+    "italy",
+    "greece",
+    "türkiye"
+   ]
+  },
+  {
+   "slug": "sea-cloud",
+   "title": "Sea Cloud",
+   "type": "cruise",
+   "summary": "Tall ships under real sail, with a small number of cabins and the sails set by hand.",
+   "url": "https://cruise24.me/journeys.html#all.any.sea-cloud",
+   "regions": [
+    "western-med",
+    "italy",
+    "atlantic",
+    "greece",
+    "turkiye",
+    "adriatic"
+   ],
+   "countries": [
+    "italy",
+    "türkiye",
+    "greece"
+   ]
+  },
+  {
+   "slug": "star-clippers",
+   "title": "Star Clippers",
+   "type": "cruise",
+   "summary": "Four-masted clipper ships for the Greek, Turkish and Italian coasts, relaxed and outdoors.",
+   "url": "https://cruise24.me/journeys.html#all.any.star-clippers",
+   "regions": [
+    "italy",
+    "western-med",
+    "greece",
+    "turkiye",
+    "adriatic",
+    "atlantic",
+    "northern-europe"
+   ],
+   "countries": [
+    "italy",
+    "greece",
+    "türkiye"
+   ]
+  },
+  {
+   "slug": "celestyal",
+   "title": "Celestyal",
+   "type": "cruise",
+   "summary": "Greek line, mid-size ships, itineraries built around long port days in the Aegean. Three-, four- and seven-night loops from Athens.",
+   "url": "https://cruise24.me/lines.html"
+  },
+  {
+   "slug": "aroya-cruises",
+   "title": "AROYA Cruises",
+   "type": "cruise",
+   "summary": "Winter in the Red Sea from Jeddah, summer in the eastern Mediterranean from Turkish ports. Alcohol-free, family-focused, well organised.",
+   "url": "https://cruise24.me/lines.html"
+  },
+  {
+   "slug": "msc-cruises",
+   "title": "MSC Cruises",
+   "type": "cruise",
+   "summary": "Geneva-based, Italian at heart, the world's largest privately held cruise company. Best for families and anyone who wants a big ship at a fair price. Watch the extras: drinks, Wi‑Fi and service charge add up.",
+   "url": "https://cruise24.me/lines.html"
+  },
+  {
+   "slug": "a-rosa",
+   "title": "A-ROSA",
+   "type": "cruise",
+   "summary": "German river line, Rhine and Danube plus Rhône and Seine. The only river line with proper family cabins and a children's programme on some boats. All-inclusive drinks in the \"Premium\" fare.",
+   "url": "https://cruise24.me/lines.html"
+  },
+  {
+   "slug": "nicko-cruises",
+   "title": "nicko cruises",
+   "type": "cruise",
+   "summary": "Stuttgart-based, river and small-ship expedition cruises. Quiet, well-fed, German-language on board with English available. Douro and Rhine are the strong programmes.",
+   "url": "https://cruise24.me/lines.html"
+  },
+  {
+   "slug": "amadeus-river-cruises",
+   "title": "Amadeus River Cruises",
+   "type": "cruise",
+   "summary": "Lüftner family, Vienna. Classic Danube itineraries from Passau, plus Rhine, Seine and the Dutch waterways at tulip time. The boats are elegant without trying to be hotels.",
+   "url": "https://cruise24.me/lines.html"
+  },
+  {
+   "slug": "rivers",
+   "title": "European rivers",
+   "type": "destination",
+   "summary": "Cruises on European rivers, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#rivers.any",
+   "regions": [
+    "rivers"
+   ]
+  },
+  {
+   "slug": "italy",
+   "title": "Italy, Sicily and Malta",
+   "type": "destination",
+   "summary": "Cruises in Italy, Sicily and Malta, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#italy.any",
+   "regions": [
+    "italy"
+   ]
+  },
+  {
+   "slug": "western-med",
+   "title": "Western Mediterranean",
+   "type": "destination",
+   "summary": "Cruises in Western Mediterranean, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#western-med.any",
+   "regions": [
+    "western-med"
+   ]
+  },
+  {
+   "slug": "americas",
+   "title": "Caribbean and the Americas",
+   "type": "destination",
+   "summary": "Cruises in Caribbean and the Americas, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#americas.any",
+   "regions": [
+    "americas"
+   ]
+  },
+  {
+   "slug": "greece",
+   "title": "Greece and the Greek islands",
+   "type": "destination",
+   "summary": "Cruises in Greece and the Greek islands, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#greece.any",
+   "regions": [
+    "greece"
+   ]
+  },
+  {
+   "slug": "adriatic",
+   "title": "Croatia and the Adriatic",
+   "type": "destination",
+   "summary": "Cruises in Croatia and the Adriatic, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#adriatic.any",
+   "regions": [
+    "adriatic"
+   ]
+  },
+  {
+   "slug": "atlantic",
+   "title": "Atlantic islands and crossings",
+   "type": "destination",
+   "summary": "Cruises in Atlantic islands and crossings, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#atlantic.any",
+   "regions": [
+    "atlantic"
+   ]
+  },
+  {
+   "slug": "northern-europe",
+   "title": "Northern Europe and the fjords",
+   "type": "destination",
+   "summary": "Cruises in Northern Europe and the fjords, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#northern-europe.any",
+   "regions": [
+    "northern-europe"
+   ]
+  },
+  {
+   "slug": "turkiye",
+   "title": "Türkiye",
+   "type": "destination",
+   "summary": "Cruises in Türkiye, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#turkiye.any",
+   "regions": [
+    "turkiye"
+   ]
+  },
+  {
+   "slug": "asia-pacific",
+   "title": "Asia and the Pacific",
+   "type": "destination",
+   "summary": "Cruises in Asia and the Pacific, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#asia-pacific.any",
+   "regions": [
+    "asia-pacific"
+   ]
+  },
+  {
+   "slug": "polar",
+   "title": "Arctic and Antarctica",
+   "type": "destination",
+   "summary": "Cruises in Arctic and Antarctica, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#polar.any",
+   "regions": [
+    "polar"
+   ]
+  },
+  {
+   "slug": "africa-arabia",
+   "title": "Africa, the Red Sea and the Indian Ocean",
+   "type": "destination",
+   "summary": "Cruises in Africa, the Red Sea and the Indian Ocean, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#africa-arabia.any",
+   "regions": [
+    "africa-arabia"
+   ]
+  },
+  {
+   "slug": "tahiti",
+   "title": "Tahiti and French Polynesia",
+   "type": "destination",
+   "summary": "Cruises in Tahiti and French Polynesia, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#tahiti.any",
+   "regions": [
+    "tahiti"
+   ]
+  },
+  {
+   "slug": "seychelles",
+   "title": "Seychelles",
+   "type": "destination",
+   "summary": "Cruises in Seychelles, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#seychelles.any",
+   "regions": [
+    "seychelles"
+   ]
+  }
+ ]
+}
