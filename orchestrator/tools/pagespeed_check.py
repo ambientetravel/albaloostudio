@@ -82,9 +82,25 @@ def check(url: str) -> dict:
     savings = sorted(((a.get("title"), (a.get("details") or {}).get("overallSavingsMs") or 0)
                       for a in audits.values() if (a.get("details") or {}).get("type") == "opportunity"),
                      key=lambda x: -x[1])
+    lab = {k: (audits.get(a) or {}).get("displayValue")
+           for k, a in (("FCP", "first-contentful-paint"), ("LCP", "largest-contentful-paint"),
+                        ("TBT", "total-blocking-time"), ("CLS", "cumulative-layout-shift"),
+                        ("SI", "speed-index"))}
+    lcp_items = (((audits.get("largest-contentful-paint-element") or {}).get("details") or {})
+                 .get("items") or [])
+    lcp_node = None
+    for it in lcp_items:   # newer Lighthouse nests the node inside a table
+        node = it.get("node") or next((r.get("node") for r in (it.get("items") or []) if r.get("node")), None)
+        if node:
+            lcp_node = (node.get("snippet") or node.get("nodeLabel") or "")[:140]
+            break
+    heavy = sorted((((audits.get("total-byte-weight") or {}).get("details") or {}).get("items") or []),
+                   key=lambda i: -(i.get("totalBytes") or 0))[:4]
     return {"url": url, "field": field or None,
             "lab_score": round(score * 100) if isinstance(score, (int, float)) else None,
             "lcp_lab_ms": (audits.get("largest-contentful-paint") or {}).get("numericValue"),
+            "lab": lab, "lcp_element": lcp_node,
+            "heaviest": [{"url": i.get("url", ""), "kb": round((i.get("totalBytes") or 0) / 1024)} for i in heavy],
             "top_savings": [{"fix": t, "ms": round(ms)} for t, ms in savings[:3] if ms >= 200]}
 
 
@@ -106,6 +122,16 @@ def to_md(report: dict) -> str:
             fixes += [f"- **{p['url']}** — {x['fix']} (~{x['ms']} ms)" for x in p.get("top_savings", [])]
     if fixes:
         L += ["", "**Biggest savings Lighthouse found:**", *fixes]
+    detail = [p for s in report["sites"] for p in s["pages"] if p.get("lab")]
+    if detail:
+        L += ["", "**Lab timings (one mobile load) — what holds each score down:**", "",
+              "| Page | FCP | LCP | TBT | CLS | LCP element | Heaviest downloads |", "|---|---|---|---|---|---|---|"]
+        for p in detail:
+            lb = p["lab"]
+            el = (p.get("lcp_element") or "—").replace("|", "/")
+            hv = ", ".join(f"{h['url'].rsplit('/', 1)[-1][:32]} {h['kb']} KB" for h in p.get("heaviest", []))
+            L.append(f"| {p['url']} | {lb.get('FCP') or '—'} | {lb.get('LCP') or '—'} | {lb.get('TBT') or '—'} | "
+                     f"{lb.get('CLS') or '—'} | `{el[:80]}` | {hv or '—'} |")
     L += ["", "_Good thresholds (p75): LCP ≤ 2500 ms, INP ≤ 200 ms, CLS ≤ 0.1._"]
     return "\n".join(L)
 
