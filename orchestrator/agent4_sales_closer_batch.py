@@ -221,7 +221,10 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
                     "The source cannot tell this request from anyone else's.")
 
     resp = requests.get(url, headers=headers, timeout=config.WEBHOOK_TIMEOUT_S)
-    resp.raise_for_status()
+    if resp.status_code >= 400:
+        # The source's own reason ("unsigned", "stale", "signature") is what tells a wrong
+        # secret from a host that strips the X- headers; raise_for_status alone drops it.
+        raise requests.HTTPError(f"{resp.status_code} from {url}: {config.redact(resp.text[:200])}", response=resp)
     data = resp.json()
     # Accept a bare array or {"leads": [...]}, because both are what real
     # endpoints return and arguing about it helps nobody.
