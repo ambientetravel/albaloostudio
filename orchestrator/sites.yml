@@ -167,7 +167,7 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.ir/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: fa-IR
-    indexnow_key: "4122355951fb72bf9ee8ccc04ab5d484"   # public by design; site must serve /4122355951fb72bf9ee8ccc04ab5d484.txt containing it
+    indexnow_key: "d926d866154a4982b8674635e4fc6065"   # the key boutimar.ir has served since 24 Jul (its own _indexnow.py uses it); 4122… was never hosted
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - کروز دبی        # bare «کروز» = Land Cruiser / Penélope Cruz / cruise missile noise (29 Sep)
       - تور کشتی
