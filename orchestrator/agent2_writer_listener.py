@@ -1916,6 +1916,11 @@ def _cms_dict(site: SiteBlock) -> dict[str, Any]:
 BASE44_API = "https://app.base44.com/api"
 
 
+def base44_entity_url(app_id: str, entity: str) -> str:
+    """Collection URL for an entity's records: POST here creates, {url}/{id} updates."""
+    return f"{BASE44_API}/apps/{app_id}/entities/{entity}"
+
+
 def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) -> dict[str, Any]:
     """
     Create the article as a DRAFT record in the site's base44 app.
@@ -1961,11 +1966,16 @@ def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) ->
     }
     if draft.get("valid_until"):
         record["valid_until"] = draft["valid_until"]
-    base = f"{BASE44_API}/apps/{app_id}/entities/{entity}/records"
+    # Apps API paths (docs.base44.com/api-reference): list = GET …/entities/{E}/v2/list,
+    # create = POST …/entities/{E}, update = PUT …/entities/{E}/{id}. There is no
+    # "/records" segment — the first version used one and every write 404'd as
+    # "no entity", which read like a missing table rather than a wrong URL (2 Oct 2026).
+    base = base44_entity_url(app_id, entity)
     hdr = {"Authorization": f"Bearer {token}", "Content-Type": "application/json",
            "User-Agent": config.USER_AGENT}
     try:
-        r = requests.get(base, headers=hdr, params={"q": json.dumps({"slug": slug}), "limit": 1},
+        r = requests.get(f"{base}/v2/list", headers=hdr,
+                         params={"q": json.dumps({"slug": slug}), "limit": 1},
                          timeout=config.WEBHOOK_TIMEOUT_S)
         r.raise_for_status()
         found = r.json()
@@ -1995,7 +2005,8 @@ def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) ->
         code = getattr(getattr(exc, "response", None), "status_code", None)
         hint = {401: "BASE44_ACCESS_TOKEN rejected — expired/revoked, or an old account API key.",
                 403: "the token's user cannot write this entity (RLS / not an app editor).",
-                404: f"no entity {entity!r} in app {app_id} — the site session has not created it yet."
+                404: (f"no entity {entity!r} in app {app_id} (or the token cannot see this app) — "
+                      "check the entity exists and the token's app scope.")
                 }.get(code, "")
         detail = config.redact(str(exc))[:160]
         log.error("%s — base44 write failed: %s%s; staging instead", site.domain, detail,

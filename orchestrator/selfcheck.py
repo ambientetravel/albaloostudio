@@ -3508,20 +3508,20 @@ _r, _c = _b44run([])
 _post = [c for c in _c if c[0] == "POST"]
 ok("a new slug is CREATED as a draft record, even when publish_mode says publish",
    _r["record_id"] == "new1" and _post and _post[0][2]["json"]["status"] == "draft"
-   and _post[0][1].endswith("/apps/app123/entities/Article/records")
+   and _post[0][1].endswith("/apps/app123/entities/Article")
    and _r["live_url"] is None)
 ok("the bearer token is sent, and slug is the upsert key",
    _post[0][2]["headers"]["Authorization"] == "Bearer tok"
    and _post[0][2]["json"]["slug"] == _b44m.brief.target_url_path)
 _r, _c = _b44run([{"id": "old1", "status": "draft"}])
 ok("an existing DRAFT is updated in place (redelivery-safe), not duplicated",
-   [c[0] for c in _c] == ["GET", "PUT"] and _c[1][1].endswith("/records/old1"))
+   [c[0] for c in _c] == ["GET", "PUT"] and _c[1][1].endswith("/entities/Article/old1") and _c[0][1].endswith("/entities/Article/v2/list"))
 _r, _c = _b44run([{"id": "old1", "status": "published"}])
 ok("a PUBLISHED record is never overwritten",
    [c[0] for c in _c] == ["GET"] and "not overwritten" in _r["note"])
 _r, _c = _b44run({"message": "Entity schema Article not found"}, get_code=404)
 ok("a missing entity stages the draft and names the fix, never a false live_url",
-   _r["live_url"] is None and "has not created it yet" in _r["note"] and _r.get("staged_path"))
+   _r["live_url"] is None and "check the entity exists" in _r["note"] and _r.get("staged_path"))
 _saved_tok = os.environ.pop("BASE44_ACCESS_TOKEN", None)
 _r = a2._push_base44_entity(_b44m, _b44d, "https://x.test/p")
 if _saved_tok is not None: os.environ["BASE44_ACCESS_TOKEN"] = _saved_tok
@@ -3863,6 +3863,12 @@ _roll = _aiv.rollup([{"provider": "deepseek", "properties": [_r]}], [_bm])
 ok("roll-up gives health_report a mentioned_any per property", _roll[0]["mentioned_any"] is True)
 ok("health_report reads the list-shaped properties (it assumed a dict and would crash)",
    "isinstance(props, dict)" in pathlib.Path("tools/health_report.py").read_text())
+
+print("\n=== base44 Apps API paths ===")
+_w2src = pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("base44 records use the documented paths (list = /v2/list, create = POST collection), never '/records'",
+   a2.base44_entity_url("APP", "Article") == "https://app.base44.com/api/apps/APP/entities/Article"
+   and '/v2/list"' in _w2src and 'entities/{entity}/records' not in _w2src)
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
