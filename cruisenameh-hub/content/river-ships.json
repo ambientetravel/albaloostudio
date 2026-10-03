@@ -1,0 +1,22 @@
+[
+ {"slug":"viking-longship","title":"کلاس Viking Longship","latin":"Viking Longship class","kicker":"Viking · راین، دانوب، سن","summary":"استاندارد کشتی رودخانه‌ای اروپا؛ ۱۳۵ متر، چون قفل‌ها بلندتر را راه نمی‌دهند.",
+  "facts":{"line":"Viking","year":"از ۲۰۱۲","river":"راین، دانوب، مَین، سن، رون","length_m":"۱۳۵","guests":"۱۹۰","cabins":"۹۵"},
+  "body":["طول ۱۳۵ متر و عرض ۱۱٫۵ متر اندازهٔ قفل‌های رودخانه‌های اروپاست؛ به همین دلیل بیشتر کشتی‌های رودخانه‌ای شبیه هم‌اند. وایکینگ ده‌ها کشتی از این کلاس دارد."],
+  "related":[{"collection":"rivers","slug":"danube"},{"collection":"rivers","slug":"rhine"}]},
+ {"slug":"amamagna","title":"AmaMagna","latin":"AmaMagna","kicker":"AmaWaterways · دانوب","summary":"دو برابر پهن‌تر از کشتی‌های رودخانه‌ای معمول؛ استخر، چهار رستوران، فقط ۱۹۶ مهمان.",
+  "facts":{"line":"AmaWaterways","year":"۲۰۱۹","river":"دانوب","length_m":"۱۳۵","guests":"۱۹۶","cabins":"۹۸"},
+  "body":["AmaMagna با عرض ۲۲ متر فقط در دانوب می‌تواند حرکت کند، اما در عوض سوئیت‌های بزرگ و فضایی دارد که در کشتی رودخانه‌ای کم‌سابقه است."],
+  "related":[{"collection":"rivers","slug":"danube"}]},
+ {"slug":"viking-osiris","title":"Viking Osiris","latin":"Viking Osiris","kicker":"Viking · نیل","summary":"کشتی نیلِ وایکینگ، ۸۲ مهمان، میان اقصر و اسوان.",
+  "facts":{"line":"Viking","year":"۲۰۲۲","river":"نیل","length_m":"۷۲","guests":"۸۲","cabins":"۴۱"},
+  "body":["نیل برای مسافر ایرانی جذاب است: مصر در مسیرهای مشخص ویزای ساده دارد و کروز نیل معمولاً با چند شب قاهره ترکیب می‌شود."],
+  "related":[{"collection":"rivers","slug":"nile"}]},
+ {"slug":"oberoi-zahra","title":"Oberoi Zahra","latin":"The Oberoi Zahra","kicker":"Oberoi · نیل","summary":"۲۷ کابین، اسپا، و سرویس هتل‌های اوبروی روی نیل.",
+  "facts":{"line":"Oberoi Hotels","year":"۲۰۰۷","river":"نیل","length_m":"۷۲","guests":"۵۴","cabins":"۲۷"},
+  "body":["زهرا لوکس‌ترین نسخهٔ کروز نیل است: کابین‌های بزرگ، اسپا، و سفرهای هفت‌شبهٔ اقصر تا اسوان."],
+  "related":[{"collection":"rivers","slug":"nile"}]},
+ {"slug":"ss-maria-theresa","title":"S.S. Maria Theresa","latin":"S.S. Maria Theresa","kicker":"Uniworld · دانوب","summary":"کشتی «قصر شناور» یونی‌ورلد؛ دکور باروک، ۱۵۰ مهمان.",
+  "facts":{"line":"Uniworld","year":"۲۰۱۵","river":"دانوب","length_m":"۱۳۵","guests":"۱۵۰","cabins":"۷۵"},
+  "body":["یونی‌ورلد کشتی‌هایش را مثل هتل‌های بوتیک تزئین می‌کند. ماریا ترزا با الهام از کاخ‌های وین ساخته شده و مسیر کلاسیک پاساو تا بوداپست را می‌رود."],
+  "related":[{"collection":"rivers","slug":"danube"}]}
+]

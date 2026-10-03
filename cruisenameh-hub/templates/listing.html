@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "_story.html" as S with context %}
+{% block title %}{{ coll.title }} · {{ site.brand.fa }}{% endblock %}
+{% block description %}{{ coll.lede }}{% endblock %}
+{% block content %}
+<header class="dhead{% if dept %} dhead--{{ dept.slug }}{% endif %}"><div class="wrap">
+  <p class="kicker">{% if dept %}<a href="/{{ dept.slug }}/">{{ dept.label }}</a> · {% endif %}<a href="/guides/">راهنما</a></p>
+  <h1 class="dhead__t">{{ coll.title }}</h1>
+  <p class="lede">{{ coll.lede }}</p>
+  <input class="filter" type="search" placeholder="فیلتر…" data-filter="#list" aria-label="فیلتر">
+</div></header>
+<section class="sec sec--tight"><div class="wrap"><div class="sgrid" id="list">
+{% for x in stories %}<div class="sgrid__cell" data-text="{{ x.title }} {{ x.latin }} {{ x.kicker }} {{ x.dek }}">{{ S.card(x, 'std', loop.index0 % 3) }}{% if x.visa %}<span class="pill pill--{{ 'free' if 'بدون ویزا' in x.visa else ('schengen' if 'شینگن' in x.visa else 'easy') }}">{{ x.visa }}</span>{% endif %}</div>{% endfor %}
+</div></div></section>
+{% endblock %}

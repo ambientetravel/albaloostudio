@@ -1,0 +1,4 @@
+{#- Every date twice: Jalali first, Gregorian beside it, ISO in the attribute for
+    machines. Readers of this magazine live on two calendars and most read one of
+    them fluently and the other by counting. -#}
+<time class="dt{% if compact %} dt--c{% endif %}" datetime="{{ d }}"><span class="dt__j">{{ d|jdate }}</span><span class="dt__g">{{ d|gdate }}</span></time>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}پیشنهادها و تورها · {{ site.brand.fa }}{% endblock %}
+{% block description %}پیشنهادهای کروز از شبکهٔ فروش؛ هیچ قیمتی حدس زده نمی‌شود.{% endblock %}
+{% block content %}
+<section class="pagehead"><div class="wrap"><p class="kicker">پیشنهادها و تورها <span class="tag">آگهی</span></p><h1 class="display display--md">قیمت‌ها از شبکهٔ فروش، نه از حدس</h1>
+<p class="lede">این صفحه از فید زندهٔ سفرهای شبکهٔ ما پر می‌شود و ویزای هر سفر از بندرهای واقعی مسیر محاسبه می‌شود. رزرو در سایت‌های همراه انجام می‌شود، نه اینجا.</p>
+<p class="tiny" id="offersStatus">منبع: {{ feed_status }} · ساخت {{ built|fa }}</p></div></section>
+<section class="sec"><div class="wrap"><div class="offers offers--full" id="offersFull" data-limit="60" data-feed="{{ site.feed.url }}" data-book="{{ site.feed.book_url }}" data-book-label="{{ site.feed.book_label }}">{% include "_offers.html" %}</div></div></section>
+{% endblock %}
+{% block scripts %}<script src="/js/offers.js?v={{ built }}" defer></script>{% endblock %}

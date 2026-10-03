@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "_story.html" as S with context %}
+{% block title %}{{ dept.label }} · {{ site.brand.fa }}{% endblock %}
+{% block description %}{{ dept.desc }}{% endblock %}
+{% block bodyclass %}page dept dept--{{ dept.slug }}{% endblock %}
+{% block content %}
+<header class="dhead dhead--{{ dept.slug }}">
+  <div class="wrap">
+    <p class="kicker"><a href="/journal/">مجلهٔ کروزنامه</a> · بخش</p>
+    <h1 class="dhead__t">{{ dept.label }}</h1>
+    <p class="dhead__la">{{ dept.latin }}</p>
+    <p class="lede">{{ dept.desc }}</p>
+    {% if colls %}<nav class="dhead__sub" aria-label="راهنماهای این بخش">{% for g in colls %}<a href="/{{ g.slug }}/">{{ g.title }} <small>{{ g.n|fa }}</small></a>{% endfor %}</nav>{% endif %}
+  </div>
+</header>
+<section class="sec sec--tight"><div class="wrap">
+  {% if stories %}
+  <div class="well__grid well__grid--{{ [stories|length, 4]|min }}">{% for x in stories[:4] %}{{ S.card(x, 'big' if loop.first else 'std', loop.index0) }}{% endfor %}</div>
+  {% if stories|length > 4 %}<div class="sgrid">{% for x in stories[4:] %}{{ S.card(x, 'std', loop.index0) }}{% endfor %}</div>{% endif %}
+  {% else %}<p class="lede">این بخش هنوز داستانی ندارد.</p>{% endif %}
+</div></section>
+{% endblock %}
