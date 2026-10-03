@@ -1,4 +1,4 @@
-# Orchestration health — 2026-10-02T13:46 UTC
+# Orchestration health — 2026-10-03T12:25 UTC
 
 **0 broke · 2 need you · 1 to watch.**
 
@@ -9,7 +9,7 @@
 ## 🟡 Needs you — only you can do these
 
 - 3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship
-- **7 article PR(s) waiting on your merge** (oldest 5 days): [boutimar#28](https://github.com/ambientetravel/boutimar/pull/28) Agent 2 draft: Biblical Sites in Iran: Tombs of ; [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی; [cruise24-ir#5](https://github.com/ambientetravel/cruise24-ir/pull/5) Agent 2 draft: راهنمای بندر گالاتاپورت استانبول ; [boutimar#29](https://github.com/ambientetravel/boutimar/pull/29) Agent 2 draft: Climbing Mount Damavand: A Guide ; [boutimarfarsi#2](https://github.com/ambientetravel/boutimarfarsi/pull/2) دریانامه draft: بهترین زمان سفر دریایی به فیورده; [cruise24-ir#6](https://github.com/ambientetravel/cruise24-ir/pull/6) Agent 2 draft: چگونه کشتی مناسب را در ناوگان MSC; [boutimar#30](https://github.com/ambientetravel/boutimar/pull/30) Agent 2 draft: Skiing in Iran: A Practical Guide
+- **1 article PR(s) waiting on your merge** (oldest 6 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی
 
 ## 👀 To watch
 
@@ -27,24 +27,24 @@
 | Briefs deferred by cap | 0 | |
 | Model spend | $1.015 | $1.077 |
 | Social: campaigns / posts held / no-media | 5 / 3 / 3 | |
-| Article PRs open | 7 | |
+| Article PRs open | 1 | |
 | AI recall (Oracle, monthly) | 0/8 properties named by ≥1 of 2 models | |
 
 ## Agents
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 5.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36311094001) |
-| Writer | ✓ success | 5.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36311399609) |
-| Broadcaster | ✓ success | 5.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36311889268) |
-| Closer | ✓ success | 2.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36714977982) |
-| Auditor+Analyst | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36416020184) |
-| Cartographer | ✓ success | 3.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36539473135) |
-| Watcher | ✓ success | 5.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36314957718) |
-| Oracle | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426) |
-| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37013896289) |
-| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37004559801) |
-| Dashboard | ✓ success | 4.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36426438004) |
+| Scout | ✓ success | 6.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36311094001) |
+| Writer | ✓ success | 6.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36311399609) |
+| Broadcaster | ✓ success | 6.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36311889268) |
+| Closer | ✓ success | 3.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36714977982) |
+| Auditor+Analyst | ✓ success | 5.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36416020184) |
+| Cartographer | ✓ success | 4.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36539473135) |
+| Watcher | ✓ success | 6.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36314957718) |
+| Oracle | ✓ success | 1.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426) |
+| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37122221283) |
+| PR gate | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37119113230) |
+| Dashboard | ✓ success | 5.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36426438004) |
 
 ## ✓ Fine
 
