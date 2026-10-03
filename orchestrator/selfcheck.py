@@ -3870,5 +3870,33 @@ ok("base44 records use the documented paths (list = /v2/list, create = POST coll
    a2.base44_entity_url("APP", "Article") == "https://app.base44.com/api/apps/APP/entities/Article"
    and '/v2/list"' in _w2src and 'entities/{entity}/records' not in _w2src)
 
+print("\n=== Scout: head terms + existing pages ===")
+_sites = {x.domain: x for x in config.load_sites(include_hold=True)}
+ok("the three Farsi cruise sites declare «تور کشتی کروز» as their homepage head term",
+   all("تور کشتی کروز" in _sites[d].head_terms for d in ("boutimar.ir", "cruisebaz.com", "cruise24.ir")))
+_cands = [{"query": q} for q in ("تور کشتی کروز", "تور کشتی کروز ۱۴۰۵", "تور  كشتی كروز 2026",
+                                 "تور کشتی کروز دبی", "قیمت کروز آرویا")]
+_hits = a1._head_term_hits(_sites["cruisebaz.com"], _cands)
+ok("the head term is caught with a year, Arabic kaf or double spaces — but a longer intent is not",
+   _hits == {"تور کشتی کروز", "تور کشتی کروز ۱۴۰۵", "تور  كشتی كروز 2026"})
+ok("a site without head terms filters nothing", a1._head_term_hits(_sites["boutimar.com"], _cands) == set())
+_paths = a1._existing_paths(_sites["cruisebaz.com"], {"https://cruisebaz.com/aroya/price", "https://cruisebaz.com/", "https://cruisebaz.com/about"})
+ok("existing pages reach the prompt as paths, articles first", _paths[0] == "/aroya/price" and "/about" in _paths)
+a1._EXISTING_PAGES["cruisebaz.com"] = _paths
+_pr = json.loads(a1._analysis_user_prompt(_sites["cruisebaz.com"], [], 3))
+ok("the scout prompt carries existing pages, the duplicate rule and the head terms",
+   _pr.get("existing_pages") == _paths and "REJECT" in _pr.get("existing_pages_rule", "")
+   and _pr.get("homepage_head_terms") == ["تور کشتی کروز"] and "ONE brief at most" in _pr["instruction"])
+a1._EXISTING_PAGES.pop("cruisebaz.com", None)
+class _RobotsResp:
+    status_code = 200
+    text = ("User-agent: *\nSitemap: https://cruisebaz.com/sitemap.xml\n"
+            "Sitemap: https://cruisebaz.com/functions/articlesSitemap\nSitemap: https://evil.example/s.xml\n")
+class _RobotsSess:
+    def get(self, url, **k): return _RobotsResp()
+ok("extra sitemaps are read from robots.txt, same host only",
+   a1._robots_sitemaps(_sites["cruisebaz.com"], _RobotsSess()) ==
+   ["https://cruisebaz.com/sitemap.xml", "https://cruisebaz.com/functions/articlesSitemap"])
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

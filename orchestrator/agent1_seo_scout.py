@@ -295,8 +295,34 @@ def fetch_sitemap_urls(site: Site, session: requests.Session, depth: int = 0) ->
             if loc.text:
                 urls.add(loc.text.strip())
 
+    # Extra sitemaps the site declares in robots.txt (same host only). cruisebaz
+    # lists its published blog articles in a second, function-served sitemap;
+    # reading only sitemap.xml would make the scout re-propose live articles.
+    for extra in _robots_sitemaps(site, session):
+        if extra.rstrip("/") != site.sitemap.rstrip("/"):
+            urls |= _fetch_child_sitemap(extra, session)
+
     log.info("%s — sitemap lists %d URLs", site.domain, len(urls))
     return urls
+
+
+def _robots_sitemaps(site: Site, session: requests.Session) -> list[str]:
+    """`Sitemap:` lines from robots.txt that point at the site's own host."""
+    host = urlparse(site.base_url).netloc.removeprefix("www.")
+    try:
+        r = session.get(site.base_url.rstrip("/") + "/robots.txt", timeout=15,
+                        headers={"User-Agent": config.USER_AGENT})
+        if r.status_code != 200:
+            return []
+    except requests.RequestException:
+        return []
+    out = []
+    for line in r.text.splitlines():
+        if line.lower().startswith("sitemap:"):
+            u = line.split(":", 1)[1].strip()
+            if urlparse(u).netloc.removeprefix("www.") == host and u not in out:
+                out.append(u)
+    return out
 
 
 def _fetch_child_sitemap(url: str, session: requests.Session) -> set[str]:
@@ -552,6 +578,40 @@ def _excluded(site: Site, candidates: list[dict[str, Any]]) -> set[str]:
     return {c["query"] for c in candidates if any(p.search(c["query"]) for p in pats)}
 
 
+_FA_NORM = str.maketrans({"ي": "ی", "ك": "ک", "\u200c": " ", "ة": "ه"})
+_DIGITS = re.compile(r"[0-9۰-۹٠-٩]+")
+
+
+def _norm_phrase(s: str) -> str:
+    """Spelling-insensitive form for comparing a query with a head term:
+    Arabic→Persian letters, ZWNJ→space, digits (years like ۱۴۰۵/2026) dropped,
+    punctuation and repeated spaces collapsed."""
+    s = _DIGITS.sub(" ", str(s).translate(_FA_NORM).lower())
+    s = re.sub(r"[^\w\s]", " ", s)
+    return " ".join(s.split())
+
+
+def _head_term_hits(site: Site, candidates: list[dict[str, Any]]) -> set[str]:
+    """Candidate queries that ARE the site's head term (± a year). The homepage
+    owns that search; a new page on it only splits the result (cruisebaz
+    /tor-keshti, 2 Oct 2026)."""
+    heads = {_norm_phrase(h) for h in (getattr(site, "head_terms", None) or [])}
+    heads.discard("")
+    return {c["query"] for c in candidates if _norm_phrase(c["query"]) in heads}
+
+
+# Per-run: the paths the site already publishes, set before analysis and read
+# by the prompt (same module-dict pattern as _SIBLING_COVERAGE).
+_EXISTING_PAGES: dict[str, list[str]] = {}
+
+
+def _existing_paths(site: Site, sitemap_urls: set[str], cap: int = 250) -> list[str]:
+    """Sitemap URLs as site-relative paths, articles first, capped for the prompt."""
+    paths = sorted({urlparse(u).path or "/" for u in sitemap_urls})
+    art = re.compile(r"/(journal|daryanameh|blog|guides|aroya|cruise-line|destinations)/")
+    return ([p for p in paths if art.search(p)] + [p for p in paths if not art.search(p)])[:cap]
+
+
 def apply_path_template(site: Site, path: str) -> str:
     """Force the site's URL contract onto a proposed path. cruise24.ir's build
     accepts only /blog/<slug>/ and SystemExits on anything else — the WHOLE site
@@ -765,6 +825,21 @@ _SIBLING_COVERAGE: dict[str, list[dict[str, str]]] = {}
 def _analysis_user_prompt(site: Site, candidates: list[dict[str, Any]], limit: int) -> str:
     sib = _SIBLING_COVERAGE.get(site.domain) or []
     extra = {}
+    have = _EXISTING_PAGES.get(site.domain) or []
+    if have:
+        extra["existing_pages"] = have
+        extra["existing_pages_rule"] = (
+            "These pages ALREADY exist on this site (URL paths; Farsi sites use "
+            "Latin/finglish slugs, e.g. /aroya/price is the AROYA price page, "
+            "/aroya/jeddah-red-sea the Jeddah–Red Sea route). If a candidate's "
+            "intent is already served by one of them, REJECT it — do not brief a "
+            "second page on the same intent under a new slug. On 2 Oct four "
+            "near-identical 'what is AROYA' drafts and two duplicates of "
+            "/aroya/price were produced exactly this way."
+        )
+    heads = getattr(site, "head_terms", None) or []
+    if heads:
+        extra["homepage_head_terms"] = heads
     if sib:
         extra = {
             "sibling_sites_already_cover": sib[:40],
@@ -788,7 +863,9 @@ def _analysis_user_prompt(site: Site, candidates: list[dict[str, Any]], limit: i
                 "do not justify more. Score priority 0-100 using volume, position "
                 "proximity, commercial value and effort. Reject candidates that are "
                 "brand-navigational, and MERGE any that share an intent — two "
-                "spellings of one query are one page, not two. NAMED SUBJECTS: if a "
+                "spellings of one query are one page, not two, and four phrasings "
+                "of 'what is X' are ONE brief at most. Never brief the homepage's "
+                "head term (homepage_head_terms) as a new page. NAMED SUBJECTS: if a "
                 "candidate is built around a specific company, ship, hotel, venue or "
                 "product, brief it ONLY if you are certain it exists exactly as "
                 "spelled and is something this site can speak to. Search queries are "
@@ -1709,6 +1786,14 @@ def process_site(
             stat["excluded_queries"] = sorted(excl)
             log.info("%s — %d excluded query(ies) dropped: %s", site.domain,
                      len(excl), ", ".join(sorted(excl)[:5]))
+        # The homepage's own head term is never a new page (sites.yml head_terms).
+        heads = _head_term_hits(site, candidates)
+        if heads:
+            candidates = [c for c in candidates if c["query"] not in heads]
+            stat["head_term_skipped"] = sorted(heads)
+            log.info("%s — %d head-term query(ies) left to the homepage: %s",
+                     site.domain, len(heads), ", ".join(sorted(heads)[:5]))
+        _EXISTING_PAGES[site.domain] = _existing_paths(site, sitemap_urls)
         stat["candidates"] = len(candidates)
 
         # Pages Google already ranks that the sitemap never mentions. Both

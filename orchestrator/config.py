@@ -458,6 +458,10 @@ class Site:
     trend_terms: list[str] = field(default_factory=list)
     # IndexNow key (public by design); the site must serve /<key>.txt with it.
     indexnow_key: str = ""
+    # The phrase the HOMEPAGE ranks for («تور کشتی کروز»). Never briefed as a new
+    # page: a second page on the head term competes with the homepage (2 Oct,
+    # cruisebaz /tor-keshti). Digits/years are ignored when matching.
+    head_terms: list[str] = field(default_factory=list)
 
     @property
     def on_hold(self) -> bool:
@@ -529,6 +533,7 @@ def load_sites(
                 exclude_queries=[str(x) for x in (merged.get("exclude_queries") or [])],
                 trend_terms=[str(x) for x in (merged.get("trend_terms") or [])],
                 indexnow_key=str(merged.get("indexnow_key", "") or "").strip(),
+                head_terms=[str(x).strip() for x in (merged.get("head_terms") or []) if str(x).strip()],
             )
         )
 

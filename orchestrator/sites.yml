@@ -168,6 +168,8 @@ sites:
     offer_feed: "https://boutimar.ir/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: fa-IR
     indexnow_key: "d926d866154a4982b8674635e4fc6065"   # the key boutimar.ir has served since 24 Jul (its own _indexnow.py uses it); 4122… was never hosted
+    head_terms:   # the homepage owns this search — never briefed as a new page (2 Oct, /tor-keshti)
+      - تور کشتی کروز
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - کروز دبی        # bare «کروز» = Land Cruiser / Penélope Cruz / cruise missile noise (29 Sep)
       - تور کشتی
@@ -466,6 +468,8 @@ sites:
     brand: CruiseBaz
     locale: fa-IR
     indexnow_key: "6ee0c8e240f47be5d7e63ad224835a79"   # public by design; site must serve /6ee0c8e240f47be5d7e63ad224835a79.txt containing it
+    head_terms:   # the homepage owns this search — never briefed as a new page (2 Oct, /tor-keshti)
+      - تور کشتی کروز
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - آرویا
       - کروز خلیج فارس
@@ -526,6 +530,8 @@ sites:
       - انتخاب کشتی مناسب در ناوگان MSC                      # msc.html
     locale: fa-IR              # Farsi build shipped — live <html lang="fa" dir="rtl">; was `en`, so 17 Sep's 4 guides came out English (fixed 25 Sep)
     indexnow_key: "afe2aa16ad7cad86fee55eb79893deb2"   # public by design; site must serve /afe2aa16ad7cad86fee55eb79893deb2.txt containing it
+    head_terms:   # the homepage owns this search — never briefed as a new page (2 Oct, /tor-keshti)
+      - تور کشتی کروز
     trend_terms:   # short head terms for Google Trends (Agent 7)
       - کشتی کروز
       - تور دبی
