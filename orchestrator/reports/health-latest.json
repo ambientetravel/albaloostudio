@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-04T10:44+00:00",
+ "generated": "2026-10-04T10:45+00:00",
  "critical": [],
  "needs_you": [
   "3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
@@ -29,7 +29,7 @@
   "posts": 6,
   "posts_held": 3,
   "posts_no_media": 3,
-  "campaigns": 5,
+  "campaigns": 4,
   "open_prs": 4,
   "ai_recall": "0/8 properties named by ≥1 of 2 models"
  },
@@ -50,7 +50,7 @@
   },
   {
    "agent": "Broadcaster",
-   "result": "in_progress",
+   "result": "success",
    "age_days": 0.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37196307135",
    "run": 59
