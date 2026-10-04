@@ -1,7 +1,7 @@
 {
  "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
  "cooldown_days": 45,
- "updated_at": "2026-09-27T10:04:56+00:00",
+ "updated_at": "2026-10-04T10:37:52+00:00",
  "entries": [
   {
    "domain": "cruise24.me",
@@ -108,6 +108,14 @@
    "target_url_path": "/guides/skiing-in-iran-dizin-shemshak"
   },
   {
+   "domain": "cruise24.me",
+   "query": "Star Clippers tall ship cruise guide",
+   "first_briefed": "2026-10-04T10:37:52+00:00",
+   "last_briefed": "2026-10-04T10:37:52+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/star-clippers-tall-ship-cruise-guide"
+  },
+  {
    "domain": "boutimar.com",
    "query": "Stargazing in the Iranian desert",
    "first_briefed": "2026-09-27T10:01:08+00:00",
@@ -122,6 +130,14 @@
    "last_briefed": "2026-09-18T12:45:28+00:00",
    "times_briefed": 1,
    "target_url_path": "/guides/uzbekistan-cultural-tour-guide"
+  },
+  {
+   "domain": "cruise24.me",
+   "query": "Variety Cruises Greek islands small ship",
+   "first_briefed": "2026-10-04T10:37:52+00:00",
+   "last_briefed": "2026-10-04T10:37:52+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/variety-cruises-greek-islands"
   },
   {
    "domain": "boutimar.com",
@@ -636,6 +652,14 @@
    "target_url_path": "/experience/nomadic-tribal/"
   },
   {
+   "domain": "cruise24.me",
+   "query": "small ship cruise Croatia Adriatic",
+   "first_briefed": "2026-10-04T10:37:52+00:00",
+   "last_briefed": "2026-10-04T10:37:52+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/guides/croatia-adriatic-small-ship-cruise"
+  },
+  {
    "domain": "boutimar.com",
    "query": "tehran boutique hotel",
    "first_briefed": "2026-08-08T20:36:52Z",
@@ -692,6 +716,14 @@
    "target_url_path": "/behtarin-zaman-safar-dariyayi-fjordhaye-norway"
   },
   {
+   "domain": "cruise24.ir",
+   "query": "تفاوت ویزای کروز ترکیه با کروز یونان برای ایرانیان",
+   "first_briefed": "2026-10-04T10:36:44+00:00",
+   "last_briefed": "2026-10-04T10:36:44+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/blog/tafavot-vizaye-kroz-torkiye-va-yunan/"
+  },
+  {
    "domain": "cruisebaz.com",
    "query": "تور کشتی",
    "first_briefed": "2026-09-13T09:41:20+00:00",
@@ -734,10 +766,10 @@
   {
    "domain": "boutimar.ir",
    "query": "راهنمای سفر دریایی دور دنیا برای ایرانیان",
-   "first_briefed": "2026-09-27T10:03:16+00:00",
-   "last_briefed": "2026-09-27T10:03:16+00:00",
+   "first_briefed": "2026-10-04T10:35:59+00:00",
+   "last_briefed": "2026-10-04T10:35:59+00:00",
    "times_briefed": 1,
-   "target_url_path": "/rahnamaye-safar-dariyayi-dore-donya-baraye-iranian"
+   "target_url_path": "/rahnamaye-safar-daryaei-dor-donya-baraye-iranian"
   },
   {
    "domain": "boutimar.ir",
@@ -770,6 +802,14 @@
    "last_briefed": "2026-09-27T10:03:16+00:00",
    "times_briefed": 1,
    "target_url_path": "/kroz-zemestani-jazayer-qanari-va-madira"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "کروز لوکس چیست و چه تفاوتی با کروز معمولی دارد",
+   "first_briefed": "2026-10-04T10:35:59+00:00",
+   "last_briefed": "2026-10-04T10:35:59+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/kroz-luks-chist-tafavot-ba-kroz-moamoli"
   },
   {
    "domain": "boutimar.ir",
