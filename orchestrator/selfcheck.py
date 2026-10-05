@@ -3898,5 +3898,27 @@ ok("extra sitemaps are read from robots.txt, same host only",
    a1._robots_sitemaps(_sites["cruisebaz.com"], _RobotsSess()) ==
    ["https://cruisebaz.com/sitemap.xml", "https://cruisebaz.com/functions/articlesSitemap"])
 
+print("\n=== Notion review: article text in the page ===")
+import notion_review_sync as _nrs
+_mb = _nrs.md_blocks('---\ntitle: "Skiing in Iran"\nsummary: "A guide"\n---\n\n## Dizin\n\nLine one\nline two.\n\n- a bullet\n')
+ok("markdown drafts become title, summary, headings, paragraphs and bullets",
+   [b["type"] for b in _mb] == ["heading_1", "quote", "heading_2", "paragraph", "bulleted_list_item"]
+   and _mb[3]["paragraph"]["rich_text"][0]["text"]["content"] == "Line one line two.")
+_jb = _nrs.json_blocks({"title": "کروز لوکس", "dek": "خلاصه", "body": [{"h": "عنوان\nمتن بند"}, {"p": "بند دوم"}]})
+ok("boutimar.ir JSON drafts become readable blocks (heading split from its paragraph)",
+   [b["type"] for b in _jb] == ["heading_1", "quote", "heading_2", "paragraph", "paragraph"])
+ok("long paragraphs are split under Notion's 2,000-character limit",
+   len(_nrs._rt("x" * 4000)) == 3 and all(len(t["text"]["content"]) <= 1900 for t in _nrs._rt("x" * 4000)))
+_rb = _nrs.review_blocks({"warns": [{"rule": "visa", "excerpt": "بدون ویزا", "fix": "say easy visa"}]})
+ok("WARN findings are explained in the page, not just coloured", len(_rb) == 2 and "visa" in json.dumps(_rb, ensure_ascii=False))
+
+print("\n=== PR gate: generated pages are not re-judged ===")
+import pr_review as _prr
+ok("a daryanameh page rendered from articles.json in the same PR is skipped (its nav menu caused false WARNs)",
+   _prr.is_generated("daryanameh/x.html", {"data/articles.json", "daryanameh/x.html"})
+   and _prr.is_generated("sitemap.xml", {"sitemap.xml"}))
+ok("a hand-written daryanameh page WITHOUT its source JSON in the PR is still judged",
+   not _prr.is_generated("daryanameh/x.html", {"daryanameh/x.html"}) and not _prr.is_generated("data/articles.json", {"data/articles.json"}))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

@@ -81,6 +81,21 @@ INTERNAL_DOC = re.compile(r"(^|/)[A-Z0-9][A-Z0-9_.-]*\.md$")
 INTERNAL_PREFIXES = ("orchestrator/inbox/",)
 
 
+# Pages GENERATED from data the same PR already carries. boutimar.ir renders each
+# daryanameh/*.html from data/articles.json; judging the render too re-judges the
+# article AND the site chrome around it — the nav link «کروزهای بدون ویزا» turned
+# every boutimar.ir draft WARN on 4 Oct. The source JSON is judged item by item.
+GENERATED_FROM = {re.compile(r"^daryanameh/[^/]+\.html$"): "data/articles.json",
+                  re.compile(r"^sitemap\.xml$"): None}
+
+
+def is_generated(filename: str, pr_files: set[str]) -> bool:
+    for pat, source in GENERATED_FROM.items():
+        if pat.search(filename) and (source is None or source in pr_files):
+            return True
+    return False
+
+
 def is_internal(filename: str) -> bool:
     return bool(INTERNAL_DOC.search(filename)) or filename.startswith(INTERNAL_PREFIXES)
 
@@ -172,12 +187,13 @@ def review_pr(repo: str, num: int, profile: str) -> dict:
     base_sha = (meta.get("base") or {}).get("sha", "") if isinstance(meta, dict) else ""
     head_sha = (meta.get("head") or {}).get("sha", "") if isinstance(meta, dict) else ""
     blocks, warns, scanned, internal = [], [], 0, 0
+    names = {f.get("filename", "") for f in files} if isinstance(files, list) else set()
     for f in files if isinstance(files, list) else []:
         name = f.get("filename", "")
         patch = f.get("patch")  # None for binary/renamed-only
         if not patch or not name.lower().endswith(TEXT_EXT):
             continue
-        if is_internal(name):
+        if is_internal(name) or is_generated(name, names):
             internal += 1
             continue
         scanned += 1
