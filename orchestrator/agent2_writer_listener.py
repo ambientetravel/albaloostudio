@@ -1282,7 +1282,9 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
     # A real, freely licensed photo with its real credit (images.py). Only for
     # adapters that can commit a file next to the article; sites opt in with
     # cms.images in sites.yml. Fail-soft: no match → no photo, never a guess.
-    if adapter in ("astro_pr", "boutimar_ir_static") and (_cms_dict(site).get("images") or {}).get("dir"):
+    _ic = _cms_dict(site).get("images") or {}
+    if (adapter in ("astro_pr", "boutimar_ir_static") and _ic.get("dir")) or \
+            (adapter == "base44_entity" and _ic.get("base44_upload")):
         try:
             import images as _images
             draft["_image"] = _images.attach(draft)
@@ -2025,6 +2027,28 @@ def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) ->
     }
     if draft.get("valid_until"):
         record["valid_until"] = draft["valid_until"]
+    # Photo: re-hosted in the app's OWN storage (POST /api/files/apps/{app}/upload),
+    # never a Wikimedia URL — visitors in Iran often cannot reach upload.wikimedia.org.
+    # Only when the site opts in (cms.images.base44_upload) — the entity must
+    # carry image_url / image_credit / image_source first.
+    img = draft.get("_image")
+    if img and (cms.get("images") or {}).get("base44_upload"):
+        try:
+            import images as _images
+            up = requests.post(f"{BASE44_API}/files/apps/{app_id}/upload",
+                               headers={"Authorization": f"Bearer {token}", "User-Agent": config.USER_AGENT},
+                               files={"file": (f"{slug.strip('/').replace('/', '-') or 'article'}{img['ext']}",
+                                               img["bytes"], "image/jpeg" if img["ext"] == ".jpg" else "image/png")},
+                               data={"visibility": "public"}, timeout=config.WEBHOOK_TIMEOUT_S)
+            up.raise_for_status()
+            hosted = (up.json() or {}).get("url")
+            if hosted:
+                record["image_url"] = hosted
+                record["image_credit"] = _images.credit_line(img, brief.brief.language)
+                record["image_source"] = img["source_page"]
+        except requests.RequestException as exc:
+            log.warning("%s — photo upload to base44 failed, article goes without: %s",
+                        site.domain, config.redact(str(exc))[:120])
     # Apps API paths (docs.base44.com/api-reference): list = GET …/entities/{E}/v2/list,
     # create = POST …/entities/{E}, update = PUT …/entities/{E}/{id}. There is no
     # "/records" segment — the first version used one and every write 404'd as
