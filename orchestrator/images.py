@@ -85,7 +85,7 @@ def _avoided(hay: str, avoid) -> bool:
 
 def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "",
          avoid: list[str] | tuple = (), exclude: set | frozenset = frozenset(),
-         title_only: bool = False) -> dict[str, Any] | None:
+         title_only: bool = False, check=None) -> dict[str, Any] | None:
     """First search result that is a real photo, big enough, freely licensed, credited,
     and that actually names the place the query is about.
 
@@ -129,7 +129,7 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "",
         url = ii.get("thumburl") or ii.get("url")
         if not url:
             continue
-        return {
+        found = {
             "download_url": url,
             "source_page": ii.get("descriptionurl", ""),
             "title": clean(re.sub(r"^File:|\.\w+$", "", title), 120),
@@ -140,6 +140,9 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "",
             # What the FILE says it shows — the only honest source for alt text.
             "description": clean(_strip_html((meta.get("ImageDescription") or {}).get("value", "")), 400),
         }
+        if check is not None and not check(found, query):
+            continue
+        return found
     return None
 
 
@@ -159,7 +162,8 @@ def find_image(query: str, *, width: int = 1600, avoid: list[str] | tuple = (),
     pages = {a: _fetch_pages(a, width) for a in tries}
     for title_only in (True, False):
         for attempt in tries:
-            got = pick(pages[attempt], query=q, avoid=avoid, exclude=exclude, title_only=title_only)
+            got = pick(pages[attempt], query=q, avoid=avoid, exclude=exclude, title_only=title_only,
+                       check=suitable)
             if got:
                 return got
     return None
@@ -197,6 +201,28 @@ def credit_line(img: dict[str, Any], language: str) -> str:
     if str(language).lower().startswith("fa"):
         return f"عکس: {img['creator']} — {img['licence']}، از ویکی‌مدیا کامنز ({img['source_page']})"
     return f"Photo: {img['creator']}, {img['licence']}, via [Wikimedia Commons]({img['source_page']})"
+
+
+def suitable(img: dict[str, Any], query: str) -> bool:
+    """Does the file's own record say it shows the subject as a scene fit for an
+    article's lead photo? Word matching can't tell a ship from a phone app used
+    aboard it ('Indoor navigation and wayfinding … on MSC Bellissima', 6 Oct).
+    Fail-open when the model is unavailable: a reviewer still sees every photo."""
+    try:
+        import llm
+        out, _ = llm.complete_json(
+            "You vet stock photos for a travel article using only their catalogue record.",
+            f"Subject wanted: {query}\nPhoto title: {img.get('title', '')}\nPhoto description: "
+            f"{img.get('description', '')}\n\nDoes this record say the photo shows the subject itself as a "
+            f"scene (the ship, place or landmark — exterior, panorama or a public space), NOT a device, "
+            f"screen, sign, document, person portrait, food close-up or construction detail? "
+            f"Return JSON {{\"ok\": true|false}}.",
+            {"type": "object", "additionalProperties": False,
+             "properties": {"ok": {"type": "boolean"}}, "required": ["ok"]},
+            max_tokens=40, purpose="image vet")
+        return bool(out.get("ok", True))
+    except Exception:  # noqa: BLE001
+        return True
 
 
 def describe(img: dict[str, Any], language: str) -> str:

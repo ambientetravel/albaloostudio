@@ -4014,10 +4014,21 @@ ok("a file naming the ship in its TITLE beats one that only mentions it in the d
 ok("a photo already used in this run is never reused for a second article",
    _img.pick([_bel, _msc], query="MSC", exclude={_bel["imageinfo"][0]["descriptionurl"]})["title"].startswith("MSC Euribia"))
 _calls = iter([{"alt": "کشتی گرandیوزا در روتردام"}, {"alt": "کشتی گراندیوزا در روتردام"}])
-_saved_fp = _img._fetch_pages
+_saved_fp, _saved_su = _img._fetch_pages, _img.suitable
+_img.suitable = lambda img, q: True
 _img._fetch_pages = lambda q, width=1600: [_app] if q == "MSC Bellissima cruise ship" else [_bel]
 _fi = _img.find_image("MSC Bellissima cruise ship")
-_img._fetch_pages = _saved_fp
+_app2 = _pg("File:Indoor navigation and wayfinding by Favendo on MSC Bellissima.jpg", "CC BY-SA 4.0", "T", idx=1)
+_img._fetch_pages = lambda q, width=1600: [_app2, _bel]
+_img.suitable = lambda img, q: "navigation" not in img["title"].lower()
+_fv = _img.find_image("MSC Bellissima")
+_img._fetch_pages, _img.suitable = _saved_fp, _saved_su
+ok("a candidate the vetting step rejects (phone app aboard the ship) is passed over for the ship itself",
+   _fv and _fv["title"] == "MSC Bellissima in Southampton")
+_llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("down"))
+_open = _img.suitable(_bel_pick := _img.pick([_bel], query="MSC"), "MSC Bellissima")
+_llm.complete_json = _saved_cj
+ok("vetting fails open when the model is down (the reviewer still sees every photo)", _open is True)
 ok("a title match from a shorter retry beats a description-only match from the full query",
    _fi and _fi["title"].startswith("MSC Bellissima"))
 _llm.complete_json = lambda *a, **k: (next(_calls), {})
