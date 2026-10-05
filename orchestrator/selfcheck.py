@@ -3925,5 +3925,15 @@ ok("markdown links become real Notion links", len(_lk) == 3 and _lk[1]["text"].g
 ok("'<br>- item' lists inside a paragraph become bullets",
    [b["type"] for b in _nrs._para_blocks("Intro:<br>- one<br>- two")] == ["paragraph", "bulleted_list_item", "bulleted_list_item"])
 
+_b44row = {"kind": "base44", "pid": "cruisebaz.com/x", "site": "cruisebaz.com", "url": "https://cruisebaz.com/x",
+           "gate": "PASS", "title": "t", "written": "2026-10-05", "words": 10}
+_bp = _nrs.row_properties(_b44row)
+ok("a base44 draft row points at its future live URL, not a GitHub diff", "Read it" not in _bp and _bp["Live page"]["url"] == "https://cruisebaz.com/x")
+ok("cruisebaz and ambientetravel are reviewed on the board under their own house-rules profiles",
+   _nrs.BASE44_SITES["cruisebaz.com"][1] == "boutimar_v1" and _nrs.BASE44_SITES["ambientetravel.com"][1] == "orient_v1")
+_saved_b44 = os.environ.pop("BASE44_ACCESS_TOKEN", None)
+ok("without a base44 token the sync simply has no base44 rows (never crashes)", _nrs.base44_drafts() == [])
+if _saved_b44 is not None: os.environ["BASE44_ACCESS_TOKEN"] = _saved_b44
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

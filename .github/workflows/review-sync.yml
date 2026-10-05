@@ -41,6 +41,8 @@ jobs:
           NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
           # merge/comment/close on the site repos: the writer's PR token covers all four
           GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+          # cruisebaz.com + ambientetravel.com drafts are base44 Article records
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply }}" != "true" ]; then
             python3 tools/notion_review_sync.py | tee -a "$GITHUB_STEP_SUMMARY"

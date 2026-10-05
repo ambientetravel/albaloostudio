@@ -107,12 +107,15 @@ def row_properties(r: dict) -> dict:
         "Article": {"title": [{"text": {"content": r["title"][:200]}}]},
         "Site": {"select": {"name": r["site"]}},
         "Status": {"select": {"name": "To review"}},
-        "Read it": {"url": r["url"]},
         "House rules": {"select": {"name": r["gate"]}},
         "Language": {"select": {"name": "Farsi" if _FA.search(r["title"]) else "English"}},
         "Pipeline ID": {"rich_text": [{"text": {"content": r["pid"]}}]},
         "Written": {"date": {"start": r["written"]}},
     }
+    if r.get("kind") == "base44":
+        p["Live page"] = {"url": r["url"]}      # the text is in the page; the URL goes live on Approve
+    else:
+        p["Read it"] = {"url": r["url"]}
     if r.get("live"):
         p["Live page"] = {"url": r["live"]}
     if r.get("words"):
@@ -152,6 +155,70 @@ def open_article_prs() -> list[dict]:
                         "title": re.sub(r"^(Agent 2 draft|دریانامه draft):\s*", "", p["title"]).strip(),
                         "written": p["created_at"][:10], "live": "", "words": None})
     return out
+
+
+# ── base44 sites: drafts live as Article records, not pull requests ─────────
+# cruisebaz.com and ambientetravel.com publish through base44: the writer stores a
+# draft Article record; flipping status to "published" is the go-live (no app
+# Publish). Until 5 Oct those drafts never reached this board — Alireza published
+# them by hand in base44's Data tab. Pipeline ID = "<domain><slug>".
+BASE44_SITES = {"cruisebaz.com": ("69a20a26965079a660bdda58", "boutimar_v1"),
+                "ambientetravel.com": ("69a62d9872bf72a85738b6f8", "orient_v1")}
+B44 = "https://app.base44.com/api/apps"
+
+
+def b44(method: str, path: str, body: dict | None = None):
+    return _curl(method, B44 + path,
+                 [f"Authorization: Bearer {os.environ.get('BASE44_ACCESS_TOKEN', '')}"], body)
+
+
+def _b44_items(d) -> list[dict]:
+    return d if isinstance(d, list) else (d.get("items") or d.get("records") or []) if isinstance(d, dict) else []
+
+
+def base44_drafts() -> list[dict]:
+    if not os.environ.get("BASE44_ACCESS_TOKEN"):
+        return []
+    import compliance  # noqa: PLC0415 — orchestrator/ is on sys.path via pr_review
+    out = []
+    for domain, (app, profile) in BASE44_SITES.items():
+        code, d = b44("GET", f"/{app}/entities/Article/v2/list?q=" +
+                      __import__("urllib.parse").parse.quote(json.dumps({"status": "draft"})))
+        if code != 200:
+            if code != 404:  # 404 = this app has no Article entity yet
+                print(f"  ! base44 {domain}: {code}")
+            continue
+        for a in _b44_items(d):
+            body = str(a.get("body_markdown") or "")
+            text = "\n".join([a.get("title", ""), a.get("meta_description", ""), body] +
+                             [f"{x.get('q', '')} {x.get('a', '')}" for x in a.get("faq") or []])
+            blocks, warns = [], []
+            for v in compliance.check(text, profile):
+                row = {"rule": v.rule, "excerpt": v.excerpt, "fix": v.message}
+                (blocks if v.severity == compliance.BLOCK else warns).append(row)
+            verdict = "BLOCK" if blocks else ("WARN" if warns else "PASS")
+            slug = a.get("slug", "")
+            out.append({"pid": f"{domain}{slug}", "kind": "base44", "app": app, "record": a.get("id"),
+                        "site": domain, "url": f"https://{domain}{slug}", "gate": verdict,
+                        "review": {"blocks": blocks, "warns": warns},
+                        "title": a.get("title", slug), "md": body, "faq": a.get("faq") or [],
+                        "summary": a.get("meta_description", ""),
+                        "written": str(a.get("generated_at") or a.get("created_date") or "")[:10] or
+                        datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                        "live": "", "words": len(body.split())})
+    return out
+
+
+def base44_record(pid: str) -> tuple[str, dict] | None:
+    """(app, record) for a base44 Pipeline ID, or None if it is not one / not found."""
+    for domain, (app, _p) in BASE44_SITES.items():
+        if pid.startswith(domain + "/"):
+            slug = pid[len(domain):]
+            code, d = b44("GET", f"/{app}/entities/Article/v2/list?q=" +
+                          __import__("urllib.parse").parse.quote(json.dumps({"slug": slug})) + "&limit=1")
+            items = _b44_items(d) if code == 200 else []
+            return (app, items[0]) if items else None
+    return None
 
 
 def pr_state(pid: str) -> tuple[str, dict]:
@@ -306,8 +373,13 @@ def page_has_text(page_id: str) -> bool:
 
 
 def write_text(page_id: str, r: dict) -> int:
-    blocks = review_blocks(r.get("review") or {}) + [_blk("heading_3", f"{TEXT_MARK} — {r['pid']}")] \
-        + article_blocks(r["repo"], r["num"], r["sha"])
+    if r.get("kind") == "base44":
+        body = [_blk("heading_1", r.get("title", ""))] + ([_blk("quote", r["summary"])] if r.get("summary") else []) \
+            + md_blocks(r.get("md", "")) + ([_blk("heading_2", "FAQ")] if r.get("faq") else []) \
+            + [b for x in r.get("faq") or [] for b in (_blk("heading_3", x.get("q", "")), _blk("paragraph", x.get("a", "")))]
+    else:
+        body = article_blocks(r["repo"], r["num"], r["sha"])
+    blocks = review_blocks(r.get("review") or {}) + [_blk("heading_3", f"{TEXT_MARK} — {r['pid']}")] + body
     for i in range(0, len(blocks), 90):
         code, d = notion("PATCH", f"/blocks/{page_id}/children", {"children": blocks[i:i + 90]})
         if code != 200:
@@ -319,7 +391,7 @@ def write_text(page_id: str, r: dict) -> int:
 def sync(apply: bool, db: str) -> list[str]:
     log: list[str] = []
     board = rows(db)
-    live_prs = {r["pid"]: r for r in open_article_prs()}
+    live_prs = {r["pid"]: r for r in open_article_prs() + base44_drafts()}
 
     # 1. new PRs → new rows, each with the draft's text inside
     for pid, r in live_prs.items():
@@ -330,7 +402,7 @@ def sync(apply: bool, db: str) -> list[str]:
                                                     "properties": row_properties(r)})
                 if code != 200:
                     log.append(f"  ! Notion {code}: {str(d)[:160]}")
-                elif r.get("sha"):
+                elif r.get("sha") or r.get("kind") == "base44":
                     try:
                         log.append(f"  text      {write_text(d['id'], r)} block(s)")
                     except RuntimeError as exc:
@@ -340,7 +412,7 @@ def sync(apply: bool, db: str) -> list[str]:
             if apply:
                 notion("PATCH", f"/pages/{board[pid]['page_id']}",
                        {"properties": {"House rules": {"select": {"name": r["gate"]}}}})
-        if pid in board and r.get("sha") and not page_has_text(board[pid]["page_id"]):
+        if pid in board and (r.get("sha") or r.get("kind") == "base44") and not page_has_text(board[pid]["page_id"]):
             log.append(f"add text    {pid}  (row had no article text)")
             if apply:
                 try:
@@ -348,8 +420,36 @@ def sync(apply: bool, db: str) -> list[str]:
                 except RuntimeError as exc:
                     log.append(f"  ! {exc}")
 
-    # 2. decisions on the board → GitHub
+    # 2. decisions on the board → GitHub (PRs) or base44 (Article status)
     for pid, row in board.items():
+        if any(pid.startswith(d + "/") for d in BASE44_SITES):
+            if not os.environ.get("BASE44_ACCESS_TOKEN"):
+                continue
+            found = base44_record(pid)
+            if not found:
+                continue
+            app, rec = found
+            live_status = str(rec.get("status", "")).lower()
+            if live_status == "published" and row["status"] != "Published":
+                log.append(f"published   {pid}  (published in base44)")
+                if apply:
+                    set_status(row["page_id"], "Published")
+                continue
+            if row["status"] == "Approved" and live_status == "draft":
+                gate = live_prs.get(pid, {}).get("gate", "WARN")
+                if gate == "BLOCK":
+                    log.append(f"HOLD        {pid}  approved but house rules say BLOCK — not published")
+                    if apply:
+                        set_status(row["page_id"], "Needs edits")
+                    continue
+                log.append(f"publish     {pid}  (base44 status → published)")
+                if apply:
+                    code, d = b44("PUT", f"/{app}/entities/Article/{rec['id']}", {"status": "published"})
+                    if code == 200:
+                        set_status(row["page_id"], "Published")
+                    else:
+                        log.append(f"  ! base44 {code}: {str(d)[:140]}")
+            continue
         repo, p = pr_state(pid)
         if not p:
             continue
