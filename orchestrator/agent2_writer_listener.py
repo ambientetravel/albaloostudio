@@ -1977,6 +1977,36 @@ def _cms_dict(site: SiteBlock) -> dict[str, Any]:
 BASE44_API = "https://app.base44.com/api"
 
 
+def _serves_image(url: str) -> bool:
+    try:
+        r = requests.get(url, timeout=20, stream=True, headers={"User-Agent": config.USER_AGENT})
+        ok = r.status_code == 200 and r.headers.get("content-type", "").startswith("image/")
+        r.close()
+        return ok
+    except requests.RequestException:
+        return False
+
+
+def base44_public_image_url(upload: dict, app_id: str) -> str | None:
+    """A URL that really serves the uploaded image, or None.
+
+    Never trust the returned host blindly: the docs' example storage.base44.com
+    does not resolve (NXDOMAIN, 3 Oct 2026), so writing it would give every
+    article a broken hero. Try the returned url, then the supabase public object
+    path that cruisebaz's own assets are served from, built from file_uri
+    ("mp/public/<app_id>/<file>")."""
+    cands = [upload.get("url") or ""]
+    fname = str(upload.get("file_uri") or upload.get("url") or "").rstrip("/").rsplit("/", 1)[-1]
+    if fname:
+        cands.append(f"https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/{app_id}/{fname}")
+    for u in cands:
+        if u.startswith("https://") and _serves_image(u):
+            return u
+    log.warning("base44 upload returned no servable image URL (tried %s) — article goes without a photo",
+                ", ".join(c[:70] for c in cands if c))
+    return None
+
+
 def base44_entity_url(app_id: str, entity: str) -> str:
     """Collection URL for an entity's records: POST here creates, {url}/{id} updates."""
     return f"{BASE44_API}/apps/{app_id}/entities/{entity}"
@@ -2041,7 +2071,7 @@ def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) ->
                                                img["bytes"], "image/jpeg" if img["ext"] == ".jpg" else "image/png")},
                                data={"visibility": "public"}, timeout=config.WEBHOOK_TIMEOUT_S)
             up.raise_for_status()
-            hosted = (up.json() or {}).get("url")
+            hosted = base44_public_image_url((up.json() or {}), app_id)
             if hosted:
                 record["image_url"] = hosted
                 record["image_credit"] = _images.credit_line(img, brief.brief.language)

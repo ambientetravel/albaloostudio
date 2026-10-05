@@ -3961,5 +3961,14 @@ ok("a photo must NAME the place: a Tibet camp is rejected for a Kyrgyzstan yurt 
 ok("generic scene words never satisfy the place check on their own",
    _img.place_words("Mount Damavand ski resort") == {"damavand"} and _img.pick([_tib], query="nomad camp travel") is not None)
 
+_saved_si = a2._serves_image
+a2._serves_image = lambda u: "supabase.co" in u            # storage.base44.com: NXDOMAIN
+_u = a2.base44_public_image_url({"url": "https://storage.base44.com/APP/abc_x.jpg", "file_uri": "mp/public/APP/abc_x.jpg"}, "APP")
+a2._serves_image = lambda u: False
+_none = a2.base44_public_image_url({"url": "https://storage.base44.com/APP/abc_x.jpg"}, "APP")
+a2._serves_image = _saved_si
+ok("a base44 photo link is only saved if it really serves an image (dead storage.base44.com host → supabase path, else no photo)",
+   _u == "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/APP/abc_x.jpg" and _none is None)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
