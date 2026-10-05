@@ -204,6 +204,11 @@ def credit_line(img: dict[str, Any], language: str) -> str:
     return f"Photo: {img['creator']}, {img['licence']}, via [Wikimedia Commons]({img['source_page']})"
 
 
+# How the vetting step went this process — a check that silently fails open looks
+# exactly like one that approves everything, so runs print these counts.
+VET = {"ok": 0, "rejected": 0, "error": 0}
+
+
 def suitable(img: dict[str, Any], query: str, context: str = "") -> bool:
     """Does the file's own record say it shows the subject as a scene fit for an
     article's lead photo? Word matching can't tell a ship from a phone app used
@@ -223,8 +228,12 @@ def suitable(img: dict[str, Any], query: str, context: str = "") -> bool:
             {"type": "object", "additionalProperties": False,
              "properties": {"ok": {"type": "boolean"}}, "required": ["ok"]},
             max_tokens=40, purpose="image vet")
-        return bool(out.get("ok", True))
-    except Exception:  # noqa: BLE001
+        verdict = bool(out.get("ok", True))
+        VET["ok" if verdict else "rejected"] += 1
+        return verdict
+    except Exception as exc:  # noqa: BLE001
+        VET["error"] += 1
+        log.warning("image vet failed open for %r: %s: %s", img.get("title"), type(exc).__name__, str(exc)[:160])
         return True
 
 

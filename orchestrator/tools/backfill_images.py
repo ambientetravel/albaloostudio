@@ -259,6 +259,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--only", action="append", help="repo name filter, e.g. cruise24-ir")
     a = ap.parse_args(argv)
     print("\n".join(run(a.apply, a.only)))
+    print(f"vetting: {images.VET['ok']} passed, {images.VET['rejected']} rejected, {images.VET['error']} errors (fail-open)")
     return 0
 
 
