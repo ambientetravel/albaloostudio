@@ -45,6 +45,7 @@ SITES = [
      "img_dir": "public/img/journal", "prefix": "/img/journal", "inline": False, "lang": "en"},
     {"repo": "ambientetravel/boutimarfarsi", "kind": "json", "path": "data/articles.json",
      "img_dir": "img/daryanameh", "lang": "fa"},
+    {"repo": "ambientetravel/cruise24-ir", "kind": "bundle", "dir": "content/blog", "lang": "fa"},
 ]
 
 
@@ -85,7 +86,7 @@ def set_fm(text: str, key: str, value: str) -> str:
     return f"---\n{block}\n---\n" + text[m.end():]
 
 
-def query_for(title: str, summary: str = "") -> str:
+def query_for(title: str, summary: str = "", lang: str = "en") -> tuple[str, str]:
     """A precise English Commons search phrase that NAMES the place (Kyrgyzstan
     yurt camp, Mount Damavand). The title alone searched badly (5 Oct dry run)."""
     try:
@@ -96,14 +97,15 @@ def query_for(title: str, summary: str = "") -> str:
             f"the specific named place, landmark, venue or ship plus what to see (e.g. 'Mount Damavand "
             f"summit', 'Kyrgyzstan yurt camp Song-Kol', 'Ait Benhaddou kasbah Morocco'). It MUST contain a "
             f"proper place name. If the article is about an event or business topic with no photographable "
-            f"place, return the city or venue it happens in (e.g. 'Tehran International Exhibition Center')\"}}.",
+            f"place, return the city or venue it happens in (e.g. 'Tehran International Exhibition Center')\", "
+            f"\"alt\": \"one short sentence in {'Farsi' if lang == 'fa' else 'English'} describing that scene\"}}.",
             {"type": "object", "additionalProperties": False,
-             "properties": {"q": {"type": "string"}}, "required": ["q"]},
-            max_tokens=120, purpose="image query")
-        return str(out.get("q", "")).strip()
+             "properties": {"q": {"type": "string"}, "alt": {"type": "string"}}, "required": ["q", "alt"]},
+            max_tokens=200, purpose="image query")
+        return str(out.get("q", "")).strip(), str(out.get("alt", "")).strip()
     except Exception as exc:  # noqa: BLE001
         print(f"  ! image query failed for {title[:50]!r}: {type(exc).__name__}: {str(exc)[:120]}")
-        return ""
+        return "", ""
 
 
 def plan(site: dict) -> list[dict]:
@@ -120,6 +122,21 @@ def plan(site: dict) -> list[dict]:
             todo.append({"file": f"{site['dir']}/{f['name']}", "slug": f["name"][:-3],
                          "title": fm_value(text, "title"), "text": text, "sha": sha,
                          "summary": fm_value(text, "summary") or fm_value(text, "description")})
+    elif site["kind"] == "bundle":
+        r = gh("GET", f"/repos/{site['repo']}/contents/{site['dir']}")
+        r.raise_for_status()
+        for d in r.json():
+            if d["type"] != "dir":
+                continue
+            try:
+                text, sha = raw(site["repo"], f"{site['dir']}/{d['name']}/manifest.json")
+            except requests.HTTPError:
+                continue
+            man = json.loads(text)
+            if man.get("hero_image"):
+                continue
+            todo.append({"dir": f"{site['dir']}/{d['name']}", "slug": d["name"], "title": man.get("title", ""),
+                         "summary": man.get("meta_description", ""), "manifest": man, "sha": sha})
     else:
         text, sha = raw(site["repo"], site["path"])
         store = json.loads(text)
@@ -130,14 +147,17 @@ def plan(site: dict) -> list[dict]:
     return todo
 
 
-def run(apply: bool) -> list[str]:
+def run(apply: bool, only: list[str] | None = None) -> list[str]:
     log = []
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d")
     for site in SITES:
+        if only and not any(o in site["repo"] for o in only):
+            continue
         todo = plan(site)
         found = []
         for t in todo:
-            q = query_for(t["title"], t.get("summary", ""))
+            q, alt = query_for(t["title"], t.get("summary", ""), site["lang"])
+            t["alt"] = alt
             img = images.find_image(q) if q else None
             log.append(f"{site['repo'].split('/')[1]:14} {t['slug'][:48]:48} q={q!r} → "
                        + (f"{img['title'][:40]} ({img['creator'][:25]}, {img['licence']})" if img else "no acceptable photo"))
@@ -159,12 +179,23 @@ def run(apply: bool) -> list[str]:
             data = images.fetch(img)
             if not data:
                 continue
-            path = f"{site['img_dir']}/{t['slug']}{img['ext']}"
+            path = (f"{t['dir']}/hero{img['ext']}" if site["kind"] == "bundle"
+                    else f"{site['img_dir']}/{t['slug']}{img['ext']}")
             gh("PUT", f"/repos/{repo}/contents/{path}", json={
                 "message": f"photo for {t['slug']} ({img['licence']}, {img['creator']})"[:72],
                 "content": base64.b64encode(data).decode(), "branch": branch}).raise_for_status()
             credit = images.credit_line(img, site["lang"])
-            if site["kind"] == "md":
+            if site["kind"] == "bundle":
+                man, msha = raw(repo, f"{t['dir']}/manifest.json", branch)
+                man = json.loads(man)
+                man["hero_image"] = {"src": f"hero{img['ext']}", "credit": img["creator"], "licence": img["licence"],
+                                     "source_page": img["source_page"],
+                                     "alt": images.clean(t.get("alt") or t["title"], 160)}
+                gh("PUT", f"/repos/{repo}/contents/{t['dir']}/manifest.json", json={
+                    "message": f"hero photo: {t['slug']}"[:72], "branch": branch, "sha": msha,
+                    "content": base64.b64encode(json.dumps(man, ensure_ascii=False, indent=2).encode("utf-8")).decode()
+                }).raise_for_status()
+            elif site["kind"] == "md":
                 public = f"{site['prefix']}/{t['slug']}{img['ext']}"
                 text, sha = raw(repo, t["file"], branch)
                 new = set_fm(text, site["field"], public)
@@ -199,8 +230,9 @@ def run(apply: bool) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--only", action="append", help="repo name filter, e.g. cruise24-ir")
     a = ap.parse_args(argv)
-    print("\n".join(run(a.apply)))
+    print("\n".join(run(a.apply, a.only)))
     return 0
 
 

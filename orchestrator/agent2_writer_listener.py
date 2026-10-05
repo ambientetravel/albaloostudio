@@ -406,7 +406,7 @@ def _system_instruction(brief: ContentBrief) -> str:
             '{"title": str, "meta_description": str, "body_markdown": str, '
             '"key_points": [str], "quotable_lines": [str], "faq": '
             '[{"q": str, "a": str}], "internal_link_suggestions": '
-            '[{"path": str, "anchor": str}], "valid_until": str, "image_query": str}',
+            '[{"path": str, "anchor": str}], "valid_until": str, "image_query": str, "image_alt": str}',
             "body_markdown uses ## and ### only — no H1, the CMS renders that from "
             "the title.",
             "meta_description is a Google snippet: one plain sentence, about 155 "
@@ -422,6 +422,8 @@ def _system_instruction(brief: ContentBrief) -> str:
             "resort', 'Galataport Istanbul', 'Mount Damavand'). Concrete and "
             "photographable — never abstract ('luxury travel'). Empty string if "
             "nothing concrete fits.",
+            "image_alt: one short sentence IN THE ARTICLE'S LANGUAGE describing that "
+            "scene (alt text for the photo). Empty string when image_query is empty.",
         ]
     )
 
@@ -1050,10 +1052,13 @@ _DRAFT_SCHEMA = {
         # ("Dizin ski resort", "Galataport Istanbul cruise terminal"). Feeds the
         # Commons photo search (images.py). "" when nothing concrete fits.
         "image_query": {"type": "string"},
+        # One short sentence in the ARTICLE'S language describing that scene, for
+        # the photo's alt text (screen readers, image search). "" with no query.
+        "image_alt": {"type": "string"},
     },
     "required": ["title", "meta_description", "body_markdown", "key_points",
                  "quotable_lines", "faq", "internal_link_suggestions", "valid_until",
-                 "image_query"],
+                 "image_query", "image_alt"],
 }
 
 
@@ -1283,7 +1288,7 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
     # adapters that can commit a file next to the article; sites opt in with
     # cms.images in sites.yml. Fail-soft: no match → no photo, never a guess.
     _ic = _cms_dict(site).get("images") or {}
-    if (adapter in ("astro_pr", "boutimar_ir_static") and _ic.get("dir")) or \
+    if (adapter in ("astro_pr", "boutimar_ir_static", "bundle_pr") and _ic.get("dir")) or \
             (adapter == "base44_entity" and _ic.get("base44_upload")):
         try:
             import images as _images
@@ -2214,11 +2219,20 @@ def _push_bundle_pr(brief: ContentBrief, draft: dict[str, Any], url: str) -> dic
     subdir = f"content/blog/{record_id}"
     title = draft.get("title", brief.brief.working_title)
 
-    files = {
-        f"{subdir}/index.md": draft.get("body_markdown", ""),
-        f"{subdir}/manifest.json":
-            json.dumps(_bundle_manifest(site, brief, draft), ensure_ascii=False, indent=2),
-    }
+    manifest = _bundle_manifest(site, brief, draft)
+    img = draft.get("_image")
+    files: dict[str, Any] = {f"{subdir}/index.md": draft.get("body_markdown", "")}
+    if img:
+        # cruise24.ir's c2c765d contract: content/blog/<dir>/hero.<ext> + manifest.hero_image.
+        # Its build re-checks licence, credit, size and source_page and drops the photo
+        # (never the post) if any fails.
+        import images as _images
+        files[f"{subdir}/hero{img['ext']}"] = img["bytes"]
+        manifest["hero_image"] = {
+            "src": f"hero{img['ext']}", "credit": img["creator"], "licence": img["licence"],
+            "source_page": img["source_page"],
+            "alt": _images.clean(draft.get("image_alt") or title, 160)}
+    files[f"{subdir}/manifest.json"] = json.dumps(manifest, ensure_ascii=False, indent=2)
 
     if not repo or not token:
         # Not configured yet — stage the same bundle to disk so nothing is lost.
@@ -2246,7 +2260,8 @@ def _push_bundle_pr(brief: ContentBrief, draft: dict[str, Any], url: str) -> dic
         # API needs its blob sha to update — fetch it and retry rather than 422.
         for path, content in files.items():
             payload = {"message": f"Agent 2: draft — {title}"[:72],
-                       "content": _b64.b64encode(content.encode("utf-8")).decode("ascii"),
+                       "content": _b64.b64encode(content if isinstance(content, bytes)
+                                                 else content.encode("utf-8")).decode("ascii"),
                        "branch": branch}
             rp = requests.put(f"{api}/repos/{repo}/contents/{path}", headers=hdr,
                               json=payload, timeout=config.WEBHOOK_TIMEOUT_S)

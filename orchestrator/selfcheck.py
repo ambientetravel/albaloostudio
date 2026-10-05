@@ -3970,5 +3970,9 @@ a2._serves_image = _saved_si
 ok("a base44 photo link is only saved if it really serves an image (dead storage.base44.com host → supabase path, else no photo)",
    _u == "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/APP/abc_x.jpg" and _none is None)
 
+_evil = _img.pick([_pg("File:Dizin slope.jpg", "CC BY-SA 2.0", "ninara</script><script>alert(1)</script> [x](javascript:1)")], query="Dizin")
+ok("a booby-trapped Commons credit can't inject markup into our pages",
+   _evil is not None and not any(c in _evil["creator"] for c in '<>[]"`'))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

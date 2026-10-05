@@ -48,6 +48,18 @@ def _strip_html(s: str) -> str:
     return " ".join(s.replace("&amp;", "&").replace("&#039;", "'").split())
 
 
+# Credit text comes from Commons metadata, which ANYONE can edit. It ends up in
+# Markdown (raw HTML allowed), JSON data files and JSON-LD on our sites, so a
+# credit like '</script><script>…' would be an outside-reachable injection
+# (raised by the cruise24.ir session, 6 Oct). Keep letters, digits, spaces and
+# plain punctuation only — no angle brackets, quotes-as-markup, Markdown syntax.
+_SAFE = re.compile(r"[^\w\s.,'’()\-/:&+@]", re.UNICODE)
+
+
+def clean(text: str, limit: int = 200) -> str:
+    return " ".join(_SAFE.sub(" ", str(text or "")).split())[:limit]
+
+
 def licence_ok(name: str) -> bool:
     n = (name or "").strip()
     return bool(n) and bool(_OK_LICENCE.search(n)) and not re.search(r"\b(nc|nd)\b", n, re.I)
@@ -93,9 +105,9 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "") ->
         return {
             "download_url": url,
             "source_page": ii.get("descriptionurl", ""),
-            "title": re.sub(r"^File:|\.\w+$", "", title),
-            "creator": artist[:120] or "unknown (public domain)",
-            "licence": lic,
+            "title": clean(re.sub(r"^File:|\.\w+$", "", title), 120),
+            "creator": clean(artist, 120) or "unknown (public domain)",
+            "licence": clean(lic, 40),
             "licence_url": _strip_html((meta.get("LicenseUrl") or {}).get("value", "")),
             "ext": ".png" if ii.get("mime") == "image/png" else ".jpg",
         }
