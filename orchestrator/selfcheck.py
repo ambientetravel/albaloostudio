@@ -4070,5 +4070,16 @@ _img.suitable(_pd, "Tehran International Exhibition Center", "Iran-Germany trade
 _llm.complete_json = _saved_cj
 ok("the vetting step sees the article title, not only the search phrase", "Iran-Germany trade delegation" in _vet["p"])
 
+_seq = iter([RuntimeError("empty"), {"ok": False}])
+def _flaky(*a, **k):
+    v = next(_seq)
+    if isinstance(v, Exception):
+        raise v
+    return v, {}
+_llm.complete_json = _flaky
+_rv = _img.suitable(_pd, "Tehran International Exhibition Center", "trade delegation")
+_llm.complete_json = _saved_cj
+ok("an empty vet answer is retried — the retry's rejection stands instead of failing open", _rv is False)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

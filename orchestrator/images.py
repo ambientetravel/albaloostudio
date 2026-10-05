@@ -210,6 +210,16 @@ VET = {"ok": 0, "rejected": 0, "error": 0}
 
 
 def suitable(img: dict[str, Any], query: str, context: str = "") -> bool:
+    """One retry: 4 of 11 vets came back empty at a 40-token cap and failed open
+    (6 Oct) — the Tehran book-fair photo passed for a trade-delegation piece that way."""
+    for attempt in (1, 2):
+        verdict = _vet(img, query, context, final=attempt == 2)
+        if verdict is not None:
+            return verdict
+    return True
+
+
+def _vet(img: dict[str, Any], query: str, context: str, final: bool) -> bool | None:
     """Does the file's own record say it shows the subject as a scene fit for an
     article's lead photo? Word matching can't tell a ship from a phone app used
     aboard it ('Indoor navigation and wayfinding … on MSC Bellissima', 6 Oct).
@@ -227,11 +237,13 @@ def suitable(img: dict[str, Any], query: str, context: str = "") -> bool:
             f"Return JSON {{\"ok\": true|false}}.",
             {"type": "object", "additionalProperties": False,
              "properties": {"ok": {"type": "boolean"}}, "required": ["ok"]},
-            max_tokens=40, purpose="image vet")
+            max_tokens=400, purpose="image vet")
         verdict = bool(out.get("ok", True))
         VET["ok" if verdict else "rejected"] += 1
         return verdict
     except Exception as exc:  # noqa: BLE001
+        if not final:
+            return None
         VET["error"] += 1
         log.warning("image vet failed open for %r: %s: %s", img.get("title"), type(exc).__name__, str(exc)[:160])
         return True
@@ -291,7 +303,7 @@ def _alt(facts: str, fa: bool) -> str:
             f"Return JSON {{\"alt\": \"...\"}}.",
             {"type": "object", "additionalProperties": False,
              "properties": {"alt": {"type": "string"}}, "required": ["alt"]},
-            max_tokens=150, purpose="image alt")
+            max_tokens=400, purpose="image alt")
         return clean(unescape(out.get("alt", "")), 160)
     except Exception:  # noqa: BLE001 — caller falls back to the tidied file title
         return ""
