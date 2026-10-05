@@ -348,6 +348,20 @@ def article_blocks(repo: str, num: int, sha: str) -> list[dict]:
                       "Accept: application/vnd.github.raw"])
         return d if isinstance(d, str) else (json.dumps(d, ensure_ascii=False) if c == 200 else "")
     out: list[dict] = []
+    # Photos added by this PR: show them in the page so the reviewer judges the
+    # picture, not a file name. Commons' Special:FilePath serves the file
+    # directly (the repo copies are private and Notion cannot fetch them).
+    shown: set[str] = set()
+    for f in files:
+        for m in re.finditer(r"commons\.wikimedia\.org/wiki/(File:[^\s)\]\\\"']+)", f.get("patch") or ""):
+            fname = m.group(1)
+            if fname in shown:
+                continue
+            shown.add(fname)
+            out.append({"object": "block", "type": "image", "image": {
+                "type": "external",
+                "external": {"url": f"https://commons.wikimedia.org/wiki/Special:FilePath/{fname[5:]}?width=900"},
+                "caption": _rt(f"{name_of(f)} — {fname[5:]}")}})
     for f in files:
         name = f.get("filename", "")
         if name.endswith("articles.json"):
@@ -363,6 +377,10 @@ def article_blocks(repo: str, num: int, sha: str) -> list[dict]:
         elif name.endswith(".md") and "content/" in name:
             out += md_blocks(raw(name, sha))
     return out
+
+
+def name_of(f: dict) -> str:
+    return f.get("filename", "").rsplit("/", 1)[-1].rsplit(".", 1)[0]
 
 
 def page_has_text(page_id: str) -> bool:
