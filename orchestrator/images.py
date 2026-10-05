@@ -255,7 +255,7 @@ def _fa_alt(facts: str) -> str:
             f"background context, not as a list of what is in the frame: leave out anything it calls "
             f"occasional, nearby, sometimes or in general (a Galataport street photo was described as "
             f"showing cruise ships because the description said ships 'occasionally' call). Do not add "
-            f"people, actions, rooms or places that are not stated. Write every name fully in Persian script. Return JSON {{\"alt\": \"...\"}}.",
+            f"people, actions, rooms or places that are not stated. Write every name fully in Persian script, and use the half-space (ZWNJ, U+200C) where standard Farsi needs it — «کشتی‌های», «کشتی‌سازی», «کارخانه‌های». Return JSON {{\"alt\": \"...\"}}.",
             {"type": "object", "additionalProperties": False,
              "properties": {"alt": {"type": "string"}}, "required": ["alt"]},
             max_tokens=150, purpose="image alt")

@@ -4043,6 +4043,7 @@ ok("ZWNJ survives cleaning (Farsi words are not split) while markup is still str
    _img.clean("ویکی\u200cمدیا <b>") == "ویکی\u200cمدیا b")
 ok("the alt prompt treats the Commons description as context, not frame content",
    "background context" in _seen["p"] and "occasional" in _seen["p"])
+ok("the alt prompt asks for the Farsi half-space in plurals and compounds", "U+200C" in _seen["p"])
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
