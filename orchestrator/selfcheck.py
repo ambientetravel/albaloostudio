@@ -4039,5 +4039,10 @@ _llm.complete_json = _saved_cj
 ok("a Farsi alt with Latin glued inside a word is retried, then falls back to the file title",
    _fix == "کشتی گراندیوزا در روتردام" and _fix2 == "QM2 Hamburg")
 
+ok("ZWNJ survives cleaning (Farsi words are not split) while markup is still stripped",
+   _img.clean("ویکی\u200cمدیا <b>") == "ویکی\u200cمدیا b")
+ok("the alt prompt treats the Commons description as context, not frame content",
+   "background context" in _seen["p"] and "occasional" in _seen["p"])
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

@@ -53,7 +53,8 @@ def _strip_html(s: str) -> str:
 # credit like '</script><script>…' would be an outside-reachable injection
 # (raised by the cruise24.ir session, 6 Oct). Keep letters, digits, spaces and
 # plain punctuation only — no angle brackets, quotes-as-markup, Markdown syntax.
-_SAFE = re.compile(r"[^\w\s.,'’()\-/:&+@]", re.UNICODE)
+# U+200C (ZWNJ) is kept: Farsi needs it inside words («ویکی‌مدیا») and it is not markup.
+_SAFE = re.compile(r"[^\w\s.,'’()\-/:&+@\u200c]", re.UNICODE)
 
 
 def clean(text: str, limit: int = 200) -> str:
@@ -250,8 +251,11 @@ def _fa_alt(facts: str) -> str:
         out, _ = llm.complete_json(
             "You translate image captions faithfully. Never add anything not stated.",
             f"Image file title and description (from Wikimedia Commons): {facts}\n\nWrite ONE short Farsi "
-            f"sentence saying only what this states the photo shows. Do not add people, actions, rooms or "
-            f"places that are not stated. Write every name fully in Persian script. Return JSON {{\"alt\": \"...\"}}.",
+            f"sentence naming the photo's main subject as the TITLE states it. Treat the description as "
+            f"background context, not as a list of what is in the frame: leave out anything it calls "
+            f"occasional, nearby, sometimes or in general (a Galataport street photo was described as "
+            f"showing cruise ships because the description said ships 'occasionally' call). Do not add "
+            f"people, actions, rooms or places that are not stated. Write every name fully in Persian script. Return JSON {{\"alt\": \"...\"}}.",
             {"type": "object", "additionalProperties": False,
              "properties": {"alt": {"type": "string"}}, "required": ["alt"]},
             max_tokens=150, purpose="image alt")
