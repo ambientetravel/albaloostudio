@@ -4006,5 +4006,21 @@ _pl_c24, _pl_bc = a2._prefer_line("cruise24.ir"), a2._prefer_line("boutimar.com"
 ok("cruise24.ir's writer is told to name a line it sells (MSC/Explora/…); boutimar.com gets no cruise-line hint",
    "MSC" in _pl_c24 and "Never another cruise line" in _pl_c24 and _pl_bc == "")
 
+_app = _pg("File:Indoor navigation and wayfinding by Fave.jpg", "CC BY-SA 4.0", "T", idx=1)
+_app["imageinfo"][0]["extmetadata"]["ImageDescription"] = {"value": "Wayfinding app aboard MSC Bellissima"}
+_bel = _pg("File:MSC Bellissima in Southampton.jpg", "CC BY-SA 4.0", "K", idx=2)
+ok("a file naming the ship in its TITLE beats one that only mentions it in the description (phone-app photo, 6 Oct)",
+   _img.pick([_app, _bel], query="MSC Bellissima cruise ship")["title"].startswith("MSC Bellissima"))
+ok("a photo already used in this run is never reused for a second article",
+   _img.pick([_bel, _msc], query="MSC", exclude={_bel["imageinfo"][0]["descriptionurl"]})["title"].startswith("MSC Euribia"))
+_calls = iter([{"alt": "کشتی گرandیوزا در روتردام"}, {"alt": "کشتی گراندیوزا در روتردام"}])
+_llm.complete_json = lambda *a, **k: (next(_calls), {})
+_fix = _img.describe(_pd, "fa")
+_llm.complete_json = lambda *a, **k: ({"alt": "کشتی گرandیوزا"}, {})
+_fix2 = _img.describe(_pd, "fa")
+_llm.complete_json = _saved_cj
+ok("a Farsi alt with Latin glued inside a word is retried, then falls back to the file title",
+   _fix == "کشتی گراندیوزا در روتردام" and _fix2 == "QM2 Hamburg")
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
