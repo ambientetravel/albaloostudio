@@ -3935,5 +3935,24 @@ _saved_b44 = os.environ.pop("BASE44_ACCESS_TOKEN", None)
 ok("without a base44 token the sync simply has no base44 rows (never crashes)", _nrs.base44_drafts() == [])
 if _saved_b44 is not None: os.environ["BASE44_ACCESS_TOKEN"] = _saved_b44
 
+print("\n=== Article photos: real licence, real credit ===")
+import images as _img
+def _pg(title, lic, artist, width=2000, mime="image/jpeg", idx=1):
+    return {"index": idx, "title": title, "imageinfo": [{"mime": mime, "width": width, "thumburl": "https://u/x.jpg",
+            "descriptionurl": "https://commons.wikimedia.org/wiki/" + title,
+            "extmetadata": {"LicenseShortName": {"value": lic}, "Artist": {"value": artist}}}]}
+ok("NC/ND and unlicensed files are never used; CC BY-SA / CC0 are",
+   not _img.licence_ok("CC BY-NC-SA 4.0") and not _img.licence_ok("CC BY-ND 2.0") and not _img.licence_ok("")
+   and _img.licence_ok("CC BY-SA 2.0") and _img.licence_ok("CC0") and _img.licence_ok("Public domain"))
+_p = _img.pick([_pg("File:Iran map.jpg", "CC0", "x", idx=1), _pg("File:Small.jpg", "CC0", "x", width=600, idx=2),
+                _pg("File:NoArtist.jpg", "CC BY 2.0", "", idx=3), _pg("File:NC.jpg", "CC BY-NC 2.0", "A", idx=4),
+                _pg("File:Dizin slope.jpg", "CC BY-SA 2.0", '<a href="x">ninara</a>', idx=5)])
+ok("maps, small files, uncredited and NC files are skipped; the credit is the file's own Artist field",
+   _p and _p["title"] == "Dizin slope" and _p["creator"] == "ninara" and _p["licence"] == "CC BY-SA 2.0")
+_cl = _img.credit_line(_p, "en")
+ok("the caption names creator, licence and Commons — nothing composed", "ninara" in _cl and "CC BY-SA 2.0" in _cl and "Wikimedia Commons" in _cl)
+ok("Farsi articles get a Farsi caption", _img.credit_line(_p, "fa-IR").startswith("عکس: ninara"))
+ok("the writer must return an image_query (schema + prompt)", "image_query" in a2._DRAFT_SCHEMA["required"])
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

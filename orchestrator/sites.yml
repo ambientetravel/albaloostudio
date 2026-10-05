@@ -138,6 +138,11 @@ sites:
       adapter: astro_pr
       content_root: "src/content/"
       publish_mode: draft
+      images:                    # real Commons photo + its own credit (orchestrator/images.py)
+        dir: public/img/journal
+        url_prefix: /img/journal
+        field: image              # journal template uses it for og:image
+        inline: true              # [slug].astro renders no hero, so the photo leads the body
       # Agent 2 writes into an Astro content collection, and Astro will refuse
       # to build a file that does not match the collection's zod schema. So the
       # schema lives here rather than in the adapter: boutimar.com's `journal`
@@ -210,6 +215,8 @@ sites:
       adapter: boutimar_ir_static
       content_root: "/"
       publish_mode: draft
+      images:
+        dir: img/daryanameh       # article.image is a repo-relative path, like img/dest/greece.jpg
       # boutimar.ir stores articles as DATA, not files. `article.html` is a
       # shell that renders one entry of data/articles.json via ?a=<slug>, so
       # publishing adds an object to an array — no new HTML file, no rebuild,
@@ -324,6 +331,11 @@ sites:
       adapter: astro_pr          # opens a PR against the exploreorient repo
       content_root: "src/content/"
       publish_mode: draft
+      images:
+        dir: public/img/journal
+        url_prefix: /img/journal
+        field: heroImage          # resolveHeroImage() prefers it over the destination hero
+        inline: false
       # Read from exploreorient's own src/content.config.ts. Its five
       # collections are destinations, tours, blog, corridors and venues; only
       # `blog` takes an article. The other four carry structural data — mapId,

@@ -406,7 +406,7 @@ def _system_instruction(brief: ContentBrief) -> str:
             '{"title": str, "meta_description": str, "body_markdown": str, '
             '"key_points": [str], "quotable_lines": [str], "faq": '
             '[{"q": str, "a": str}], "internal_link_suggestions": '
-            '[{"path": str, "anchor": str}], "valid_until": str}',
+            '[{"path": str, "anchor": str}], "valid_until": str, "image_query": str}',
             "body_markdown uses ## and ### only — no H1, the CMS renders that from "
             "the title.",
             "meta_description is a Google snippet: one plain sentence, about 155 "
@@ -417,6 +417,11 @@ def _system_instruction(brief: ContentBrief) -> str:
             "keeps a share from advertising an event after it has happened. For "
             "evergreen content — a guide, a destination, anything without a fixed end "
             "date — return an empty string. When unsure, empty string.",
+            "image_query: 2–6 ENGLISH words naming the real place, landmark, ship or "
+            "scene a photo of which would illustrate this article (e.g. 'Dizin ski "
+            "resort', 'Galataport Istanbul', 'Mount Damavand'). Concrete and "
+            "photographable — never abstract ('luxury travel'). Empty string if "
+            "nothing concrete fits.",
         ]
     )
 
@@ -1041,9 +1046,14 @@ _DRAFT_SCHEMA = {
         # dated event, "" for evergreen (almost everything). Feeds the Broadcaster's
         # past-event guard. Required by Anthropic strict mode, so "" is the default.
         "valid_until": {"type": "string"},
+        # English, 2-6 words: the real, photographable scene the article is about
+        # ("Dizin ski resort", "Galataport Istanbul cruise terminal"). Feeds the
+        # Commons photo search (images.py). "" when nothing concrete fits.
+        "image_query": {"type": "string"},
     },
     "required": ["title", "meta_description", "body_markdown", "key_points",
-                 "quotable_lines", "faq", "internal_link_suggestions", "valid_until"],
+                 "quotable_lines", "faq", "internal_link_suggestions", "valid_until",
+                 "image_query"],
 }
 
 
@@ -1268,6 +1278,17 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
         slug = brief.brief.target_url_path.strip("/").split("/")[-1] or "page"
         brief.brief.target_url_path = tpl.format(slug=slug)
     url = f"{site.base_url}{brief.brief.target_url_path}"
+
+    # A real, freely licensed photo with its real credit (images.py). Only for
+    # adapters that can commit a file next to the article; sites opt in with
+    # cms.images in sites.yml. Fail-soft: no match → no photo, never a guess.
+    if adapter in ("astro_pr", "boutimar_ir_static") and (_cms_dict(site).get("images") or {}).get("dir"):
+        try:
+            import images as _images
+            draft["_image"] = _images.attach(draft)
+        except Exception as exc:  # noqa: BLE001 — a photo is never worth a lost article
+            log.warning("%s — image sourcing skipped: %s", site.domain, exc)
+            draft["_image"] = None
 
     # No public credit footer. The Albaloo architecture credit belongs in the
     # envelope and manifest (internal provenance), NOT appended to the article
@@ -1579,8 +1600,21 @@ def _push_astro_pr(
             "pubDate": rfc3339(),
             "lang": brief.brief.language,
         }
+    body_md = draft.get("body_markdown", "")
+    img, img_repo_path = draft.get("_image"), None
+    img_cfg = cms.get("images") or {}
+    if img and img_cfg.get("dir"):
+        import images as _images
+        img_repo_path = f"{img_cfg['dir'].rstrip('/')}/{slug}{img['ext']}"
+        public = f"{img_cfg.get('url_prefix', '/').rstrip('/')}/{slug}{img['ext']}"
+        front[img_cfg.get("field", "image")] = public
+        credit = _images.credit_line(img, brief.brief.language)
+        if img_cfg.get("inline"):
+            body_md = f"![{img['title']}]({public})\n*{credit}*\n\n{body_md}"
+        else:
+            body_md = f"{body_md}\n\n*{credit}*"
     fm = "\n".join(f'{k}: {json.dumps(v, ensure_ascii=False)}' for k, v in front.items())
-    file_body = f"---\n{fm}\n---\n\n{draft.get('body_markdown', '')}"
+    file_body = f"---\n{fm}\n---\n\n{body_md}"
 
     if not repo or not token:
         out = _Path(config.optional_env("BUNDLE_DIR", str(config.BASE_DIR / "bundles")))
@@ -1621,6 +1655,14 @@ def _push_astro_pr(
             rb.raise_for_status()
 
         import base64 as _b64
+        if img_repo_path:
+            ri = requests.put(
+                f"{api}/repos/{repo}/contents/{img_repo_path}", headers=hdr,
+                json={"message": f"Agent 2: photo for {slug} ({img['licence']}, {img['creator']})"[:72],
+                      "content": _b64.b64encode(img["bytes"]).decode("ascii"), "branch": branch},
+                timeout=config.WEBHOOK_TIMEOUT_S)
+            if ri.status_code not in (200, 201, 422):
+                ri.raise_for_status()
         r = requests.put(
             f"{api}/repos/{repo}/contents/{rel_path}", headers=hdr,
             json={"message": f"Agent 2: draft \u2014 {front['title']}"[:72],
@@ -1803,7 +1845,7 @@ def _push_boutimar_ir_article(
         "kind": kind,
         "title": draft.get("title") or brief.brief.working_title,
         "dek": (draft.get("meta_description") or "").strip(),
-        "image": "",                              # reviewer supplies — see docstring
+        "image": "",                              # set below when a photo was sourced
         "read": max(1, round(words / 200)),
         "body": body,
         # Deliberately empty. _howToAdd wants cruise ids from the feed or real
@@ -1811,6 +1853,15 @@ def _push_boutimar_ir_article(
         # nowhere, which is worse than a card with no links.
         "related": [],
     }
+
+    img = draft.get("_image")
+    img_cfg = (cms.get("images") if isinstance(cms, dict) else None) or {}
+    img_repo_path = None
+    if img and img_cfg.get("dir"):
+        import images as _images
+        img_repo_path = f"{img_cfg['dir'].rstrip('/')}/{slug}{img['ext']}"
+        article["image"] = img_repo_path            # boutimar.ir paths are relative: img/…
+        article["body"] = list(article["body"]) + [{"p": _images.credit_line(img, "fa")}]
 
     api = "https://api.github.com"
     hdr = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
@@ -1833,6 +1884,14 @@ def _push_boutimar_ir_article(
             rb.raise_for_status()
 
         import base64 as _b64
+        if img_repo_path:
+            ri = requests.put(
+                f"{api}/repos/{repo}/contents/{img_repo_path}", headers=hdr,
+                json={"message": f"photo for {slug} ({img['licence']}, {img['creator']})"[:72],
+                      "content": _b64.b64encode(img["bytes"]).decode("ascii"), "branch": branch},
+                timeout=config.WEBHOOK_TIMEOUT_S)
+            if ri.status_code not in (200, 201, 422):
+                ri.raise_for_status()
         rf = requests.get(f"{api}/repos/{repo}/contents/{path}", headers=hdr,
                           params={"ref": branch}, timeout=config.WEBHOOK_TIMEOUT_S)
         rf.raise_for_status()

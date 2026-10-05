@@ -1,0 +1,128 @@
+"""
+A real, freely licensed photo for every article — with its real credit.
+
+Until 5 Oct 2026 the writer sourced no imagery: boutimar.com and cruise24.ir
+articles showed only the site's default share image, boutimar.ir's `image` was
+left "" for a reviewer to fill, and Explore Orient fell back to a stock hero.
+
+Source: Wikimedia Commons. No key, and every file carries machine-readable
+licence metadata (LicenseShortName, Artist), so the credit printed under the
+photo is COPIED from the file's own record — never composed. CLAUDE.md: "Never
+invent … a photo credit. If the data is not there, say it is not there." A
+file without an artist (unless public domain) or under a licence that forbids
+commercial use or modification is skipped, and an article with no acceptable
+match simply has no photo.
+
+The file is downloaded and committed into the site's own repo (self-hosted):
+upload.wikimedia.org is not reliably reachable from Iran, and a hotlink can
+change or vanish under the page.
+"""
+from __future__ import annotations
+
+import logging
+import re
+from typing import Any
+
+import requests
+
+import config
+
+log = logging.getLogger("images")
+
+COMMONS = "https://commons.wikimedia.org/w/api.php"
+# Licences that allow commercial reuse AND modification (resizing). NC/ND excluded.
+_OK_LICENCE = re.compile(r"^(cc0|public domain|pd[\s-]|pd$|cc[ -]by(-sa)?[ -]\d(\.\d)?)", re.I)
+_BAD_TITLE = re.compile(r"\b(map|logo|flag|coat of arms|diagram|chart|icon|seal|emblem|plan)\b", re.I)
+MAX_BYTES = 4_000_000
+
+
+def _strip_html(s: str) -> str:
+    s = re.sub(r"<[^>]+>", " ", str(s or ""))
+    return " ".join(s.replace("&amp;", "&").replace("&#039;", "'").split())
+
+
+def licence_ok(name: str) -> bool:
+    n = (name or "").strip()
+    return bool(n) and bool(_OK_LICENCE.search(n)) and not re.search(r"\b(nc|nd)\b", n, re.I)
+
+
+def pick(pages: list[dict[str, Any]], min_width: int = 1200) -> dict[str, Any] | None:
+    """First search result that is a real photo, big enough, freely licensed, credited."""
+    for p in sorted(pages, key=lambda x: x.get("index", 99)):
+        ii = (p.get("imageinfo") or [{}])[0]
+        meta = ii.get("extmetadata") or {}
+        title = str(p.get("title", ""))
+        if ii.get("mime") not in ("image/jpeg", "image/png") or _BAD_TITLE.search(title):
+            continue
+        if int(ii.get("width") or 0) < min_width:
+            continue
+        lic = _strip_html((meta.get("LicenseShortName") or {}).get("value", ""))
+        if not licence_ok(lic):
+            continue
+        artist = _strip_html((meta.get("Artist") or {}).get("value", ""))
+        public_domain = lic.lower().startswith(("public domain", "pd", "cc0"))
+        if not artist and not public_domain:
+            continue                        # no named creator → no honest credit
+        url = ii.get("thumburl") or ii.get("url")
+        if not url:
+            continue
+        return {
+            "download_url": url,
+            "source_page": ii.get("descriptionurl", ""),
+            "title": re.sub(r"^File:|\.\w+$", "", title),
+            "creator": artist[:120] or "unknown (public domain)",
+            "licence": lic,
+            "licence_url": _strip_html((meta.get("LicenseUrl") or {}).get("value", "")),
+            "ext": ".png" if ii.get("mime") == "image/png" else ".jpg",
+        }
+    return None
+
+
+def find_image(query: str, *, width: int = 1600) -> dict[str, Any] | None:
+    """Search Commons for `query` (English, concrete scene). None on no match or error."""
+    q = (query or "").strip()
+    if len(q) < 3:
+        return None
+    try:
+        r = requests.get(COMMONS, timeout=20, headers={"User-Agent": config.USER_AGENT}, params={
+            "action": "query", "format": "json", "generator": "search", "gsrnamespace": 6,
+            "gsrsearch": f"{q} filetype:bitmap", "gsrlimit": 15, "prop": "imageinfo",
+            "iiprop": "url|size|mime|extmetadata", "iiurlwidth": width})
+        r.raise_for_status()
+        pages = list(((r.json().get("query") or {}).get("pages") or {}).values())
+    except (requests.RequestException, ValueError) as exc:
+        log.warning("image search failed for %r: %s", q, exc)
+        return None
+    return pick(pages)
+
+
+def fetch(img: dict[str, Any]) -> bytes | None:
+    try:
+        r = requests.get(img["download_url"], timeout=30, headers={"User-Agent": config.USER_AGENT})
+        r.raise_for_status()
+        data = r.content
+    except requests.RequestException as exc:
+        log.warning("image download failed: %s", exc)
+        return None
+    if not data or len(data) > MAX_BYTES:
+        return None
+    return data
+
+
+def credit_line(img: dict[str, Any], language: str) -> str:
+    """The caption, built only from the file's own metadata."""
+    if str(language).lower().startswith("fa"):
+        return f"عکس: {img['creator']} — {img['licence']}، از ویکی‌مدیا کامنز ({img['source_page']})"
+    return f"Photo: {img['creator']}, {img['licence']}, via [Wikimedia Commons]({img['source_page']})"
+
+
+def attach(draft: dict[str, Any]) -> dict[str, Any] | None:
+    """Find and download a photo for this draft. Fail-soft: None means no photo."""
+    img = find_image(str(draft.get("image_query") or ""))
+    if not img:
+        return None
+    data = fetch(img)
+    if not data:
+        return None
+    img["bytes"] = data
+    return img
