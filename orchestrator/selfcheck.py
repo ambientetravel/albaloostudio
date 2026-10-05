@@ -4045,5 +4045,13 @@ ok("the alt prompt treats the Commons description as context, not frame content"
    "background context" in _seen["p"] and "occasional" in _seen["p"])
 ok("the alt prompt asks for the Farsi half-space in plurals and compounds", "U+200C" in _seen["p"])
 
+import tools.backfill_images as _bf
+_saved_plan = _bf.plan
+_ran = []
+_bf.plan = lambda site: (_ran.append(site["repo"]), [])[1]
+_bf.run(False, ["boutimar"])
+_bf.plan = _saved_plan
+ok("backfill --only boutimar runs boutimar alone, not boutimarfarsi", _ran == ["ambientetravel/boutimar"])
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

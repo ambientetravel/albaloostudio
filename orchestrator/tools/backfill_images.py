@@ -169,7 +169,8 @@ def run(apply: bool, only: list[str] | None = None) -> list[str]:
     # (a PUT onto an existing file without its sha fails).
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
     for site in SITES:
-        if only and not any(o in site["repo"] for o in only):
+        # Exact repo name: a substring test made `--only boutimar` also run boutimarfarsi.
+        if only and site["repo"].split("/")[1] not in only:
             continue
         todo = plan(site)
         cfg = image_cfg(site["repo"])
