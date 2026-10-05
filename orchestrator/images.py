@@ -84,7 +84,8 @@ def _avoided(hay: str, avoid) -> bool:
 
 
 def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "",
-         avoid: list[str] | tuple = (), exclude: set | frozenset = frozenset()) -> dict[str, Any] | None:
+         avoid: list[str] | tuple = (), exclude: set | frozenset = frozenset(),
+         title_only: bool = False) -> dict[str, Any] | None:
     """First search result that is a real photo, big enough, freely licensed, credited,
     and that actually names the place the query is about.
 
@@ -95,7 +96,7 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "",
     words = place_words(query)
     ordered = sorted(pages, key=lambda x: x.get("index", 99))
     titled = [p for p in ordered if not words or any(w in str(p.get("title", "")).lower() for w in words)]
-    for p in titled + [p for p in ordered if p not in titled]:
+    for p in titled + ([] if title_only else [p for p in ordered if p not in titled]):
         if ((p.get("imageinfo") or [{}])[0].get("descriptionurl") or "") in exclude:
             continue
         ii = (p.get("imageinfo") or [{}])[0]
@@ -152,15 +153,19 @@ def find_image(query: str, *, width: int = 1600, avoid: list[str] | tuple = (),
         return None
     words = q.split()
     tries = [q] + [" ".join(words[:n]) for n in (3, 2) if len(words) > n]
-    for attempt in tries:
-        got = _search(attempt, q, width, avoid, exclude)
-        if got:
-            return got
+    # A title match from ANY attempt beats a description-only match from the first:
+    # 'MSC Bellissima cruise ship' matched a phone-app photo by description before
+    # 'MSC Bellissima' found the ship itself (6 Oct dry run).
+    pages = {a: _fetch_pages(a, width) for a in tries}
+    for title_only in (True, False):
+        for attempt in tries:
+            got = pick(pages[attempt], query=q, avoid=avoid, exclude=exclude, title_only=title_only)
+            if got:
+                return got
     return None
 
 
-def _search(q_search: str, q_place: str, width: int, avoid=(), exclude=frozenset()) -> dict[str, Any] | None:
-    q = q_search
+def _fetch_pages(q: str, width: int = 1600) -> list[dict[str, Any]]:
     try:
         r = requests.get(COMMONS, timeout=20, headers={"User-Agent": config.USER_AGENT}, params={
             "action": "query", "format": "json", "generator": "search", "gsrnamespace": 6,
@@ -170,8 +175,8 @@ def _search(q_search: str, q_place: str, width: int, avoid=(), exclude=frozenset
         pages = list(((r.json().get("query") or {}).get("pages") or {}).values())
     except (requests.RequestException, ValueError) as exc:
         log.warning("image search failed for %r: %s", q, exc)
-        return None
-    return pick(pages, query=q_place, avoid=avoid, exclude=exclude)
+        return []
+    return pages
 
 
 def fetch(img: dict[str, Any]) -> bytes | None:
@@ -202,7 +207,7 @@ def describe(img: dict[str, Any], language: str) -> str:
     facts = f"{img.get('title', '')}. {img.get('description', '')}".strip(" .")
     if not str(language).lower().startswith("fa"):
         return clean(img.get("title", ""), 160)
-    for _ in range(2):
+    for _ in range(3):
         alt = _fa_alt(facts)
         if alt and not _MIXED.search(alt):
             return alt

@@ -4014,6 +4014,12 @@ ok("a file naming the ship in its TITLE beats one that only mentions it in the d
 ok("a photo already used in this run is never reused for a second article",
    _img.pick([_bel, _msc], query="MSC", exclude={_bel["imageinfo"][0]["descriptionurl"]})["title"].startswith("MSC Euribia"))
 _calls = iter([{"alt": "کشتی گرandیوزا در روتردام"}, {"alt": "کشتی گراندیوزا در روتردام"}])
+_saved_fp = _img._fetch_pages
+_img._fetch_pages = lambda q, width=1600: [_app] if q == "MSC Bellissima cruise ship" else [_bel]
+_fi = _img.find_image("MSC Bellissima cruise ship")
+_img._fetch_pages = _saved_fp
+ok("a title match from a shorter retry beats a description-only match from the full query",
+   _fi and _fi["title"].startswith("MSC Bellissima"))
 _llm.complete_json = lambda *a, **k: (next(_calls), {})
 _fix = _img.describe(_pd, "fa")
 _llm.complete_json = lambda *a, **k: ({"alt": "کشتی گرandیوزا"}, {})
