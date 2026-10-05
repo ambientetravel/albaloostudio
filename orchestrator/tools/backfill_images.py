@@ -177,7 +177,8 @@ def run(apply: bool, only: list[str] | None = None) -> list[str]:
         found, used = [], set()
         for t in todo:
             q, _ = query_for(t["title"], t.get("summary", ""), site["lang"], cfg.get("prefer") or ())
-            img = images.find_image(q, avoid=cfg.get("avoid") or (), exclude=used) if q else None
+            img = images.find_image(q, avoid=cfg.get("avoid") or (), exclude=used,
+                                    context=t["title"]) if q else None
             if img:
                 used.add(img["source_page"])
                 # Alt from the CHOSEN file's own record, not from the article's wish.

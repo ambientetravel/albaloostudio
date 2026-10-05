@@ -148,7 +148,7 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "",
 
 
 def find_image(query: str, *, width: int = 1600, avoid: list[str] | tuple = (),
-               exclude: set | frozenset = frozenset()) -> dict[str, Any] | None:
+               exclude: set | frozenset = frozenset(), context: str = "") -> dict[str, Any] | None:
     """Search Commons for `query`; if nothing acceptable, retry with the first 3, then
     2 words ('Galataport Istanbul cruise terminal' → 'Galataport Istanbul'). The place
     check always uses the FULL query's place words, so a shorter search can't drift."""
@@ -164,7 +164,7 @@ def find_image(query: str, *, width: int = 1600, avoid: list[str] | tuple = (),
     for title_only in (True, False):
         for attempt in tries:
             got = pick(pages[attempt], query=q, avoid=avoid, exclude=exclude, title_only=title_only,
-                       check=suitable)
+                       check=lambda f, sub: suitable(f, sub, context))
             if got:
                 return got
     return None
@@ -204,7 +204,7 @@ def credit_line(img: dict[str, Any], language: str) -> str:
     return f"Photo: {img['creator']}, {img['licence']}, via [Wikimedia Commons]({img['source_page']})"
 
 
-def suitable(img: dict[str, Any], query: str) -> bool:
+def suitable(img: dict[str, Any], query: str, context: str = "") -> bool:
     """Does the file's own record say it shows the subject as a scene fit for an
     article's lead photo? Word matching can't tell a ship from a phone app used
     aboard it ('Indoor navigation and wayfinding … on MSC Bellissima', 6 Oct).
@@ -213,7 +213,7 @@ def suitable(img: dict[str, Any], query: str) -> bool:
         import llm
         out, _ = llm.complete_json(
             "You vet stock photos for a travel article using only their catalogue record.",
-            f"Subject wanted: {query}\nPhoto title: {img.get('title', '')}\nPhoto description: "
+            f"Subject wanted: {query}\n" + (f"Article it illustrates: {context}\n" if context else "") + f"Photo title: {img.get('title', '')}\nPhoto description: "
             f"{img.get('description', '')}\n\nDoes this record say the photo shows the subject itself as a "
             f"scene (the ship, place or landmark — exterior, panorama or a public space), NOT a device, "
             f"screen, sign, document, person portrait, food close-up or construction detail? If the record "
@@ -249,6 +249,12 @@ _NOISE = re.compile(r"\(\d{6,}\)|\b\d{4}-\d{2}-\d{2}(?:[ _]\d{2}){0,3}\b|\b(?:pa
                     re.I)
 
 
+def unescape(text: str) -> str:
+    """Models sometimes return a literal '\\u00ef' inside a JSON string; clean() then
+    dropped the backslash and printed 'A u00eft Benhaddou' (6 Oct dry run)."""
+    return re.sub(r"\\u([0-9a-fA-F]{4})", lambda m: chr(int(m.group(1), 16)), str(text or ""))
+
+
 def tidy_title(title: str) -> str:
     """A Commons file title without camera numbers, Flickr ids, dates and edit notes."""
     t = _NOISE.sub(" ", str(title or ""))
@@ -277,14 +283,15 @@ def _alt(facts: str, fa: bool) -> str:
             {"type": "object", "additionalProperties": False,
              "properties": {"alt": {"type": "string"}}, "required": ["alt"]},
             max_tokens=150, purpose="image alt")
-        return clean(out.get("alt", ""), 160)
+        return clean(unescape(out.get("alt", "")), 160)
     except Exception:  # noqa: BLE001 — caller falls back to the tidied file title
         return ""
 
 
 def attach(draft: dict[str, Any], *, language: str = "en", avoid: list[str] | tuple = ()) -> dict[str, Any] | None:
     """Find and download a photo for this draft. Fail-soft: None means no photo."""
-    img = find_image(str(draft.get("image_query") or ""), avoid=avoid)
+    img = find_image(str(draft.get("image_query") or ""), avoid=avoid,
+                     context=str(draft.get("title") or ""))
     if not img:
         return None
     data = fetch(img)

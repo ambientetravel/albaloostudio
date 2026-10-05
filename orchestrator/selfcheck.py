@@ -4024,12 +4024,12 @@ ok("a photo already used in this run is never reused for a second article",
    _img.pick([_bel, _msc], query="MSC", exclude={_bel["imageinfo"][0]["descriptionurl"]})["title"].startswith("MSC Euribia"))
 _calls = iter([{"alt": "کشتی گرandیوزا در روتردام"}, {"alt": "کشتی گراندیوزا در روتردام"}])
 _saved_fp, _saved_su = _img._fetch_pages, _img.suitable
-_img.suitable = lambda img, q: True
+_img.suitable = lambda img, q, c="": True
 _img._fetch_pages = lambda q, width=1600: [_app] if q == "MSC Bellissima cruise ship" else [_bel]
 _fi = _img.find_image("MSC Bellissima cruise ship")
 _app2 = _pg("File:Indoor navigation and wayfinding by Favendo on MSC Bellissima.jpg", "CC BY-SA 4.0", "T", idx=1)
 _img._fetch_pages = lambda q, width=1600: [_app2, _bel]
-_img.suitable = lambda img, q: "navigation" not in img["title"].lower()
+_img.suitable = lambda img, q, c="": "navigation" not in img["title"].lower()
 _fv = _img.find_image("MSC Bellissima")
 _img._fetch_pages, _img.suitable = _saved_fp, _saved_su
 ok("a candidate the vetting step rejects (phone app aboard the ship) is passed over for the ship itself",
@@ -4061,6 +4061,14 @@ _bf.plan = lambda site: (_ran.append(site["repo"]), [])[1]
 _bf.run(False, ["boutimar"])
 _bf.plan = _saved_plan
 ok("backfill --only boutimar runs boutimar alone, not boutimarfarsi", _ran == ["ambientetravel/boutimar"])
+
+ok("a literal \\u00ef from the model becomes the letter, not 'u00ef'",
+   _img.clean(_img.unescape("The ksar of A\\u00eft Benhaddou"), 160) == "The ksar of Aït Benhaddou")
+_vet = {}
+_llm.complete_json = lambda system, prompt, *a, **k: (_vet.setdefault("p", prompt), ({"ok": True}, {}))[1]
+_img.suitable(_pd, "Tehran International Exhibition Center", "Iran-Germany trade delegation 2026")
+_llm.complete_json = _saved_cj
+ok("the vetting step sees the article title, not only the search phrase", "Iran-Germany trade delegation" in _vet["p"])
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
