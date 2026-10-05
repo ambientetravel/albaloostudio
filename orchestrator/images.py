@@ -216,7 +216,9 @@ def suitable(img: dict[str, Any], query: str) -> bool:
             f"Subject wanted: {query}\nPhoto title: {img.get('title', '')}\nPhoto description: "
             f"{img.get('description', '')}\n\nDoes this record say the photo shows the subject itself as a "
             f"scene (the ship, place or landmark — exterior, panorama or a public space), NOT a device, "
-            f"screen, sign, document, person portrait, food close-up or construction detail? "
+            f"screen, sign, document, person portrait, food close-up or construction detail? If the record "
+            f"names a specific event, fair or place OTHER than the subject wanted (a book fair for a trade "
+            f"delegation), answer false. "
             f"Return JSON {{\"ok\": true|false}}.",
             {"type": "object", "additionalProperties": False,
              "properties": {"ok": {"type": "boolean"}}, "required": ["ok"]},
@@ -230,37 +232,53 @@ def describe(img: dict[str, Any], language: str) -> str:
     """Alt text built ONLY from what the chosen file says it shows (its Commons
     title and description), in the article's language. Written from the article
     instead, it described the photo the article wanted — 'a balcony cabin with a
-    sea view' for a hull seen across Hamburg harbour (cruise24.ir PR #8)."""
+    sea view' for a hull seen across Hamburg harbour (cruise24.ir PR #8). English
+    used to be the raw file title ('Yazd - Old Town - panoramio', 'Book Fair2')."""
     facts = f"{img.get('title', '')}. {img.get('description', '')}".strip(" .")
-    if not str(language).lower().startswith("fa"):
-        return clean(img.get("title", ""), 160)
+    fa = str(language).lower().startswith("fa")
     for _ in range(3):
-        alt = _fa_alt(facts)
-        if alt and not _MIXED.search(alt):
+        alt = _alt(facts, fa)
+        if alt and not (fa and _MIXED.search(alt)):
             return alt
-    return clean(img.get("title", ""), 160)
+    return tidy_title(img.get("title", ""))
 
 
 # A Latin run glued to Persian letters inside one word ('گرandیوزا', 6 Oct dry run).
 _MIXED = re.compile(r"[\u0600-\u06FF][A-Za-z]|[A-Za-z][\u0600-\u06FF]")
+_NOISE = re.compile(r"\(\d{6,}\)|\b\d{4}-\d{2}-\d{2}(?:[ _]\d{2}){0,3}\b|\b(?:panoramio|modified|crop|IMG[ _]?\d+|DSC[ _]?\d+)\b",
+                    re.I)
 
 
-def _fa_alt(facts: str) -> str:
+def tidy_title(title: str) -> str:
+    """A Commons file title without camera numbers, Flickr ids, dates and edit notes."""
+    t = _NOISE.sub(" ", str(title or ""))
+    t = re.sub(r"(?<=[A-Za-z])\d$", "", t.strip())          # 'Book Fair2' → 'Book Fair'
+    return clean(re.sub(r"\s*[-–,]\s*$", "", " ".join(t.split())), 160)
+
+
+_ALT_RULES = ("naming the photo's main subject as the TITLE states it. Treat the description as "
+              "background context, not as a list of what is in the frame: leave out anything it calls "
+              "occasional, nearby, sometimes or in general (a Galataport street photo was described as "
+              "showing cruise ships because the description said ships 'occasionally' call). Leave out "
+              "camera numbers, file ids, upload dates and edit notes. Do not add people, actions, rooms "
+              "or places that are not stated.")
+
+
+def _alt(facts: str, fa: bool) -> str:
+    lang = ("Farsi sentence " + _ALT_RULES + " Write every name fully in Persian script, and use the "
+            "half-space (ZWNJ, U+200C) where standard Farsi needs it — «کشتی‌های», «کشتی‌سازی», «کارخانه‌های».") \
+        if fa else ("English sentence " + _ALT_RULES)
     try:
         import llm
         out, _ = llm.complete_json(
             "You translate image captions faithfully. Never add anything not stated.",
-            f"Image file title and description (from Wikimedia Commons): {facts}\n\nWrite ONE short Farsi "
-            f"sentence naming the photo's main subject as the TITLE states it. Treat the description as "
-            f"background context, not as a list of what is in the frame: leave out anything it calls "
-            f"occasional, nearby, sometimes or in general (a Galataport street photo was described as "
-            f"showing cruise ships because the description said ships 'occasionally' call). Do not add "
-            f"people, actions, rooms or places that are not stated. Write every name fully in Persian script, and use the half-space (ZWNJ, U+200C) where standard Farsi needs it — «کشتی‌های», «کشتی‌سازی», «کارخانه‌های». Return JSON {{\"alt\": \"...\"}}.",
+            f"Image file title and description (from Wikimedia Commons): {facts}\n\nWrite ONE short {lang} "
+            f"Return JSON {{\"alt\": \"...\"}}.",
             {"type": "object", "additionalProperties": False,
              "properties": {"alt": {"type": "string"}}, "required": ["alt"]},
             max_tokens=150, purpose="image alt")
         return clean(out.get("alt", ""), 160)
-    except Exception:  # noqa: BLE001 — caller falls back to the file's own title
+    except Exception:  # noqa: BLE001 — caller falls back to the tidied file title
         return ""
 
 

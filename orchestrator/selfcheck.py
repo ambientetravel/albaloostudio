@@ -3987,7 +3987,16 @@ _d["imageinfo"][0]["extmetadata"]["ImageDescription"] = {"value": "<p>Queen Mary
 _pd = _img.pick([_d], query="Hamburg")
 ok("the chosen file's own description is kept, cleaned, as the source for alt text",
    _pd["description"] == "Queen Mary 2 behind port cranes in Hamburg")
-ok("English alt is the file's own title — never the article's wished-for scene", _img.describe(_pd, "en") == "QM2 Hamburg")
+import llm as _llm
+_saved_cj = _llm.complete_json
+_llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("down"))
+ok("English alt falls back to the file's own title — never the article's wished-for scene", _img.describe(_pd, "en") == "QM2 Hamburg")
+_llm.complete_json = _saved_cj
+ok("a fallback title loses camera numbers, Flickr ids, dates and edit notes",
+   _img.tidy_title("Yazd - Old Town - panoramio") == "Yazd - Old Town"
+   and _img.tidy_title("29th Tehran International Book Fair2") == "29th Tehran International Book Fair"
+   and _img.tidy_title("Kyrgyzstan yurts at Song Kul (48221119097)") == "Kyrgyzstan yurts at Song Kul"
+   and _img.tidy_title("2010-04-25 04 02 37 Iran Tehran Exhibition") == "Iran Tehran Exhibition")
 import llm as _llm
 _saved_cj = _llm.complete_json
 _seen = {}
