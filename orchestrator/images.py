@@ -92,6 +92,11 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "") ->
             continue
         if not _relevant(title, meta, words):
             continue
+        # A travel page wants a current scene: skip archive photos (NARA 1970s
+        # terminals, 6 Oct) when the file states when it was taken.
+        taken = re.search(r"\b(1[89]\d\d|20\d\d)\b", _strip_html((meta.get("DateTimeOriginal") or {}).get("value", "")))
+        if taken and int(taken.group(1)) < 2000:
+            continue
         lic = _strip_html((meta.get("LicenseShortName") or {}).get("value", ""))
         if not licence_ok(lic):
             continue
@@ -115,10 +120,23 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "") ->
 
 
 def find_image(query: str, *, width: int = 1600) -> dict[str, Any] | None:
-    """Search Commons for `query` (English, concrete scene). None on no match or error."""
-    q = (query or "").strip()
+    """Search Commons for `query`; if nothing acceptable, retry with the first 3, then
+    2 words ('Galataport Istanbul cruise terminal' → 'Galataport Istanbul'). The place
+    check always uses the FULL query's place words, so a shorter search can't drift."""
+    q = " ".join((query or "").split())
     if len(q) < 3:
         return None
+    words = q.split()
+    tries = [q] + [" ".join(words[:n]) for n in (3, 2) if len(words) > n]
+    for attempt in tries:
+        got = _search(attempt, q, width)
+        if got:
+            return got
+    return None
+
+
+def _search(q_search: str, q_place: str, width: int) -> dict[str, Any] | None:
+    q = q_search
     try:
         r = requests.get(COMMONS, timeout=20, headers={"User-Agent": config.USER_AGENT}, params={
             "action": "query", "format": "json", "generator": "search", "gsrnamespace": 6,
@@ -129,7 +147,7 @@ def find_image(query: str, *, width: int = 1600) -> dict[str, Any] | None:
     except (requests.RequestException, ValueError) as exc:
         log.warning("image search failed for %r: %s", q, exc)
         return None
-    return pick(pages, query=q)
+    return pick(pages, query=q_place)
 
 
 def fetch(img: dict[str, Any]) -> bytes | None:
