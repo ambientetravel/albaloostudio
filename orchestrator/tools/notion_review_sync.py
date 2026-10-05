@@ -95,6 +95,7 @@ def rows(db: str) -> dict[str, dict]:
             if pid:
                 out[pid] = {"page_id": p["id"],
                             "status": ((pr.get("Status") or {}).get("select") or {}).get("name", ""),
+                            "gate": ((pr.get("House rules") or {}).get("select") or {}).get("name", ""),
                             "feedback": _txt(pr.get("Feedback", {}))}
         if not d.get("has_more"):
             return out
@@ -168,14 +169,37 @@ def pr_state(pid: str) -> tuple[str, dict]:
 TEXT_MARK = "Draft text"
 
 
+_MDLINK = re.compile(r"\[([^\]]+)\]\((https?://[^)\s]+)\)")
+
+
 def _rt(text: str) -> list[dict]:
+    """Rich text, with [label](url) turned into real links and every run kept
+    under Notion's 2,000-character limit."""
     text = str(text or "")
-    return [{"type": "text", "text": {"content": text[i:i + 1900]}}
-            for i in range(0, max(len(text), 1), 1900)] if text else []
+    out, pos = [], 0
+    for m in list(_MDLINK.finditer(text)) + [None]:
+        plain = text[pos:m.start()] if m else text[pos:]
+        out += [{"type": "text", "text": {"content": plain[i:i + 1900]}} for i in range(0, len(plain), 1900)]
+        if m:
+            out.append({"type": "text", "text": {"content": m.group(1)[:1900], "link": {"url": m.group(2)}}})
+            pos = m.end()
+    return out
 
 
 def _blk(kind: str, text: str) -> dict:
     return {"object": "block", "type": kind, kind: {"rich_text": _rt(text)}}
+
+
+def _para_blocks(text: str) -> list[dict]:
+    """A paragraph that carries '<br>- item' lists becomes a paragraph plus bullets."""
+    parts = [x.strip() for x in re.split(r"<br\s*/?>", str(text)) if x.strip()]
+    out = []
+    for x in parts:
+        if re.match(r"^[-•*]\s+", x):
+            out.append(_blk("bulleted_list_item", re.sub(r"^[-•*]\s+", "", x)))
+        else:
+            out.append(_blk("paragraph", x))
+    return out
 
 
 def md_blocks(md: str) -> list[dict]:
@@ -225,9 +249,9 @@ def json_blocks(item: dict) -> list[dict]:
                 head, _, rest = str(v).partition("\n")
                 out.append(_blk("heading_2", head))
                 if rest.strip():
-                    out.append(_blk("paragraph", rest.strip()))
+                    out += _para_blocks(rest.strip())
             else:
-                out.append(_blk("paragraph", str(v)))
+                out += _para_blocks(str(v))
     return out
 
 
@@ -311,7 +335,12 @@ def sync(apply: bool, db: str) -> list[str]:
                         log.append(f"  text      {write_text(d['id'], r)} block(s)")
                     except RuntimeError as exc:
                         log.append(f"  ! {exc}")
-        elif r.get("sha") and not page_has_text(board[pid]["page_id"]):
+        elif r.get("gate") and board[pid].get("gate") and r["gate"] != board[pid]["gate"]:
+            log.append(f"house rules {pid}  {board[pid]['gate']} → {r['gate']}")
+            if apply:
+                notion("PATCH", f"/pages/{board[pid]['page_id']}",
+                       {"properties": {"House rules": {"select": {"name": r["gate"]}}}})
+        if pid in board and r.get("sha") and not page_has_text(board[pid]["page_id"]):
             log.append(f"add text    {pid}  (row had no article text)")
             if apply:
                 try:

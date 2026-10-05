@@ -3920,5 +3920,10 @@ ok("a daryanameh page rendered from articles.json in the same PR is skipped (its
 ok("a hand-written daryanameh page WITHOUT its source JSON in the PR is still judged",
    not _prr.is_generated("daryanameh/x.html", {"daryanameh/x.html"}) and not _prr.is_generated("data/articles.json", {"data/articles.json"}))
 
+_lk = _nrs._rt("see [Explora](https://boutimar.ir/explora.html) now")
+ok("markdown links become real Notion links", len(_lk) == 3 and _lk[1]["text"].get("link", {}).get("url") == "https://boutimar.ir/explora.html")
+ok("'<br>- item' lists inside a paragraph become bullets",
+   [b["type"] for b in _nrs._para_blocks("Intro:<br>- one<br>- two")] == ["paragraph", "bulleted_list_item", "bulleted_list_item"])
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
