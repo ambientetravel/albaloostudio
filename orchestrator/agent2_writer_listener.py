@@ -335,6 +335,20 @@ def _ack(brief: ContentBrief, job: dict[str, Any]) -> dict[str, Any]:
 # ══════════════════════════════════════════════════════════════════════════════
 
 
+def _prefer_line(domain: str) -> str:
+    """A cruise site's photo should show a line it sells, not a competitor's ship
+    (cruise24.ir PR #8: Royal Caribbean ×2, Cunard, Holland America)."""
+    try:
+        site = config.load_sites(only=[domain], include_hold=True)[0]
+        prefer = (_cms_dict(site).get("images") or {}).get("prefer") or []
+    except Exception:  # noqa: BLE001 — a prompt hint is never worth a failed draft
+        return ""
+    if not prefer:
+        return ""
+    return ("For a cruise topic not about one specific ship or port, image_query must name a "
+            "ship of a line this site sells: " + ", ".join(prefer) + ". Never another cruise line's ship.")
+
+
 def _system_instruction(brief: ContentBrief) -> str:
     s, b = brief.site, brief.brief
     return "\n".join(
@@ -424,6 +438,7 @@ def _system_instruction(brief: ContentBrief) -> str:
             "nothing concrete fits.",
             "image_alt: one short sentence IN THE ARTICLE'S LANGUAGE describing that "
             "scene (alt text for the photo). Empty string when image_query is empty.",
+            _prefer_line(brief.site.domain),
         ]
     )
 
@@ -1292,7 +1307,8 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
             (adapter == "base44_entity" and _ic.get("base44_upload")):
         try:
             import images as _images
-            draft["_image"] = _images.attach(draft)
+            draft["_image"] = _images.attach(draft, language=brief.brief.language,
+                                             avoid=_ic.get("avoid") or ())
         except Exception as exc:  # noqa: BLE001 — a photo is never worth a lost article
             log.warning("%s — image sourcing skipped: %s", site.domain, exc)
             draft["_image"] = None
@@ -1617,7 +1633,7 @@ def _push_astro_pr(
         front[img_cfg.get("field", "image")] = public
         credit = _images.credit_line(img, brief.brief.language)
         if img_cfg.get("inline"):
-            body_md = f"![{img['title']}]({public})\n*{credit}*\n\n{body_md}"
+            body_md = f"![{img.get('alt') or img['title']}]({public})\n*{credit}*\n\n{body_md}"
         else:
             body_md = f"{body_md}\n\n*{credit}*"
     fm = "\n".join(f'{k}: {json.dumps(v, ensure_ascii=False)}' for k, v in front.items())
@@ -2231,7 +2247,7 @@ def _push_bundle_pr(brief: ContentBrief, draft: dict[str, Any], url: str) -> dic
         manifest["hero_image"] = {
             "src": f"hero{img['ext']}", "credit": img["creator"], "licence": img["licence"],
             "source_page": img["source_page"],
-            "alt": _images.clean(draft.get("image_alt") or title, 160)}
+            "alt": img.get("alt") or _images.clean(img["title"], 160)}
     files[f"{subdir}/manifest.json"] = json.dumps(manifest, ensure_ascii=False, indent=2)
 
     if not repo or not token:

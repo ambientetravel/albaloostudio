@@ -78,7 +78,13 @@ def _relevant(title: str, meta: dict, words: set[str]) -> bool:
     return any(w in hay for w in words)
 
 
-def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "") -> dict[str, Any] | None:
+def _avoided(hay: str, avoid) -> bool:
+    """Whole-word match, so 'Viking' rejects a Viking ship but 'AIDA' never rejects 'Aidan'."""
+    return any(re.search(rf"(?<!\w){re.escape(a.lower())}(?!\w)", hay) for a in avoid if a)
+
+
+def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "",
+         avoid: list[str] | tuple = ()) -> dict[str, Any] | None:
     """First search result that is a real photo, big enough, freely licensed, credited,
     and that actually names the place the query is about."""
     words = place_words(query)
@@ -91,6 +97,12 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "") ->
         if int(ii.get("width") or 0) < min_width:
             continue
         if not _relevant(title, meta, words):
+            continue
+        # Never another company's branded ship on a site that doesn't sell it
+        # (cruise24.ir PR #8: Royal Caribbean, Cunard, Holland America; boutimar.ir: Viking).
+        hay = " ".join([title] + [_strip_html((meta.get(k) or {}).get("value", ""))
+                                  for k in ("ImageDescription", "ObjectName", "Categories")]).lower()
+        if _avoided(hay, avoid):
             continue
         # A travel page wants a current scene: skip archive photos (NARA 1970s
         # terminals, 6 Oct) when the file states when it was taken.
@@ -115,11 +127,13 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "") ->
             "licence": clean(lic, 40),
             "licence_url": _strip_html((meta.get("LicenseUrl") or {}).get("value", "")),
             "ext": ".png" if ii.get("mime") == "image/png" else ".jpg",
+            # What the FILE says it shows — the only honest source for alt text.
+            "description": clean(_strip_html((meta.get("ImageDescription") or {}).get("value", "")), 400),
         }
     return None
 
 
-def find_image(query: str, *, width: int = 1600) -> dict[str, Any] | None:
+def find_image(query: str, *, width: int = 1600, avoid: list[str] | tuple = ()) -> dict[str, Any] | None:
     """Search Commons for `query`; if nothing acceptable, retry with the first 3, then
     2 words ('Galataport Istanbul cruise terminal' → 'Galataport Istanbul'). The place
     check always uses the FULL query's place words, so a shorter search can't drift."""
@@ -129,13 +143,13 @@ def find_image(query: str, *, width: int = 1600) -> dict[str, Any] | None:
     words = q.split()
     tries = [q] + [" ".join(words[:n]) for n in (3, 2) if len(words) > n]
     for attempt in tries:
-        got = _search(attempt, q, width)
+        got = _search(attempt, q, width, avoid)
         if got:
             return got
     return None
 
 
-def _search(q_search: str, q_place: str, width: int) -> dict[str, Any] | None:
+def _search(q_search: str, q_place: str, width: int, avoid=()) -> dict[str, Any] | None:
     q = q_search
     try:
         r = requests.get(COMMONS, timeout=20, headers={"User-Agent": config.USER_AGENT}, params={
@@ -147,7 +161,7 @@ def _search(q_search: str, q_place: str, width: int) -> dict[str, Any] | None:
     except (requests.RequestException, ValueError) as exc:
         log.warning("image search failed for %r: %s", q, exc)
         return None
-    return pick(pages, query=q_place)
+    return pick(pages, query=q_place, avoid=avoid)
 
 
 def fetch(img: dict[str, Any]) -> bytes | None:
@@ -170,13 +184,37 @@ def credit_line(img: dict[str, Any], language: str) -> str:
     return f"Photo: {img['creator']}, {img['licence']}, via [Wikimedia Commons]({img['source_page']})"
 
 
-def attach(draft: dict[str, Any]) -> dict[str, Any] | None:
+def describe(img: dict[str, Any], language: str) -> str:
+    """Alt text built ONLY from what the chosen file says it shows (its Commons
+    title and description), in the article's language. Written from the article
+    instead, it described the photo the article wanted — 'a balcony cabin with a
+    sea view' for a hull seen across Hamburg harbour (cruise24.ir PR #8)."""
+    facts = f"{img.get('title', '')}. {img.get('description', '')}".strip(" .")
+    if not str(language).lower().startswith("fa"):
+        return clean(img.get("title", ""), 160)
+    try:
+        import llm
+        out, _ = llm.complete_json(
+            "You translate image captions faithfully. Never add anything not stated.",
+            f"Image file title and description (from Wikimedia Commons): {facts}\n\nWrite ONE short Farsi "
+            f"sentence saying only what this states the photo shows. Do not add people, actions, rooms or "
+            f"places that are not stated. Return JSON {{\"alt\": \"...\"}}.",
+            {"type": "object", "additionalProperties": False,
+             "properties": {"alt": {"type": "string"}}, "required": ["alt"]},
+            max_tokens=150, purpose="image alt")
+        return clean(out.get("alt", ""), 160)
+    except Exception:  # noqa: BLE001 — fall back to the file's own title
+        return clean(img.get("title", ""), 160)
+
+
+def attach(draft: dict[str, Any], *, language: str = "en", avoid: list[str] | tuple = ()) -> dict[str, Any] | None:
     """Find and download a photo for this draft. Fail-soft: None means no photo."""
-    img = find_image(str(draft.get("image_query") or ""))
+    img = find_image(str(draft.get("image_query") or ""), avoid=avoid)
     if not img:
         return None
     data = fetch(img)
     if not data:
         return None
     img["bytes"] = data
+    img["alt"] = describe(img, language)
     return img

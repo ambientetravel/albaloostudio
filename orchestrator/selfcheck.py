@@ -3974,5 +3974,37 @@ _evil = _img.pick([_pg("File:Dizin slope.jpg", "CC BY-SA 2.0", "ninara</script><
 ok("a booby-trapped Commons credit can't inject markup into our pages",
    _evil is not None and not any(c in _evil["creator"] for c in '<>[]"`'))
 
+_AV = ["of the Seas", "Cunard", "Viking", "AIDA"]
+_rc = _pg("File:Oasis of the Seas arriving Port Everglades.jpg", "CC BY 2.0", "A", idx=1)
+_msc = _pg("File:MSC Euribia in Kiel port.jpg", "CC BY-SA 4.0", "B", idx=2)
+ok("a competitor's ship is skipped for a site that names it in avoid — and picked when nothing is avoided (plant test)",
+   _img.pick([_rc, _msc], query="cruise ship port", avoid=_AV)["title"].startswith("MSC")
+   and _img.pick([_rc, _msc], query="cruise ship port")["title"].startswith("Oasis"))
+ok("avoid is whole-word: 'AIDA' never rejects an 'Aidan' file, 'Viking' rejects a Viking longship",
+   not _img._avoided("aidan photographer harbour", _AV) and _img._avoided("viking ship museum oslo", _AV))
+_d = _pg("File:QM2 Hamburg.jpg", "CC BY 2.0", "C")
+_d["imageinfo"][0]["extmetadata"]["ImageDescription"] = {"value": "<p>Queen Mary 2 behind port cranes in Hamburg</p>"}
+_pd = _img.pick([_d], query="Hamburg")
+ok("the chosen file's own description is kept, cleaned, as the source for alt text",
+   _pd["description"] == "Queen Mary 2 behind port cranes in Hamburg")
+ok("English alt is the file's own title — never the article's wished-for scene", _img.describe(_pd, "en") == "QM2 Hamburg")
+import llm as _llm
+_saved_cj = _llm.complete_json
+_seen = {}
+def _fake_cj(system, prompt, *a, **k):
+    _seen["p"] = prompt
+    return {"alt": "کشتی کوئین مری ۲ در بندر هامبورگ"}, {}
+_llm.complete_json = _fake_cj
+_fa = _img.describe(_pd, "fa")
+_llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("down"))
+_fa_down = _img.describe(_pd, "fa")
+_llm.complete_json = _saved_cj
+ok("Farsi alt is translated from the FILE's title+description only (prompt carries them; no article text)",
+   _fa.startswith("کشتی") and "port cranes in Hamburg" in _seen["p"] and "Article" not in _seen["p"])
+ok("if the alt model is down, the alt falls back to the file's title (no photo is lost)", _fa_down == "QM2 Hamburg")
+_pl_c24, _pl_bc = a2._prefer_line("cruise24.ir"), a2._prefer_line("boutimar.com")
+ok("cruise24.ir's writer is told to name a line it sells (MSC/Explora/…); boutimar.com gets no cruise-line hint",
+   "MSC" in _pl_c24 and "Never another cruise line" in _pl_c24 and _pl_bc == "")
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

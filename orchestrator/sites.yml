@@ -139,6 +139,8 @@ sites:
       content_root: "src/content/"
       publish_mode: draft
       images:                    # real Commons photo + its own credit (orchestrator/images.py)
+        # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
+        avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
         dir: public/img/journal
         url_prefix: /img/journal
         field: image              # journal template uses it for og:image
@@ -216,6 +218,9 @@ sites:
       content_root: "/"
       publish_mode: draft
       images:
+        # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
+        avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
+        prefer: ["MSC", "Explora Journeys", "Celestyal", "AROYA", "Variety Cruises"]   # lines these sites sell
         dir: img/daryanameh       # article.image is a repo-relative path, like img/dest/greece.jpg
       # boutimar.ir stores articles as DATA, not files. `article.html` is a
       # shell that renders one entry of data/articles.json via ?a=<slug>, so
@@ -332,6 +337,8 @@ sites:
       content_root: "src/content/"
       publish_mode: draft
       images:
+        # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
+        avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
         dir: public/img/journal
         url_prefix: /img/journal
         field: heroImage          # resolveHeroImage() prefers it over the destination hero
@@ -566,6 +573,9 @@ sites:
       adapter: bundle_pr         # opens a PR of content/blog/<record_id>/{index.md,manifest.json}
       path_template: "/blog/{slug}/"   # c24blog.py render_post() SystemExits on any other shape — the whole site build
       images:
+        # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
+        avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
+        prefer: ["MSC", "Explora Journeys", "Celestyal", "AROYA", "Variety Cruises"]   # lines these sites sell
         dir: content/blog            # hero.<ext> + manifest.hero_image (cruise24-ir c2c765d contract)
                                  # into ambientetravel/cruise24-ir (ASTRO_REPO_CRUISE24_IR).
                                  # tools/build.py renders it; deploy-cruise24-ir.sh ships public_html/.

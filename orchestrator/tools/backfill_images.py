@@ -37,6 +37,19 @@ sys.path.insert(0, str(ROOT))
 import config  # noqa: E402
 import images  # noqa: E402
 
+DOMAIN = {"boutimar": "boutimar.com", "exploreorient": "exploreorient.com",
+          "boutimarfarsi": "boutimar.ir", "cruise24-ir": "cruise24.ir"}
+
+
+def image_cfg(repo: str) -> dict:
+    """prefer/avoid from the site's cms.images in sites.yml — one list for the writer and here."""
+    try:
+        site = config.load_sites(only=[DOMAIN[repo.split("/")[1]]], include_hold=True)[0]
+        cms = site.cms.model_dump() if hasattr(site.cms, "model_dump") else dict(site.cms or {})
+        return cms.get("images") or {}
+    except Exception:  # noqa: BLE001
+        return {}
+
 API = "https://api.github.com"
 SITES = [
     {"repo": "ambientetravel/boutimar", "kind": "md", "dir": "src/content/journal", "field": "image",
@@ -86,7 +99,7 @@ def set_fm(text: str, key: str, value: str) -> str:
     return f"---\n{block}\n---\n" + text[m.end():]
 
 
-def query_for(title: str, summary: str = "", lang: str = "en") -> tuple[str, str]:
+def query_for(title: str, summary: str = "", lang: str = "en", prefer=()) -> tuple[str, str]:
     """A precise English Commons search phrase that NAMES the place (Kyrgyzstan
     yurt camp, Mount Damavand). The title alone searched badly (5 Oct dry run)."""
     try:
@@ -97,7 +110,10 @@ def query_for(title: str, summary: str = "", lang: str = "en") -> tuple[str, str
             f"the specific named place, landmark, venue or ship plus what to see (e.g. 'Mount Damavand "
             f"summit', 'Kyrgyzstan yurt camp Song-Kol', 'Ait Benhaddou kasbah Morocco'). It MUST contain a "
             f"proper place name. If the article is about an event or business topic with no photographable "
-            f"place, return the city or venue it happens in (e.g. 'Tehran International Exhibition Center')\", "
+            f"place, return the city or venue it happens in (e.g. 'Tehran International Exhibition Center')."
+            + (f" For a cruise topic not about one named ship or port, name a ship of one of these lines: "
+               f"{', '.join(prefer)} — never another cruise line's ship." if prefer else "")
+            + f"\", "
             f"\"alt\": \"one short sentence in {'Farsi' if lang == 'fa' else 'English'} describing that scene\"}}.",
             {"type": "object", "additionalProperties": False,
              "properties": {"q": {"type": "string"}, "alt": {"type": "string"}}, "required": ["q", "alt"]},
@@ -149,18 +165,25 @@ def plan(site: dict) -> list[dict]:
 
 def run(apply: bool, only: list[str] | None = None) -> list[str]:
     log = []
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d")
+    # Minute stamp: a second run the same day must not collide with an open branch
+    # (a PUT onto an existing file without its sha fails).
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
     for site in SITES:
         if only and not any(o in site["repo"] for o in only):
             continue
         todo = plan(site)
+        cfg = image_cfg(site["repo"])
         found = []
         for t in todo:
-            q, alt = query_for(t["title"], t.get("summary", ""), site["lang"])
-            t["alt"] = alt
-            img = images.find_image(q) if q else None
+            q, _ = query_for(t["title"], t.get("summary", ""), site["lang"], cfg.get("prefer") or ())
+            img = images.find_image(q, avoid=cfg.get("avoid") or ()) if q else None
+            if img:
+                # Alt from the CHOSEN file's own record, not from the article's wish.
+                img["alt"] = images.describe(img, site["lang"])
+                t["alt"] = img["alt"]
             log.append(f"{site['repo'].split('/')[1]:14} {t['slug'][:48]:48} q={q!r} → "
-                       + (f"{img['title'][:40]} ({img['creator'][:25]}, {img['licence']})" if img else "no acceptable photo"))
+                       + (f"{img['title'][:40]} ({img['creator'][:25]}, {img['licence']}) alt={img['alt'][:60]!r}"
+                          if img else "no acceptable photo"))
             if img:
                 found.append((t, img))
         if not apply or not found:
@@ -200,7 +223,7 @@ def run(apply: bool, only: list[str] | None = None) -> list[str]:
                 text, sha = raw(repo, t["file"], branch)
                 new = set_fm(text, site["field"], public)
                 head, body = new[:_FM.match(new).end()], new[_FM.match(new).end():]
-                body = (f"\n![{img['title']}]({public})\n*{credit}*\n" + body) if site["inline"] \
+                body = (f"\n![{img['alt'] or img['title']}]({public})\n*{credit}*\n" + body) if site["inline"] \
                     else body.rstrip() + f"\n\n*{credit}*\n"
                 gh("PUT", f"/repos/{repo}/contents/{t['file']}", json={
                     "message": f"photo: {t['slug']}"[:72], "branch": branch, "sha": sha,
