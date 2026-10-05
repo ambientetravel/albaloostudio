@@ -36,6 +36,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PROSE_PROVIDER: anthropic
         run: |
           if [ "${{ inputs.apply }}" = "true" ]; then
             python3 tools/backfill_images.py --apply | tee -a "$GITHUB_STEP_SUMMARY"

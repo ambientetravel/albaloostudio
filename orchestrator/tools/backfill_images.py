@@ -85,22 +85,24 @@ def set_fm(text: str, key: str, value: str) -> str:
     return f"---\n{block}\n---\n" + text[m.end():]
 
 
-def query_for(title: str, lang: str) -> str:
-    if lang == "en":
-        # Drop the guide-ish tail ("A Practical Guide to …") — Commons wants the subject.
-        q = re.split(r"[:—–|]", title)[0]
-        return re.sub(r"\b(guide|complete|practical|best|how to|what is)\b", " ", q, flags=re.I).strip()
+def query_for(title: str, summary: str = "") -> str:
+    """A precise English Commons search phrase that NAMES the place (Kyrgyzstan
+    yurt camp, Mount Damavand). The title alone searched badly (5 Oct dry run)."""
     try:
         import llm
         out, _ = llm.complete_json(
-            "You name photographable scenes.",
-            f"Article title (Farsi): {title}\nReturn JSON {{\"q\": \"2-6 English words naming the real place, "
-            f"landmark or ship a photo of which would illustrate it\"}}.",
+            "You choose search phrases for finding a real photograph on Wikimedia Commons.",
+            f"Article title: {title}\nSummary: {summary}\n\nReturn JSON {{\"q\": \"3-6 English words: "
+            f"the specific named place, landmark, venue or ship plus what to see (e.g. 'Mount Damavand "
+            f"summit', 'Kyrgyzstan yurt camp Song-Kol', 'Ait Benhaddou kasbah Morocco'). It MUST contain a "
+            f"proper place name. If the article is about an event or business topic with no photographable "
+            f"place, return the city or venue it happens in (e.g. 'Tehran International Exhibition Center')\"}}.",
             {"type": "object", "additionalProperties": False,
              "properties": {"q": {"type": "string"}}, "required": ["q"]},
-            max_tokens=100, purpose="image query")
+            max_tokens=120, purpose="image query")
         return str(out.get("q", "")).strip()
-    except Exception:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
+        print(f"  ! image query failed for {title[:50]!r}: {type(exc).__name__}: {str(exc)[:120]}")
         return ""
 
 
@@ -116,13 +118,15 @@ def plan(site: dict) -> list[dict]:
             if fm_value(text, site["field"]):
                 continue
             todo.append({"file": f"{site['dir']}/{f['name']}", "slug": f["name"][:-3],
-                         "title": fm_value(text, "title"), "text": text, "sha": sha})
+                         "title": fm_value(text, "title"), "text": text, "sha": sha,
+                         "summary": fm_value(text, "summary") or fm_value(text, "description")})
     else:
         text, sha = raw(site["repo"], site["path"])
         store = json.loads(text)
         for a in store.get("articles", []):
             if not a.get("image"):
-                todo.append({"slug": a["slug"], "title": a.get("title", ""), "article": a})
+                todo.append({"slug": a["slug"], "title": a.get("title", ""), "article": a,
+                             "summary": a.get("dek", "")})
     return todo
 
 
@@ -133,7 +137,7 @@ def run(apply: bool) -> list[str]:
         todo = plan(site)
         found = []
         for t in todo:
-            q = query_for(t["title"], site["lang"])
+            q = query_for(t["title"], t.get("summary", ""))
             img = images.find_image(q) if q else None
             log.append(f"{site['repo'].split('/')[1]:14} {t['slug'][:48]:48} q={q!r} → "
                        + (f"{img['title'][:40]} ({img['creator'][:25]}, {img['licence']})" if img else "no acceptable photo"))

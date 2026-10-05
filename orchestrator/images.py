@@ -34,6 +34,13 @@ COMMONS = "https://commons.wikimedia.org/w/api.php"
 _OK_LICENCE = re.compile(r"^(cc0|public domain|pd[\s-]|pd$|cc[ -]by(-sa)?[ -]\d(\.\d)?)", re.I)
 _BAD_TITLE = re.compile(r"\b(map|logo|flag|coat of arms|diagram|chart|icon|seal|emblem|plan)\b", re.I)
 MAX_BYTES = 4_000_000
+# Words that say WHAT kind of scene, not WHERE — a photo must match a place word,
+# not just these. (5 Oct dry run: "Staying with Nomads" for a Kyrgyzstan piece
+# returned a Tibet camp; "Iran Oil Show" returned Safavid oil paintings.)
+_GENERIC = set("""ski resort resorts cruise cruises port terminal island islands mount mountain castle
+travel tour tours guide trip route routes camp camps camping city town village old new great
+temple temples fire festival show fair exhibition market bazaar hotel boutique ship ships
+desert lake river valley coast beach sea gulf trail road the and with from view night day""".split())
 
 
 def _strip_html(s: str) -> str:
@@ -46,8 +53,23 @@ def licence_ok(name: str) -> bool:
     return bool(n) and bool(_OK_LICENCE.search(n)) and not re.search(r"\b(nc|nd)\b", n, re.I)
 
 
-def pick(pages: list[dict[str, Any]], min_width: int = 1200) -> dict[str, Any] | None:
-    """First search result that is a real photo, big enough, freely licensed, credited."""
+def place_words(query: str) -> set[str]:
+    """The specific words in a query (Dizin, Damavand, Galataport) a photo must name."""
+    return {w for w in re.findall(r"[A-Za-zÀ-ÿ'-]{4,}", (query or "").lower()) if w not in _GENERIC}
+
+
+def _relevant(title: str, meta: dict, words: set[str]) -> bool:
+    if not words:
+        return True
+    hay = " ".join([title] + [_strip_html((meta.get(k) or {}).get("value", ""))
+                              for k in ("ImageDescription", "ObjectName", "Categories")]).lower()
+    return any(w in hay for w in words)
+
+
+def pick(pages: list[dict[str, Any]], min_width: int = 1200, query: str = "") -> dict[str, Any] | None:
+    """First search result that is a real photo, big enough, freely licensed, credited,
+    and that actually names the place the query is about."""
+    words = place_words(query)
     for p in sorted(pages, key=lambda x: x.get("index", 99)):
         ii = (p.get("imageinfo") or [{}])[0]
         meta = ii.get("extmetadata") or {}
@@ -55,6 +77,8 @@ def pick(pages: list[dict[str, Any]], min_width: int = 1200) -> dict[str, Any] |
         if ii.get("mime") not in ("image/jpeg", "image/png") or _BAD_TITLE.search(title):
             continue
         if int(ii.get("width") or 0) < min_width:
+            continue
+        if not _relevant(title, meta, words):
             continue
         lic = _strip_html((meta.get("LicenseShortName") or {}).get("value", ""))
         if not licence_ok(lic):
@@ -87,13 +111,13 @@ def find_image(query: str, *, width: int = 1600) -> dict[str, Any] | None:
         r = requests.get(COMMONS, timeout=20, headers={"User-Agent": config.USER_AGENT}, params={
             "action": "query", "format": "json", "generator": "search", "gsrnamespace": 6,
             "gsrsearch": f"{q} filetype:bitmap", "gsrlimit": 15, "prop": "imageinfo",
-            "iiprop": "url|size|mime|extmetadata", "iiurlwidth": width})
+            "iiprop": "url|size|mime|extmetadata", "iiurlwidth": width, "iiextmetadatalanguage": "en"})
         r.raise_for_status()
         pages = list(((r.json().get("query") or {}).get("pages") or {}).values())
     except (requests.RequestException, ValueError) as exc:
         log.warning("image search failed for %r: %s", q, exc)
         return None
-    return pick(pages)
+    return pick(pages, query=q)
 
 
 def fetch(img: dict[str, Any]) -> bytes | None:

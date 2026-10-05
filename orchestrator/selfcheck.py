@@ -3954,5 +3954,12 @@ ok("the caption names creator, licence and Commons — nothing composed", "ninar
 ok("Farsi articles get a Farsi caption", _img.credit_line(_p, "fa-IR").startswith("عکس: ninara"))
 ok("the writer must return an image_query (schema + prompt)", "image_query" in a2._DRAFT_SCHEMA["required"])
 
+_tib = _pg("File:Tibet camping with the nomads.jpg", "CC BY 2.0", "McKay Savage")
+_kyr = _pg("File:Song-Kol yurt camp, Kyrgyzstan.jpg", "CC BY-SA 4.0", "A. Photographer", idx=2)
+ok("a photo must NAME the place: a Tibet camp is rejected for a Kyrgyzstan yurt query",
+   _img.pick([_tib, _kyr], query="Kyrgyzstan yurt camp")["title"].startswith("Song-Kol"))
+ok("generic scene words never satisfy the place check on their own",
+   _img.place_words("Mount Damavand ski resort") == {"damavand"} and _img.pick([_tib], query="nomad camp travel") is not None)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
