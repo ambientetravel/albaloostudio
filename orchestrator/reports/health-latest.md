@@ -1,26 +1,28 @@
-# Orchestration health — 2026-10-06T09:34 UTC
+# Orchestration health — 2026-10-06T09:36 UTC
 
-**3 broke · 2 need you · 0 to watch.**
+**0 broke · 2 need you · 1 to watch.**
 
 ## 🔴 Broke
 
-- **Writer** was **skipped** last cycle (#65) — its upstream failed, so nothing downstream ran
-- **Broadcaster** was **skipped** last cycle (#64) — its upstream failed, so nothing downstream ran
-- Scout found 2 candidates but emitted **0 briefs**
+- Nothing. Every core agent's last run succeeded.
 
 ## 🟡 Needs you — only you can do these
 
 - 3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship
 - **1 article PR(s) waiting on your merge** (oldest 9 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی
 
+## 👀 To watch
+
+- 1 brief(s) dead-lettered by the compliance gate (gate working; review the DLQ for anything worth a human rewrite)
+
 ## Numbers — last cycle
 
 | Metric | This cycle | Previous |
 |---|---:|---:|
-| Sites scanned | 1 | |
-| Gap candidates → briefs | 2 → **0** | |
-| Skipped by ledger (already briefed) | 0 | |
-| Dead-lettered / degraded | 0 / 0 | |
+| Sites scanned | 10 | |
+| Gap candidates → briefs | 94 → **6** | |
+| Skipped by ledger (already briefed) | 63 | |
+| Dead-lettered / degraded | 1 / 0 | |
 | Articles drafted (as PRs) | **0** | 2 |
 | Briefs deferred by cap | 0 | |
 | Model spend | — | $0.570 |
@@ -33,8 +35,8 @@
 | Agent | Last result | Age | |
 |---|---|---:|---|
 | Scout | ✓ success | 2.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37195789418) |
-| Writer | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37443435933) |
-| Broadcaster | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37443442832) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439324302) |
+| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439672404) |
 | Closer | · never ran | — |  |
 | Auditor+Analyst | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475) |
 | Cartographer | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115) |
