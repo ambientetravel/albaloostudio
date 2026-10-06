@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}راهنماها · {{ site.brand.fa }}{% endblock %}
+{% block description %}کتابخانهٔ مرجع کروزنامه: بندرها، کشتی‌ها، خطوط، رودخانه‌ها، میراث جهانی، ویزا و واژه‌ها.{% endblock %}
+{% block content %}
+<header class="dhead"><div class="wrap">
+  <p class="kicker"><a href="/journal/">مجلهٔ کروزنامه</a> · مرجع</p>
+  <h1 class="dhead__t">کتابخانهٔ راهنما</h1>
+  <p class="lede">پشت هر داستان کروزنامه یک مدخل مرجع هست: بندر، کشتی، رودخانه. این‌ها همان مدخل‌ها هستند، مرتب و کامل.</p>
+</div></header>
+<section class="sec sec--tight"><div class="wrap">
+  {% for d in depts %}{% set gs = guides|selectattr('dept','equalto',d.slug)|list %}{% if gs %}
+  <div class="gsec"><h2 class="gsec__h"><a href="/{{ d.slug }}/">{{ d.label }}</a></h2>
+    <div class="library__list">{% for g in gs %}<a class="lib" href="/{{ g.slug }}/"><span class="lib__t">{{ g.title }}</span><span class="lib__n">{{ g.n|fa }} مدخل</span></a>{% endfor %}</div></div>
+  {% endif %}{% endfor %}
+  <div class="gsec"><h2 class="gsec__h">ابزارها</h2>
+    <div class="library__list">
+      <a class="lib" href="/visa/"><span class="lib__t">ویزانامه</span><span class="lib__n">قاعدهٔ ویزا، بندر به بندر</span></a>
+      <a class="lib" href="/glossary/"><span class="lib__t">واژه‌نامهٔ کروز</span><span class="lib__n">اصطلاح‌ها به فارسی</span></a>
+      <a class="lib" href="/offers/"><span class="lib__t">پیشنهادهای همراهان <span class="tag">آگهی</span></span><span class="lib__n">قیمت‌ها از شبکهٔ فروش</span></a>
+    </div></div>
+</div></section>
+{% endblock %}

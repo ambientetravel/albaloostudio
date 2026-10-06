@@ -1,0 +1,13 @@
+[
+  {"slug": "ports", "title": "بندرنامه", "singular": "بندر", "lede": "هر بندری که کشتی‌های کروز به آن می‌رسند؛ با وضعیت ویزا برای گذرنامهٔ ایرانی، فاصله تا شهر، و آنچه در چند ساعت می‌توان دید.", "facts": ["country", "terminal", "walkable", "visa", "distance_city", "unesco_nearby"]},
+  {"slug": "ships", "title": "کشتی‌نامه", "singular": "کشتی", "lede": "کشتی‌های کروز دریایی، از غول‌های ۶ هزار نفره تا یات‌های ۴۶۰ سوئیتی.", "facts": ["line", "year", "gt", "length_m", "guests", "cabins", "class"]},
+  {"slug": "river-ships", "title": "کشتی‌های رودخانه‌ای", "singular": "کشتی رودخانه‌ای", "lede": "کشتی‌های باریک و بلندی که از زیر پل‌های وین و بوداپست می‌گذرند.", "facts": ["line", "year", "river", "length_m", "guests", "cabins"]},
+  {"slug": "lines", "title": "خطوط کروز", "singular": "خط کروز", "lede": "شرکت‌های کشتیرانی کروز؛ سبک، ناوگان، بازار و آنچه برای مسافر ایرانی مهم است.", "facts": ["hq", "founded", "fleet_size", "style", "iranian_passport"]},
+  {"slug": "rivers", "title": "رودخانه‌ها", "singular": "رودخانه", "lede": "دانوب، راین، نیل، دورو، مکونگ؛ رودخانه‌هایی که کروز از روی آن‌ها می‌گذرد.", "facts": ["length_km", "countries", "season", "classic_route"]},
+  {"slug": "river-ports", "title": "شهرهای رودخانه‌ای", "singular": "شهر رودخانه‌ای", "lede": "شهرهایی که کشتی رودخانه‌ای درست در قلبشان پهلو می‌گیرد.", "facts": ["river", "country", "dock", "unesco_nearby"]},
+  {"slug": "excursions", "title": "گشت و اقامت کوتاه", "singular": "گشت", "lede": "گشت‌های بندری، گشت‌های شهری و اقامت کوتاه پیش و پس از کروز.", "facts": ["port", "duration", "type", "distance"]},
+  {"slug": "unesco", "title": "میراث جهانی نزدیک بندرها", "singular": "میراث جهانی", "lede": "آثار ثبت‌شدهٔ یونسکو که در یک روزِ بندر می‌توان دید.", "facts": ["country", "inscribed", "nearest_port", "distance"]},
+  {"slug": "hotels", "title": "هتل‌ها و زنجیره‌های مهمان‌نوازی", "singular": "هتل", "lede": "جایی برای شبِ پیش از سوارشدن، یا دو شب پس از پیاده‌شدن.", "facts": ["chain", "city", "near_port", "opened"]},
+  {"slug": "landmarks", "title": "مکان‌های تاریخی در دسترس با کروز", "singular": "مکان تاریخی", "lede": "از کتابخانهٔ سلسوس تا درهٔ پادشاهان؛ تاریخی که از عرشه به آن می‌رسید.", "facts": ["country", "nearest_port", "distance", "era"]},
+  {"slug": "gatherings", "title": "نوروز و گردهمایی‌ها", "singular": "گردهمایی", "lede": "کروزهای نوروزی، شب یلدا روی آب، و دورهمی‌های ایرانیان در بندرهای جهان.", "facts": ["season", "status", "city"]}
+]

@@ -1,0 +1,20 @@
+{% if offers %}
+{% for o in offers %}
+<article class="offer">
+  <p class="kicker">{{ o.line }} · {{ o.ship }}</p>
+  <h3>{{ o.region or o.title }}</h3>
+  <p class="offer__ports">{{ o.ports[:5]|join(' · ') }}{% if o.ports|length > 5 %} · …{% endif %}</p>
+  <div class="offer__meta">
+    {% if o.nights %}<span>{{ o.nights|fa }} شب</span>{% endif %}
+    <span class="pill pill--{{ o.visa_level }}">{{ o.visa }}</span>
+    {% if o.dates %}<span>{{ o.date_count|fa }} تاریخ؛ نزدیک‌ترین {{ o.dates[0]|fa }}</span>{% endif %}
+  </div>
+  <div class="offer__foot">
+    {% if o.price_from %}<span class="price">از {{ o.price_from|fa }} {{ o.currency }}</span>{% else %}<span class="price">قیمت را بپرسید</span>{% endif %}
+    <a class="btn btn--sm" href="{{ o.book_url }}" rel="sponsored noopener" target="_blank">{{ site.feed.book_label }}</a>
+  </div>
+</article>
+{% endfor %}
+{% else %}
+<p class="offers__empty">در این لحظه پیشنهادی از شبکهٔ فروش در دسترس نیست. این بخش وقتی فید قیمت‌ها وصل باشد خودکار پر می‌شود؛ هیچ قیمتی حدس زده نمی‌شود. تا آن زمان: <a href="https://cruise24.ir" rel="sponsored noopener" target="_blank">کروز۲۴</a> <span class="tag">آگهی</span></p>
+{% endif %}
