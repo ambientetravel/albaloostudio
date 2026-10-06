@@ -4110,5 +4110,23 @@ _llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("quota")
 ok("a planner outage returns nothing instead of failing the scout run", _a1.plan_topics(_eo, 3, _sm, _led, []) == [])
 _a1._offer_titles, _llm.complete_json = _saved_offers, _saved_cj2
 
+_calls_r = []
+def _busy(system, prompt, schema, **k):
+    _calls_r.append(k.get("provider"))
+    if k.get("provider") != "anthropic":
+        raise _llm.ProviderUnavailable("gemini unavailable: 503 high demand")
+    return {"topics": []}, {"provider": "anthropic"}
+_saved_env_key = os.environ.get("ANTHROPIC_API_KEY")
+os.environ["ANTHROPIC_API_KEY"] = "test-not-a-key"
+_llm.complete_json = _busy
+_res, _m = _llm.complete_json_resilient("s", "p", {}, waits=(0, 0))
+_llm.complete_json = _saved_cj2
+if _saved_env_key is None:
+    os.environ.pop("ANTHROPIC_API_KEY", None)
+else:
+    os.environ["ANTHROPIC_API_KEY"] = _saved_env_key
+ok("a busy Gemini is retried, then the planner falls back to Anthropic (6 Oct: 503 on 5 of 6 sites)",
+   _m["provider"] == "anthropic" and _calls_r[-1] == "anthropic" and len(_calls_r) == 3)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

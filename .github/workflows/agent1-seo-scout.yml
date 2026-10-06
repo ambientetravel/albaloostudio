@@ -169,6 +169,10 @@ jobs:
           # Agents 3, 4 and 6 keep ANTHROPIC_MODEL for prose and strategy.
           GAP_ANALYSIS_MODEL: ${{ vars.GAP_ANALYSIS_MODEL || 'claude-sonnet-5' }}
           GAP_ANALYSIS_PROVIDER: ${{ vars.GAP_ANALYSIS_PROVIDER || 'gemini' }}
+          # The fallback defaulted to gemini — the SAME provider as the primary —
+          # so a Gemini 503 ("high demand", 6 Oct dry run) went straight to the
+          # mechanical stub and Agent 2 skips those briefs. Anthropic is funded.
+          GAP_ANALYSIS_FALLBACK: ${{ vars.GAP_ANALYSIS_FALLBACK || 'anthropic' }}
           # Kept so GAP_ANALYSIS_PROVIDER=openai still works if you switch back.
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1' }}

@@ -681,7 +681,7 @@ def plan_topics(site: Site, need: int, sitemap_urls: set[str], ledger: dict[str,
     ask = need + 4                               # head-room for the filters below
     try:
         import llm
-        out, _ = llm.complete_json(
+        out, _ = llm.complete_json_resilient(
             "You plan articles for a travel company's website. You never invent products, "
             "prices, dates or facts.",
             f"Site: {site.domain} ({site.brand}); market: {site.market}; write topics in {lang}.\n"
