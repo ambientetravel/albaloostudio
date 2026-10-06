@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-06T08:52+00:00",
+ "generated": "2026-10-06T08:54+00:00",
  "critical": [
   "Scout found 1 candidates but emitted **0 briefs**"
  ],
@@ -34,7 +34,7 @@
   "posts": 6,
   "posts_held": 3,
   "posts_no_media": 3,
-  "campaigns": 4,
+  "campaigns": 5,
   "open_prs": 13,
   "ai_recall": "0/8 properties named by ≥1 of 2 models"
  },
@@ -55,7 +55,7 @@
   },
   {
    "agent": "Broadcaster",
-   "result": "in_progress",
+   "result": "success",
    "age_days": 0.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37439035819",
    "run": 61

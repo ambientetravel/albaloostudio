@@ -1,4 +1,4 @@
-# Orchestration health — 2026-10-06T08:52 UTC
+# Orchestration health — 2026-10-06T08:54 UTC
 
 **1 broke · 2 need you · 4 to watch.**
 
@@ -29,7 +29,7 @@
 | Articles drafted (as PRs) | **2** | 6 |
 | Briefs deferred by cap | 0 | |
 | Model spend | $0.570 | $0.678 |
-| Social: campaigns / posts held / no-media | 4 / 3 / 3 | |
+| Social: campaigns / posts held / no-media | 5 / 3 / 3 | |
 | Article PRs open | 13 | |
 | AI recall (Oracle, monthly) | 0/8 properties named by ≥1 of 2 models | |
 
@@ -39,7 +39,7 @@
 |---|---|---:|---|
 | Scout | ✓ success | 1.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37195789418) |
 | Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37438382118) |
-| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439035819) |
+| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439035819) |
 | Closer | · never ran | — |  |
 | Auditor+Analyst | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475) |
 | Cartographer | ✓ success | 0.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115) |
