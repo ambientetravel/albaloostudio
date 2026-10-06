@@ -1,34 +1,29 @@
-# Orchestration health — 2026-10-06T08:59 UTC
+# Orchestration health — 2026-10-06T09:30 UTC
 
-**0 broke · 2 need you · 4 to watch.**
+**3 broke · 2 need you · 0 to watch.**
 
 ## 🔴 Broke
 
-- Nothing. Every core agent's last run succeeded.
+- **Writer** was **skipped** last cycle (#65) — its upstream failed, so nothing downstream ran
+- **Broadcaster** was **skipped** last cycle (#64) — its upstream failed, so nothing downstream ran
+- Scout found 2 candidates but emitted **0 briefs**
 
 ## 🟡 Needs you — only you can do these
 
 - 3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship
 - **1 article PR(s) waiting on your merge** (oldest 9 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی
 
-## 👀 To watch
-
-- **exploreorient.com** 'armenia historic monasteries guide' failed: Object of type bytes is not JSON serializable
-- **exploreorient.com** 'visiting hegra alula travel guide' failed: Object of type bytes is not JSON serializable
-- **exploreorient.com** 'jordan petra wadi rum itinerary' failed: Object of type bytes is not JSON serializable
-- **exploreorient.com** 'fann mountains trekking guide tajikistan' failed: Object of type bytes is not JSON serializable
-
 ## Numbers — last cycle
 
 | Metric | This cycle | Previous |
 |---|---:|---:|
-| Sites scanned | 10 | |
-| Gap candidates → briefs | 99 → **2** | |
-| Skipped by ledger (already briefed) | 71 | |
+| Sites scanned | 1 | |
+| Gap candidates → briefs | 2 → **0** | |
+| Skipped by ledger (already briefed) | 0 | |
 | Dead-lettered / degraded | 0 / 0 | |
-| Articles drafted (as PRs) | **2** | 1 |
+| Articles drafted (as PRs) | **0** | 2 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $0.570 | $0.236 |
+| Model spend | — | $0.570 |
 | Social: campaigns / posts held / no-media | 5 / 3 / 3 | |
 | Article PRs open | 14 | |
 | AI recall (Oracle, monthly) | 0/8 properties named by ≥1 of 2 models | |
@@ -37,16 +32,16 @@
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 1.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37195789418) |
-| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439324302) |
-| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439672404) |
+| Scout | ✓ success | 2.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37195789418) |
+| Writer | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37443435933) |
+| Broadcaster | ⏭ skipped | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37443442832) |
 | Closer | · never ran | — |  |
 | Auditor+Analyst | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475) |
 | Cartographer | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115) |
 | Watcher | ✓ success | 1.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37199470106) |
 | Oracle | · never ran | — |  |
 | Merge-watch | ✓ success | 0.7d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37333805308) |
-| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37418527626) |
+| PR gate | ✓ success | 0.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37418527626) |
 | Dashboard | ✓ success | 0.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37319951897) |
 
 ## ✓ Fine

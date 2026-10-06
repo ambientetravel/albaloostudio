@@ -1,34 +1,33 @@
 {
- "generated": "2026-10-06T08:59+00:00",
- "critical": [],
+ "generated": "2026-10-06T09:30+00:00",
+ "critical": [
+  "**Writer** was **skipped** last cycle (#65) — its upstream failed, so nothing downstream ran",
+  "**Broadcaster** was **skipped** last cycle (#64) — its upstream failed, so nothing downstream ran",
+  "Scout found 2 candidates but emitted **0 briefs**"
+ ],
  "needs_you": [
   "3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
   "**1 article PR(s) waiting on your merge** (oldest 9 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی"
  ],
- "warn": [
-  "**exploreorient.com** 'armenia historic monasteries guide' failed: Object of type bytes is not JSON serializable",
-  "**exploreorient.com** 'visiting hegra alula travel guide' failed: Object of type bytes is not JSON serializable",
-  "**exploreorient.com** 'jordan petra wadi rum itinerary' failed: Object of type bytes is not JSON serializable",
-  "**exploreorient.com** 'fann mountains trekking guide tajikistan' failed: Object of type bytes is not JSON serializable"
- ],
+ "warn": [],
  "fine": [
   "3 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
  "numbers": {
-  "briefs": 2,
-  "candidates": 99,
+  "briefs": 0,
+  "candidates": 2,
   "dlq": 0,
   "degraded": 0,
-  "ledger_skipped": 71,
-  "sites_scanned": 10,
-  "scout_run": "run_20261006T0849Z_2ec1",
-  "articles": 2,
-  "writer_failed": 4,
+  "ledger_skipped": 0,
+  "sites_scanned": 1,
+  "scout_run": "run_20261006T0930Z_0862",
+  "articles": 0,
+  "writer_failed": 0,
   "deferred": 0,
-  "briefs_seen": 7,
-  "cost_usd": 0.57036,
-  "prev_cost_usd": 0.235572,
-  "prev_articles": 1,
+  "briefs_seen": 0,
+  "cost_usd": null,
+  "prev_cost_usd": 0.57036,
+  "prev_articles": 2,
   "posts": 6,
   "posts_held": 3,
   "posts_no_media": 3,
@@ -40,23 +39,23 @@
   {
    "agent": "Scout",
    "result": "success",
-   "age_days": 1.9,
+   "age_days": 2.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37195789418",
    "run": 47
   },
   {
    "agent": "Writer",
-   "result": "success",
+   "result": "skipped",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37439324302",
-   "run": 63
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37443435933",
+   "run": 65
   },
   {
    "agent": "Broadcaster",
-   "result": "success",
+   "result": "skipped",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37439672404",
-   "run": 62
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37443442832",
+   "run": 64
   },
   {
    "agent": "Closer",
@@ -101,7 +100,7 @@
   {
    "agent": "PR gate",
    "result": "success",
-   "age_days": 0.1,
+   "age_days": 0.2,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37418527626",
    "run": 120
   },
