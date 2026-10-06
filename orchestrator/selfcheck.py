@@ -4160,5 +4160,13 @@ _arch = json.loads(json.dumps({"draft": {"_image": {"bytes": b"\xff\xd8abc", "ti
 ok("a draft carrying its photo bytes archives as JSON (6 Oct: 4 EO PRs opened, then counted 'failed')",
    _arch["draft"]["_image"]["bytes"] == "<5 bytes>")
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "tools"))
+import health_report as _hr
+ok("Health ignores dry runs and self-skips/cancels but still counts real failures (6 Oct false '3 broke')",
+   not _hr._counts({"display_title": "Agent 1 — SEO Scout (dry run)", "conclusion": "success"})
+   and not _hr._counts({"display_title": "Agent 2 — Writer", "conclusion": "skipped"})
+   and not _hr._counts({"display_title": "Agent 1 — SEO Scout", "conclusion": "cancelled"})
+   and _hr._counts({"display_title": "Agent 2 — Writer", "conclusion": "failure"}))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
