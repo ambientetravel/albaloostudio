@@ -3,6 +3,8 @@
 # Owner: Alireza Mozaffari
 
 name: Agent 1 — SEO Scout
+# The gate below reads this title to tell a dry run from a real one.
+run-name: "Agent 1 — SEO Scout${{ inputs.dry_run && ' (dry run)' || '' }}"
 
 on:
   schedule:
@@ -23,6 +25,12 @@ on:
     #
     # Sunday so the briefs and drafts are waiting on Monday morning, and clear
     # of the Monday 05:00/05:30 audit jobs. Dispatch any time for a fresh look.
+    #
+    # Since 6 Oct 2026 the REAL Sunday trigger is cron-job.org ("Albaloo — Sunday
+    # scout"), which POSTs workflow_dispatch at 07:15 Europe/Istanbul. GitHub's own
+    # schedule fired 5–6 h late on 27 Sep and 4 Oct (09:59 / 10:34 UTC for 04:15).
+    # This cron stays as a FALLBACK: the gate job stands it down when a real
+    # dispatch already ran in the last 20 h, so the week is never scouted twice.
     - cron: "15 4 * * 0"
   workflow_dispatch:
     inputs:
@@ -56,7 +64,37 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Only for the GitHub schedule (the fallback). If cron-job.org's dispatch has
+  # already scouted this week, cancel this run: a CANCELLED scout does not wake
+  # Agent 2 (it requires conclusion == success), so nothing is written twice.
+  gate:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Stand down if this week's scout already ran
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          since=$(date -u -d '20 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+          n=$(gh api "repos/${{ github.repository }}/actions/workflows/agent1-seo-scout.yml/runs?event=workflow_dispatch&created=%3E%3D$since&per_page=20" \
+                --jq '[.workflow_runs[] | select(.conclusion != "cancelled" and .conclusion != "failure")
+                       | select(.display_title | contains("dry run") | not)] | length')
+          echo "real dispatch runs since $since: $n"
+          if [ "$n" -gt 0 ]; then
+            echo "::notice title=Fallback stood down::cron-job.org already ran this week's scout ($n run(s) since $since). Cancelling this late GitHub-scheduled run."
+            gh run cancel "${{ github.run_id }}" --repo "${{ github.repository }}"
+            sleep 120
+          fi
+          echo "::warning title=Fallback scout running::No cron-job.org dispatch in the last 20 h — the external trigger did not fire. Check the cron-job.org job."
+
   scout:
+    needs: gate
+    # gate is skipped on a dispatch; !cancelled() lets the scout run then, and
+    # stops it when the gate cancelled a duplicate fallback run.
+    if: ${{ !cancelled() && needs.gate.result != 'failure' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     defaults:
