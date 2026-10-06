@@ -54,10 +54,26 @@ jobs:
           git config user.email "albaloo-health@users.noreply.github.com"
           # orchestrator/reports is gitignored on purpose (per-run copies stay
           # out of git). Force-add only the two 'latest' files.
-          git add -f orchestrator/reports/health-latest.md orchestrator/reports/health-latest.json
+          files="orchestrator/reports/health-latest.md orchestrator/reports/health-latest.json"
+          msg="Health: $(head -1 orchestrator/reports/health-latest.md | sed 's/^# //')"
+          git add -f $files
           git diff --cached --quiet && exit 0
-          git commit -m "Health: $(head -1 orchestrator/reports/health-latest.md | sed 's/^# //')"
-          git push
+          git commit -q -m "$msg"
+          # A push race is not a broken pipeline. On 6 Oct four Health runs went
+          # red (and emailed) only because main moved while they ran. Rebuild the
+          # commit on the newest main — the two report files ONLY; a mixed reset
+          # never carries this checkout's stale copy of anything else — and retry.
+          for i in 1 2 3 4 5; do
+            git push -q origin HEAD:main && exit 0
+            sleep $((i * 4))
+            git fetch -q origin main
+            git reset -q origin/main
+            git add -f $files
+            git diff --cached --quiet && exit 0
+            git commit -q -m "$msg"
+          done
+          echo "::warning title=Report not committed::main kept moving; the report is still in this run's summary."
+          exit 0
       - name: Go red only when something actually broke
         run: |
           code="${{ steps.report.outputs.code }}"

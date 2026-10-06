@@ -103,6 +103,17 @@ class Outcome:
     cms_note: str = ""
 
 
+
+def _jsonable(obj):
+    """json default for the archived draft. The draft carries the article photo's
+    raw bytes (draft["_image"]["bytes"], images.attach) so the adapter can commit
+    it; dumping that crashed AFTER the PR was opened — 6 Oct: four Explore Orient
+    PRs counted as "failed", Health went red. The archive keeps a marker, not the
+    image (the image is in the PR)."""
+    if isinstance(obj, (bytes, bytearray)):
+        return f"<{len(obj)} bytes>"
+    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
 def _usage_summary(outcomes: list["Outcome"]) -> dict[str, Any]:
     """
     What this run spent on drafting, totalled from the per-article counts.
@@ -236,7 +247,8 @@ def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
             oc.status = "drafted"
             (out_dir / "drafts").mkdir(parents=True, exist_ok=True)
             (out_dir / "drafts" / f"{name}.json").write_text(
-                json.dumps({"brief": payload, "draft": draft}, ensure_ascii=False, indent=2),
+                json.dumps({"brief": payload, "draft": draft}, ensure_ascii=False, indent=2,
+                           default=_jsonable),
                 encoding="utf-8")
             return oc
 
@@ -248,11 +260,11 @@ def write_one(payload: dict[str, Any], out_dir: Path, *, dry_run: bool,
 
         (out_dir / "events").mkdir(parents=True, exist_ok=True)
         (out_dir / "events" / f"{name}.json").write_text(
-            json.dumps(event, ensure_ascii=False, indent=2), encoding="utf-8")
+            json.dumps(event, ensure_ascii=False, indent=2, default=_jsonable), encoding="utf-8")
         (out_dir / "drafts").mkdir(parents=True, exist_ok=True)
         (out_dir / "drafts" / f"{name}.json").write_text(
             json.dumps({"brief": payload, "draft": draft, "cms": result},
-                       ensure_ascii=False, indent=2), encoding="utf-8")
+                       ensure_ascii=False, indent=2, default=_jsonable), encoding="utf-8")
 
         oc.status = "drafted"
         return oc

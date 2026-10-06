@@ -4155,5 +4155,10 @@ ok("a Finglish answer to the retry is refused (kept and flagged, never swapped f
 ok("the analysis prompt now asks for English slugs, not transliteration",
    "do NOT transliterate" in _a1._analysis_system_prompt(_bi))
 
+import agent2_writer_batch as _a2b
+_arch = json.loads(json.dumps({"draft": {"_image": {"bytes": b"\xff\xd8abc", "title": "x"}}}, default=_a2b._jsonable))
+ok("a draft carrying its photo bytes archives as JSON (6 Oct: 4 EO PRs opened, then counted 'failed')",
+   _arch["draft"]["_image"]["bytes"] == "<5 bytes>")
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
