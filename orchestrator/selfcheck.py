@@ -4114,7 +4114,9 @@ _calls_r = []
 def _busy(system, prompt, schema, **k):
     _calls_r.append(k.get("provider"))
     if k.get("provider") != "anthropic":
-        raise _llm.ProviderUnavailable("gemini unavailable: 503 high demand")
+        class ServerError(Exception):     # google-genai's own type, not ours
+            pass
+        raise ServerError("503 UNAVAILABLE. This model is currently experiencing high demand.")
     return {"topics": []}, {"provider": "anthropic"}
 _saved_env_key = os.environ.get("ANTHROPIC_API_KEY")
 os.environ["ANTHROPIC_API_KEY"] = "test-not-a-key"

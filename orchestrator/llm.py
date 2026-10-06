@@ -290,9 +290,12 @@ def complete_json_resilient(system: str, prompt: str, schema: dict[str, Any], *,
         try:
             return complete_json(system, prompt, schema, max_tokens=max_tokens,
                                  purpose=purpose, provider=name)
-        except (ProviderUnavailable, ValueError) as exc:
+        except Exception as exc:  # noqa: BLE001 — google-genai raises its own ServerError
+            # for a 503 "high demand", which is neither ProviderUnavailable nor
+            # ValueError; catching only those let the first 503 skip the fallback.
             last = exc
-            log.warning("%s on %s failed: %s", purpose or "completion", name, str(exc)[:160])
+            log.warning("%s on %s failed: %s: %s", purpose or "completion", name,
+                        type(exc).__name__, str(exc)[:160])
     raise ProviderUnavailable(f"every provider failed: {last}")
 
 
