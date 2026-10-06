@@ -63,9 +63,14 @@ jobs:
     # A failed scout produces no briefs worth writing. Skip rather than run and
     # report an empty success, which reads as "nothing to do" when it means
     # "the upstream broke".
+    #
+    # A DRY-RUN scout must never be written up: its artifact still carries
+    # briefs, and on 6 Oct three test dry runs turned into 10 real draft PRs.
+    # The scout titles those runs "… (dry run)" (run-name), so read the title.
     if: >
       github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
+      (github.event.workflow_run.conclusion == 'success' &&
+       !contains(github.event.workflow_run.display_title, 'dry run'))
     defaults:
       run:
         working-directory: orchestrator
@@ -95,8 +100,10 @@ jobs:
           set -euo pipefail
           RUN="${{ inputs.run_id || github.event.workflow_run.id }}"
           if [ -z "$RUN" ]; then
+            # Never a dry run (6 Oct): take the latest successful REAL scout.
             RUN=$(gh run list --workflow agent1-seo-scout.yml --status success \
-                    --limit 1 --json databaseId --jq '.[0].databaseId' \
+                    --limit 20 --json databaseId,displayTitle \
+                    --jq '[.[] | select(.displayTitle | contains("dry run") | not)][0].databaseId' \
                     --repo "${{ github.repository }}")
             if [ -z "$RUN" ] || [ "$RUN" = "null" ]; then
               echo "::error title=No scout run::No successful Agent 1 run to take briefs from. Run the scout first."
