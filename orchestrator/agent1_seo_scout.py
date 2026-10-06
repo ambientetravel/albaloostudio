@@ -631,6 +631,114 @@ def _improves_existing(site: Site) -> bool:
     return bool((site.cms or {}).get("improve_existing"))
 
 
+def _plans_topics(site: Site) -> bool:
+    """A site opts in with cms.topic_planner: true (sites.yml)."""
+    return bool((site.cms or {}).get("topic_planner"))
+
+
+def _offer_titles(site: Site, cap: int = 60) -> list[str]:
+    """Titles of what the site really sells (offer.v1 feed), never prices.
+    Fail-soft: an unreachable feed just means the planner works without it."""
+    if not site.offer_feed:
+        return []
+    try:
+        r = requests.get(site.offer_feed, timeout=15, headers={"User-Agent": config.USER_AGENT})
+        r.raise_for_status()
+        payload = r.json()
+        items = payload.get("offerings") if isinstance(payload, dict) else payload
+        return [str(o.get("title")) for o in (items or []) if isinstance(o, dict) and o.get("title")][:cap]
+    except (requests.RequestException, ValueError) as exc:
+        log.warning("%s — offer feed unavailable for the topic planner: %s", site.domain, exc)
+        return []
+
+
+def plan_topics(site: Site, need: int, sitemap_urls: set[str], ledger: dict[str, Any] | None,
+                have: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Fresh missing-page topics for a site whose measured gaps and seed list have
+    run dry. On 4 Oct exploreorient.com and ambientetravel.com produced NOTHING:
+    one candidate each, both inside the 45-day cooldown; cruisebaz had 12 in
+    cooldown and no seeds. A young site has too little Search Console footprint
+    to gap-find from, and a hand-written seed list is used up in a few weeks.
+
+    The model proposes search phrases tied to what the site actually sells (its
+    offer feed) and to pages it does NOT already have. Every proposal then goes
+    through the same tests as a seed — sitemap coverage, the ledger cooldown,
+    sibling ownership, exclusions, head terms — so a planned topic can never be
+    a twin of a live page or of a topic another site already owns. Its
+    local_score sits below seeds: measured demand and curated seeds rank first.
+    Fail-soft: no model, no feed or no survivors means no planned topics.
+    """
+    if need <= 0 or not _plans_topics(site):
+        return []
+    entries = (ledger or {}).get("entries", [])
+    written = sorted({e["query"] for e in entries if e.get("domain") == site.domain})[:150]
+    siblings = config.audience_siblings(site)
+    sib = sorted({e["query"] for e in entries if e.get("domain") in siblings})[:150]
+    offers = _offer_titles(site)
+    paths = _existing_paths(site, sitemap_urls, cap=200)
+    lang = "Farsi" if str(site.locale).lower().startswith("fa") else "English"
+    ask = need + 4                               # head-room for the filters below
+    try:
+        import llm
+        out, _ = llm.complete_json(
+            "You plan articles for a travel company's website. You never invent products, "
+            "prices, dates or facts.",
+            f"Site: {site.domain} ({site.brand}); market: {site.market}; write topics in {lang}.\n"
+            f"What it sells (offer feed titles): {json.dumps(offers, ensure_ascii=False)}\n"
+            f"Pages it already has (paths): {json.dumps(paths, ensure_ascii=False)}\n"
+            f"Topics already written for it: {json.dumps(written, ensure_ascii=False)}\n"
+            f"Topics its sister sites own (do not repeat): {json.dumps(sib, ensure_ascii=False)}\n\n"
+            f"Propose {ask} NEW article topics as the exact search phrase a traveller would type "
+            f"({lang}, 2–7 words). Each must lead to something this site sells or a destination it "
+            f"covers, must NOT duplicate an existing page or a written topic, and must not depend on "
+            f"a price, a departure date or a fact you would have to invent. Prefer practical guides "
+            f"and comparisons with clear search intent. Return JSON "
+            f'{{"topics": [{{"query": "...", "offer": "exact offer title or empty", "why": "one line"}}]}}.',
+            {"type": "object", "additionalProperties": False,
+             "properties": {"topics": {"type": "array", "items": {
+                 "type": "object", "additionalProperties": False,
+                 "properties": {"query": {"type": "string"}, "offer": {"type": "string"},
+                                "why": {"type": "string"}},
+                 "required": ["query", "offer", "why"]}}},
+             "required": ["topics"]},
+            max_tokens=2000, purpose="topic planner")
+    except Exception as exc:  # noqa: BLE001 — a planner outage must never cost a scout run
+        log.warning("%s — topic planner unavailable: %s: %s", site.domain, type(exc).__name__,
+                    str(exc)[:160])
+        return []
+
+    have_keys = {_ledger.topic_key(c["query"]) for c in have}
+    sitemap_tokens = [_slug_tokens(u) for u in sitemap_urls]
+    planned: list[dict[str, Any]] = []
+    for t in (out.get("topics") or []):
+        q = " ".join(str(t.get("query") or "").split())
+        if len(q) < 4 or _ledger.topic_key(q) in have_keys:
+            continue
+        qt = {w for w in _SLUG_SPLIT.split(q.lower()) if len(w) > 2}
+        if any(qt and len(qt & toks) >= max(1, (len(qt) + 1) // 2) for toks in sitemap_tokens):
+            continue                              # a live page already covers it
+        have_keys.add(_ledger.topic_key(q))
+        planned.append({
+            "query": q, "gap_type": "missing_page",
+            "impressions": 0, "clicks": 0, "ctr": 0.0,
+            "position": site.max_position, "best_position": site.max_position,
+            "trend": "planned", "current_url": None, "competing_urls": [],
+            "top_country": None, "device_split": {}, "covered_by_sitemap": False,
+            "local_score": round(0.001 / (len(planned) + 1), 6),
+            "seed": True, "planned": True,
+            "planner_offer": str(t.get("offer") or "")[:160],
+            "planner_why": str(t.get("why") or "")[:200],
+        })
+    if ledger is not None:
+        planned, _ = _ledger.filter_candidates(planned, ledger, site.domain, siblings=siblings)
+    excl = _excluded(site, planned) | _head_term_hits(site, planned)
+    planned = [c for c in planned if c["query"] not in excl][:need]
+    log.info("%s — topic planner added %d topic(s): %s", site.domain, len(planned),
+             ", ".join(c["query"] for c in planned))
+    return planned
+
+
 def seed_candidates(site: Site, sitemap_urls: set[str],
                     existing: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
@@ -1848,10 +1956,19 @@ def process_site(
                 log.info("%s — %d candidate(s) skipped, still in cooldown: %s",
                          site.domain, len(skipped), ", ".join(skipped[:5]))
             candidates = kept
-            if not candidates:
-                stat["note"] = ("all gap candidates are within the briefing "
-                                "cooldown; nothing new to write this run")
-                return stat
+
+        # Refill: fewer new-page topics than this run can brief → plan more.
+        new_pages = [c for c in candidates
+                     if c.get("gap_type") == "missing_page" or _improves_existing(site)]
+        planned = (plan_topics(site, limit - len(new_pages), sitemap_urls, ledger, candidates)
+                   if use_llm else [])
+        if planned:
+            candidates = candidates + planned
+            stat["planned_topics"] = [c["query"] for c in planned]
+        if not candidates:
+            stat["note"] = ("all gap candidates are within the briefing "
+                            "cooldown; nothing new to write this run")
+            return stat
 
         # An improvement gap (thin_content, serp_feature_loss, cannibalisation)
         # says "this EXISTING page underperforms". Every publishing adapter can

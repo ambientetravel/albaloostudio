@@ -4081,5 +4081,34 @@ _rv = _img.suitable(_pd, "Tehran International Exhibition Center", "trade delega
 _llm.complete_json = _saved_cj
 ok("an empty vet answer is retried — the retry's rejection stands instead of failing open", _rv is False)
 
+# ── topic planner (6 Oct: EO + ambientetravel briefed nothing on 4 Oct) ──
+import agent1_seo_scout as _a1
+import config as _cfg
+_eo = _cfg.load_sites(only=["exploreorient.com"], include_hold=True)[0]
+_saved_offers, _saved_cj2 = _a1._offer_titles, _llm.complete_json
+_a1._offer_titles = lambda site, cap=60: ["Silk Road Classic", "Nile Dahabiya"]
+_llm.complete_json = lambda *a, **k: ({"topics": [
+    {"query": "Silk Road travel guide", "offer": "", "why": "live page"},              # sitemap covers it
+    {"query": "Nile dahabiya cruise guide", "offer": "", "why": "cooldown"},           # in the ledger
+    {"query": "Khiva walled city day guide", "offer": "Silk Road Classic", "why": "ok"},
+    {"query": "Bukhara old town food guide", "offer": "Silk Road Classic", "why": "ok"},
+    {"query": "Aswan Nubian village visit", "offer": "Nile Dahabiya", "why": "ok"},
+]}, {})
+_now = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
+_led = {"cooldown_days": 45, "entries": [
+    {"domain": "exploreorient.com", "query": "Nile dahabiya cruise guide", "last_briefed": _now}]}
+_sm = {"https://exploreorient.com/journal/silk-road-travel-guide/"}
+_pl = _a1.plan_topics(_eo, 2, _sm, _led, [])
+ok("planner drops topics a live page covers or the ledger holds, and caps at what the run needs",
+   [c["query"] for c in _pl] == ["Khiva walled city day guide", "Bukhara old town food guide"]
+   and all(c["gap_type"] == "missing_page" and c["planned"] for c in _pl))
+ok("planned topics rank below seeds and real demand", all(c["local_score"] < 0.01 for c in _pl))
+ok("no planning when the run already has enough new-page topics", _a1.plan_topics(_eo, 0, _sm, _led, []) == [])
+_cb = _cfg.load_sites(only=["cruise24.me"], include_hold=True)[0]
+ok("a site that has not opted in (cms.topic_planner) is never planned for", _a1.plan_topics(_cb, 3, set(), _led, []) == [])
+_llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("quota"))
+ok("a planner outage returns nothing instead of failing the scout run", _a1.plan_topics(_eo, 3, _sm, _led, []) == [])
+_a1._offer_titles, _llm.complete_json = _saved_offers, _saved_cj2
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

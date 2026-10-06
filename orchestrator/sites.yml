@@ -138,6 +138,9 @@ sites:
       adapter: astro_pr
       content_root: "src/content/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
       images:                    # real Commons photo + its own credit (orchestrator/images.py)
         # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
         avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
@@ -217,6 +220,9 @@ sites:
       adapter: boutimar_ir_static
       content_root: "/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
       images:
         # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
         avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
@@ -336,6 +342,9 @@ sites:
       adapter: astro_pr          # opens a PR against the exploreorient repo
       content_root: "src/content/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
       images:
         # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
         avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
@@ -447,6 +456,9 @@ sites:
       entity: Article                    # created by the owning site session (contract: _push_base44_entity)
       content_root: "/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
     channels:
       - name: linkedin
         audience: b2b
@@ -511,6 +523,9 @@ sites:
       entity: Article                    # created by the owning site session (contract: _push_base44_entity)
       content_root: "/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
     channels:
       - name: telegram
         audience: d2c
@@ -582,6 +597,9 @@ sites:
                                  # Degrades to disk-staging if the repo var/token are unset.
       content_root: "/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
     channels:
       - name: telegram
         audience: d2c
