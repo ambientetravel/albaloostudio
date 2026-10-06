@@ -1,9 +1,10 @@
 # Orchestration health — 2026-10-06T08:38 UTC
 
-**1 broke · 2 need you · 0 to watch.**
+**2 broke · 2 need you · 0 to watch.**
 
 ## 🔴 Broke
 
+- **Broadcaster** last run **failed** (#60, 0.0d ago) — https://github.com/ambientetravel/albaloostudio/actions/runs/37437388371
 - Scout found 1 candidates but emitted **0 briefs**
 
 ## 🟡 Needs you — only you can do these
@@ -32,7 +33,7 @@
 |---|---|---:|---|
 | Scout | ✓ success | 1.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37195789418) |
 | Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37437327695) |
-| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37437388371) |
+| Broadcaster | ✗ failure | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37437388371) |
 | Closer | · never ran | — |  |
 | Auditor+Analyst | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475) |
 | Cartographer | ✓ success | 0.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115) |
