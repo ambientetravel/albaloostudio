@@ -1,4 +1,4 @@
-# Orchestration health — 2026-10-06T09:30 UTC
+# Orchestration health — 2026-10-06T09:34 UTC
 
 **3 broke · 2 need you · 0 to watch.**
 
@@ -40,7 +40,7 @@
 | Cartographer | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115) |
 | Watcher | ✓ success | 1.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37199470106) |
 | Oracle | · never ran | — |  |
-| Merge-watch | ✓ success | 0.7d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37333805308) |
+| Merge-watch | ✓ success | 0.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37333805308) |
 | PR gate | ✓ success | 0.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37418527626) |
 | Dashboard | ✓ success | 0.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37319951897) |
 

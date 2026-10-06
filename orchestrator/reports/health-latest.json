@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-06T09:30+00:00",
+ "generated": "2026-10-06T09:34+00:00",
  "critical": [
   "**Writer** was **skipped** last cycle (#65) — its upstream failed, so nothing downstream ran",
   "**Broadcaster** was **skipped** last cycle (#64) — its upstream failed, so nothing downstream ran",
@@ -93,7 +93,7 @@
   {
    "agent": "Merge-watch",
    "result": "success",
-   "age_days": 0.7,
+   "age_days": 0.8,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37333805308",
    "run": 54
   },
