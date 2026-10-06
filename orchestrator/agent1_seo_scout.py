@@ -1976,11 +1976,16 @@ def process_site(
         # A held site is not live. Keep gathering its demand — knowing what
         # people already search for is exactly what you want on launch day —
         # but write nothing for a site that cannot publish it.
-        if site.on_hold:
+        # cms.briefs_paused: "<reason>" does the same for a LIVE site whose CMS
+        # cannot take an article yet, without dropping it from audits the way
+        # status: hold does. 6 Oct: ambientetravel's base44 app has no Article
+        # entity, so a draft was written, paid for and lost on a 404.
+        paused = str((site.cms or {}).get("briefs_paused") or "").strip()
+        if site.on_hold or paused:
             stat["status"] = "hold"
             stat["note"] = (
                 f"{len(candidates)} gap candidate(s) recorded; no briefs emitted "
-                "because the site is on hold"
+                + (f"— briefs paused: {paused}" if paused else "because the site is on hold")
             )
             (run_dir / "demand").mkdir(parents=True, exist_ok=True)
             (run_dir / "demand" / f"{site.domain}.json").write_text(
@@ -1990,7 +1995,8 @@ def process_site(
                     ensure_ascii=False, indent=2),
                 encoding="utf-8",
             )
-            log.info("%s — on hold; demand banked, no briefs", site.domain)
+            log.info("%s — %s; demand banked, no briefs", site.domain,
+                     f"briefs paused ({paused})" if paused else "on hold")
             return stat
 
         if not candidates:
