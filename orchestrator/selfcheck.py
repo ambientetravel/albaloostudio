@@ -4113,6 +4113,8 @@ _llm.complete_json = lambda *a, **k: ({"topics": [
     {"query": "dahabiya Nile cruise guide", "offer": "", "why": "reordered ledger entry"},
     {"query": "Hegra tombs visit", "offer": "", "why": "ok"}]}, {})
 _pl2 = _a1.plan_topics(_eo, 3, set(), _led, [])
+ok("planned topics are capped at 2 per site per run even when the run could take 5 (review load)",
+   len(_a1.plan_topics(_eo, 5, set(), {"entries": []}, [])) <= 2)
 ok("a reordered seed or written topic is the same topic — the planner drops it",
    [c["query"] for c in _pl2] == ["Hegra tombs visit"])
 _a1._offer_titles, _llm.complete_json = _saved_offers, _saved_cj2

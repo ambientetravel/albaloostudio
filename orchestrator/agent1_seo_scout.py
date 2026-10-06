@@ -669,7 +669,12 @@ def plan_topics(site: Site, need: int, sitemap_urls: set[str], ledger: dict[str,
     local_score sits below seeds: measured demand and curated seeds rank first.
     Fail-soft: no model, no feed or no survivors means no planned topics.
     """
-    if need <= 0 or not _plans_topics(site):
+    if not _plans_topics(site):
+        return []
+    # Review is the bottleneck, not ideas (12 Aug: 35 drafts a week went unread).
+    # Planned topics top a site up by at most cms.topic_planner_max (default 2).
+    need = min(need, int((site.cms or {}).get("topic_planner_max") or 2))
+    if need <= 0:
         return []
     entries = (ledger or {}).get("entries", [])
     written = sorted({e["query"] for e in entries if e.get("domain") == site.domain})[:150]
