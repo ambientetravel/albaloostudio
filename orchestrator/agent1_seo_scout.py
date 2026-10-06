@@ -612,6 +612,46 @@ def _existing_paths(site: Site, sitemap_urls: set[str], cap: int = 250) -> list[
     return ([p for p in paths if art.search(p)] + [p for p in paths if not art.search(p)])[:cap]
 
 
+# Finglish words seen in pipeline slugs. A slug made of these is a transliteration,
+# spelled differently every time (keruz / kroz / kruz) — 6 Oct, boutimarfarsi #7.
+_FINGLISH = set("""keruz kroz kruz kerooz keshti kashti safar daryaei dariyayi daryayi bedoon
+bedun baraye barayeh rahnamaye rahnama behtarin zaman chist chegoone chegune tafavot vizaye
+viza irani iraniyan bandar entekhab entekhabe kabin khanevade khanevadegi chamedan baste bandi
+monaseb navgan raznamaye barnamerizi norooz jazire jazayer gheimat arzan luks mikonad hazine
+hazineh jambi tour-e safare""".split())
+
+
+def _finglish(slug: str) -> bool:
+    return any(t in _FINGLISH for t in slug.lower().split("-"))
+
+
+def english_path(site: Site, path: str, title: str) -> str:
+    """Keep the URL in English. If the model still transliterated, ask once for an
+    English slug of the title; if that fails too, keep the path and say so loudly
+    — a reviewer can rename it before merge, which is cheaper than a lost brief."""
+    slug = path.rstrip("/").split("/")[-1]
+    base = slug[:-5] if slug.endswith(".html") else slug
+    if not base or not _finglish(base):
+        return path
+    try:
+        import llm
+        out, _ = llm.complete_json_resilient(
+            "You write short English URL slugs.",
+            f"Article title: {title}\nReturn JSON {{\"slug\": \"3-6 lowercase English words joined by "
+            f"hyphens, no transliterated Persian\"}}.",
+            {"type": "object", "additionalProperties": False,
+             "properties": {"slug": {"type": "string"}}, "required": ["slug"]},
+            max_tokens=300, purpose="english slug", waits=(0,))
+        new = re.sub(r"[^a-z0-9-]+", "-", str(out.get("slug", "")).lower()).strip("-")[:80]
+        if new and not _finglish(new):
+            log.info("%s — Finglish slug %r replaced by %r", site.domain, base, new)
+            return path.replace(base, new, 1)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("%s — could not English-ise slug %r: %s", site.domain, base, exc)
+    log.warning("%s — slug %r is Finglish; rename it before merging", site.domain, base)
+    return path
+
+
 def apply_path_template(site: Site, path: str) -> str:
     """Force the site's URL contract onto a proposed path. cruise24.ir's build
     accepts only /blog/<slug>/ and SystemExits on anything else — the WHOLE site
@@ -885,9 +925,12 @@ def _analysis_system_prompt(site: Site) -> str:
         f"Write every brief field in the site's language ({site.locale}); keep "
         "keywords exactly as they appear in the Search Console data.",
         "",
-        "target_url_path must be a lowercase ASCII slug beginning with '/' even "
-        "for Farsi pages — the sites do not use percent-encoded URLs. Transliterate "
-        "rather than leaving a placeholder.",
+        "target_url_path must be a lowercase slug of ENGLISH words beginning with '/' "
+        "— also for Farsi pages: translate the topic, do NOT transliterate it. Every "
+        "site's own pages use English addresses (boutimar.ir/visa-for-cruise-iranians, "
+        "cruise24.ir/cruise-persian-gulf.html, cruisebaz.com/cruise-line/msc); Finglish "
+        "like /keruz-bedoon-viza-iranian has no fixed spelling (keruz/kroz/kruz) and "
+        "matches nothing anyone types. Good: /visa-free-cruises-for-iranians.",
         "Never propose a path that already exists in the supplied sitemap sample.",
         "",
         compliance.prompt_constraints(site.compliance_profile),
@@ -1604,6 +1647,7 @@ def build_brief_payload(
     path = analysis["target_url_path"]
     if not path.startswith("/"):
         path = "/" + path
+    path = english_path(site, path, analysis.get("working_title") or analysis.get("primary_keyword", ""))
     path = apply_path_template(site, path)
 
     # A must_include item that names a banned term is the model restating a

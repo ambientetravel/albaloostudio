@@ -4139,5 +4139,21 @@ else:
 ok("a busy Gemini is retried, then the planner falls back to Anthropic (6 Oct: 503 on 5 of 6 sites)",
    _m["provider"] == "anthropic" and _calls_r[-1] == "anthropic" and len(_calls_r) == 3)
 
+# ── English slugs (6 Oct: /keruz-bedoon-viza-iranian on boutimarfarsi #7) ──
+_bi = _cfg.load_sites(only=["boutimar.ir"], include_hold=True)[0]
+_saved_cjr = _llm.complete_json_resilient
+_llm.complete_json_resilient = lambda *a, **k: ({"slug": "Visa-Free Cruises for Iranians"}, {})
+_ep = _a1.english_path(_bi, "/daryanameh/keruz-bedoon-viza-iranian", "کروز بدون ویزا برای ایرانیان")
+_keep = _a1.english_path(_bi, "/visa-for-cruise-iranians", "x")
+_llm.complete_json_resilient = lambda *a, **k: ({"slug": "kroz-bedoon-viza"}, {})
+_still = _a1.english_path(_bi, "/keruz-bedoon-viza-iranian", "x")
+_llm.complete_json_resilient = _saved_cjr
+ok("a Finglish slug is replaced by an English one; an English slug is left alone",
+   _ep == "/daryanameh/visa-free-cruises-for-iranians" and _keep == "/visa-for-cruise-iranians")
+ok("a Finglish answer to the retry is refused (kept and flagged, never swapped for more Finglish)",
+   _still == "/keruz-bedoon-viza-iranian")
+ok("the analysis prompt now asks for English slugs, not transliteration",
+   "do NOT transliterate" in _a1._analysis_system_prompt(_bi))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
