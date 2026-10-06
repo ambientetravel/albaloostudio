@@ -708,7 +708,12 @@ def plan_topics(site: Site, need: int, sitemap_urls: set[str], ledger: dict[str,
                     str(exc)[:160])
         return []
 
-    have_keys = {_ledger.topic_key(c["query"]) for c in have}
+    # Same words in another order are the same topic: "Saudi Arabia travel guide
+    # AlUla" re-proposed the written "AlUla travel guide Saudi Arabia" (6 Oct dry
+    # run) — the ledger filter compares this site's own history by exact phrase.
+    have_keys = ({_ledger.topic_key(c["query"]) for c in have}
+                 | {_ledger.topic_key(e["query"]) for e in entries if e.get("domain") == site.domain}
+                 | {_ledger.topic_key(k) for k in (site.seed_keywords or [])})
     sitemap_tokens = [_slug_tokens(u) for u in sitemap_urls]
     planned: list[dict[str, Any]] = []
     for t in (out.get("topics") or []):

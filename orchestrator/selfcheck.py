@@ -4108,6 +4108,13 @@ _cb = _cfg.load_sites(only=["cruise24.me"], include_hold=True)[0]
 ok("a site that has not opted in (cms.topic_planner) is never planned for", _a1.plan_topics(_cb, 3, set(), _led, []) == [])
 _llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("quota"))
 ok("a planner outage returns nothing instead of failing the scout run", _a1.plan_topics(_eo, 3, _sm, _led, []) == [])
+_llm.complete_json = lambda *a, **k: ({"topics": [
+    {"query": "Saudi Arabia travel guide AlUla", "offer": "", "why": "reordered seed"},
+    {"query": "dahabiya Nile cruise guide", "offer": "", "why": "reordered ledger entry"},
+    {"query": "Hegra tombs visit", "offer": "", "why": "ok"}]}, {})
+_pl2 = _a1.plan_topics(_eo, 3, set(), _led, [])
+ok("a reordered seed or written topic is the same topic — the planner drops it",
+   [c["query"] for c in _pl2] == ["Hegra tombs visit"])
 _a1._offer_titles, _llm.complete_json = _saved_offers, _saved_cj2
 
 _calls_r = []
