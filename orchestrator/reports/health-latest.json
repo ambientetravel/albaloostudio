@@ -1,8 +1,6 @@
 {
- "generated": "2026-10-06T08:54+00:00",
- "critical": [
-  "Scout found 1 candidates but emitted **0 briefs**"
- ],
+ "generated": "2026-10-06T08:58+00:00",
+ "critical": [],
  "needs_you": [
   "3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
   "**1 article PR(s) waiting on your merge** (oldest 9 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی"
@@ -17,25 +15,25 @@
   "3 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
  "numbers": {
-  "briefs": 0,
-  "candidates": 1,
+  "briefs": 2,
+  "candidates": 99,
   "dlq": 0,
   "degraded": 0,
-  "ledger_skipped": 1,
-  "sites_scanned": 1,
-  "scout_run": "run_20261006T0837Z_8d41",
+  "ledger_skipped": 71,
+  "sites_scanned": 10,
+  "scout_run": "run_20261006T0849Z_2ec1",
   "articles": 2,
   "writer_failed": 4,
   "deferred": 0,
   "briefs_seen": 7,
   "cost_usd": 0.57036,
-  "prev_cost_usd": 0.678105,
-  "prev_articles": 6,
+  "prev_cost_usd": 0.235572,
+  "prev_articles": 1,
   "posts": 6,
   "posts_held": 3,
   "posts_no_media": 3,
   "campaigns": 5,
-  "open_prs": 13,
+  "open_prs": 14,
   "ai_recall": "0/8 properties named by ≥1 of 2 models"
  },
  "agents": [
@@ -50,15 +48,15 @@
    "agent": "Writer",
    "result": "success",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37438382118",
-   "run": 62
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37439324302",
+   "run": 63
   },
   {
    "agent": "Broadcaster",
-   "result": "success",
+   "result": "in_progress",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37439035819",
-   "run": 61
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37439672404",
+   "run": 62
   },
   {
    "agent": "Closer",
@@ -76,7 +74,7 @@
   {
    "agent": "Cartographer",
    "result": "success",
-   "age_days": 0.8,
+   "age_days": 0.9,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115",
    "run": 14
   },
@@ -89,10 +87,9 @@
   },
   {
    "agent": "Oracle",
-   "result": "success",
-   "age_days": 4.7,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426",
-   "run": 2
+   "result": "never ran",
+   "age_days": null,
+   "url": ""
   },
   {
    "agent": "Merge-watch",
