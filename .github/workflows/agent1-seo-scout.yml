@@ -31,7 +31,10 @@ on:
     # schedule fired 5–6 h late on 27 Sep and 4 Oct (09:59 / 10:34 UTC for 04:15).
     # This cron stays as a FALLBACK: the gate job stands it down when a real
     # dispatch already ran in the last 20 h, so the week is never scouted twice.
-    - cron: "15 4 * * 0"
+    # It sits at 06:15 UTC, two hours AFTER cron-job.org (04:15 UTC): at the
+    # same minute, an on-time GitHub run could start before the dispatch's run
+    # existed, see nothing to stand down for, and scout the week a second time.
+    - cron: "15 6 * * 0"
   workflow_dispatch:
     inputs:
       domain:
