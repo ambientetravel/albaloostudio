@@ -1,14 +1,18 @@
 {
- "generated": "2026-10-06T08:38+00:00",
+ "generated": "2026-10-06T08:52+00:00",
  "critical": [
-  "**Broadcaster** last run **failed** (#60, 0.0d ago) — https://github.com/ambientetravel/albaloostudio/actions/runs/37437388371",
   "Scout found 1 candidates but emitted **0 briefs**"
  ],
  "needs_you": [
   "3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship",
   "**1 article PR(s) waiting on your merge** (oldest 9 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی"
  ],
- "warn": [],
+ "warn": [
+  "**exploreorient.com** 'armenia historic monasteries guide' failed: Object of type bytes is not JSON serializable",
+  "**exploreorient.com** 'visiting hegra alula travel guide' failed: Object of type bytes is not JSON serializable",
+  "**exploreorient.com** 'jordan petra wadi rum itinerary' failed: Object of type bytes is not JSON serializable",
+  "**exploreorient.com** 'fann mountains trekking guide tajikistan' failed: Object of type bytes is not JSON serializable"
+ ],
  "fine": [
   "3 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
@@ -20,18 +24,18 @@
   "ledger_skipped": 1,
   "sites_scanned": 1,
   "scout_run": "run_20261006T0837Z_8d41",
-  "articles": 6,
-  "writer_failed": 0,
+  "articles": 2,
+  "writer_failed": 4,
   "deferred": 0,
-  "briefs_seen": 6,
-  "cost_usd": 0.678105,
-  "prev_cost_usd": 1.015158,
-  "prev_articles": 7,
+  "briefs_seen": 7,
+  "cost_usd": 0.57036,
+  "prev_cost_usd": 0.678105,
+  "prev_articles": 6,
   "posts": 6,
   "posts_held": 3,
   "posts_no_media": 3,
   "campaigns": 4,
-  "open_prs": 8,
+  "open_prs": 13,
   "ai_recall": "0/8 properties named by ≥1 of 2 models"
  },
  "agents": [
@@ -46,15 +50,15 @@
    "agent": "Writer",
    "result": "success",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37437327695",
-   "run": 61
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37438382118",
+   "run": 62
   },
   {
    "agent": "Broadcaster",
-   "result": "failure",
+   "result": "in_progress",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37437388371",
-   "run": 60
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37439035819",
+   "run": 61
   },
   {
    "agent": "Closer",

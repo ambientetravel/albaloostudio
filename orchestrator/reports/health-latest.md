@@ -1,16 +1,22 @@
-# Orchestration health — 2026-10-06T08:38 UTC
+# Orchestration health — 2026-10-06T08:52 UTC
 
-**2 broke · 2 need you · 0 to watch.**
+**1 broke · 2 need you · 4 to watch.**
 
 ## 🔴 Broke
 
-- **Broadcaster** last run **failed** (#60, 0.0d ago) — https://github.com/ambientetravel/albaloostudio/actions/runs/37437388371
 - Scout found 1 candidates but emitted **0 briefs**
 
 ## 🟡 Needs you — only you can do these
 
 - 3 social post(s) blocked for **missing media** — no image source is wired, so these can never ship
 - **1 article PR(s) waiting on your merge** (oldest 9 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی
+
+## 👀 To watch
+
+- **exploreorient.com** 'armenia historic monasteries guide' failed: Object of type bytes is not JSON serializable
+- **exploreorient.com** 'visiting hegra alula travel guide' failed: Object of type bytes is not JSON serializable
+- **exploreorient.com** 'jordan petra wadi rum itinerary' failed: Object of type bytes is not JSON serializable
+- **exploreorient.com** 'fann mountains trekking guide tajikistan' failed: Object of type bytes is not JSON serializable
 
 ## Numbers — last cycle
 
@@ -20,11 +26,11 @@
 | Gap candidates → briefs | 1 → **0** | |
 | Skipped by ledger (already briefed) | 1 | |
 | Dead-lettered / degraded | 0 / 0 | |
-| Articles drafted (as PRs) | **6** | 7 |
+| Articles drafted (as PRs) | **2** | 6 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $0.678 | $1.015 |
+| Model spend | $0.570 | $0.678 |
 | Social: campaigns / posts held / no-media | 4 / 3 / 3 | |
-| Article PRs open | 8 | |
+| Article PRs open | 13 | |
 | AI recall (Oracle, monthly) | 0/8 properties named by ≥1 of 2 models | |
 
 ## Agents
@@ -32,8 +38,8 @@
 | Agent | Last result | Age | |
 |---|---|---:|---|
 | Scout | ✓ success | 1.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37195789418) |
-| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37437327695) |
-| Broadcaster | ✗ failure | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37437388371) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37438382118) |
+| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439035819) |
 | Closer | · never ran | — |  |
 | Auditor+Analyst | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475) |
 | Cartographer | ✓ success | 0.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115) |
