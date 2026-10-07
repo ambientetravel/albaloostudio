@@ -1,0 +1,67 @@
+name: base44 — insert one paragraph into a live article
+
+# One narrow, verified edit to a LIVE base44 record (no PRs on base44): the
+# anchor must occur exactly once, only body_markdown is written, the record is
+# backed up first (artifact, 90 days) and read back; a mismatch is restored.
+# See orchestrator/tools/base44_patch.py.
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Site in sites.yml (e.g. cruisebaz.com)"
+        required: true
+      slug:
+        description: "Article slug (e.g. /aroya-cruise-guide)"
+        required: true
+      after:
+        description: "Exact anchor text (must occur once in the body)"
+        required: true
+      insert:
+        description: "Paragraph to insert after the anchor's line"
+        required: true
+      apply:
+        description: "Write it (unticked = dry run)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Patch
+        env:
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
+          # Free text goes through env, never interpolated into the script.
+          P_DOMAIN: ${{ inputs.domain }}
+          P_SLUG: ${{ inputs.slug }}
+          P_AFTER: ${{ inputs.after }}
+          P_INSERT: ${{ inputs.insert }}
+          P_APPLY: ${{ inputs.apply }}
+        run: |
+          ARGS=()
+          [ "$P_APPLY" = "true" ] && ARGS+=(--apply)
+          python3 tools/base44_patch.py --domain "$P_DOMAIN" --slug "$P_SLUG" \
+            --after "$P_AFTER" --insert "$P_INSERT" "${ARGS[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Keep the backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: base44-patch-backup
+          path: orchestrator/runs/base44-patch-backup-*
+          if-no-files-found: ignore
+          retention-days: 90

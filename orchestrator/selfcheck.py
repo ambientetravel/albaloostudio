@@ -4193,5 +4193,18 @@ ok("a credit the page already links leaves the raw URL out; a plain-text credit 
    "http" not in _img.credit_line(_p, "fa", linked=True) and "http" in _img.credit_line(_p, "fa")
    and _img.credit_line(_cc, "fa", linked=True).endswith("برش‌خورده"))
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "tools"))
+import base44_patch as _bp
+_b = "### visa\nPersian Gulf is easy visa. More text.\nNext line."
+_n = _bp.patched(_b, "Persian Gulf is easy visa.", "Greek calls need Schengen.")
+ok("a live-article patch lands as its own paragraph after the anchor line, and re-running is a no-op",
+   _n == "### visa\nPersian Gulf is easy visa. More text.\n\nGreek calls need Schengen.\n\nNext line."
+   and _bp.patched(_n, "Persian Gulf is easy visa.", "Greek calls need Schengen.") == _n)
+try:
+    _bp.patched("a. a.", "a.", "x"); _dup = False
+except ValueError:
+    _dup = True
+ok("a patch refuses an anchor that is missing or not unique", _dup)
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
