@@ -17,12 +17,11 @@
   "ListAgents will NOT show a stopped session — it only lists live peers.",
   "That difference cost a round trip on 26 Aug 2026."
  ],
- "verified": "2026-08-31",
+ "verified": "2026-09-27",
  "routes": [
   {
    "properties": [
     "cruise24.ir",
-    "cruise24.me",
     "book.cruise24.ir"
    ],
    "title": "Cruise24.ir storefront build",
@@ -32,6 +31,18 @@
     "/Users/alimozzy/cruise24.ir/"
    ],
    "note": "29 Sep 2026: repo_paths corrected. The live tree is /Users/alimozzy/cruise24.ir/ (GitHub ambientetravel/cruise24-ir, auto-deploy via the deploy branch). claude websitebuilder/cruise24-ir/ is the DEAD tree from August — never build or deploy from it. cruise24.me: staging.cruise24.me (GoDaddy, 92.205.251.216) was NOT built by this session and its source is not on this Mac; ask Alireza where it lives before changing it."
+  },
+  {
+   "properties": [
+    "cruise24.me"
+   ],
+   "title": "Cruise24.me website tools",
+   "sessionId": "session_01YCGvQ6DXzq5u7P4hVwKiMm",
+   "confirmed_by_user": true,
+   "note": "Cruise24 brand at cruise24.me: brings the world of cruising to the Middle East market (English). AmbiMare is kept only as the header wordmark. Alireza handed the claude.ai chat 'building a professional cruise website' to this session on 2026-09-27 and asked for it to be built here. Was previously bundled with cruise24.ir; the two are different audiences (Middle East, English vs Iran, Farsi).",
+   "repo_paths": [
+    "cruise24-me/"
+   ]
   },
   {
    "properties": [

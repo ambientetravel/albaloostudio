@@ -46,8 +46,10 @@ from agent4_sales_closer import (
     LeadRouting,
     _fetch_rates,
     decide_escalation,
+    profile_for,
     qualify,
     redact,
+    site_of,
 )
 from config import rfc3339, utc_now
 
@@ -130,9 +132,7 @@ def close_one(raw: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Outcome:
     # CampaignLog mirrors campaign.log.v1 rather than flattening it.
     oc.attributed_campaign = (str(campaign.campaign.get("campaign_id", "")) if campaign else "")
     routing = campaign.lead_routing if campaign else LeadRouting()
-    profile = str((campaign.compliance.get("profile") if campaign else None) or "boutimar_v1")
-    if profile not in compliance.PROFILES:
-        profile = "boutimar_v1"
+    profile = profile_for(campaign, site_of(lead))
 
     oc.lead_id = f"lead_{utc_now():%Y%m%dT%H%M%S}Z_{abs(hash(lead.from_ref)) % 10**6:06d}"
 
@@ -210,16 +210,30 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
     """
     import requests
 
-    secret = config.optional_env("WEBHOOK_SIGNING_SECRET")
+    # LEADS_SIGNING_SECRET, when set, is used only for pulling leads: it lives in a
+    # site's api/config.php, so it should not be the key that signs every other hop.
+    secret = config.optional_env("LEADS_SIGNING_SECRET") or config.optional_env("WEBHOOK_SIGNING_SECRET")
+    # A value copied out of a web terminal can carry a line break where the line wrapped;
+    # a signing secret never contains whitespace, so none of it is meant.
+    secret = "".join(secret.split())
+    if secret:
+        # Length and a short hash, never the value: compared with the same two numbers
+        # printed on the server, they show which copy of the secret is the wrong one.
+        import hashlib
+        log.info("lead-pull secret: %d chars, fingerprint %s",
+                 len(secret), hashlib.sha256(secret.encode("utf-8")).hexdigest()[:8])
     body = b""
     headers = (config.signed_headers(secret, body, "agent4-lead-pull")
                if secret else {"User-Agent": config.USER_AGENT})
     if not secret:
-        log.warning("WEBHOOK_SIGNING_SECRET not set — pulling leads unsigned. "
+        log.warning("LEADS_SIGNING_SECRET / WEBHOOK_SIGNING_SECRET not set — pulling leads unsigned. "
                     "The source cannot tell this request from anyone else's.")
 
     resp = requests.get(url, headers=headers, timeout=config.WEBHOOK_TIMEOUT_S)
-    resp.raise_for_status()
+    if resp.status_code >= 400:
+        # The source's own reason ("unsigned", "stale", "signature") is what tells a wrong
+        # secret from a host that strips the X- headers; raise_for_status alone drops it.
+        raise requests.HTTPError(f"{resp.status_code} from {url}: {config.redact(resp.text[:200])}", response=resp)
     data = resp.json()
     # Accept a bare array or {"leads": [...]}, because both are what real
     # endpoints return and arguing about it helps nobody.

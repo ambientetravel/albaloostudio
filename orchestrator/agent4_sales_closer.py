@@ -295,10 +295,38 @@ def _fetch_rates(price_source: str | None) -> dict[str, Any]:
         }
 
 
-def _system_prompt(routing: LeadRouting, profile: str) -> str:
+def site_of(lead: InboundLead) -> "config.Site | None":
+    """The registry entry for the site a lead came from, when the lead says so.
+
+    Site forms (cruise24.me's api/enquiry.php) send `site`. Without it a lead
+    was drafted under the default profile with no brand at all, so a Cruise24
+    enquiry could be answered as if it had come to Boutimar."""
+    domain = str((lead.model_extra or {}).get("site") or "").strip().lower()
+    if not domain:
+        return None
+    try:
+        return next((s for s in config.load_sites(include_hold=True) if s.domain == domain), None)
+    except Exception as exc:  # the registry is advice here, never a reason to drop a lead
+        log.warning("could not read the site registry for %s: %s", domain, exc)
+        return None
+
+
+def profile_for(campaign: "CampaignLog | None", site: "config.Site | None") -> str:
+    """Campaign first (it knows the article), then the site's own profile, then the default."""
+    profile = str((campaign.compliance.get("profile") if campaign else None)
+                  or (site.compliance_profile if site else None) or "boutimar_v1")
+    return profile if profile in compliance.PROFILES else "boutimar_v1"
+
+
+def _system_prompt(routing: LeadRouting, profile: str, site: "config.Site | None" = None) -> str:
     threshold = routing.high_value_threshold
+    brand_line = (
+        [f"You reply on behalf of {site.brand} ({site.domain}). Sign as the {site.brand} "
+         "team, and never name or link any other brand or website of the group.", ""]
+        if site else []
+    )
     return "\n".join(
-        [
+        brand_line + [
             "You qualify inbound travel enquiries for a luxury travel group and "
             "draft a reply for a human colleague to review and send.",
             "",
@@ -345,6 +373,7 @@ def qualify(
                 "message": clean_message,
                 "locale": lead.locale,
                 "display_name": lead.display_name,
+                "site": (lead.model_extra or {}).get("site"),
                 "received_at": lead.received_at or rfc3339(),
             },
             "attribution": {
@@ -367,7 +396,7 @@ def qualify(
     kwargs: dict[str, Any] = {
         "model": config.ANTHROPIC_MODEL,
         "max_tokens": 8000,
-        "system": _system_prompt(routing, profile),
+        "system": _system_prompt(routing, profile, site_of(lead)),
         "messages": [{"role": "user", "content": user}],
         "output_config": {
             "effort": config.ANTHROPIC_EFFORT,
@@ -555,9 +584,7 @@ async def inbound_lead(
 
     campaign = CAMPAIGNS.attribute(lead)
     routing = campaign.lead_routing if campaign else LeadRouting()
-    profile = str((campaign.compliance.get("profile") if campaign else None) or "boutimar_v1")
-    if profile not in compliance.PROFILES:
-        profile = "boutimar_v1"
+    profile = profile_for(campaign, site_of(lead))
 
     rates = _fetch_rates(routing.price_source)
     lead_id = f"lead_{utc_now():%Y%m%dT%H%M%S}Z_{abs(hash(lead.from_ref)) % 10**6:06d}"

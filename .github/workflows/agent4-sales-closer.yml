@@ -9,9 +9,12 @@
 # wired. A nightly run would register campaigns, find zero leads and report a
 # green no-op every morning, which is how a green tick stops meaning anything.
 #
-# Add `schedule:` the day leads actually arrive — from res.boutimar.ir/ingest,
-# a Make scenario polling an inbox, or a WhatsApp bridge. Until then this runs
-# when someone has leads to qualify.
+# 30 Sep 2026: leads now arrive. cruise24.me stores its enquiries and serves them
+# on a signed GET (api/leads.php, `lead_source` in sites.yml). The schedule below
+# pulls every site with a lead_source every four hours — but ONLY once the repo
+# secret LEADS_SIGNING_SECRET exists (the same value as that site's
+# api/config.php signing_secret). Without it the scheduled run says so and stops,
+# rather than failing red every four hours or reporting a green no-op.
 #
 # NOTHING IS SENT. Agent 4 has no delivery path at all: no SMTP, no webhook to
 # a customer, nothing. Replies land in the artifact for a human to read, edit
@@ -21,11 +24,17 @@
 name: Agent 4 — Sales Closer
 
 on:
+  schedule:
+    - cron: "23 */4 * * *"     # every four hours; pulls each site's lead_source
   workflow_dispatch:
     inputs:
       leads_path:
-        description: "Path in the repo to a JSONL/JSON array of inbound leads"
-        required: true
+        description: "Path in the repo to a JSONL/JSON array of inbound leads (blank = pull from URLs)"
+        required: false
+        type: string
+      leads_url:
+        description: "Pull from this URL instead (blank = every lead_source in sites.yml)"
+        required: false
         type: string
       campaigns_run_id:
         description: "Agent 3 run ID for attribution (blank = latest successful)"
@@ -70,19 +79,44 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Check the leads file exists
+      - name: Choose the lead sources
         id: leads
+        env:
+          LEADS_PATH: ${{ inputs.leads_path }}
+          LEADS_URL: ${{ inputs.leads_url }}
+          HAS_LEADS_SECRET: ${{ secrets.LEADS_SIGNING_SECRET != '' }}
         run: |
           set -euo pipefail
-          P="../${{ inputs.leads_path }}"
-          if [ ! -f "$P" ]; then
-            echo "::error title=No leads file::${{ inputs.leads_path }} does not exist in the repository."
-            exit 1
+          if [ -n "${LEADS_PATH:-}" ]; then
+            P="../$LEADS_PATH"
+            if [ ! -f "$P" ]; then
+              echo "::error title=No leads file::$LEADS_PATH does not exist in the repository."
+              exit 1
+            fi
+            echo "path=$P" >> "$GITHUB_OUTPUT"
+            echo "$(wc -l < "$P") line(s) in $LEADS_PATH"
+            exit 0
           fi
-          echo "path=$P" >> "$GITHUB_OUTPUT"
-          echo "$(wc -l < "$P") line(s) in ${{ inputs.leads_path }}"
+          if [ "$HAS_LEADS_SECRET" != "true" ]; then
+            echo "::notice title=Lead pull not set up::Repo secret LEADS_SIGNING_SECRET is missing, so no site's leads can be pulled. Set it to the signing_secret in the site's api/config.php. Nothing ran."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -n "${LEADS_URL:-}" ]; then
+            URLS="$LEADS_URL"
+          else
+            URLS=$(python3 -c "import config; print(' '.join(s.lead_source for s in config.load_sites() if s.lead_source))")
+          fi
+          if [ -z "$URLS" ]; then
+            echo "::notice title=No lead sources::No site in sites.yml has a lead_source. Nothing ran."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "urls=$URLS" >> "$GITHUB_OUTPUT"
+          echo "Pulling leads from: $URLS"
 
       - name: Resolve the broadcaster run for attribution
+        if: steps.leads.outputs.skip != 'true'
         id: b
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -99,7 +133,7 @@ jobs:
             echo "::notice title=No campaigns::No Agent 3 run found — leads will be qualified without attribution."
 
       - name: Fetch campaign logs
-        if: steps.b.outputs.run_id != ''
+        if: steps.leads.outputs.skip != 'true' && steps.b.outputs.run_id != ''
         continue-on-error: true
         uses: actions/download-artifact@v5
         with:
@@ -109,49 +143,67 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Qualify
+        if: steps.leads.outputs.skip != 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-5' }}
+          LEADS_SIGNING_SECRET: ${{ secrets.LEADS_SIGNING_SECRET }}
           PIPELINE_ENVIRONMENT: production
+          LEADS_FILE: ${{ steps.leads.outputs.path }}
+          LEADS_URLS: ${{ steps.leads.outputs.urls }}
+          LIMIT: ${{ inputs.limit || '0' }}
+          NO_LLM: ${{ inputs.no_llm || false }}
         run: |
           set -euo pipefail
-          ARGS="--leads ${{ steps.leads.outputs.path }} --out closed"
+          COMMON=""
           CDIR=$(find inbox -type d -name campaigns 2>/dev/null | head -1 || true)
-          if [ -n "$CDIR" ]; then ARGS="$ARGS --campaigns $CDIR"; fi
-          if [ "${{ inputs.limit || '0' }}" != "0" ]; then ARGS="$ARGS --limit ${{ inputs.limit || '0' }}"; fi
-
-          if [ "${{ inputs.no_llm }}" = "true" ] || [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+          if [ -n "$CDIR" ]; then COMMON="$COMMON --campaigns $CDIR"; fi
+          if [ "$LIMIT" != "0" ]; then COMMON="$COMMON --limit $LIMIT"; fi
+          if [ "$NO_LLM" = "true" ] || [ -z "${ANTHROPIC_API_KEY:-}" ]; then
             if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
               echo "::notice title=No Anthropic key::Running --no-llm: redaction, attribution, the compliance gate and escalation are exercised, but no reply is drafted."
             fi
-            ARGS="$ARGS --no-llm"
+            COMMON="$COMMON --no-llm"
           fi
 
-          python3 agent4_sales_closer_batch.py $ARGS
+          if [ -n "${LEADS_FILE:-}" ]; then
+            python3 agent4_sales_closer_batch.py --leads "$LEADS_FILE" --out closed $COMMON
+            exit 0
+          fi
+          FAILED=0
+          for U in $LEADS_URLS; do
+            HOST=$(python3 -c "import sys,urllib.parse; print(urllib.parse.urlparse(sys.argv[1]).hostname)" "$U")
+            echo "::group::$HOST"
+            python3 agent4_sales_closer_batch.py --leads-url "$U" --out "closed/$HOST" $COMMON || FAILED=1
+            echo "::endgroup::"
+          done
+          exit $FAILED
 
       - name: Summarise
         if: always()
         run: |
           set -euo pipefail
-          [ -f closed/manifest.json ] || exit 0
+          ls closed/manifest.json closed/*/manifest.json >/dev/null 2>&1 || exit 0
           python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-          import json
-          m = json.load(open("closed/manifest.json", encoding="utf-8"))
-          print("## Agent 4 — Sales Closer\n")
-          if m.get("no_llm"):
-              print("> **Structural run — no model was called.** No replies were drafted.\n")
-          print(f"{m['qualified']} qualified · {m['blocked_replies']} replies blocked · "
-                f"{m['failed']} failed (of {m['leads_seen']} leads)\n")
-          print(f"**{m['escalated']} escalated to a human** · {m['with_draft']} drafts · "
-                f"{m['leads_containing_pii']} contained PII (redacted before the model) · "
-                f"{m['attributed']} attributed to a campaign\n")
-          print(f"> **{m['sent']} sent.** {m['sent_note']}\n")
-          print("| Lead | Channel | Status | Intent | Score | Escalated | Redacted |")
-          print("|---|---|---|---|---:|---|---|")
-          for o in m["outcomes"]:
-              print(f"| `{o['lead_id'] or o['lead_ref']}` | {o['channel']} | {o['status']} | "
-                    f"{o['intent'] or '—'} | {o['score']} | "
-                    f"{'yes' if o['escalated'] else ''} | {', '.join(o['redactions']) or ''} |")
+          import glob, json
+          for path in sorted(glob.glob("closed/manifest.json") + glob.glob("closed/*/manifest.json")):
+            m = json.load(open(path, encoding="utf-8"))
+            src = path.split("/")[1] if path.count("/") == 2 else "leads file"
+            print(f"## Agent 4 — Sales Closer · {src}\n")
+            if m.get("no_llm"):
+                print("> **Structural run — no model was called.** No replies were drafted.\n")
+            print(f"{m['qualified']} qualified · {m['blocked_replies']} replies blocked · "
+                  f"{m['failed']} failed (of {m['leads_seen']} leads)\n")
+            print(f"**{m['escalated']} escalated to a human** · {m['with_draft']} drafts · "
+                  f"{m['leads_containing_pii']} contained PII (redacted before the model) · "
+                  f"{m['attributed']} attributed to a campaign\n")
+            print(f"> **{m['sent']} sent.** {m['sent_note']}\n")
+            print("| Lead | Channel | Status | Intent | Score | Escalated | Redacted |")
+            print("|---|---|---|---|---:|---|---|")
+            for o in m["outcomes"]:
+                print(f"| `{o['lead_id'] or o['lead_ref']}` | {o['channel']} | {o['status']} | "
+                      f"{o['intent'] or '—'} | {o['score']} | "
+                      f"{'yes' if o['escalated'] else ''} | {', '.join(o['redactions']) or ''} |")
           print("\n*Architecture credit: Albaloo Studio*")
           PY
 

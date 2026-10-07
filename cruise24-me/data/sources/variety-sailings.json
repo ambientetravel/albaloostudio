@@ -1,0 +1,4021 @@
+{
+ "_about": "Variety Cruises sailings read from varietycruises.com cruise pages (the line's own booking data). priceFrom = cheapest cabin category with cabins left, EUR per person, port charges excluded; soldOut when none are left.",
+ "source": "Variety Cruises",
+ "synced": "2026-09-27",
+ "sailings": [
+  {
+   "id": "VAR-antiquity-to-byzantium-canal-crossing",
+   "slug": "antiquity-to-byzantium-canal-crossing",
+   "url": "https://www.varietycruises.com/cruises/antiquity-to-byzantium-canal-crossing",
+   "title": "Peloponnese Treasures: From Antiquity to Byzantium",
+   "summary": "A voyage through history dedicated to the Golden Age of Greek civilization and beyond, this cruise comes complete with a guest lecturer , Eugenia Alexiou. Eugenia has a Master’s degree in Byzantine Art, is an expert historian and, as a graduate of the Athens’ Tour Guide Academy, is the perfect tutor through all the classical sites and sights we visit. This journey to off-the-beaten track locales in the Peloponnese peninsula is a masterclass on the journey through classical antiquity and the Roman conquest, ending with the transition to the Christian empire of Byzantium.",
+   "region": "Greece: Corinth Canal",
+   "ships": [
+    "Galileo"
+   ],
+   "nights": 7,
+   "route": [
+    "Athens, Marina Zeas (Piraeus)",
+    "Nafplion",
+    "Nafplion / Mycenae",
+    "Monemvasia",
+    "Gythion",
+    "Pylos",
+    "Katakolon / Olympia",
+    "Itea",
+    "Itea / Delphi",
+    "Corinth Canal Crossing",
+    "Marina Zeas",
+    "Athens"
+   ],
+   "itinerary": [
+    [
+     "Athens, Marina Zeas (Piraeus) - Nafplion",
+     ""
+    ],
+    [
+     "Nafplion",
+     ""
+    ],
+    [
+     "Nafplion / Mycenae - Monemvasia",
+     ""
+    ],
+    [
+     "Gythion",
+     ""
+    ],
+    [
+     "Pylos",
+     ""
+    ],
+    [
+     "Katakolon / Olympia - Itea",
+     ""
+    ],
+    [
+     "Itea / Delphi - Corinth Canal Crossing - Marina Zeas",
+     ""
+    ],
+    [
+     "Athens - Marina Zeas (Piraeus)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    "onboard M/S GALILEO: Buffet breakfast and two meals daily, including a Welcome Cocktail, a Greek night Evening, and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "Onboard Guest Lecturer.",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2026-10-23",
+     "code": "ATB261023",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-30",
+     "code": "ATB261030",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 1700,
+     "soldOut": false
+    },
+    {
+     "date": "2026-11-06",
+     "code": "ATB261106",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2250,
+     "soldOut": false
+    },
+    {
+     "date": "2026-11-13",
+     "code": "ATB261113",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 1700,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-19",
+     "code": "ATB270319",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 1700,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-26",
+     "code": "ATB270326",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 1700,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-02",
+     "code": "ATB270402",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2250,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-09",
+     "code": "ATB270409",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2290,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-22",
+     "code": "ATB271022",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2290,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-29",
+     "code": "ATB271029",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2290,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-05",
+     "code": "ATB271105",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 1700,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-12",
+     "code": "ATB271112",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 1700,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-classical-greece",
+   "slug": "classical-greece",
+   "url": "https://www.varietycruises.com/cruises/classical-greece",
+   "title": "Classical Greece",
+   "summary": "Enjoy a harmonious balance between conventional cruising and private yachting, along with an exciting voyage of discovery, unraveling the wonders of Classical Greece. The beautiful Cyclades, Kea, Santorini, Mykonos and the neighboring UNESCO-protected archaeological isle of Delos. Crete, the largest and southern most Greek island. The crystal blue waters of the island of Kythira, a hidden gem of the Aegean sea. The Peloponnese with Monemvasia and Nafplion historical treasures.",
+   "region": "Greek Islands",
+   "ships": [
+    "Harmony G",
+    "Harmony V",
+    "Variety Voyager"
+   ],
+   "nights": 7,
+   "route": [
+    "Athens, Marina Zeas (Piraeus)",
+    "Kea",
+    "Delos",
+    "Mykonos",
+    "Santorini",
+    "Rethymnon, Crete",
+    "Kythira",
+    "Monemvasia",
+    "Nafplion",
+    "Hydra",
+    "Marina Zea",
+    "Athens"
+   ],
+   "itinerary": [
+    [
+     "Athens, Marina Zeas (Piraeus) - Kea",
+     ""
+    ],
+    [
+     "Delos - Mykonos",
+     ""
+    ],
+    [
+     "Santorini",
+     ""
+    ],
+    [
+     "Rethymnon, Crete",
+     ""
+    ],
+    [
+     "Kythira",
+     ""
+    ],
+    [
+     "Monemvasia - Nafplion",
+     ""
+    ],
+    [
+     "Nafplion - Hydra - Marina Zea- Athens",
+     ""
+    ],
+    [
+     "Athens - Marina Zeas (Piraeus)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Half-board: Buffet breakfast and one meal daily, including a Welcome Cocktail, a Greek night Evening, fun BBQ (weather permitting), and Captain’s Dinner.",
+    "Filter coffee, tea and mineral water all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "A government-mandated sustainability fee applies",
+    "only to the Variety Voyager",
+    "(October 2, 2026 departure) and is not included in the cruise fare.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2026-10-02",
+     "code": "CGVV261002",
+     "ship": "Variety Voyager",
+     "nights": 7,
+     "priceFrom": 3590,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-09",
+     "code": "CGHG261009",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-16",
+     "code": "CGHG270416",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2610,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-23",
+     "code": "CGHG270423",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2610,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-30",
+     "code": "CGHG270430",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2610,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-07",
+     "code": "CGHG270507",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-21",
+     "code": "CGHG270521",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-28",
+     "code": "CGHG270528",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-04",
+     "code": "CGHV270604",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3650,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-11",
+     "code": "CGHV270611",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-18",
+     "code": "CGHV270618",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-25",
+     "code": "CGHV270625",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-09",
+     "code": "CGHV270709",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-16",
+     "code": "CGHV270716",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 2790,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-23",
+     "code": "CGHV270723",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3285,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-30",
+     "code": "CGHV270730",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-06",
+     "code": "CGHV270806",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-13",
+     "code": "CGHV270813",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 2790,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-27",
+     "code": "CGHG270827",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-03",
+     "code": "CGHG270903",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-10",
+     "code": "CGHG270910",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-17",
+     "code": "CGHG270917",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-24",
+     "code": "CGHG270924",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 4150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-01",
+     "code": "CGHG271001",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-08",
+     "code": "CGHG271008",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2900,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-15",
+     "code": "CGHG271015",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2610,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-croatia-island-hopping-montenegro",
+   "slug": "croatia-island-hopping-montenegro",
+   "url": "https://www.varietycruises.com/cruises/croatia-island-hopping-montenegro",
+   "title": "Croatia Island-Hopping & Montenegro",
+   "summary": "77 Years of Small-Ship Expertise. This is How the Adriatic Was Meant to Be Discovered. Designed for today's premium traveler, this Croatia Island-Hopping &amp; Montenegro itinerary blends iconic Adriatic highlights with hidden islands, authentic local experiences, and a relaxed boutique yacht atmosphere. Sailing with up to just 34 guests, this journey offers a slower, more immersive way to explore the region—combining crystal-clear swim stops, charming coastal towns, rich gastronomy, and the spectacular scenery of Montenegro’s Bay of Kotor. Why This Cruise Stands Out ✓ Explore two countries in one voyage, Croatia and Montenegro ✓ Authentic Islands : Beyond Croatia's famous ports, discover Lastovo, Vis and other islands where local traditions remain wonderfully preserved. ✓ Discover the spectacular Bay of Kotor , Montenegro. ✓ Enjoy multiple Variety Swim Experiences directly from the yacht ✓ Balanced Dining : Half board meals with drinks included onboard, plus opportunities to experience authentic local cuisine and family-run Croatian konobas ashore ✓ Experience authentic island life, family wineries, fresh seafood and local traditions ✓ Included guided experiences combined with optional immersive adventures, giving you the freedom to explore your way. ✓ The Variety Difference : A family-owned company with 77 years of small-ship expertise, an exceptional 1:2 crew-to-guest ratio , personalized service and warm hospitality that guests consistently rate among the highlights of their cruise. Highlights: Dubrovnik - Elaphiti Islands - Mljet National Park - Korčula - Lastovo Nature Park - Blue Cave - Vis Island - Hvar - Pakleni Islands - Bay of Kotor, Montenegro",
+   "region": "Croatia & Adriatic",
+   "ships": [
+    "Callisto"
+   ],
+   "nights": 7,
+   "route": [
+    "Dubrovnik, Croatia",
+    "Elaphiti Islands & Mljet",
+    "Korčula",
+    "Lastovo",
+    "Vis",
+    "Pakleni Islands & Hvar",
+    "Kotor, Montenegro",
+    "Dubrovnik, Croatia"
+   ],
+   "itinerary": [
+    [
+     "Dubrovnik, Croatia",
+     ""
+    ],
+    [
+     "Elaphiti Islands & Mljet",
+     ""
+    ],
+    [
+     "Korčula",
+     ""
+    ],
+    [
+     "Lastovo",
+     ""
+    ],
+    [
+     "Vis",
+     ""
+    ],
+    [
+     "Pakleni Islands & Hvar",
+     ""
+    ],
+    [
+     "Kotor, Montenegro",
+     ""
+    ],
+    [
+     "Dubrovnik, Croatia",
+     ""
+    ]
+   ],
+   "included": [
+    "Boutique Yacht Accommodation",
+    "•    Accommodation in sea-view double or twin cabins with private en-suite facilities and individually controlled air conditioning (large windows on the Main Deck, portholes on the Lower Deck)",
+    "•    Daily housekeeping service and evening turndown service",
+    "•",
+    "Free Wi-Fi onboard",
+    "Exceptional Hospitality",
+    "•    15–16 experienced English-speaking crew members (approximately 1:2 crew-to-guest ratio), delivering one of the highest levels of personalized service in the Adriatic",
+    "•    Our crew are consistently rated among the highlights of the Variety Cruises experience, praised by guests for their warmth, professionalism and genuine hospitality",
+    "•    English-speaking Chief Experience Officer",
+    "Dining & Onboard Experiences",
+    "•    14 meals onboard featuring Mediterranean and local cuisine, including:",
+    "-Daily buffet breakfast with fresh fruit",
+    "-Daily buffet lunch or three-course dinner (depending on the day's programe), including Welcome Cocktail Reception & Dinner and Captain's Farewell Dinner",
+    "•",
+    "One complimentary glass of wine, beer or soft drink with every onboard lunch and dinner",
+    "•    Complimentary filtered water, tea, coffee and fresh fruit throughout the day",
+    "•    Local Theme Evening with music and cultural entertainment",
+    "•    Complimentary wine tasting onboard",
+    "•    Complimentary cooking or cocktail demonstration onboard",
+    "Included Experiences/Tours",
+    "•    Guided walking tour of Dubrovnik Old Town",
+    "•    Entrance and visit to Mljet National Park",
+    "•    Guided walking tour of Hvar",
+    "•    Guided walking tour of UNESCO-listed Kotor Old Town",
+    "•    Multiple Variety Swim Experiences (weather and local authority permitting)",
+    "•    Onboard BBQ (weather permitting)",
+    "Water Sports & Recreation",
+    "•    Kayaks",
+    "•    Stand-Up Paddleboards",
+    "•    Snorkeling equipment (mask, fins & snorkel)",
+    "•    Beach towels"
+   ],
+   "notIncluded": [
+    "•    Beverages (except those mentioned above)",
+    "•    Optional shore excursions (except those included) or other land arrangements",
+    "•    Meals ashore",
+    "•    Crew tips",
+    "•    Passenger personal expenses"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-14",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-28",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-18",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-25",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-02",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-09",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-16",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-23",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-30",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-06",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-13",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-20",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-03",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-17",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-01",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-greek-easter-sailing",
+   "slug": "greek-easter-sailing",
+   "url": "https://www.varietycruises.com/cruises/greek-easter-sailing",
+   "title": "Greek Easter Sailing",
+   "summary": "Celebrate Greek Easter, Greece’s most cherished tradition, in an unforgettable way aboard our Jewels of the Cyclades Cruise, departing April 30, 2027. Sail around the stunning Cycladic islands, where each region brings unique Easter customs, vibrant celebrations, and local charm. From the sacred atmosphere of Good Friday in Poros to the Resurrection celebrations in Folegandros, Santorini’s festive Easter Sunday traditions, and the vibrant island life of Mykonos and Syros, this journey blends Greek heritage and living traditions, island beauty, and unforgettable moments at sea.",
+   "region": "Greek Islands",
+   "ships": [
+    "Galileo"
+   ],
+   "nights": 7,
+   "route": [
+    "Athens, Marina Zeas (Piraeus)",
+    "Poros",
+    "Poliegos",
+    "Folegandros",
+    "Santorini",
+    "Antiparos",
+    "Paros",
+    "Delos",
+    "Mykonos",
+    "Syros",
+    "Kythnos",
+    "Athens"
+   ],
+   "itinerary": [
+    [
+     "Athens, Marina Zeas (Piraeus) - Poros",
+     ""
+    ],
+    [
+     "Poliegos - Folegandros",
+     ""
+    ],
+    [
+     "Santorini",
+     ""
+    ],
+    [
+     "Antiparos - Paros",
+     ""
+    ],
+    [
+     "Delos - Mykonos",
+     ""
+    ],
+    [
+     "Syros",
+     ""
+    ],
+    [
+     "Kythnos - Marina Zeas (Piraeus)",
+     ""
+    ],
+    [
+     "Athens - Marina Zeas (Piraeus)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Half-board: Buffet breakfast and 1 meal daily, including a Welcome Cocktail, a Greek night Evening, fun BBQ (weather permitting), and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "Onboard Guest Lecturer.",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2027-04-30",
+     "code": "CJ270430",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-greek-islands-and-turkey",
+   "slug": "greek-islands-and-turkey",
+   "url": "https://www.varietycruises.com/cruises/greek-islands-and-turkey",
+   "title": "Greek Islands & Turkey",
+   "summary": "Discover the timeless treasures of the Aegean Sea on an unforgettable journey through Greece and Turkey. Sail between iconic Greek islands, exploring highlights such as Delos &amp; Mykonos, Syros, Patmos, Naxos, and Sifnos, alongside the legendary ruins of Ephesus in Kusadasi . This carefully curated itinerary offers a perfectly balanced exploration of the Cyclades and the Eastern Aegean, blending rich history, stunning island landscapes, and authentic local culture, all enjoyed at a relaxed pace aboard an intimate yacht-style cruise. Enhancing your experience, enjoy two complimentary shore excursions to the archaeological site of Delos and the ancient city of Ephesus in Kusadasi, allowing you to delve deeper into the region’s extraordinary heritage. Perfect for travelers seeking a refined yet immersive Greece and Turkey cruise experience, this voyage offers effortless exploration, cultural depth, and breathtaking scenery at every stop.",
+   "region": "Greek Islands & Türkiye",
+   "ships": [
+    "Panorama",
+    "Variety Voyager"
+   ],
+   "nights": 7,
+   "route": [
+    "Athens (Lavrio Port)",
+    "Syros Or Kea",
+    "Delos",
+    "Mykonos",
+    "Samos",
+    "Kusadasi (Turkey)",
+    "Patmos",
+    "Naxos",
+    "Sifnos"
+   ],
+   "itinerary": [
+    [
+     "Athens (Lavrio Port) - Syros Or Kea",
+     ""
+    ],
+    [
+     "Delos - Mykonos",
+     ""
+    ],
+    [
+     "Samos",
+     ""
+    ],
+    [
+     "Kusadasi (Turkey)",
+     ""
+    ],
+    [
+     "Patmos",
+     ""
+    ],
+    [
+     "Naxos",
+     ""
+    ],
+    [
+     "Sifnos",
+     ""
+    ],
+    [
+     "Athens (Lavrio Port)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Half-board: Buffet breakfast and one meal daily, including a Welcome Cocktail, a Greek night Evening, fun BBQ (weather permitting), and Captain’s Dinner.",
+    "Two complimentary shore excursions",
+    "in Delos & Ephesus in Turkey.",
+    "Regular (filter) coffee, tea and mineral water all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands (except the two mentioned above) or other land arrangements.",
+    "A government-mandated sustainability fee applies",
+    "only to the Variety Voyager",
+    "and is not included in the cruise fare.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2026-10-09",
+     "code": "AOVV261009",
+     "ship": "Variety Voyager",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-30",
+     "code": "AOPI270430",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-14",
+     "code": "AOPI270514",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-02",
+     "code": "AOPI270702",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-30",
+     "code": "AOPI270730",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-01",
+     "code": "AOPI271001",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-08",
+     "code": "AOPI271008",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-ionian-odyssey",
+   "slug": "ionian-odyssey",
+   "url": "https://www.varietycruises.com/cruises/ionian-odyssey",
+   "title": "Ionian Odyssey",
+   "summary": "Embark on a journey to the Greek Ionian islands and immerse yourself in a world of enchanting beauty. Explore emerald landscapes that stretch as far as the eye can see, where hillsides are adorned with vibrant flora. Dip into sparkling turquoise waters that beckon you to unwind and discover the secrets beneath the surface. Wander through colorful port towns, each exuding a tranquil charm that invites you to savor the unique essence of Greek island life. This is a voyage to a realm where every moment is painted in hues of serenity and magic.",
+   "region": "Ionian Islands",
+   "ships": [
+    "Harmony G"
+   ],
+   "nights": 7,
+   "route": [
+    "Athens, Marina Zeas (Piraeus)",
+    "Corinth Canal – Kefalonia",
+    "Sami",
+    "Kefalonia",
+    "Antipaxos",
+    "Paxos Islands",
+    "Corfu Island",
+    "Ithaca",
+    "Vathi",
+    "Nafpaktos Or Messolonghi",
+    "Corinth Canal – Angistri",
+    "Aegina",
+    "Athens"
+   ],
+   "itinerary": [
+    [
+     "Athens, Marina Zeas (Piraeus) - Corinth Canal – Kefalonia",
+     ""
+    ],
+    [
+     "Sami - Kefalonia",
+     ""
+    ],
+    [
+     "Antipaxos - Paxos Islands",
+     ""
+    ],
+    [
+     "Corfu Island",
+     ""
+    ],
+    [
+     "Ithaca - Vathi",
+     ""
+    ],
+    [
+     "Ithaca - Nafpaktos Or Messolonghi",
+     ""
+    ],
+    [
+     "Corinth Canal – Angistri - Aegina",
+     ""
+    ],
+    [
+     "Athens - Marina Zeas (Piraeus)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Half-board: Buffet breakfast and one meal daily, including a Welcome Cocktail, a Greek night Evening, fun BBQ (weather permitting), and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and mineral water all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2027-06-04",
+     "code": "ION270604",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-11",
+     "code": "ION270611",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-18",
+     "code": "ION270618",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-25",
+     "code": "ION270625",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-02",
+     "code": "ION270702",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-16",
+     "code": "ION270716",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-23",
+     "code": "ION270723",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-30",
+     "code": "ION270730",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-06",
+     "code": "ION270806",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-13",
+     "code": "ION270813",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-20",
+     "code": "ION270820",
+     "ship": "Harmony G",
+     "nights": 7,
+     "priceFrom": 2660,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-islands-of-cape-verde-archipelago",
+   "slug": "islands-of-cape-verde-archipelago",
+   "url": "https://www.varietycruises.com/cruises/islands-of-cape-verde-archipelago",
+   "title": "Islands of Cape Verde Archipelago",
+   "summary": "Cape Verde is unlike anywhere else—a raw Atlantic world where Africa, Europe and the tropics meet across ten different islands. Explore the archipelago of Cape Verde with its intoxicating mixture of African and Portuguese heritage and its welcoming locals. Once a former colony and slave trade outpost, the Cape Verde Islands of today offer a spellbinding blend of African and Portuguese influences in their architecture, food, customs and traditions. Being blessed with a pleasant year-round climate, the archipelago offers a diverse range of landscapes from verdant mountain ranges, lush hills, to volcanic landscapes and wide deserted beaches. On your cruise, explore the 6 most famous of Cape Verde’s 10 islands, each revealing its own unique character, landscapes and traditions.",
+   "region": "Cape Verde",
+   "ships": [
+    "Harmony V"
+   ],
+   "nights": 7,
+   "route": [
+    "Palmeira (Sal Island)",
+    "Sal Rei (Boa Vista Island)",
+    "Praia (Santiago Island)",
+    "Sao Felipe (Fogo Island)",
+    "Mindelo (Sao Vincente Island)",
+    "Porto Novo (Santo Antao)"
+   ],
+   "itinerary": [
+    [
+     "Palmeira (Sal Island)",
+     ""
+    ],
+    [
+     "Sal Rei (Boa Vista Island)",
+     ""
+    ],
+    [
+     "Praia (Santiago Island)",
+     ""
+    ],
+    [
+     "Sao Felipe (Fogo Island)",
+     ""
+    ],
+    [
+     "Mindelo (Sao Vincente Island)",
+     ""
+    ],
+    [
+     "Porto Novo (Santo Antao)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board: Buffet breakfast and two meals daily, including a Welcome Cocktail, a local Theme Evening, fun BBQ (weather permitting) and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Office."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2026-11-28",
+     "code": "CVERHV261128",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3490,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-05",
+     "code": "CVERHV261205",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3350,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-12",
+     "code": "CVERHV261212",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3350,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-19",
+     "code": "CVERHV261219",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-26",
+     "code": "CVERHV261226",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-02",
+     "code": "CVERHV270102",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-24",
+     "code": "CVERHV270224",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3490,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-jewels-of-the-cyclades",
+   "slug": "jewels-of-the-cyclades",
+   "url": "https://www.varietycruises.com/cruises/jewels-of-the-cyclades",
+   "title": "Jewels of the Cyclades",
+   "summary": "Cyclades: Dazzling white villages, golden beaches and clear azure water are just the start of what these islands have to offer. Ancient Greek geographers gave this unique cluster of islands the name Cyclades because they saw that they formed a circle ('kyklos\" in Greek) of sorts around the sacred island of Delos. According to myth, the islands were the debris that remained after a battle between giants. In reality, they resulted from colossal geological events like earthquakes and volcanic eruptions.",
+   "region": "Greek Islands",
+   "ships": [
+    "Panorama",
+    "Galileo"
+   ],
+   "nights": 7,
+   "route": [
+    "Athens, Marina Zeas (Piraeus)",
+    "Poros",
+    "Poliegos",
+    "Folegandros",
+    "Santorini",
+    "Antiparos",
+    "Paros",
+    "Delos",
+    "Mykonos",
+    "Syros",
+    "Kythnos",
+    "Athens"
+   ],
+   "itinerary": [
+    [
+     "Athens, Marina Zeas (Piraeus) - Poros",
+     ""
+    ],
+    [
+     "Poliegos - Folegandros",
+     ""
+    ],
+    [
+     "Santorini",
+     ""
+    ],
+    [
+     "Antiparos - Paros",
+     ""
+    ],
+    [
+     "Delos - Mykonos",
+     ""
+    ],
+    [
+     "Syros",
+     ""
+    ],
+    [
+     "Kythnos - Marina Zeas (Piraeus)",
+     ""
+    ],
+    [
+     "Athens - Marina Zeas (Piraeus)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Half-board: Buffet breakfast and meal daily, including a Welcome Cocktail, a Greek night Evening, fun BBQ (weather permitting), and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2026-10-02",
+     "code": "CJPAN261002",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 2590,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-09",
+     "code": "CJ261009",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 3290,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-16",
+     "code": "CJ261016",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2590,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-23",
+     "code": "CJPAN261023",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 2590,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-16",
+     "code": "CJ270416",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2421,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-23",
+     "code": "CJ270423",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2421,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-07",
+     "code": "CJ270507",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-14",
+     "code": "CJ270514",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-21",
+     "code": "CJ270521",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 3390,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-28",
+     "code": "CJ270528",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-04",
+     "code": "CJ270604",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-11",
+     "code": "CJ270611",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-25",
+     "code": "CJ270625",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-02",
+     "code": "CJ270702",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 3390,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-09",
+     "code": "CJ270709",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-16",
+     "code": "CJ270716",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-23",
+     "code": "CJ270723",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-30",
+     "code": "CJ270730",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2421,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-06",
+     "code": "CJ270806",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2421,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-13",
+     "code": "CJ270813",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2421,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-20",
+     "code": "CJ270820",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2421,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-27",
+     "code": "CJ270827",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-03",
+     "code": "CJ270903",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-10",
+     "code": "CJ270910",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-17",
+     "code": "CJ270917",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-24",
+     "code": "CJ270924",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-01",
+     "code": "CJ271001",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-08",
+     "code": "CJ271008",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-15",
+     "code": "CJ271015",
+     "ship": "Galileo",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-la-dolce-vita",
+   "slug": "la-dolce-vita",
+   "url": "https://www.varietycruises.com/cruises/la-dolce-vita",
+   "title": "La Dolce Vita",
+   "summary": "Embark on your journey from charming Naples, the birthplace of pizza, and venture to the stylish island of Capri, adored by glamorous celebrities and global jet-setters. In Sicily, explore the captivating streets of Taormina, steeped in secrets and tales, as well as the bustling Corso Umberto, a cosmopolitan hub boasting the boutiques of renowned fashion designers. Ascend Mount Etna, an active volcano, visit the filming locations of \"The Godfather\" in Catania, then journey on to Malta. Discover UNESCO's cultural heritage sites, including the uniquely beautiful city of Valletta, and the ancient megalithic monuments of Gozo, dating back 5500 years. Highlights include: Naples - Capri island - Lipari – Taormina – Catania – Syracuse – Gozo- Valletta",
+   "region": "Italy & Malta",
+   "ships": [
+    "Variety Voyager"
+   ],
+   "nights": 7,
+   "route": [
+    "Naples, Italy",
+    "Capri, Italy",
+    "Lipari, Italy",
+    "Taormina, Sicily",
+    "Catania, Italy",
+    "Syracuse, Italy",
+    "Gozo Island",
+    "Valletta",
+    "Valletta, Malta"
+   ],
+   "itinerary": [
+    [
+     "Naples, Italy",
+     ""
+    ],
+    [
+     "Capri, Italy",
+     ""
+    ],
+    [
+     "Lipari, Italy",
+     ""
+    ],
+    [
+     "Taormina, Sicily",
+     ""
+    ],
+    [
+     "Catania, Italy",
+     ""
+    ],
+    [
+     "Syracuse, Italy",
+     ""
+    ],
+    [
+     "Gozo Island",
+     ""
+    ],
+    [
+     "Valletta",
+     ""
+    ],
+    [
+     "Valletta, Malta",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Half-board: Buffet breakfast and one meal daily, including a Welcome Cocktail, fun BBQ (weather permitting), and Captain’s Italian Night Dinner.",
+    "Filter coffee, tea and mineral water all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks, Water Toys and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2027-07-10",
+     "code": "NTM270710",
+     "ship": "Variety Voyager",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-24",
+     "code": "NTM270724",
+     "ship": "Variety Voyager",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-seychelles-3-nights-cruise",
+   "slug": "seychelles-3-nights-cruise",
+   "url": "https://www.varietycruises.com/cruises/seychelles-3-nights-cruise",
+   "title": "Seychelles 3-Nights",
+   "summary": "There aren't many places on Earth where hawks-bill turtles feel so unthreatened that they come ashore in broad daylight to lay their eggs. These exotic Gallic outposts were made for exploring by sea, with BBQ breaks on deserted islands, every-day swimming stops, and walking tours through the lush interiors. Scattered across the Indian Ocean, some 1,000 miles east of Kenya, these 115 islands offer everything from unsurpassed white sandy beaches to UNESCO Heritage Sites and incredible wildlife.",
+   "region": "Seychelles",
+   "ships": [
+    "Pegasus"
+   ],
+   "nights": 3,
+   "route": [
+    "Baie St. Anne, Praslin",
+    "Felicite",
+    "La Digue",
+    "Moyenne Island",
+    "Mahe",
+    "Inter Island Quay",
+    "Mahe/Victoria (Inter Island Quay)"
+   ],
+   "itinerary": [
+    [
+     "Baie St. Anne, Praslin - Felicite - La Digue",
+     ""
+    ],
+    [
+     "La Digue - Moyenne Island",
+     ""
+    ],
+    [
+     "Moyenne Island - Mahe - Inter Island Quay",
+     ""
+    ],
+    [
+     "Mahe/Victoria (Inter Island Quay)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    ": Buffet breakfast and two meals daily, including a Welcome Cocktail, fun BBQ (weather permitting) and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkelling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer.",
+    "Walking tour",
+    "of Moyenne Island, guided by the island’s rangers."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge).",
+    "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
+   ],
+   "departures": [
+    {
+     "date": "2026-09-30",
+     "code": "SEY260930D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-07",
+     "code": "SEY261007D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-14",
+     "code": "SEY261014D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-21",
+     "code": "SEY261021D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": null,
+     "soldOut": true
+    },
+    {
+     "date": "2026-11-11",
+     "code": "SEY261111D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-09",
+     "code": "SEY261209D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-16",
+     "code": "SEY261216D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-23",
+     "code": "SEY261223D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-30",
+     "code": "SEY261230D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-06",
+     "code": "SEY270106D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-13",
+     "code": "SEY270113D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-20",
+     "code": "SEY270120D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-10",
+     "code": "SEY270210D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-03",
+     "code": "SEY270303D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-10",
+     "code": "SEY270310D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-24",
+     "code": "SEY270324D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-31",
+     "code": "SEY270331D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-07",
+     "code": "SEY270407D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-14",
+     "code": "SEY270414D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-21",
+     "code": "SEY270421D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-09",
+     "code": "SEY270609D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-16",
+     "code": "SEY270616D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-23",
+     "code": "SEY270623D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-30",
+     "code": "SEY270630D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-07",
+     "code": "SEY270707D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-14",
+     "code": "SEY270714D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-21",
+     "code": "SEY270721D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-28",
+     "code": "SEY270728D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-04",
+     "code": "SEY270804D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-11",
+     "code": "SEY270811D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-18",
+     "code": "SEY270818D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-25",
+     "code": "SEY270825D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-01",
+     "code": "SEY270901D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-08",
+     "code": "SEY270908D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-15",
+     "code": "SEY270915D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-22",
+     "code": "SEY270922D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-29",
+     "code": "SEY270929D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-06",
+     "code": "SEY271006D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-13",
+     "code": "SEY271013D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-20",
+     "code": "SEY271020D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-27",
+     "code": "SEY271027D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-03",
+     "code": "SEY271103D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-10",
+     "code": "SEY271110D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-17",
+     "code": "SEY271117D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2380,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-01",
+     "code": "SEY271201D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-08",
+     "code": "SEY271208D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-15",
+     "code": "SEY271215D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-22",
+     "code": "SEY271222D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-29",
+     "code": "SEY271229D3",
+     "ship": "Pegasus",
+     "nights": 3,
+     "priceFrom": 2100,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-seychelles-4-nights-cruise",
+   "slug": "seychelles-4-nights-cruise",
+   "url": "https://www.varietycruises.com/cruises/seychelles-4-nights-cruise",
+   "title": "Seychelles 4-Nights",
+   "summary": "There aren't many places on Earth where hawks-bill turtles feel so unthreatened that they come ashore in broad daylight to lay their eggs. These exotic Gallic outposts were made for exploring by sea, with BBQ breaks on deserted islands, every-day swimming stops, and walking tours through the lush interiors. Scattered across the Indian Ocean, some 1,000 miles east of Kenya, these 115 islands offer everything from unsurpassed white sandy beaches to UNESCO Heritage Sites and incredible wildlife.",
+   "region": "Seychelles",
+   "ships": [
+    "Pegasus"
+   ],
+   "nights": 4,
+   "route": [
+    "Mahe/Victoria (Inter Island Quay)",
+    "St. Anne",
+    "Curieuse",
+    "Cousin Island",
+    "Anse Lazio",
+    "Aride",
+    "St. Pierre",
+    "Baie St. Anne/Praslin",
+    "Baie St. Anne",
+    "Praslin"
+   ],
+   "itinerary": [
+    [
+     "Mahe/Victoria (Inter Island Quay) - St. Anne",
+     ""
+    ],
+    [
+     "St. Anne - Curieuse",
+     ""
+    ],
+    [
+     "Curieuse - Cousin Island - Anse Lazio",
+     ""
+    ],
+    [
+     "Anse Lazio - Aride - St. Pierre - Baie St. Anne/Praslin",
+     ""
+    ],
+    [
+     "Baie St. Anne - Praslin",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    ": Buffet breakfast and two meals daily, including a Welcome Cocktail, a local Theme Evening , fun BBQ (weather permitting) and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkelling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer.",
+    "Walking tours",
+    "of the islands Cousin, Curieuse & Aride, guided by the island’s rangers."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge).",
+    "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
+   ],
+   "departures": [
+    {
+     "date": "2026-10-03",
+     "code": "SEY261003D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-10",
+     "code": "SEY261010D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2950,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-17",
+     "code": "SEY261017D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 3150,
+     "soldOut": false
+    },
+    {
+     "date": "2026-11-07",
+     "code": "SEY261107D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": null,
+     "soldOut": true
+    },
+    {
+     "date": "2026-12-05",
+     "code": "SEY261205D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2600,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-12",
+     "code": "SEY261212D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-19",
+     "code": "SEY261219D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-26",
+     "code": "SEY261226D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-02",
+     "code": "SEY270102D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-09",
+     "code": "SEY270109D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-16",
+     "code": "SEY270116D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2600,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-06",
+     "code": "SEY270206D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2600,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-27",
+     "code": "SEY270227D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-06",
+     "code": "SEY270306D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-20",
+     "code": "SEY270320D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2950,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-27",
+     "code": "SEY270327D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-03",
+     "code": "SEY270403D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-10",
+     "code": "SEY270410D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2950,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-17",
+     "code": "SEY270417D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-24",
+     "code": "SEY270424D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-05",
+     "code": "SEY270605D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-12",
+     "code": "SEY270612D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-19",
+     "code": "SEY270619D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-26",
+     "code": "SEY270626D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-03",
+     "code": "SEY270703D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-10",
+     "code": "SEY270710D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-17",
+     "code": "SEY270717D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-24",
+     "code": "SEY270724D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-31",
+     "code": "SEY270731D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-07",
+     "code": "SEY270807D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-14",
+     "code": "SEY270814D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-21",
+     "code": "SEY270821D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-28",
+     "code": "SEY270828D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-04",
+     "code": "SEY270904D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-11",
+     "code": "SEY270911D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-18",
+     "code": "SEY270918D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-25",
+     "code": "SEY270925D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-02",
+     "code": "SEY271002D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-09",
+     "code": "SEY271009D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-16",
+     "code": "SEY271016D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-23",
+     "code": "SEY271023D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-30",
+     "code": "SEY271030D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-06",
+     "code": "SEY271106D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-13",
+     "code": "SEY271113D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-27",
+     "code": "SEY271127D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-04",
+     "code": "SEY271204D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 2000,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-11",
+     "code": "SEY271211D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-18",
+     "code": "SEY271218D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-25",
+     "code": "SEY271225D5",
+     "ship": "Pegasus",
+     "nights": 4,
+     "priceFrom": 1720,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-seychelles-7-nights-cruise",
+   "slug": "seychelles-7-nights-cruise",
+   "url": "https://www.varietycruises.com/cruises/seychelles-7-nights-cruise",
+   "title": "Seychelles 7-Nights",
+   "summary": "There aren't many places on Earth where hawks-bill turtles feel so unthreatened that they come ashore in broad daylight to lay their eggs. These exotic Gallic outposts were made for exploring by sea, with BBQ breaks on deserted islands, every-day swimming stops, and walking tours through the lush interiors. Scattered across the Indian Ocean, some 1,000 miles east of Kenya, these 115 islands offer everything from unsurpassed white sandy beaches to UNESCO Heritage Sites and incredible wildlife.",
+   "region": "Seychelles",
+   "ships": [
+    "Pegasus"
+   ],
+   "nights": 7,
+   "route": [
+    "Mahe/Victoria (Inter Island Quay)",
+    "St. Anne",
+    "Curieuse",
+    "Cousin Island",
+    "Anse Lazio",
+    "Aride",
+    "St. Pierre",
+    "Baie St. Anne/Praslin",
+    "Baie St. Anne, Praslin",
+    "Felicite",
+    "La Digue",
+    "Moyenne Island",
+    "Mahe",
+    "Inter Island Quay"
+   ],
+   "itinerary": [
+    [
+     "Mahe/Victoria (Inter Island Quay) - St. Anne",
+     ""
+    ],
+    [
+     "St. Anne - Curieuse",
+     ""
+    ],
+    [
+     "Curieuse - Cousin Island - Anse Lazio",
+     ""
+    ],
+    [
+     "Anse Lazio - Aride - St. Pierre - Baie St. Anne/Praslin",
+     ""
+    ],
+    [
+     "Baie St. Anne, Praslin - Felicite - La Digue",
+     ""
+    ],
+    [
+     "La Digue - Moyenne Island",
+     ""
+    ],
+    [
+     "Moyenne Island - Mahe - Inter Island Quay",
+     ""
+    ],
+    [
+     "Mahe/Victoria (Inter Island Quay)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    ": Buffet breakfast and two meals daily, including a Welcome Cocktail, a local Theme Evening, fun BBQ (weather permitting) and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkelling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer.",
+    "Walking tours",
+    "of the islands Cousin, Curieuse, Moyenne & Aride, guided by the island’s rangers."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge).",
+    "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
+   ],
+   "departures": [
+    {
+     "date": "2026-10-03",
+     "code": "SEY261003D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-10",
+     "code": "SEY261010D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 4150,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-17",
+     "code": "SEY261017D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 4350,
+     "soldOut": false
+    },
+    {
+     "date": "2026-11-07",
+     "code": "SEY261107D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": true
+    },
+    {
+     "date": "2026-12-05",
+     "code": "SEY261205D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 3600,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-12",
+     "code": "SEY261212D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-19",
+     "code": "SEY261219D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-26",
+     "code": "SEY261226D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 3250,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-02",
+     "code": "SEY270102D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-09",
+     "code": "SEY270109D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-16",
+     "code": "SEY270116D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 3600,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-06",
+     "code": "SEY270206D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 3600,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-27",
+     "code": "SEY270227D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-06",
+     "code": "SEY270306D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 3300,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-20",
+     "code": "SEY270320D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 4150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-27",
+     "code": "SEY270327D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 3300,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-03",
+     "code": "SEY270403D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-10",
+     "code": "SEY270410D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 4150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-17",
+     "code": "SEY270417D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-24",
+     "code": "SEY270424D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-05",
+     "code": "SEY270605D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-12",
+     "code": "SEY270612D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-19",
+     "code": "SEY270619D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-26",
+     "code": "SEY270626D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-03",
+     "code": "SEY270703D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-10",
+     "code": "SEY270710D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-17",
+     "code": "SEY270717D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-24",
+     "code": "SEY270724D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-31",
+     "code": "SEY270731D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-07",
+     "code": "SEY270807D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-14",
+     "code": "SEY270814D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-21",
+     "code": "SEY270821D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-28",
+     "code": "SEY270828D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-04",
+     "code": "SEY270904D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-11",
+     "code": "SEY270911D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-18",
+     "code": "SEY270918D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-25",
+     "code": "SEY270925D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-02",
+     "code": "SEY271002D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-09",
+     "code": "SEY271009D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-16",
+     "code": "SEY271016D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-23",
+     "code": "SEY271023D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-30",
+     "code": "SEY271030D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-06",
+     "code": "SEY271106D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-13",
+     "code": "SEY271113D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-27",
+     "code": "SEY271127D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-04",
+     "code": "SEY271204D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2790,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-11",
+     "code": "SEY271211D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-18",
+     "code": "SEY271218D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-25",
+     "code": "SEY271225D7",
+     "ship": "Pegasus",
+     "nights": 7,
+     "priceFrom": 2350,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-tahiti-10-nights-cruise",
+   "slug": "tahiti-10-nights-cruise",
+   "url": "https://www.varietycruises.com/cruises/tahiti-10-nights-cruise",
+   "title": "Tahiti 10-Nights",
+   "summary": "Join us on board our 10-night sailing, roundtrip from Tahiti unraveling the Society Islands. Uncover the islands of two archipelagos by small ship. Bora Bora, Taha'a, Moorea, Huahine, Raiatea - islands sculpted by sky-piercing, moss-green peaks and lined with vivid turquoise lagoons. Island hopping allows you to see every landscape, from geometric ridges strung with waterfalls on the high islands to flat, desert-like atolls where lagoons far outsize the landmass.",
+   "region": "Tahiti & French Polynesia",
+   "ships": [
+    "Panorama II"
+   ],
+   "nights": 10,
+   "route": [
+    "Papeete Port/Tahiti, Society Islands",
+    "Mo'Orea, Society Islands",
+    "Huahine, Society Islands",
+    "Bora Bora, Society Islands",
+    "Taha'A, Society Islands",
+    "Raiatea, Society Islands"
+   ],
+   "itinerary": [
+    [
+     "Papeete Port/Tahiti, Society Islands",
+     ""
+    ],
+    [
+     "Mo'Orea, Society Islands",
+     ""
+    ],
+    [
+     "Huahine, Society Islands",
+     ""
+    ],
+    [
+     "Bora Bora, Society Islands",
+     ""
+    ],
+    [
+     "Taha'A, Society Islands",
+     ""
+    ],
+    [
+     "Raiatea, Society Islands",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    ": Buffet breakfast and two meals daily, including a Welcome Cocktail, a local Theme Evening, fun BBQ (weather permitting) and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkelling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2026-10-16",
+     "code": "TAH10D261016",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3590,
+     "soldOut": false
+    },
+    {
+     "date": "2026-11-13",
+     "code": "TAH10D261113",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3590,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-18",
+     "code": "TAH10D261218",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3590,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-26",
+     "code": "TAH10D270226",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-26",
+     "code": "TAH10D270326",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-23",
+     "code": "TAH10D270423",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-21",
+     "code": "TAH10D270521",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3590,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-11",
+     "code": "TAH10D270611",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 4190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-09",
+     "code": "TAH10D270709",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3590,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-13",
+     "code": "TAH10D270813",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3590,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-03",
+     "code": "TAH10D270903",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 4190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-01",
+     "code": "TAH10D271001",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-29",
+     "code": "TAH10D271029",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-26",
+     "code": "TAH10D271126",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-17",
+     "code": "TAH10D271217",
+     "ship": "Panorama II",
+     "nights": 10,
+     "priceFrom": 3850,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-tahiti-11-nights-cruise",
+   "slug": "tahiti-11-nights-cruise",
+   "url": "https://www.varietycruises.com/cruises/tahiti-11-nights-cruise",
+   "title": "Tahiti 11-Nights",
+   "summary": "Join us on board our 11-night sailing, roundtrip from Tahiti unraveling the Society Islands. Uncover the islands of two archipelagos by small ship. Bora Bora, Taha'a, Mo'orea, Huahine, Raiatea - islands sculpted by sky-piercing, moss-green peaks and lined with vivid turquoise lagoons. Island hopping allows you to see every landscape, from geometric ridges strung with waterfalls on the high islands to flat, desert-like atolls where lagoons far outsize the landmass.",
+   "region": "Tahiti & French Polynesia",
+   "ships": [
+    "Panorama II"
+   ],
+   "nights": 11,
+   "route": [
+    "Papeete Port/Tahiti, Society Islands",
+    "Mo'Orea, Society Islands",
+    "Huahine, Society Islands",
+    "Bora Bora, Society Islands",
+    "Taha'A, Society Islands",
+    "Raiatea, Society Islands"
+   ],
+   "itinerary": [
+    [
+     "Papeete Port/Tahiti, Society Islands",
+     ""
+    ],
+    [
+     "Mo'Orea, Society Islands",
+     ""
+    ],
+    [
+     "Huahine, Society Islands",
+     ""
+    ],
+    [
+     "Bora Bora, Society Islands",
+     ""
+    ],
+    [
+     "Taha'A, Society Islands",
+     ""
+    ],
+    [
+     "Raiatea, Society Islands",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    ": Buffet breakfast and two meals daily, including a Welcome Cocktail, a local Theme Evening, fun BBQ (weather permitting) and Captain’s Dinner.",
+    "FREE ½ day excursion to Papeete on Day 11.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkelling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2027-01-04",
+     "code": "TAH11D270104",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 3870,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-08",
+     "code": "TAH11D270308",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 4150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-05",
+     "code": "TAH11D270405",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 4150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-03",
+     "code": "TAH11D270503",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 3870,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-31",
+     "code": "TAH11D270531",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 3870,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-21",
+     "code": "TAH11D270621",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 3870,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-19",
+     "code": "TAH11D270719",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 3870,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-23",
+     "code": "TAH11D270823",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 3870,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-13",
+     "code": "TAH11D270913",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 3870,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-11",
+     "code": "TAH11D271011",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 4150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-08",
+     "code": "TAH11D271108",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 4150,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-27",
+     "code": "TAH11D271227",
+     "ship": "Panorama II",
+     "nights": 11,
+     "priceFrom": 4150,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-tahiti-6-nights-cruise",
+   "slug": "tahiti-6-nights-cruise",
+   "url": "https://www.varietycruises.com/cruises/tahiti-6-nights-cruise",
+   "title": "Tahiti 6-Nights",
+   "summary": "Sailing from Bora Bora to Papeete, Tahiti uncover the world-famous Society Islands of French Polynesia by small ship. Explore Taha’a, Mo’orea, Huahine, Raiatea, and Tahiti , islands sculpted by sky-piercing, moss-green peaks and lined with vivid turquoise lagoons. Island hopping allows you to experience every landscape, from geometric ridges draped with waterfalls on the high islands to flat, desert-like atolls where lagoons far outsize the landmass. There are many sides to the Islands of Tahiti, yet they are all connected by Mana. Mana a life force and spirit that surrounds us. You can see it. Touch it. Taste it. Feel it.",
+   "region": "Tahiti & French Polynesia",
+   "ships": [
+    "Panorama II"
+   ],
+   "nights": 6,
+   "route": [
+    "Bora Bora, Society Islands",
+    "Taha'A",
+    "Raiatea, Society Islands",
+    "Huahine, Society Islands",
+    "Mo'Orea, Society Islands",
+    "Papeete, Society Islands"
+   ],
+   "itinerary": [
+    [
+     "Bora Bora, Society Islands",
+     ""
+    ],
+    [
+     "Taha'A - Raiatea, Society Islands",
+     ""
+    ],
+    [
+     "Raiatea, Society Islands",
+     ""
+    ],
+    [
+     "Huahine, Society Islands",
+     ""
+    ],
+    [
+     "Huahine, Society Islands",
+     ""
+    ],
+    [
+     "Mo'Orea, Society Islands",
+     ""
+    ],
+    [
+     "Papeete, Society Islands",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    ": Buffet breakfast and two meals daily, including a Welcome Cocktail, a local Theme Evening, fun BBQ (weather permitting) and Captain’s Dinner.",
+    "One free excursion in Huahine",
+    "(Exploring Cultures & Legends Tour).",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkelling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2026-11-28",
+     "code": "TAH6D261128",
+     "ship": "Panorama II",
+     "nights": 6,
+     "priceFrom": 2550,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-tahiti-7-nights-cruise",
+   "slug": "tahiti-7-nights-cruise",
+   "url": "https://www.varietycruises.com/cruises/tahiti-7-nights-cruise",
+   "title": "Tahiti 7-Nights",
+   "summary": "Sailing round-trip from Papeete port, Tahiti, uncover the world-famous Society islands of French Polynesia by small ship. Bora Bora, Taha'a, Mo'orea, Huahine, Raiatea - islands sculpted by sky-piercing, moss-green peaks and lined with vivid turquoise lagoons. Island hopping allows you to see every landscape, from geometric ridges strung with waterfalls on the high islands to flat, desert-like atolls where lagoons far outsize the landmass. There are many sides to the Islands of Tahiti, yet they are all connected by Mana. Mana is a life force and spirit that surrounds us. You can see it. Touch it. Taste it. Feel it.",
+   "region": "Tahiti & French Polynesia",
+   "ships": [
+    "Panorama II"
+   ],
+   "nights": 7,
+   "route": [
+    "Papeete Port, Tahiti",
+    "Mo'Orea, Society Islands",
+    "Raiatea, Society Islands",
+    "Taha'A, Society Islands",
+    "Bora Bora, Society Islands",
+    "Huahine, Society Islands"
+   ],
+   "itinerary": [
+    [
+     "Papeete Port, Tahiti",
+     ""
+    ],
+    [
+     "Mo'Orea, Society Islands",
+     ""
+    ],
+    [
+     "Raiatea, Society Islands",
+     ""
+    ],
+    [
+     "Taha'A, Society Islands",
+     ""
+    ],
+    [
+     "Bora Bora, Society Islands",
+     ""
+    ],
+    [
+     "Bora Bora, Society Islands",
+     ""
+    ],
+    [
+     "Huahine, Society Islands",
+     ""
+    ],
+    [
+     "Papeete Port, Tahiti",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    ": Buffet breakfast and two meals daily, including a Welcome Cocktail, a local Theme Evening, fun BBQ (weather permitting) and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkelling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2026-10-02",
+     "code": "TAH7D261002",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    },
+    {
+     "date": "2026-10-09",
+     "code": "TAH7D261009",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2990,
+     "soldOut": false
+    },
+    {
+     "date": "2026-11-06",
+     "code": "TAH7D261106",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2990,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-04",
+     "code": "TAH7D261204",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-11",
+     "code": "TAH7D261211",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    },
+    {
+     "date": "2026-12-28",
+     "code": "TAH7D261228",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2990,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-15",
+     "code": "TAH7D270115",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-12",
+     "code": "TAH7D270212",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2800,
+     "soldOut": false
+    },
+    {
+     "date": "2027-03-19",
+     "code": "TAH7D270319",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2800,
+     "soldOut": false
+    },
+    {
+     "date": "2027-04-16",
+     "code": "TAH7D270416",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2800,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-14",
+     "code": "TAH7D270514",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-02",
+     "code": "TAH7D270702",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-30",
+     "code": "TAH7D270730",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-06",
+     "code": "TAH7D270806",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-24",
+     "code": "TAH7D270924",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    },
+    {
+     "date": "2027-10-22",
+     "code": "TAH7D271022",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2800,
+     "soldOut": false
+    },
+    {
+     "date": "2027-11-19",
+     "code": "TAH7D271119",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2800,
+     "soldOut": false
+    },
+    {
+     "date": "2027-12-10",
+     "code": "TAH7D271210",
+     "ship": "Panorama II",
+     "nights": 7,
+     "priceFrom": 2550,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-the-rivers-of-west-africa-banjul-to-banjul",
+   "slug": "the-rivers-of-west-africa-banjul-to-banjul",
+   "url": "https://www.varietycruises.com/cruises/the-rivers-of-west-africa-banjul-to-banjul",
+   "title": "The Rivers of West Africa: Banjul To Banjul",
+   "summary": "The Rivers of Gambia &amp; Senegal, 7-night cruise sure to satisfy your curious minds. Experience outstanding wildlife viewing on a yacht cruise along the West Africa Coast and upstream the Gambia River, deep inside the African continent. Discover the waterways of Senegal and Gambia with visits to no less than 4 Natural Reserves: Sine Saloum Delta, a UNESCO Biosphere Reserve and a birdwatcher's paradise; Djiffere fishing village; River Gambia National Park; Wassu mysterious stone circles, another UNESCO World Heritage site; Bao Bolong Wetland Reserve and Kiang West National Park in Gambia.",
+   "region": "West Africa",
+   "ships": [
+    "Harmony V"
+   ],
+   "nights": 7,
+   "route": [
+    "Banjul",
+    "Bakau, The Gambia",
+    "Tendaba, The Gambia",
+    "Gambia River – Kuntaur",
+    "River Gambia National Park, The Gambia",
+    "Kuntaur – Janjanbureh",
+    "Kaur, The Gambia",
+    "Kunta Kinteh Island",
+    "Banjul, The Gambia",
+    "Dakar, Senegal",
+    "Djiffer/Senegal – Banjul, The Gambia"
+   ],
+   "itinerary": [
+    [
+     "Banjul - Bakau, The Gambia",
+     ""
+    ],
+    [
+     "Tendaba, The Gambia",
+     ""
+    ],
+    [
+     "Gambia River – Kuntaur - River Gambia National Park, The Gambia",
+     ""
+    ],
+    [
+     "Kuntaur – Janjanbureh - Kaur, The Gambia",
+     ""
+    ],
+    [
+     "Kunta Kinteh Island - Banjul, The Gambia",
+     ""
+    ],
+    [
+     "Dakar, Senegal",
+     ""
+    ],
+    [
+     "Djiffer/Senegal – Banjul, The Gambia",
+     ""
+    ],
+    [
+     "Banjul, The Gambia",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    ": Buffet breakfast and two meals daily, including a Welcome Cocktail, local Theme evening, and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "On board Gambian River Naturalist.",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses / Passenger Visas whenever required.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2027-02-01",
+     "code": "RWAHV270201",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 4190,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-the-rivers-of-west-africa-dakar-to-dakar",
+   "slug": "the-rivers-of-west-africa-dakar-to-dakar",
+   "url": "https://www.varietycruises.com/cruises/the-rivers-of-west-africa-dakar-to-dakar",
+   "title": "The Rivers of West Africa: Dakar To Dakar",
+   "summary": "The Rivers of Gambia &amp; Senegal, 7-night cruise sure to satisfy your curious minds. Experience outstanding wildlife viewing on a yacht cruise along the West Africa Coast and upstream the Gambia River, deep inside the African continent. Discover the waterways of Senegal and Gambia with visits to no less than 4 Natural Reserves: Sine Saloum Delta, a UNESCO Biosphere Reserve and a birdwatcher's paradise; Djiffere fishing village; River Gambia National Park; Wassu mysterious stone circles, another UNESCO World Heritage site; Bao Bolong Wetland Reserve and Kiang West National Park in Gambia.",
+   "region": "West Africa",
+   "ships": [
+    "Harmony V"
+   ],
+   "nights": 7,
+   "route": [
+    "Dakar, Senegal",
+    "Djiffer, Senegal – Banjul, The Gambia",
+    "Banjul",
+    "Bakau, The Gambia",
+    "Tendaba, The Gambia",
+    "Gambia River – Kuntaur",
+    "River Gambia National Park, The Gambia",
+    "Kuntaur – Janjanbureh",
+    "Kaur, The Gambia",
+    "Kunta Kinteh Island",
+    "Banjul, The Gambia"
+   ],
+   "itinerary": [
+    [
+     "Dakar, Senegal",
+     ""
+    ],
+    [
+     "Djiffer, Senegal – Banjul, The Gambia",
+     ""
+    ],
+    [
+     "Banjul - Bakau, The Gambia",
+     ""
+    ],
+    [
+     "Tendaba, The Gambia",
+     ""
+    ],
+    [
+     "Gambia River – Kuntaur - River Gambia National Park, The Gambia",
+     ""
+    ],
+    [
+     "Kuntaur – Janjanbureh - Kaur, The Gambia",
+     ""
+    ],
+    [
+     "Kunta Kinteh Island - Banjul, The Gambia",
+     ""
+    ],
+    [
+     "Dakar, Senegal",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Full-board",
+    ": Buffet breakfast and two meals daily, including a Welcome Cocktail, local Theme evening, and Captain’s Dinner.",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "On board Gambian River Naturalist.",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses / Passenger Visas whenever required.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2027-01-16",
+     "code": "RWAHV270116",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3490,
+     "soldOut": false
+    },
+    {
+     "date": "2027-01-30",
+     "code": "RWAHV270130",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 3490,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-06",
+     "code": "RWAHV270206",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 4190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-02-13",
+     "code": "RWAHV270213",
+     "ship": "Harmony V",
+     "nights": 7,
+     "priceFrom": 2690,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-unexplored-greece-aegean-islands",
+   "slug": "unexplored-greece-aegean-islands",
+   "url": "https://www.varietycruises.com/cruises/unexplored-greece-aegean-islands",
+   "title": "Unexplored Greece: Aegean Islands",
+   "summary": "Let us show you our home, off-the-beaten path. These 10 stunning island destinations offer a more nourishing side of Greece, a taste of true Greek culture. These are places where people take pride in offering hospitality – in line with the ancient custom of filoxenia, love of strangers – and where things are done with meraki, love and soul. A cruise voyage unraveling the most authentic Cycladic and Dodecanese islands of Greece. Discover unknown gems with rich history, incomparable light, translucent water, and heavenly beaches.",
+   "region": "Greek Islands",
+   "ships": [
+    "Panorama"
+   ],
+   "nights": 7,
+   "route": [
+    "Athens, Marina Zeas (Piraeus)",
+    "Cape Sounion",
+    "Ikaria",
+    "Patmos",
+    "Lipsi",
+    "Kalymnos",
+    "Levitha",
+    "Amorgos",
+    "Koufonissia",
+    "Iraklia",
+    "Serifos",
+    "Athens"
+   ],
+   "itinerary": [
+    [
+     "Athens, Marina Zeas (Piraeus) - Cape Sounion",
+     ""
+    ],
+    [
+     "Ikaria",
+     ""
+    ],
+    [
+     "Patmos - Lipsi",
+     ""
+    ],
+    [
+     "Kalymnos",
+     ""
+    ],
+    [
+     "Levitha - Amorgos",
+     ""
+    ],
+    [
+     "Amorgos - Koufonissia - Iraklia",
+     ""
+    ],
+    [
+     "Serifos",
+     ""
+    ],
+    [
+     "Athens - Marina Zeas (Piraeus)",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning",
+    "Half-board: Buffet breakfast daily, 6 lunches, and 2 dinners, including a Welcome Cocktail, a Greek night Evening, fun BBQ (weather permitting), and Captain’s Dinner",
+    "Select Shore Excursions included: Amorgos half-day walking tour & Patmos half-day tour",
+    "Complimentary House Wine, Beer and Soft drinks with lunch and dinner on board",
+    "Filter coffee, tea and mineral water all day",
+    "Use of fishing and snorkeling equipment (Masks, Fins and Snorkels), and Beach Towels",
+    "Kayaks, Water Toys and Stand-Up Paddle Boards (subject to availability)",
+    "English-Speaking Chief Experience Officer"
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above)",
+    "Shore excursions on the islands (except those mentioned above) or other land arrangements",
+    "Crew tips",
+    "Passenger personal expenses",
+    "Wi-Fi (available at charge)"
+   ],
+   "departures": [
+    {
+     "date": "2026-10-09",
+     "code": "UNEXPAN261009",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3140,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-07",
+     "code": "UNEXPAN270507",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-21",
+     "code": "UNEXPAN270521",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-05-28",
+     "code": "UNEXPAN270528",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-18",
+     "code": "UNEXPAN270618",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-06-25",
+     "code": "UNEXPAN270625",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-09",
+     "code": "UNEXPAN270709",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-16",
+     "code": "UNEXPAN270716",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-07-23",
+     "code": "UNEXPAN270723",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-06",
+     "code": "UNEXPAN270806",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-13",
+     "code": "UNEXPAN270813",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-08-20",
+     "code": "UNEXPAN270820",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-03",
+     "code": "UNEXPAN270903",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-17",
+     "code": "UNEXPAN270917",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3850,
+     "soldOut": false
+    },
+    {
+     "date": "2027-09-24",
+     "code": "UNEXPAN270924",
+     "ship": "Panorama",
+     "nights": 7,
+     "priceFrom": 3190,
+     "soldOut": false
+    }
+   ]
+  }
+ ]
+}

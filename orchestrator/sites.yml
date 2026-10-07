@@ -619,16 +619,23 @@ sites:
     brand: Cruise24
     # 30 Sep 2026: moved OFF the GoDaddy Website Builder onto GoDaddy cPanel
     # (Apache, 92.205.251.216): 1,715 static English pages, https + www→apex
-    # 301s live, noindex scoped to staging only. Its source repo is not yet
-    # located, so drafts are staged for manual upload (static_bundle); once the
-    # repo exists, switch to bundle_pr like cruise24.ir (PRs, review board,
-    # auto-deploy).
+    # 301s live, noindex scoped to staging only. Source: cruise24-me/ in this
+    # repo (build_journeys.py), owned by the session "Cruise24.me website tools";
+    # handoff notes in cruise24-me/HANDOFF*.md. Drafts are staged for a manual
+    # upload (static_bundle) — there is no publishing API on this hosting.
+    offer_feed: "https://cruise24.me/offer.json"     # offer.v1, built by cruise24-me/build_offer_feed.py
+    lead_source: "https://cruise24.me/api/leads.php" # signed GET (LEADS_SIGNING_SECRET); Agent 4 pulls new enquiries
+    # Brand-neutral towards the group: a Cruise24 reply or article must not name or link
+    # Boutimar. Otherwise the same cruise rules (Persian Gulf, visa accuracy, never invent).
+    compliance_profile: partner_widget_v1
     seed_keywords:            # English guides for lines/regions the site sells (offer.json)
       - "Explora Journeys review first cruise"
       - "Variety Cruises Greek islands small ship"
       - "small ship cruise Croatia Adriatic"
       - "Star Clippers tall ship cruise guide"
       - "European river cruise first time guide"
+      - "Persian Gulf cruise from Dubai guide"
+      - "Schengen visa for a Mediterranean cruise"
     trend_terms:
       - Explora Journeys
       - Variety Cruises
@@ -638,15 +645,16 @@ sites:
     indexnow_key: "32848188bc802588ccb8b2f6b390a74f"   # public by design; site must serve /32848188bc802588ccb8b2f6b390a74f.txt containing it
     market: INT                # the world-audience twin of cruise24.ir
     base_url: "https://cruise24.me"
-    offer_feed: "https://cruise24.me/offer.json"   # offer.v1 — 30 offerings (16 lines, 14 regions)
     hosting: godaddy_cpanel
     hosting_note: >-
-      Static site on GoDaddy cPanel (Apache). robots.txt + sitemap.xml (1,715 URLs)
-      live; /api/ protected (leads.php is HMAC-signed for Agent 4).
+      Static site on GoDaddy cPanel (Economy, cPanel user ekrd2r2976p9, Apache, 92.205.251.216).
+      Deploy = cruise24-me/build_bundle.py, then upload the parts in cPanel File Manager and
+      extract into public_html. Let's Encrypt via acme.sh (AutoSSL is off on this plan).
+      robots.txt + sitemap.xml (1,715 URLs) live; /api/ protected (leads.php is HMAC-signed for Agent 4).
     sitemap: "https://cruise24.me/sitemap.xml"
     cms:
       type: static
-      # Stages the article bundle for a manual upload until the repo is found.
+      # Stages the article bundle for a manual upload; it ships with the next deploy bundle.
       adapter: static_bundle
       content_root: "/"
       publish_mode: draft
@@ -656,6 +664,8 @@ sites:
         autopost: false
         account_ref: null
     notes:
+      - "LinkedIn company page: https://www.linkedin.com/company/cruise24/ (edited 28 Sep)."
+      - "Enquiries: api/enquiry.php stores them and copies each to res@cruise24.me."
       - "Launched 30 Sep 2026. Open source-side fixes: 952 pages share 269 titles (departures of one route), JSON-LD on the homepage only, 5,214 of 8,307 images without alt, sitemap lastmod all 2026-09-28, no llms.txt."
 
   - domain: albaloostudio.com
