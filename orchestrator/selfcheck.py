@@ -4189,5 +4189,9 @@ ok("a chosen photo crops by fractions, and its credit says it was cropped (CC BY
    _cut.size == (100, 150) and _img.credit_line(_cc, "fa").endswith("برش‌خورده")
    and _img.credit_line(_cc, "en").endswith(", cropped") and "cropped" not in _img.credit_line(_p, "en"))
 
+ok("a credit the page already links leaves the raw URL out; a plain-text credit keeps it",
+   "http" not in _img.credit_line(_p, "fa", linked=True) and "http" in _img.credit_line(_p, "fa")
+   and _img.credit_line(_cc, "fa", linked=True).endswith("برش‌خورده"))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

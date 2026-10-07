@@ -29,6 +29,10 @@ on:
         description: "Crop fractions left,top,width,height (e.g. 0,0.3223,1,0.3164)"
         required: false
         default: ""
+      recredit:
+        description: "base44 only: drop raw URLs from credits the page already links"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -59,6 +63,7 @@ jobs:
           for r in $(echo "${{ inputs.only }}" | tr ',' ' '); do ARGS="$ARGS --only $r"; done
           if [ -n "${{ inputs.slug }}" ]; then ARGS="$ARGS --slug ${{ inputs.slug }}"; fi
           FILE_ARG="${{ inputs.file }}"; CROP_ARG="${{ inputs.crop }}"
+          if [ "${{ inputs.recredit }}" = "true" ]; then ARGS="$ARGS --recredit"; fi
           if [ "${{ inputs.apply }}" = "true" ]; then ARGS="$ARGS --apply"; fi
           python3 tools/backfill_images.py $ARGS --file "$FILE_ARG" --crop "$CROP_ARG" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Keep the base44 record backups

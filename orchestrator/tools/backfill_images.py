@@ -167,7 +167,7 @@ def base44_set_photo(site: dict, rec: dict, img: dict, data: bytes, lang: str, b
     hosted = a2.base44_public_image_url(up.json() or {}, app_id)
     if not hosted:
         raise RuntimeError("uploaded, but no public URL serves the image")
-    patch = {"image_url": hosted, "image_credit": images.credit_line(img, lang),
+    patch = {"image_url": hosted, "image_credit": images.credit_line(img, lang, linked=True),
              "image_source": img["source_page"]}
     requests.put(f"{base}/{rid}", headers=hdr, json=patch, timeout=40).raise_for_status()
     after = requests.get(f"{base}/{rid}", headers=hdr, timeout=40)
@@ -179,6 +179,25 @@ def base44_set_photo(site: dict, rec: dict, img: dict, data: bytes, lang: str, b
         requests.put(f"{base}/{rid}", headers=hdr, json={**restore, **patch}, timeout=40).raise_for_status()
         return f"{hosted} (update replaced {lost}; restored from backup)"
     return hosted
+
+
+def base44_recredit(site: dict, apply: bool, slugs: list[str] | None) -> list[str]:
+    """Drop the raw source URL from credits the page already links (7 Oct: on a
+    phone the URL inside the Farsi credit ran off the left edge). Text only."""
+    base, _, hdr = _b44(site)
+    out = []
+    for rec in base44_records(site):
+        cr = str(rec.get("image_credit") or "")
+        if not re.search(r"\(https?://[^)]+\)", cr):
+            continue
+        if slugs and not any(x.strip("/") in str(rec.get("slug", "")).strip("/") for x in slugs):
+            continue
+        new = re.sub(r"\s*\(https?://[^)]+\)", "", cr)
+        out.append(f"  {rec.get('slug')}: {cr[:60]}… → {new}")
+        if apply:
+            rid = rec.get("id") or rec.get("_id")
+            requests.put(f"{base}/{rid}", headers=hdr, json={"image_credit": new}, timeout=40).raise_for_status()
+    return out or [f"{site['repo']}: no linked credit carries a raw URL"]
 
 
 def _fetch(img: dict) -> bytes | None:
@@ -236,7 +255,7 @@ def plan(site: dict) -> list[dict]:
 
 
 def run(apply: bool, only: list[str] | None = None, slugs: list[str] | None = None,
-        commons_file: str = "", crop_box: str = "") -> list[str]:
+        commons_file: str = "", crop_box: str = "", recredit: bool = False) -> list[str]:
     log = []
     # Minute stamp: a second run the same day must not collide with an open branch
     # (a PUT onto an existing file without its sha fails).
@@ -244,6 +263,9 @@ def run(apply: bool, only: list[str] | None = None, slugs: list[str] | None = No
     for site in SITES:
         # Exact repo name: a substring test made `--only boutimar` also run boutimarfarsi.
         if only and site["repo"].split("/")[1] not in only:
+            continue
+        if recredit and site["kind"] == "base44":
+            log += base44_recredit(site, apply, slugs)
             continue
         todo = plan(site)
         if slugs:
@@ -359,8 +381,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--slug", action="append", help="only articles whose slug contains this")
     ap.add_argument("--file", default="", help="use this exact Commons file (needs --slug matching ONE article)")
     ap.add_argument("--crop", default="", help="crop as fractions left,top,width,height, e.g. 0,0.32,1,0.32")
+    ap.add_argument("--recredit", action="store_true", help="base44: drop raw URLs from linked credits")
     a = ap.parse_args(argv)
-    print("\n".join(run(a.apply, a.only, a.slug, a.file, a.crop)))
+    print("\n".join(run(a.apply, a.only, a.slug, a.file, a.crop, a.recredit)))
     print(f"vetting: {images.VET['ok']} passed, {images.VET['rejected']} rejected, {images.VET['error']} errors (fail-open)")
     return 0
 

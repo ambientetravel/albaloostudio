@@ -197,13 +197,15 @@ def fetch(img: dict[str, Any]) -> bytes | None:
     return data
 
 
-def credit_line(img: dict[str, Any], language: str) -> str:
+def credit_line(img: dict[str, Any], language: str, *, linked: bool = False) -> str:
     """The caption, built only from the file's own metadata. A cropped photo says
-    so — CC BY / BY-SA require changes to be indicated."""
+    so — CC BY / BY-SA require changes to be indicated. `linked`: the page wraps
+    the whole credit in a link to the source (cruisebaz), so the raw URL is left
+    out — printed inside Farsi text it ran off the left edge on a phone (7 Oct)."""
     cut = bool(img.get("cropped"))
     if str(language).lower().startswith("fa"):
-        return (f"عکس: {img['creator']} — {img['licence']}، از ویکی‌مدیا کامنز ({img['source_page']})"
-                + ("، برش‌خورده" if cut else ""))
+        return (f"عکس: {img['creator']} — {img['licence']}، از ویکی‌مدیا کامنز"
+                + ("" if linked else f" ({img['source_page']})") + ("، برش‌خورده" if cut else ""))
     return (f"Photo: {img['creator']}, {img['licence']}, via [Wikimedia Commons]({img['source_page']})"
             + (", cropped" if cut else ""))
 

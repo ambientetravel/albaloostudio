@@ -2095,7 +2095,7 @@ def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) ->
             hosted = base44_public_image_url((up.json() or {}), app_id)
             if hosted:
                 record["image_url"] = hosted
-                record["image_credit"] = _images.credit_line(img, brief.brief.language)
+                record["image_credit"] = _images.credit_line(img, brief.brief.language, linked=True)
                 record["image_source"] = img["source_page"]
         except requests.RequestException as exc:
             log.warning("%s — photo upload to base44 failed, article goes without: %s",
