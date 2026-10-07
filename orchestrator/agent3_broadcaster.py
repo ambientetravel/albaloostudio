@@ -137,6 +137,15 @@ class ContentSummary(_Loose):
     valid_until: str | None = None
 
 
+def with_photo_credit(body: str, assets: list[dict[str, Any]]) -> str:
+    """CC BY / BY-SA attribution goes WITH the image, so a post that carries the
+    article photo carries its credit line too (plain text — no Markdown in posts)."""
+    credit = next((str(a.get("credit")) for a in assets or [] if a.get("credit")), "")
+    if not credit or credit in body:
+        return body
+    return f"{body.rstrip()}\n\n📷 {credit}"
+
+
 class DistributionHints(_Loose):
     channels: list[str] = Field(default_factory=list)
     b2b_angle: str | None = None
@@ -682,14 +691,14 @@ def run_broadcast_job(event: PublishingEvent, raw_payload: dict[str, Any]) -> No
                 "external_id": None,
                 "permalink": None,
                 "copy": {
-                    "body": draft["body"],
+                    "body": with_photo_credit(draft["body"], event.distribution_hints.assets),
                     "hashtags": draft.get("hashtags", []),
                     "cta_url": cta,
                     "language": draft.get("language", event.publication.language),
                     # Dedupe guard: identical copy is never posted twice to one
                     # channel, however many times the event is redelivered.
                     "hash": "sha256:" + hashlib.sha256(
-                        f"{channel}|{draft['body']}".encode("utf-8")
+                        f"{channel}|{with_photo_credit(draft['body'], event.distribution_hints.assets)}".encode("utf-8")
                     ).hexdigest(),
                 },
                 "assets": event.distribution_hints.assets,

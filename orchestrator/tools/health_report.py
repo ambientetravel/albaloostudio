@@ -255,8 +255,12 @@ def build(token: str, bridge_token: str) -> dict:
                        posts_no_media=bc.get("posts_blocked_media"),
                        campaigns=bc.get("composed"))
         if bc.get("posts_blocked_media"):
-            needs_you.append(f"{bc['posts_blocked_media']} social post(s) blocked for **missing "
-                             f"media** — no image source is wired, so these can never ship")
+            # Not a "needs you": nothing here is the owner's to do. Since 7 Oct the
+            # writer attaches the article photo + credit to each event; these are
+            # Instagram posts for articles drafted before that, and stay text-less.
+            warn.append(f"{bc['posts_blocked_media']} Instagram post(s) without an image — from "
+                        f"articles drafted before photos were attached to social posts (7 Oct); "
+                        f"new articles carry their photo and credit")
         if bc.get("posts_held"):
             fine.append(f"{bc['posts_held']} social post(s) composed and held at the autopost "
                         f"gate (switched off, as designed)")

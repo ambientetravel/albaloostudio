@@ -43,6 +43,7 @@ import compliance
 import config
 import llm
 from agent3_broadcaster import (
+    with_photo_credit,
     SCHEDULER,
     PublishingEvent,
     _call_claude,
@@ -280,7 +281,7 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
                 "external_id": None,
                 "permalink": None,
                 "copy": {
-                    "body": d["body"],
+                    "body": with_photo_credit(d["body"], event.distribution_hints.assets),
                     "hashtags": d.get("hashtags", []),
                     "cta_url": _with_utm(
                         event.distribution_hints.cta_url or event.publication.live_url,
@@ -292,7 +293,7 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
                     # validation, not by reading the code — which is the whole
                     # reason the schema is validated rather than trusted.
                     "hash": "sha256:" + hashlib.sha256(
-                        f"{d['channel']}|{d['body']}".encode("utf-8")).hexdigest(),
+                        f"{d['channel']}|{with_photo_credit(d['body'], event.distribution_hints.assets)}".encode("utf-8")).hexdigest(),
                 },
                 "assets": event.distribution_hints.assets,
                 "angle": d.get("angle"),

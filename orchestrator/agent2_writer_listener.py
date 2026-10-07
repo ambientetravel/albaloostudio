@@ -1631,6 +1631,7 @@ def _push_astro_pr(
         img_repo_path = f"{img_cfg['dir'].rstrip('/')}/{slug}{img['ext']}"
         public = f"{img_cfg.get('url_prefix', '/').rstrip('/')}/{slug}{img['ext']}"
         front[img_cfg.get("field", "image")] = public
+        img["public_url"] = f"{site.base_url.rstrip('/')}{public}"   # live once merged
         credit = _images.credit_line(img, brief.brief.language)
         if img_cfg.get("inline"):
             body_md = f"![{img.get('alt') or img['title']}]({public})\n*{credit}*\n\n{body_md}"
@@ -1884,6 +1885,7 @@ def _push_boutimar_ir_article(
         import images as _images
         img_repo_path = f"{img_cfg['dir'].rstrip('/')}/{slug}{img['ext']}"
         article["image"] = img_repo_path            # boutimar.ir paths are relative: img/…
+        img["public_url"] = f"{site.base_url.rstrip('/')}/{img_repo_path}"
         article["body"] = list(article["body"]) + [{"p": _images.credit_line(img, "fa")}]
 
     api = "https://api.github.com"
@@ -2095,6 +2097,7 @@ def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) ->
             hosted = base44_public_image_url((up.json() or {}), app_id)
             if hosted:
                 record["image_url"] = hosted
+                img["public_url"] = hosted
                 record["image_credit"] = _images.credit_line(img, brief.brief.language, linked=True)
                 record["image_source"] = img["source_page"]
         except requests.RequestException as exc:
@@ -2425,6 +2428,17 @@ def run_writing_job(brief: ContentBrief, raw_payload: dict[str, Any]) -> None:
         JOBS.release(idem)
 
 
+def _event_hero(draft: dict[str, Any], language: str) -> dict[str, Any] | None:
+    """The article photo for the publishing event: public URL + its real credit."""
+    img = draft.get("_image") or {}
+    if not img.get("public_url"):
+        return None
+    import images as _images
+    return {"url": img["public_url"], "alt": img.get("alt") or _images.clean(img.get("title", ""), 160),
+            "credit": _images.credit_line(img, language, linked=True),
+            "license": img.get("licence"), "source_page": img.get("source_page")}
+
+
 def build_publishing_event(
     brief: ContentBrief,
     raw_payload: dict[str, Any],
@@ -2476,9 +2490,10 @@ def build_publishing_event(
             "language": brief.brief.language,
             "word_count": word_count,
             "reading_time_min": max(1, round(word_count / 220)),
-            # No hero image is asserted here. Agent 2 does not source imagery, and
-            # an image with no known credit is omitted rather than guessed (§7.3).
-            "hero_image": None,
+            # The article's photo, where the adapter placed it at a known public
+            # address, with its real credit (images.py). None when there is no photo
+            # or no confirmed address (cruise24.ir's built path is not asserted).
+            "hero_image": _event_hero(draft, brief.brief.language),
             "indexation": {
                 "sitemap_updated": False,
                 "robots": "index,follow",
@@ -2513,7 +2528,10 @@ def build_publishing_event(
             },
             "hashtags_allowed": True,
             "embargo_until": None,
-            "assets": [],
+            # Instagram cannot post without media (scheduler.media_ok): 3 posts sat
+            # "blocked, no image" while their articles had photos (7 Oct).
+            "assets": ([{"type": "image", **_event_hero(draft, brief.brief.language)}]
+                       if _event_hero(draft, brief.brief.language) else []),
         },
         "compliance": {
             "profile": brief.compliance.profile,

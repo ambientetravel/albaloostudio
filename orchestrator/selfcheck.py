@@ -972,8 +972,8 @@ ok("the writer's draft schema requires valid_until and the event carries it thro
    and '"valid_until": (draft.get("valid_until")' in _a2l_src)
 ok("the writer is told to set valid_until only for a dated event, empty otherwise",
    "valid_until: set it to the ISO date" in _a2l_src and "return an empty string" in _a2l_src)
-ok("and the hash covers channel AND body, so one post per channel is distinct",
-   "f\"{d['channel']}|{d['body']}\"" in _src3)
+ok("and the hash covers channel AND body (credit included), so one post per channel is distinct",
+   "f\"{d['channel']}|{with_photo_credit(d['body'], event.distribution_hints.assets)}\"" in _src3)
 ok("the stub copy is documented as never publishable",
    "Never publishable" in (a3b._stub_copy.__doc__ or ""))
 ok("a held post is not a failure",
@@ -4205,6 +4205,20 @@ try:
 except ValueError:
     _dup = True
 ok("a patch refuses an anchor that is missing or not unique", _dup)
+
+import jsonschema as _js
+_pe_schema = json.load(open(Path(__file__).resolve().parent / "schemas" / "publishing.event.v1.json"))
+_hero_img = dict(_p); _hero_img["public_url"] = "https://boutimar.com/img/journal/x.jpg"; _hero_img["alt"] = "Dizin slope"
+_eh = a2._event_hero({"_image": _hero_img}, "en")
+_js.validate(_eh, _pe_schema["properties"]["publication"]["properties"]["hero_image"])
+ok("the publishing event carries the photo's public URL, credit and licence, valid against the schema",
+   _eh["url"].endswith("/x.jpg") and "ninara" in _eh["credit"] and _eh["license"] == "CC BY-SA 2.0"
+   and a2._event_hero({"_image": dict(_p)}, "en") is None)
+import agent3_broadcaster as _a3
+_wc = _a3.with_photo_credit("Ski Dizin this winter.", [{"type": "image", "url": "u", "credit": "Photo: ninara, CC BY-SA 2.0"}])
+ok("a social post that carries the photo carries its credit; a post without a photo is unchanged",
+   _wc.endswith("📷 Photo: ninara, CC BY-SA 2.0") and _a3.with_photo_credit("x", []) == "x"
+   and _a3.with_photo_credit(_wc, [{"credit": "Photo: ninara, CC BY-SA 2.0"}]) == _wc)
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
