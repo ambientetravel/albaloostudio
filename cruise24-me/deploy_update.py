@@ -13,7 +13,8 @@ them for a manual upload or uploads them over SSH.
     python3 deploy_update.py --ssh      # ... and upload them, then read them back to confirm
 
 "Live" is checked, not assumed (CLAUDE.md: never infer shipped from edited). deploy/live.sha256
-records the hash of every file last seen live; a file whose built hash matches it is skipped,
+records the hash of every file last seen live (HTML compared without the analytics
+snippet GoDaddy appends to every page it serves); a file whose built hash matches it is skipped,
 anything else is fetched from cruise24.me and compared. So after a manual upload the next run
 notices by itself, and the very first run reads the whole site once to fill the record.
 
@@ -61,6 +62,23 @@ def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
+# GoDaddy's shared hosting appends its own analytics snippet (_trfq / tccl, secureserver.net)
+# to every HTML response, just before </html>. The file on disk is ours byte for byte; what a
+# visitor receives is not. Compare with that snippet taken out, or every page differs forever.
+GODADDY_TAG = re.compile(rb"<script>\s*'undefined'\s*===\s*typeof _trfq.*?(?=</html>)", re.S)
+
+
+def norm(rel: str, b: bytes) -> bytes:
+    if rel.endswith(".html"):
+        b = GODADDY_TAG.sub(b"", b)
+        return b.rstrip()
+    return b
+
+
+def fingerprint(rel: str, b: bytes) -> str:
+    return sha(norm(rel, b))
+
+
 def in_scope(rel: str) -> bool:
     name = rel.rsplit("/", 1)[-1]
     return not name.startswith(".") and not rel.endswith(".php")
@@ -100,7 +118,7 @@ def live_bytes(rel: str) -> bytes | None:
 
 def live_hash(rel: str) -> str | None:
     b = live_bytes(rel)
-    return None if b is None else sha(b)
+    return None if b is None else fingerprint(rel, b)
 
 
 def live_sailing_pages() -> set[str]:
@@ -114,7 +132,7 @@ def explain(rels: list[str], n: int) -> None:
     """Print how the first n differing text files differ from live, to tell a real change
     from something the server adds to every page."""
     for r in [r for r in rels if r.endswith((".html", ".xml", ".json", ".txt"))][:n]:
-        live = (live_bytes(r) or b"").decode("utf-8", "ignore").splitlines()
+        live = norm(r, live_bytes(r) or b"").decode("utf-8", "ignore").splitlines()
         mine = (HERE / r).read_text(encoding="utf-8").splitlines()
         d = list(difflib.unified_diff(live, mine, "live/" + r, "built/" + r, n=0, lineterm=""))
         print(f"--- {r}: {len(d)} diff lines")
@@ -145,7 +163,7 @@ def main() -> int:
     if blockers:
         print("NOT shipping, the pre-launch check failed:\n  " + "\n  ".join(blockers))
         return 2
-    local = {p.relative_to(HERE).as_posix(): sha(p.read_bytes()) for p in files}
+    local = {p.relative_to(HERE).as_posix(): fingerprint(p.relative_to(HERE).as_posix(), p.read_bytes()) for p in files}
     known = load_manifest()
 
     candidates = sorted(r for r, h in local.items() if known.get(r) != h)
