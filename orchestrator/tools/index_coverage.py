@@ -49,10 +49,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import logging
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
@@ -157,6 +158,14 @@ def robots_blocked(site: config.Site, sitemap_urls: set[str],
     return {"available": True, "reason": None, "blocked": blocked}
 
 
+def inspectable(canon: list[str], raw: Iterable[str]) -> list[str]:
+    """Canonical keys → the absolute URLs the sitemap declared (https:// fallback)."""
+    back: dict[str, str] = {}
+    for u in raw:
+        back.setdefault(a1._canon_url(u), u.strip())
+    return [back.get(c) or f"https://{c}" for c in canon]
+
+
 def inspect_urls(service, site: config.Site, urls: list[str]) -> dict[str, Any]:
     """
     Real index status, for as many URLs as the caller asked for.
@@ -175,12 +184,17 @@ def inspect_urls(service, site: config.Site, urls: list[str]) -> dict[str, Any]:
         except Exception as exc:  # googleapiclient raises HttpError, but not only
             status = getattr(getattr(exc, "resp", None), "status", None)
             if status in (403, 401):
+                # Google uses ONE message for a Restricted grant and for a URL
+                # outside the property ("You do not own this site, or the
+                # inspected URL is not part of this property"), so quote it
+                # rather than assert which of the two it was.
+                said = config.redact(str(exc))[:200]
                 return {
                     "permitted": False,
                     "reason": (
                         "URL Inspection needs an OWNER or FULL user; this service "
-                        "account is Restricted on this property. Search Console → "
-                        "Settings → Users and permissions → set it to Full."),
+                        "account may be Restricted on this property, or the URL "
+                        f"({url}) is outside it. Google said: {said}"),
                     "results": out,
                 }
             log.warning("%s — inspect failed for %s: %s", site.domain, url,
@@ -242,7 +256,17 @@ def assess(service, site: config.Site, session: requests.Session,
         "sample_undeclared": undeclared[:15],
     }
     if inspect and never:
-        row["inspection"] = inspect_urls(service, site, never[:inspect])
+        # Pipeline articles first: whether a page the writer shipped actually got
+        # indexed is the question this quota is best spent on.
+        art = re.compile(r"/(journal|daryanameh|blog|guides)/")
+        order = [u for u in never if art.search(u)] + [u for u in never if not art.search(u)]
+        # `never` holds CANONICAL keys ("host/path", no scheme) — fine for set
+        # arithmetic, but URL Inspection needs the real address. Sent bare, Google
+        # answers 403 "not part of this property", which reads exactly like a
+        # Restricted grant: that is how Full users kept being reported as
+        # Restricted (30 Sep). Map each key back to the sitemap's own spelling.
+        row["inspection"] = inspect_urls(service, site,
+                                         inspectable(order[:inspect], declared_raw))
     return row
 
 

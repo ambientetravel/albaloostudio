@@ -335,6 +335,20 @@ def _ack(brief: ContentBrief, job: dict[str, Any]) -> dict[str, Any]:
 # ══════════════════════════════════════════════════════════════════════════════
 
 
+def _prefer_line(domain: str) -> str:
+    """A cruise site's photo should show a line it sells, not a competitor's ship
+    (cruise24.ir PR #8: Royal Caribbean ×2, Cunard, Holland America)."""
+    try:
+        site = config.load_sites(only=[domain], include_hold=True)[0]
+        prefer = (_cms_dict(site).get("images") or {}).get("prefer") or []
+    except Exception:  # noqa: BLE001 — a prompt hint is never worth a failed draft
+        return ""
+    if not prefer:
+        return ""
+    return ("For a cruise topic not about one specific ship or port, image_query must name a "
+            "ship of a line this site sells: " + ", ".join(prefer) + ". Never another cruise line's ship.")
+
+
 def _system_instruction(brief: ContentBrief) -> str:
     s, b = brief.site, brief.brief
     return "\n".join(
@@ -406,7 +420,7 @@ def _system_instruction(brief: ContentBrief) -> str:
             '{"title": str, "meta_description": str, "body_markdown": str, '
             '"key_points": [str], "quotable_lines": [str], "faq": '
             '[{"q": str, "a": str}], "internal_link_suggestions": '
-            '[{"path": str, "anchor": str}], "valid_until": str}',
+            '[{"path": str, "anchor": str}], "valid_until": str, "image_query": str, "image_alt": str}',
             "body_markdown uses ## and ### only — no H1, the CMS renders that from "
             "the title.",
             "meta_description is a Google snippet: one plain sentence, about 155 "
@@ -417,6 +431,14 @@ def _system_instruction(brief: ContentBrief) -> str:
             "keeps a share from advertising an event after it has happened. For "
             "evergreen content — a guide, a destination, anything without a fixed end "
             "date — return an empty string. When unsure, empty string.",
+            "image_query: 2–6 ENGLISH words naming the real place, landmark, ship or "
+            "scene a photo of which would illustrate this article (e.g. 'Dizin ski "
+            "resort', 'Galataport Istanbul', 'Mount Damavand'). Concrete and "
+            "photographable — never abstract ('luxury travel'). Empty string if "
+            "nothing concrete fits.",
+            "image_alt: one short sentence IN THE ARTICLE'S LANGUAGE describing that "
+            "scene (alt text for the photo). Empty string when image_query is empty.",
+            _prefer_line(brief.site.domain),
         ]
     )
 
@@ -1041,9 +1063,17 @@ _DRAFT_SCHEMA = {
         # dated event, "" for evergreen (almost everything). Feeds the Broadcaster's
         # past-event guard. Required by Anthropic strict mode, so "" is the default.
         "valid_until": {"type": "string"},
+        # English, 2-6 words: the real, photographable scene the article is about
+        # ("Dizin ski resort", "Galataport Istanbul cruise terminal"). Feeds the
+        # Commons photo search (images.py). "" when nothing concrete fits.
+        "image_query": {"type": "string"},
+        # One short sentence in the ARTICLE'S language describing that scene, for
+        # the photo's alt text (screen readers, image search). "" with no query.
+        "image_alt": {"type": "string"},
     },
     "required": ["title", "meta_description", "body_markdown", "key_points",
-                 "quotable_lines", "faq", "internal_link_suggestions", "valid_until"],
+                 "quotable_lines", "faq", "internal_link_suggestions", "valid_until",
+                 "image_query", "image_alt"],
 }
 
 
@@ -1268,6 +1298,20 @@ def push_to_cms(brief: ContentBrief, draft: dict[str, Any]) -> dict[str, Any]:
         slug = brief.brief.target_url_path.strip("/").split("/")[-1] or "page"
         brief.brief.target_url_path = tpl.format(slug=slug)
     url = f"{site.base_url}{brief.brief.target_url_path}"
+
+    # A real, freely licensed photo with its real credit (images.py). Only for
+    # adapters that can commit a file next to the article; sites opt in with
+    # cms.images in sites.yml. Fail-soft: no match → no photo, never a guess.
+    _ic = _cms_dict(site).get("images") or {}
+    if (adapter in ("astro_pr", "boutimar_ir_static", "bundle_pr") and _ic.get("dir")) or \
+            (adapter == "base44_entity" and _ic.get("base44_upload")):
+        try:
+            import images as _images
+            draft["_image"] = _images.attach(draft, language=brief.brief.language,
+                                             avoid=_ic.get("avoid") or ())
+        except Exception as exc:  # noqa: BLE001 — a photo is never worth a lost article
+            log.warning("%s — image sourcing skipped: %s", site.domain, exc)
+            draft["_image"] = None
 
     # No public credit footer. The Albaloo architecture credit belongs in the
     # envelope and manifest (internal provenance), NOT appended to the article
@@ -1579,8 +1623,21 @@ def _push_astro_pr(
             "pubDate": rfc3339(),
             "lang": brief.brief.language,
         }
+    body_md = draft.get("body_markdown", "")
+    img, img_repo_path = draft.get("_image"), None
+    img_cfg = cms.get("images") or {}
+    if img and img_cfg.get("dir"):
+        import images as _images
+        img_repo_path = f"{img_cfg['dir'].rstrip('/')}/{slug}{img['ext']}"
+        public = f"{img_cfg.get('url_prefix', '/').rstrip('/')}/{slug}{img['ext']}"
+        front[img_cfg.get("field", "image")] = public
+        credit = _images.credit_line(img, brief.brief.language)
+        if img_cfg.get("inline"):
+            body_md = f"![{img.get('alt') or img['title']}]({public})\n*{credit}*\n\n{body_md}"
+        else:
+            body_md = f"{body_md}\n\n*{credit}*"
     fm = "\n".join(f'{k}: {json.dumps(v, ensure_ascii=False)}' for k, v in front.items())
-    file_body = f"---\n{fm}\n---\n\n{draft.get('body_markdown', '')}"
+    file_body = f"---\n{fm}\n---\n\n{body_md}"
 
     if not repo or not token:
         out = _Path(config.optional_env("BUNDLE_DIR", str(config.BASE_DIR / "bundles")))
@@ -1621,6 +1678,14 @@ def _push_astro_pr(
             rb.raise_for_status()
 
         import base64 as _b64
+        if img_repo_path:
+            ri = requests.put(
+                f"{api}/repos/{repo}/contents/{img_repo_path}", headers=hdr,
+                json={"message": f"Agent 2: photo for {slug} ({img['licence']}, {img['creator']})"[:72],
+                      "content": _b64.b64encode(img["bytes"]).decode("ascii"), "branch": branch},
+                timeout=config.WEBHOOK_TIMEOUT_S)
+            if ri.status_code not in (200, 201, 422):
+                ri.raise_for_status()
         r = requests.put(
             f"{api}/repos/{repo}/contents/{rel_path}", headers=hdr,
             json={"message": f"Agent 2: draft \u2014 {front['title']}"[:72],
@@ -1803,7 +1868,7 @@ def _push_boutimar_ir_article(
         "kind": kind,
         "title": draft.get("title") or brief.brief.working_title,
         "dek": (draft.get("meta_description") or "").strip(),
-        "image": "",                              # reviewer supplies — see docstring
+        "image": "",                              # set below when a photo was sourced
         "read": max(1, round(words / 200)),
         "body": body,
         # Deliberately empty. _howToAdd wants cruise ids from the feed or real
@@ -1811,6 +1876,15 @@ def _push_boutimar_ir_article(
         # nowhere, which is worse than a card with no links.
         "related": [],
     }
+
+    img = draft.get("_image")
+    img_cfg = (cms.get("images") if isinstance(cms, dict) else None) or {}
+    img_repo_path = None
+    if img and img_cfg.get("dir"):
+        import images as _images
+        img_repo_path = f"{img_cfg['dir'].rstrip('/')}/{slug}{img['ext']}"
+        article["image"] = img_repo_path            # boutimar.ir paths are relative: img/…
+        article["body"] = list(article["body"]) + [{"p": _images.credit_line(img, "fa")}]
 
     api = "https://api.github.com"
     hdr = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
@@ -1833,6 +1907,14 @@ def _push_boutimar_ir_article(
             rb.raise_for_status()
 
         import base64 as _b64
+        if img_repo_path:
+            ri = requests.put(
+                f"{api}/repos/{repo}/contents/{img_repo_path}", headers=hdr,
+                json={"message": f"photo for {slug} ({img['licence']}, {img['creator']})"[:72],
+                      "content": _b64.b64encode(img["bytes"]).decode("ascii"), "branch": branch},
+                timeout=config.WEBHOOK_TIMEOUT_S)
+            if ri.status_code not in (200, 201, 422):
+                ri.raise_for_status()
         rf = requests.get(f"{api}/repos/{repo}/contents/{path}", headers=hdr,
                           params={"ref": branch}, timeout=config.WEBHOOK_TIMEOUT_S)
         rf.raise_for_status()
@@ -1916,6 +1998,41 @@ def _cms_dict(site: SiteBlock) -> dict[str, Any]:
 BASE44_API = "https://app.base44.com/api"
 
 
+def _serves_image(url: str) -> bool:
+    try:
+        r = requests.get(url, timeout=20, stream=True, headers={"User-Agent": config.USER_AGENT})
+        ok = r.status_code == 200 and r.headers.get("content-type", "").startswith("image/")
+        r.close()
+        return ok
+    except requests.RequestException:
+        return False
+
+
+def base44_public_image_url(upload: dict, app_id: str) -> str | None:
+    """A URL that really serves the uploaded image, or None.
+
+    Never trust the returned host blindly: the docs' example storage.base44.com
+    does not resolve (NXDOMAIN, 3 Oct 2026), so writing it would give every
+    article a broken hero. Try the returned url, then the supabase public object
+    path that cruisebaz's own assets are served from, built from file_uri
+    ("mp/public/<app_id>/<file>")."""
+    cands = [upload.get("url") or ""]
+    fname = str(upload.get("file_uri") or upload.get("url") or "").rstrip("/").rsplit("/", 1)[-1]
+    if fname:
+        cands.append(f"https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/{app_id}/{fname}")
+    for u in cands:
+        if u.startswith("https://") and _serves_image(u):
+            return u
+    log.warning("base44 upload returned no servable image URL (tried %s) — article goes without a photo",
+                ", ".join(c[:70] for c in cands if c))
+    return None
+
+
+def base44_entity_url(app_id: str, entity: str) -> str:
+    """Collection URL for an entity's records: POST here creates, {url}/{id} updates."""
+    return f"{BASE44_API}/apps/{app_id}/entities/{entity}"
+
+
 def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) -> dict[str, Any]:
     """
     Create the article as a DRAFT record in the site's base44 app.
@@ -1961,11 +2078,38 @@ def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) ->
     }
     if draft.get("valid_until"):
         record["valid_until"] = draft["valid_until"]
-    base = f"{BASE44_API}/apps/{app_id}/entities/{entity}/records"
+    # Photo: re-hosted in the app's OWN storage (POST /api/files/apps/{app}/upload),
+    # never a Wikimedia URL — visitors in Iran often cannot reach upload.wikimedia.org.
+    # Only when the site opts in (cms.images.base44_upload) — the entity must
+    # carry image_url / image_credit / image_source first.
+    img = draft.get("_image")
+    if img and (cms.get("images") or {}).get("base44_upload"):
+        try:
+            import images as _images
+            up = requests.post(f"{BASE44_API}/files/apps/{app_id}/upload",
+                               headers={"Authorization": f"Bearer {token}", "User-Agent": config.USER_AGENT},
+                               files={"file": (f"{slug.strip('/').replace('/', '-') or 'article'}{img['ext']}",
+                                               img["bytes"], "image/jpeg" if img["ext"] == ".jpg" else "image/png")},
+                               data={"visibility": "public"}, timeout=config.WEBHOOK_TIMEOUT_S)
+            up.raise_for_status()
+            hosted = base44_public_image_url((up.json() or {}), app_id)
+            if hosted:
+                record["image_url"] = hosted
+                record["image_credit"] = _images.credit_line(img, brief.brief.language)
+                record["image_source"] = img["source_page"]
+        except requests.RequestException as exc:
+            log.warning("%s — photo upload to base44 failed, article goes without: %s",
+                        site.domain, config.redact(str(exc))[:120])
+    # Apps API paths (docs.base44.com/api-reference): list = GET …/entities/{E}/v2/list,
+    # create = POST …/entities/{E}, update = PUT …/entities/{E}/{id}. There is no
+    # "/records" segment — the first version used one and every write 404'd as
+    # "no entity", which read like a missing table rather than a wrong URL (2 Oct 2026).
+    base = base44_entity_url(app_id, entity)
     hdr = {"Authorization": f"Bearer {token}", "Content-Type": "application/json",
            "User-Agent": config.USER_AGENT}
     try:
-        r = requests.get(base, headers=hdr, params={"q": json.dumps({"slug": slug}), "limit": 1},
+        r = requests.get(f"{base}/v2/list", headers=hdr,
+                         params={"q": json.dumps({"slug": slug}), "limit": 1},
                          timeout=config.WEBHOOK_TIMEOUT_S)
         r.raise_for_status()
         found = r.json()
@@ -1995,7 +2139,8 @@ def _push_base44_entity(brief: ContentBrief, draft: dict[str, Any], url: str) ->
         code = getattr(getattr(exc, "response", None), "status_code", None)
         hint = {401: "BASE44_ACCESS_TOKEN rejected — expired/revoked, or an old account API key.",
                 403: "the token's user cannot write this entity (RLS / not an app editor).",
-                404: f"no entity {entity!r} in app {app_id} — the site session has not created it yet."
+                404: (f"no entity {entity!r} in app {app_id} (or the token cannot see this app) — "
+                      "check the entity exists and the token's app scope.")
                 }.get(code, "")
         detail = config.redact(str(exc))[:160]
         log.error("%s — base44 write failed: %s%s; staging instead", site.domain, detail,
@@ -2090,11 +2235,20 @@ def _push_bundle_pr(brief: ContentBrief, draft: dict[str, Any], url: str) -> dic
     subdir = f"content/blog/{record_id}"
     title = draft.get("title", brief.brief.working_title)
 
-    files = {
-        f"{subdir}/index.md": draft.get("body_markdown", ""),
-        f"{subdir}/manifest.json":
-            json.dumps(_bundle_manifest(site, brief, draft), ensure_ascii=False, indent=2),
-    }
+    manifest = _bundle_manifest(site, brief, draft)
+    img = draft.get("_image")
+    files: dict[str, Any] = {f"{subdir}/index.md": draft.get("body_markdown", "")}
+    if img:
+        # cruise24.ir's c2c765d contract: content/blog/<dir>/hero.<ext> + manifest.hero_image.
+        # Its build re-checks licence, credit, size and source_page and drops the photo
+        # (never the post) if any fails.
+        import images as _images
+        files[f"{subdir}/hero{img['ext']}"] = img["bytes"]
+        manifest["hero_image"] = {
+            "src": f"hero{img['ext']}", "credit": img["creator"], "licence": img["licence"],
+            "source_page": img["source_page"],
+            "alt": img.get("alt") or _images.clean(img["title"], 160)}
+    files[f"{subdir}/manifest.json"] = json.dumps(manifest, ensure_ascii=False, indent=2)
 
     if not repo or not token:
         # Not configured yet — stage the same bundle to disk so nothing is lost.
@@ -2122,7 +2276,8 @@ def _push_bundle_pr(brief: ContentBrief, draft: dict[str, Any], url: str) -> dic
         # API needs its blob sha to update — fetch it and retry rather than 422.
         for path, content in files.items():
             payload = {"message": f"Agent 2: draft — {title}"[:72],
-                       "content": _b64.b64encode(content.encode("utf-8")).decode("ascii"),
+                       "content": _b64.b64encode(content if isinstance(content, bytes)
+                                                 else content.encode("utf-8")).decode("ascii"),
                        "branch": branch}
             rp = requests.put(f"{api}/repos/{repo}/contents/{path}", headers=hdr,
                               json=payload, timeout=config.WEBHOOK_TIMEOUT_S)

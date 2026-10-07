@@ -23,6 +23,7 @@ it in here would mean one abstraction serving two quite different contracts.
 from __future__ import annotations
 
 import json
+import os
 import logging
 import re
 from typing import Any
@@ -239,7 +240,7 @@ _PROVIDERS = {"anthropic": _anthropic, "gemini": _gemini, "openai": _openai}
 
 def complete(system: str, prompt: str, *, max_tokens: int = 4000,
              schema: dict[str, Any] | None = None,
-             purpose: str = "") -> tuple[str, dict[str, Any]]:
+             purpose: str = "", provider: str | None = None) -> tuple[str, dict[str, Any]]:
     """
     Ask the configured provider for a completion. Returns (text, meta).
 
@@ -249,7 +250,7 @@ def complete(system: str, prompt: str, *, max_tokens: int = 4000,
     is not a defect in the payload, and every one of these agents has a
     degraded path that is honest about producing nothing.
     """
-    name = config.PROSE_PROVIDER
+    name = (provider or config.PROSE_PROVIDER).lower()
     fn = _PROVIDERS.get(name)
     if fn is None:
         raise ProviderUnavailable(
@@ -272,14 +273,40 @@ def complete(system: str, prompt: str, *, max_tokens: int = 4000,
     return text, meta
 
 
+def complete_json_resilient(system: str, prompt: str, schema: dict[str, Any], *,
+                            max_tokens: int = 4000, purpose: str = "",
+                            waits: tuple[int, ...] = (0, 20)) -> tuple[Any, dict[str, Any]]:
+    """The configured provider, retried after `waits` seconds, then Anthropic when
+    a key is present. 6 Oct: Gemini's free tier answered 503 "high demand" for 5
+    of 6 sites in one scout run — a weekly job cannot depend on a busy hour."""
+    import time
+    order = [(config.PROSE_PROVIDER, w) for w in waits]
+    if config.PROSE_PROVIDER != "anthropic" and os.getenv("ANTHROPIC_API_KEY"):
+        order.append(("anthropic", 0))
+    last: Exception | None = None
+    for name, wait in order:
+        if wait:
+            time.sleep(wait)
+        try:
+            return complete_json(system, prompt, schema, max_tokens=max_tokens,
+                                 purpose=purpose, provider=name)
+        except Exception as exc:  # noqa: BLE001 — google-genai raises its own ServerError
+            # for a 503 "high demand", which is neither ProviderUnavailable nor
+            # ValueError; catching only those let the first 503 skip the fallback.
+            last = exc
+            log.warning("%s on %s failed: %s: %s", purpose or "completion", name,
+                        type(exc).__name__, str(exc)[:160])
+    raise ProviderUnavailable(f"every provider failed: {last}")
+
+
 def complete_json(system: str, prompt: str, schema: dict[str, Any],
                   *, max_tokens: int = 4000,
-                  purpose: str = "") -> tuple[Any, dict[str, Any]]:
+                  purpose: str = "", provider: str | None = None) -> tuple[Any, dict[str, Any]]:
     """`complete()` plus parsing. A provider that returns unparseable JSON is a
     bad answer, not an unavailable provider — that raises ValueError, so the
     caller can tell "try again later" apart from "this came back wrong"."""
     text, meta = complete(system, prompt, max_tokens=max_tokens,
-                          schema=schema, purpose=purpose)
+                          schema=schema, purpose=purpose, provider=provider)
     try:
         return json.loads(text), meta
     except json.JSONDecodeError as exc:

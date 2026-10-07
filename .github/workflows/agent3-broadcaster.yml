@@ -86,6 +86,11 @@ jobs:
           echo "run_id=$RUN" >> "$GITHUB_OUTPUT"
 
       - name: Fetch the publishing events Agent 2 produced
+        # A writer run with no briefs to write uploads no agent2-written
+        # artifact; that is "nothing to broadcast", not a failure (6 Oct: a red
+        # run and an email for a writer that correctly wrote nothing). The
+        # locate step below reports the empty inbox.
+        continue-on-error: true
         uses: actions/download-artifact@v5
         with:
           name: agent2-written

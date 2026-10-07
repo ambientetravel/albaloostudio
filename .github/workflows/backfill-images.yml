@@ -1,0 +1,48 @@
+name: Backfill — photos for live articles that have none
+
+# One-shot. Finds a real, freely licensed Wikimedia Commons photo (credit copied
+# from the file's own licence record) for every live article without one, on
+# boutimar.com, exploreorient.com and boutimar.ir. With apply ticked it opens ONE
+# pull request per site on an agent2/ branch, so the photos land on the Notion
+# Content Review board for approval. Nothing goes live from this run itself.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Open the pull requests (unticked = dry run that only prints)"
+        type: boolean
+        default: false
+      only:
+        description: "Only these repos (comma list, e.g. cruise24-ir); blank = all"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Backfill
+        env:
+          GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PROSE_PROVIDER: anthropic
+        run: |
+          ARGS=""
+          for r in $(echo "${{ inputs.only }}" | tr ',' ' '); do ARGS="$ARGS --only $r"; done
+          if [ "${{ inputs.apply }}" = "true" ]; then ARGS="$ARGS --apply"; fi
+          python3 tools/backfill_images.py $ARGS | tee -a "$GITHUB_STEP_SUMMARY"

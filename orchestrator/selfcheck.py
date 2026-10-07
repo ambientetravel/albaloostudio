@@ -3317,13 +3317,17 @@ print("\n=== a settled 'cannot' is not an unfinished 'todo' ===")
 # put two closed decisions back on the backlog every week.
 _cov = _bd._coverage()
 _by = {r["domain"]: r for r in _cov}
-for _d in ("cruise24.me", "albaloostudio.com"):
+# cruise24.me left the builder on 30 Sep (static site on cPanel), so it is no
+# longer a settled "cannot": it stages bundles until its repo is found.
+for _d in ("albaloostudio.com",):
     ok(f"{_d} is a decision, not a gap",
        _by[_d]["cls"] == "hold" and "by decision" in _by[_d]["verdict"], _by[_d])
     ok(f"{_d} says WHY, in the registry not a comment",
        len(_by[_d]["unsupported_reason"]) > 30, _by[_d]["unsupported_reason"])
 ok("the reason reaches the rendered page",
-   "there is no publishing API" in _bd.render(None, None, None, None, None))
+   _by["albaloostudio.com"]["unsupported_reason"][:40] in _bd.render(None, None, None, None, None))
+ok("cruise24.me, off the builder, now stages bundles instead of being a closed 'cannot'",
+   _by["cruise24.me"]["adapter"] == "static_bundle" and _by["cruise24.me"]["cls"] != "bad")
 # The count that matters must now be the genuinely missing ones only.
 _gaps = [r["domain"] for r in _cov if r["cls"] == "bad"]
 ok("no publishing adapter is missing any more", _gaps == [], _gaps)
@@ -3516,20 +3520,20 @@ _r, _c = _b44run([])
 _post = [c for c in _c if c[0] == "POST"]
 ok("a new slug is CREATED as a draft record, even when publish_mode says publish",
    _r["record_id"] == "new1" and _post and _post[0][2]["json"]["status"] == "draft"
-   and _post[0][1].endswith("/apps/app123/entities/Article/records")
+   and _post[0][1].endswith("/apps/app123/entities/Article")
    and _r["live_url"] is None)
 ok("the bearer token is sent, and slug is the upsert key",
    _post[0][2]["headers"]["Authorization"] == "Bearer tok"
    and _post[0][2]["json"]["slug"] == _b44m.brief.target_url_path)
 _r, _c = _b44run([{"id": "old1", "status": "draft"}])
 ok("an existing DRAFT is updated in place (redelivery-safe), not duplicated",
-   [c[0] for c in _c] == ["GET", "PUT"] and _c[1][1].endswith("/records/old1"))
+   [c[0] for c in _c] == ["GET", "PUT"] and _c[1][1].endswith("/entities/Article/old1") and _c[0][1].endswith("/entities/Article/v2/list"))
 _r, _c = _b44run([{"id": "old1", "status": "published"}])
 ok("a PUBLISHED record is never overwritten",
    [c[0] for c in _c] == ["GET"] and "not overwritten" in _r["note"])
 _r, _c = _b44run({"message": "Entity schema Article not found"}, get_code=404)
 ok("a missing entity stages the draft and names the fix, never a false live_url",
-   _r["live_url"] is None and "has not created it yet" in _r["note"] and _r.get("staged_path"))
+   _r["live_url"] is None and "check the entity exists" in _r["note"] and _r.get("staged_path"))
 _saved_tok = os.environ.pop("BASE44_ACCESS_TOKEN", None)
 _r = a2._push_base44_entity(_b44m, _b44d, "https://x.test/p")
 if _saved_tok is not None: os.environ["BASE44_ACCESS_TOKEN"] = _saved_tok
@@ -3710,6 +3714,471 @@ ok("both deploy scripts refuse to build or ship anything but main",
        for f in ("deploy-cruise24-ir.sh", "deploy-boutimar-com.sh")))
 ok("the cruise24 deploy pulls before it builds, fast-forward only",
    'pull --ff-only origin main' in pathlib.Path("tools/deploy-cruise24-ir.sh").read_text())
+
+
+print("\n=== the PR gate judges only the articles a JSON PR adds ===")
+_docs = {"base": {"_note": "x", "articles": [{"slug": "visa", "dek": "کدام مسیرها واقعاً بدون ویزا هستند و چرا یک بندرِ یونانی"}]},
+         "head": {"_note": "x", "articles": [{"slug": "visa", "dek": "کدام مسیرها واقعاً بدون ویزا هستند و چرا یک بندرِ یونانی"},
+                                             {"slug": "new", "dek": "راهنمای فیوردهای نروژ"}]}}
+_orig_raw = _prg._raw
+_prg._raw = lambda repo, path, ref: json.dumps(_docs[ref], ensure_ascii=False)
+try:
+    _s = _prg._json_new_items("r", "data/articles.json", "base", "head")
+finally:
+    _prg._raw = _orig_raw
+ok("an existing (already live) article in a rewritten articles.json is not re-judged; the new one is",
+   "فیوردهای نروژ" in _s and "یونانی" not in _s)
+
+
+print("\n=== Content Review board ⇄ GitHub ===")
+import notion_review_sync as _nrs
+import re
+def _nrs_run(board, prs_state, open_prs, comments=None):
+    calls = []
+    comments = comments if comments is not None else {}
+    def fake_gh(method, path, body=None):
+        calls.append((method, path, body))
+        m = re.match(r"/repos/ambientetravel/([^/]+)/pulls/(\d+)$", path)
+        if method == "GET" and m:
+            return 200, prs_state[f"{m.group(1)}#{m.group(2)}"]
+        if method == "GET" and "/comments" in path:
+            return 200, comments.get(path, [])
+        if method == "PUT" and path.endswith("/merge"):
+            return 200, {"merged": True}
+        return 200, {}
+    def fake_notion(method, path, body=None):
+        calls.append(("N" + method, path, body))
+        return 200, {}
+    saved = (_nrs.gh, _nrs.notion, _nrs.rows, _nrs.open_article_prs)
+    _nrs.gh, _nrs.notion = fake_gh, fake_notion
+    _nrs.rows = lambda db: board
+    _nrs.open_article_prs = lambda: open_prs
+    try:
+        log = _nrs.sync(True, "db")
+    finally:
+        _nrs.gh, _nrs.notion, _nrs.rows, _nrs.open_article_prs = saved
+    return log, calls
+_open = {"number": 30, "state": "open", "merged_at": None, "title": "Agent 2 draft: Skiing"}
+_log, _c = _nrs_run({"boutimar#30": {"page_id": "p1", "status": "Approved", "feedback": ""}},
+                    {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "PASS"}])
+ok("Approved on the board squash-merges the PR and marks it Published",
+   any(m == "PUT" and p.endswith("/pulls/30/merge") for m, p, b in _c)
+   and any(m == "NPATCH" and b["properties"]["Status"]["select"]["name"] == "Published" for m, p, b in _c))
+_log, _c = _nrs_run({"boutimar#30": {"page_id": "p1", "status": "Approved", "feedback": ""}},
+                    {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "BLOCK"}])
+ok("Approved but BLOCKed by the house rules is NOT merged, and goes back to Needs edits",
+   not any(m == "PUT" for m, p, b in _c) and any("HOLD" in l for l in _log))
+_fb = {"boutimar#30": {"page_id": "p1", "status": "Needs edits", "feedback": "Cut the second section."}}
+_log, _c = _nrs_run(_fb, {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "PASS"}])
+_posted = [b for m, p, b in _c if m == "POST" and p.endswith("/issues/30/comments")]
+_mk = _nrs.feedback_marker("Needs edits", "Cut the second section.")
+_log2, _c2 = _nrs_run(_fb, {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "PASS"}],
+                      comments={"/repos/ambientetravel/boutimar/issues/30/comments?per_page=100": [{"body": _mk}]})
+ok("Needs-edits feedback is posted to the PR once, and not again on the next run",
+   len(_posted) == 1 and "Cut the second section." in _posted[0]["body"]
+   and not any(m == "POST" and p.endswith("/comments") for m, p, b in _c2))
+ok("the feedback marker is stable across processes", _mk == _nrs.feedback_marker("Needs edits", "Cut the second section."))
+_log, _c = _nrs_run({"boutimar#9": {"page_id": "p9", "status": "To review", "feedback": ""}},
+                    {"boutimar#9": {"number": 9, "state": "closed", "merged_at": "2026-09-26T00:00:00Z", "title": "x"}}, [])
+ok("a PR merged directly on GitHub flips its row to Published",
+   any(m == "NPATCH" and b["properties"]["Status"]["select"]["name"] == "Published" for m, p, b in _c))
+_saved_nt = os.environ.pop("NOTION_TOKEN", None)
+_buf2 = io.StringIO()
+with contextlib.redirect_stdout(_buf2):
+    _rc2 = _nrs.main(["--apply"])
+if _saved_nt is not None: os.environ["NOTION_TOKEN"] = _saved_nt
+ok("with no NOTION_TOKEN the sync is a no-op, not a failure", _rc2 == 0 and "not configured" in _buf2.getvalue())
+
+
+print("\n=== Google Trends (Agent 7) ===")
+import trends_scan as _ts
+_c24 = [x for x in config.load_sites(include_hold=True) if x.domain == "cruise24.ir"][0]
+ok("Trends uses short head terms, not long seed phrases", _ts.terms_for(_c24)[0] == "کشتی کروز")
+_md = _ts.to_md({"generated_at": "2026-09-29T00:00:00+00:00", "sites": [{"domain": "cruise24.ir", "geo": "IR", "terms": [
+    {"term": "تور دبی", "momentum": "flat", "peak_months": ["Nov"], "avg_interest": 35.6,
+     "rising": [{"query": "تور دبی دی ماه", "growth": "+150%"}]},
+    {"term": "آرویا", "error": "explore HTTP 429 (rate-limited)"}]}]})
+ok("the report shows seasonality, rising searches, and a rate-limit as a note",
+   "Nov" in _md and "تور دبی دی ماه" in _md and "rate-limited" in _md)
+ok("Agent 7 runs Trends without letting it fail the agent",
+   "trends_scan.py" in pathlib.Path("../.github/workflows/agent7-keyword-geo.yml").read_text()
+   and "continue-on-error: true" in pathlib.Path("../.github/workflows/agent7-keyword-geo.yml").read_text())
+
+
+print("\n=== IndexNow + page speed ===")
+import indexnow_ping as _inp, tempfile as _tf2
+with _tf2.TemporaryDirectory() as _d:
+    _d = pathlib.Path(_d); (_d / "prev").mkdir(); (_d / "now").mkdir()
+    for _n, _u in (("old.json", "https://exploreorient.com/journal/a/"), ("new.json", "https://exploreorient.com/journal/b/")):
+        (_d / "now" / _n).write_text(json.dumps({"publication": {"live_url": _u}}))
+    (_d / "prev" / "old.json").write_text("{}")
+    ok("only pages that went live THIS run are submitted",
+       _inp.new_live_urls(_d / "now", _d / "prev") == ["https://exploreorient.com/journal/b/"])
+_saved_kh = _inp.key_hosted
+_inp.key_hosted = lambda host, key: False
+_lg = _inp.ping(["https://cruisebaz.com/x"], {s.domain: s for s in config.load_sites(include_hold=True)})
+_inp.key_hosted = _saved_kh
+ok("a site whose key file is not served (e.g. base44 answering 200 for anything) is skipped, not pinged",
+   _lg and _lg[0].startswith("skip") and "not served" in _lg[0])
+ok("every live site has an IndexNow key", all(s.indexnow_key for s in config.load_sites() if s.domain in
+   ("boutimar.com", "boutimar.ir", "cruise24.ir", "exploreorient.com", "cruisebaz.com", "ambientetravel.com")))
+import pagespeed_check as _psc
+_md = _psc.to_md({"generated_at": "2026-09-29T00:00:00+00:00", "sites": [{"domain": "x", "pages": [
+    {"url": "https://x/", "field": {"LCP": {"p75": 3100, "rating": "AVERAGE"}, "_scope": "this page"},
+     "lab_score": 71, "top_savings": [{"fix": "Reduce unused JavaScript", "ms": 900}]},
+    {"url": "https://x/a", "error": "HTTP 429 (quota — set PAGESPEED_API_KEY)"}]}]})
+ok("the speed report shows field data, lab score, fixes, and a quota error as a note",
+   "3100ms average" in _md and "| 71 |" in _md and "Reduce unused JavaScript" in _md and "PAGESPEED_API_KEY" in _md)
+
+print("\n=== URL Inspection gets real addresses ===")
+_calls = []
+class _Ins:
+    def urlInspection(self): return self
+    def index(self): return self
+    def inspect(self, body): _calls.append(body["inspectionUrl"]); return self
+    def execute(self): return {"inspectionResult": {"indexStatusResult": {"verdict": "PASS"}}}
+_st = next(s for s in config.load_sites(include_hold=True) if s.domain == "cruise24.me")
+_r = ic.inspect_urls(_Ins(), _st, ic.inspectable(["cruise24.me/destinations.html"],
+                                                 ["https://cruise24.me/destinations.html"]))
+ok("inspection is sent the absolute sitemap URL, never the scheme-less canonical key "
+   "(a bare key 403s exactly like a Restricted grant)",
+   _calls == ["https://cruise24.me/destinations.html"] and _r["permitted"] and _r["results"][0]["verdict"] == "PASS")
+ok("assess() maps canonical keys back before inspecting", "inspectable(order[:inspect], declared_raw)" in _ICSRC
+   or "inspectable(order[:inspect], declared_raw)" in pathlib.Path("tools/index_coverage.py").read_text())
+
+print("\n=== Oracle: Chinese models ===")
+import ai_visibility as _aiv
+ok("all five Chinese models are registered on the OpenAI protocol",
+   set(_aiv.CN) == {"deepseek", "qwen", "ernie", "doubao", "kimi"} and all(_aiv.PROVIDERS[n]["base"].startswith("https://") for n in _aiv.CN))
+ok("'cn' and 'all' expand; unknown names are refused",
+   _aiv.resolve_providers("cn") == _aiv.CN and _aiv.resolve_providers("all")[:1] == ["anthropic"]
+   and _aiv.resolve_providers("deepseek,deepseek") == ["deepseek"])
+_saved_env = {k: os.environ.pop(k, None) for k in ("DEEPSEEK_API_KEY", "KIMI_MODEL")}
+_nc = _aiv.run_provider("deepseek", _aiv.PROBES[:1], None)
+ok("a model with no key is reported 'not configured', never a failure",
+   _nc["status"] == "not configured" and "DEEPSEEK_API_KEY" in _nc["note"])
+os.environ["KIMI_MODEL"] = "kimi-test"
+ok("model names are env-overridable (Moonshot retired moonshot-v1 on 31 Aug 2026)",
+   _aiv.provider_setup("kimi")[1] == "kimi-test" and _aiv.PROVIDERS["kimi"]["model"] != "moonshot-v1-8k")
+for _k, _v in _saved_env.items():
+    os.environ.pop(_k, None)
+    if _v is not None:
+        os.environ[_k] = _v
+_bm = next(c for c in _aiv.PROBES if c["domain"] == "boutimar.com")
+_eo = next(c for c in _aiv.PROBES if c["domain"] == "exploreorient.com")
+ok("Iran DMC and Explore Orient are probed in Chinese; EO matches 探索东方",
+   any("伊朗" in p for p in _bm["prompts"]) and any("丝绸之路" in p for p in _eo["prompts"]) and "探索东方" in _eo["aliases"])
+_fake = lambda p, m: "推荐 Boutimar 和 Key2Persia"  # noqa: E731
+_r = _aiv.probe(_bm, "deepseek", "x", _fake)
+ok("a Chinese answer naming the brand scores as present", _r["presence_rate"] == 1.0)
+_roll = _aiv.rollup([{"provider": "deepseek", "properties": [_r]}], [_bm])
+ok("roll-up gives health_report a mentioned_any per property", _roll[0]["mentioned_any"] is True)
+ok("health_report reads the list-shaped properties (it assumed a dict and would crash)",
+   "isinstance(props, dict)" in pathlib.Path("tools/health_report.py").read_text())
+
+print("\n=== base44 Apps API paths ===")
+_w2src = pathlib.Path("agent2_writer_listener.py").read_text(encoding="utf-8")
+ok("base44 records use the documented paths (list = /v2/list, create = POST collection), never '/records'",
+   a2.base44_entity_url("APP", "Article") == "https://app.base44.com/api/apps/APP/entities/Article"
+   and '/v2/list"' in _w2src and 'entities/{entity}/records' not in _w2src)
+
+print("\n=== Scout: head terms + existing pages ===")
+_sites = {x.domain: x for x in config.load_sites(include_hold=True)}
+ok("the three Farsi cruise sites declare «تور کشتی کروز» as their homepage head term",
+   all("تور کشتی کروز" in _sites[d].head_terms for d in ("boutimar.ir", "cruisebaz.com", "cruise24.ir")))
+_cands = [{"query": q} for q in ("تور کشتی کروز", "تور کشتی کروز ۱۴۰۵", "تور  كشتی كروز 2026",
+                                 "تور کشتی کروز دبی", "قیمت کروز آرویا")]
+_hits = a1._head_term_hits(_sites["cruisebaz.com"], _cands)
+ok("the head term is caught with a year, Arabic kaf or double spaces — but a longer intent is not",
+   _hits == {"تور کشتی کروز", "تور کشتی کروز ۱۴۰۵", "تور  كشتی كروز 2026"})
+ok("a site without head terms filters nothing", a1._head_term_hits(_sites["boutimar.com"], _cands) == set())
+_paths = a1._existing_paths(_sites["cruisebaz.com"], {"https://cruisebaz.com/aroya/price", "https://cruisebaz.com/", "https://cruisebaz.com/about"})
+ok("existing pages reach the prompt as paths, articles first", _paths[0] == "/aroya/price" and "/about" in _paths)
+a1._EXISTING_PAGES["cruisebaz.com"] = _paths
+_pr = json.loads(a1._analysis_user_prompt(_sites["cruisebaz.com"], [], 3))
+ok("the scout prompt carries existing pages, the duplicate rule and the head terms",
+   _pr.get("existing_pages") == _paths and "REJECT" in _pr.get("existing_pages_rule", "")
+   and _pr.get("homepage_head_terms") == ["تور کشتی کروز"] and "ONE brief at most" in _pr["instruction"])
+a1._EXISTING_PAGES.pop("cruisebaz.com", None)
+class _RobotsResp:
+    status_code = 200
+    text = ("User-agent: *\nSitemap: https://cruisebaz.com/sitemap.xml\n"
+            "Sitemap: https://cruisebaz.com/functions/articlesSitemap\nSitemap: https://evil.example/s.xml\n")
+class _RobotsSess:
+    def get(self, url, **k): return _RobotsResp()
+ok("extra sitemaps are read from robots.txt, same host only",
+   a1._robots_sitemaps(_sites["cruisebaz.com"], _RobotsSess()) ==
+   ["https://cruisebaz.com/sitemap.xml", "https://cruisebaz.com/functions/articlesSitemap"])
+
+print("\n=== Notion review: article text in the page ===")
+import notion_review_sync as _nrs
+_mb = _nrs.md_blocks('---\ntitle: "Skiing in Iran"\nsummary: "A guide"\n---\n\n## Dizin\n\nLine one\nline two.\n\n- a bullet\n')
+ok("markdown drafts become title, summary, headings, paragraphs and bullets",
+   [b["type"] for b in _mb] == ["heading_1", "quote", "heading_2", "paragraph", "bulleted_list_item"]
+   and _mb[3]["paragraph"]["rich_text"][0]["text"]["content"] == "Line one line two.")
+_jb = _nrs.json_blocks({"title": "کروز لوکس", "dek": "خلاصه", "body": [{"h": "عنوان\nمتن بند"}, {"p": "بند دوم"}]})
+ok("boutimar.ir JSON drafts become readable blocks (heading split from its paragraph)",
+   [b["type"] for b in _jb] == ["heading_1", "quote", "heading_2", "paragraph", "paragraph"])
+ok("long paragraphs are split under Notion's 2,000-character limit",
+   len(_nrs._rt("x" * 4000)) == 3 and all(len(t["text"]["content"]) <= 1900 for t in _nrs._rt("x" * 4000)))
+_rb = _nrs.review_blocks({"warns": [{"rule": "visa", "excerpt": "بدون ویزا", "fix": "say easy visa"}]})
+ok("WARN findings are explained in the page, not just coloured", len(_rb) == 2 and "visa" in json.dumps(_rb, ensure_ascii=False))
+
+print("\n=== PR gate: generated pages are not re-judged ===")
+import pr_review as _prr
+ok("a daryanameh page rendered from articles.json in the same PR is skipped (its nav menu caused false WARNs)",
+   _prr.is_generated("daryanameh/x.html", {"data/articles.json", "daryanameh/x.html"})
+   and _prr.is_generated("sitemap.xml", {"sitemap.xml"}))
+ok("a hand-written daryanameh page WITHOUT its source JSON in the PR is still judged",
+   not _prr.is_generated("daryanameh/x.html", {"daryanameh/x.html"}) and not _prr.is_generated("data/articles.json", {"data/articles.json"}))
+
+_lk = _nrs._rt("see [Explora](https://boutimar.ir/explora.html) now")
+ok("markdown links become real Notion links", len(_lk) == 3 and _lk[1]["text"].get("link", {}).get("url") == "https://boutimar.ir/explora.html")
+ok("'<br>- item' lists inside a paragraph become bullets",
+   [b["type"] for b in _nrs._para_blocks("Intro:<br>- one<br>- two")] == ["paragraph", "bulleted_list_item", "bulleted_list_item"])
+
+_b44row = {"kind": "base44", "pid": "cruisebaz.com/x", "site": "cruisebaz.com", "url": "https://cruisebaz.com/x",
+           "gate": "PASS", "title": "t", "written": "2026-10-05", "words": 10}
+_bp = _nrs.row_properties(_b44row)
+ok("a base44 draft row points at its future live URL, not a GitHub diff", "Read it" not in _bp and _bp["Live page"]["url"] == "https://cruisebaz.com/x")
+ok("cruisebaz and ambientetravel are reviewed on the board under their own house-rules profiles",
+   _nrs.BASE44_SITES["cruisebaz.com"][1] == "boutimar_v1" and _nrs.BASE44_SITES["ambientetravel.com"][1] == "orient_v1")
+_saved_b44 = os.environ.pop("BASE44_ACCESS_TOKEN", None)
+ok("without a base44 token the sync simply has no base44 rows (never crashes)", _nrs.base44_drafts() == [])
+if _saved_b44 is not None: os.environ["BASE44_ACCESS_TOKEN"] = _saved_b44
+
+print("\n=== Article photos: real licence, real credit ===")
+import images as _img
+def _pg(title, lic, artist, width=2000, mime="image/jpeg", idx=1):
+    return {"index": idx, "title": title, "imageinfo": [{"mime": mime, "width": width, "thumburl": "https://u/x.jpg",
+            "descriptionurl": "https://commons.wikimedia.org/wiki/" + title,
+            "extmetadata": {"LicenseShortName": {"value": lic}, "Artist": {"value": artist}}}]}
+ok("NC/ND and unlicensed files are never used; CC BY-SA / CC0 are",
+   not _img.licence_ok("CC BY-NC-SA 4.0") and not _img.licence_ok("CC BY-ND 2.0") and not _img.licence_ok("")
+   and _img.licence_ok("CC BY-SA 2.0") and _img.licence_ok("CC0") and _img.licence_ok("Public domain"))
+_p = _img.pick([_pg("File:Iran map.jpg", "CC0", "x", idx=1), _pg("File:Small.jpg", "CC0", "x", width=600, idx=2),
+                _pg("File:NoArtist.jpg", "CC BY 2.0", "", idx=3), _pg("File:NC.jpg", "CC BY-NC 2.0", "A", idx=4),
+                _pg("File:Dizin slope.jpg", "CC BY-SA 2.0", '<a href="x">ninara</a>', idx=5)])
+ok("maps, small files, uncredited and NC files are skipped; the credit is the file's own Artist field",
+   _p and _p["title"] == "Dizin slope" and _p["creator"] == "ninara" and _p["licence"] == "CC BY-SA 2.0")
+_cl = _img.credit_line(_p, "en")
+ok("the caption names creator, licence and Commons — nothing composed", "ninara" in _cl and "CC BY-SA 2.0" in _cl and "Wikimedia Commons" in _cl)
+ok("Farsi articles get a Farsi caption", _img.credit_line(_p, "fa-IR").startswith("عکس: ninara"))
+ok("the writer must return an image_query (schema + prompt)", "image_query" in a2._DRAFT_SCHEMA["required"])
+
+_tib = _pg("File:Tibet camping with the nomads.jpg", "CC BY 2.0", "McKay Savage")
+_kyr = _pg("File:Song-Kol yurt camp, Kyrgyzstan.jpg", "CC BY-SA 4.0", "A. Photographer", idx=2)
+ok("a photo must NAME the place: a Tibet camp is rejected for a Kyrgyzstan yurt query",
+   _img.pick([_tib, _kyr], query="Kyrgyzstan yurt camp")["title"].startswith("Song-Kol"))
+ok("generic scene words never satisfy the place check on their own",
+   _img.place_words("Mount Damavand ski resort") == {"damavand"} and _img.pick([_tib], query="nomad camp travel") is not None)
+
+_saved_si = a2._serves_image
+a2._serves_image = lambda u: "supabase.co" in u            # storage.base44.com: NXDOMAIN
+_u = a2.base44_public_image_url({"url": "https://storage.base44.com/APP/abc_x.jpg", "file_uri": "mp/public/APP/abc_x.jpg"}, "APP")
+a2._serves_image = lambda u: False
+_none = a2.base44_public_image_url({"url": "https://storage.base44.com/APP/abc_x.jpg"}, "APP")
+a2._serves_image = _saved_si
+ok("a base44 photo link is only saved if it really serves an image (dead storage.base44.com host → supabase path, else no photo)",
+   _u == "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/APP/abc_x.jpg" and _none is None)
+
+_evil = _img.pick([_pg("File:Dizin slope.jpg", "CC BY-SA 2.0", "ninara</script><script>alert(1)</script> [x](javascript:1)")], query="Dizin")
+ok("a booby-trapped Commons credit can't inject markup into our pages",
+   _evil is not None and not any(c in _evil["creator"] for c in '<>[]"`'))
+
+_AV = ["of the Seas", "Cunard", "Viking", "AIDA"]
+_rc = _pg("File:Oasis of the Seas arriving Port Everglades.jpg", "CC BY 2.0", "A", idx=1)
+_msc = _pg("File:MSC Euribia in Kiel port.jpg", "CC BY-SA 4.0", "B", idx=2)
+ok("a competitor's ship is skipped for a site that names it in avoid — and picked when nothing is avoided (plant test)",
+   _img.pick([_rc, _msc], query="cruise ship port", avoid=_AV)["title"].startswith("MSC")
+   and _img.pick([_rc, _msc], query="cruise ship port")["title"].startswith("Oasis"))
+ok("avoid is whole-word: 'AIDA' never rejects an 'Aidan' file, 'Viking' rejects a Viking longship",
+   not _img._avoided("aidan photographer harbour", _AV) and _img._avoided("viking ship museum oslo", _AV))
+_d = _pg("File:QM2 Hamburg.jpg", "CC BY 2.0", "C")
+_d["imageinfo"][0]["extmetadata"]["ImageDescription"] = {"value": "<p>Queen Mary 2 behind port cranes in Hamburg</p>"}
+_pd = _img.pick([_d], query="Hamburg")
+ok("the chosen file's own description is kept, cleaned, as the source for alt text",
+   _pd["description"] == "Queen Mary 2 behind port cranes in Hamburg")
+import llm as _llm
+_saved_cj = _llm.complete_json
+_llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("down"))
+ok("English alt falls back to the file's own title — never the article's wished-for scene", _img.describe(_pd, "en") == "QM2 Hamburg")
+_llm.complete_json = _saved_cj
+ok("a fallback title loses camera numbers, Flickr ids, dates and edit notes",
+   _img.tidy_title("Yazd - Old Town - panoramio") == "Yazd - Old Town"
+   and _img.tidy_title("29th Tehran International Book Fair2") == "29th Tehran International Book Fair"
+   and _img.tidy_title("Kyrgyzstan yurts at Song Kul (48221119097)") == "Kyrgyzstan yurts at Song Kul"
+   and _img.tidy_title("2010-04-25 04 02 37 Iran Tehran Exhibition") == "Iran Tehran Exhibition")
+import llm as _llm
+_saved_cj = _llm.complete_json
+_seen = {}
+def _fake_cj(system, prompt, *a, **k):
+    _seen["p"] = prompt
+    return {"alt": "کشتی کوئین مری ۲ در بندر هامبورگ"}, {}
+_llm.complete_json = _fake_cj
+_fa = _img.describe(_pd, "fa")
+_llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("down"))
+_fa_down = _img.describe(_pd, "fa")
+_llm.complete_json = _saved_cj
+ok("Farsi alt is translated from the FILE's title+description only (prompt carries them; no article text)",
+   _fa.startswith("کشتی") and "port cranes in Hamburg" in _seen["p"] and "Article" not in _seen["p"])
+ok("if the alt model is down, the alt falls back to the file's title (no photo is lost)", _fa_down == "QM2 Hamburg")
+_pl_c24, _pl_bc = a2._prefer_line("cruise24.ir"), a2._prefer_line("boutimar.com")
+ok("cruise24.ir's writer is told to name a line it sells (MSC/Explora/…); boutimar.com gets no cruise-line hint",
+   "MSC" in _pl_c24 and "Never another cruise line" in _pl_c24 and _pl_bc == "")
+
+_app = _pg("File:Indoor navigation and wayfinding by Fave.jpg", "CC BY-SA 4.0", "T", idx=1)
+_app["imageinfo"][0]["extmetadata"]["ImageDescription"] = {"value": "Wayfinding app aboard MSC Bellissima"}
+_bel = _pg("File:MSC Bellissima in Southampton.jpg", "CC BY-SA 4.0", "K", idx=2)
+ok("a file naming the ship in its TITLE beats one that only mentions it in the description (phone-app photo, 6 Oct)",
+   _img.pick([_app, _bel], query="MSC Bellissima cruise ship")["title"].startswith("MSC Bellissima"))
+ok("a photo already used in this run is never reused for a second article",
+   _img.pick([_bel, _msc], query="MSC", exclude={_bel["imageinfo"][0]["descriptionurl"]})["title"].startswith("MSC Euribia"))
+_calls = iter([{"alt": "کشتی گرandیوزا در روتردام"}, {"alt": "کشتی گراندیوزا در روتردام"}])
+_saved_fp, _saved_su = _img._fetch_pages, _img.suitable
+_img.suitable = lambda img, q, c="": True
+_img._fetch_pages = lambda q, width=1600: [_app] if q == "MSC Bellissima cruise ship" else [_bel]
+_fi = _img.find_image("MSC Bellissima cruise ship")
+_app2 = _pg("File:Indoor navigation and wayfinding by Favendo on MSC Bellissima.jpg", "CC BY-SA 4.0", "T", idx=1)
+_img._fetch_pages = lambda q, width=1600: [_app2, _bel]
+_img.suitable = lambda img, q, c="": "navigation" not in img["title"].lower()
+_fv = _img.find_image("MSC Bellissima")
+_img._fetch_pages, _img.suitable = _saved_fp, _saved_su
+ok("a candidate the vetting step rejects (phone app aboard the ship) is passed over for the ship itself",
+   _fv and _fv["title"] == "MSC Bellissima in Southampton")
+_llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("down"))
+_open = _img.suitable(_bel_pick := _img.pick([_bel], query="MSC"), "MSC Bellissima")
+_llm.complete_json = _saved_cj
+ok("vetting fails open when the model is down (the reviewer still sees every photo)", _open is True)
+ok("a title match from a shorter retry beats a description-only match from the full query",
+   _fi and _fi["title"].startswith("MSC Bellissima"))
+_llm.complete_json = lambda *a, **k: (next(_calls), {})
+_fix = _img.describe(_pd, "fa")
+_llm.complete_json = lambda *a, **k: ({"alt": "کشتی گرandیوزا"}, {})
+_fix2 = _img.describe(_pd, "fa")
+_llm.complete_json = _saved_cj
+ok("a Farsi alt with Latin glued inside a word is retried, then falls back to the file title",
+   _fix == "کشتی گراندیوزا در روتردام" and _fix2 == "QM2 Hamburg")
+
+ok("ZWNJ survives cleaning (Farsi words are not split) while markup is still stripped",
+   _img.clean("ویکی\u200cمدیا <b>") == "ویکی\u200cمدیا b")
+ok("the alt prompt treats the Commons description as context, not frame content",
+   "background context" in _seen["p"] and "occasional" in _seen["p"])
+ok("the alt prompt asks for the Farsi half-space in plurals and compounds", "U+200C" in _seen["p"])
+
+import tools.backfill_images as _bf
+_saved_plan = _bf.plan
+_ran = []
+_bf.plan = lambda site: (_ran.append(site["repo"]), [])[1]
+_bf.run(False, ["boutimar"])
+_bf.plan = _saved_plan
+ok("backfill --only boutimar runs boutimar alone, not boutimarfarsi", _ran == ["ambientetravel/boutimar"])
+
+ok("a literal \\u00ef from the model becomes the letter, not 'u00ef'",
+   _img.clean(_img.unescape("The ksar of A\\u00eft Benhaddou"), 160) == "The ksar of Aït Benhaddou")
+_vet = {}
+_llm.complete_json = lambda system, prompt, *a, **k: (_vet.setdefault("p", prompt), ({"ok": True}, {}))[1]
+_img.suitable(_pd, "Tehran International Exhibition Center", "Iran-Germany trade delegation 2026")
+_llm.complete_json = _saved_cj
+ok("the vetting step sees the article title, not only the search phrase", "Iran-Germany trade delegation" in _vet["p"])
+
+_seq = iter([RuntimeError("empty"), {"ok": False}])
+def _flaky(*a, **k):
+    v = next(_seq)
+    if isinstance(v, Exception):
+        raise v
+    return v, {}
+_llm.complete_json = _flaky
+_rv = _img.suitable(_pd, "Tehran International Exhibition Center", "trade delegation")
+_llm.complete_json = _saved_cj
+ok("an empty vet answer is retried — the retry's rejection stands instead of failing open", _rv is False)
+
+# ── topic planner (6 Oct: EO + ambientetravel briefed nothing on 4 Oct) ──
+import agent1_seo_scout as _a1
+import config as _cfg
+_eo = _cfg.load_sites(only=["exploreorient.com"], include_hold=True)[0]
+_saved_offers, _saved_cj2 = _a1._offer_titles, _llm.complete_json
+_a1._offer_titles = lambda site, cap=60: ["Silk Road Classic", "Nile Dahabiya"]
+_llm.complete_json = lambda *a, **k: ({"topics": [
+    {"query": "Silk Road travel guide", "offer": "", "why": "live page"},              # sitemap covers it
+    {"query": "Nile dahabiya cruise guide", "offer": "", "why": "cooldown"},           # in the ledger
+    {"query": "Khiva walled city day guide", "offer": "Silk Road Classic", "why": "ok"},
+    {"query": "Bukhara old town food guide", "offer": "Silk Road Classic", "why": "ok"},
+    {"query": "Aswan Nubian village visit", "offer": "Nile Dahabiya", "why": "ok"},
+]}, {})
+_now = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
+_led = {"cooldown_days": 45, "entries": [
+    {"domain": "exploreorient.com", "query": "Nile dahabiya cruise guide", "last_briefed": _now}]}
+_sm = {"https://exploreorient.com/journal/silk-road-travel-guide/"}
+_pl = _a1.plan_topics(_eo, 2, _sm, _led, [])
+ok("planner drops topics a live page covers or the ledger holds, and caps at what the run needs",
+   [c["query"] for c in _pl] == ["Khiva walled city day guide", "Bukhara old town food guide"]
+   and all(c["gap_type"] == "missing_page" and c["planned"] for c in _pl))
+ok("planned topics rank below seeds and real demand", all(c["local_score"] < 0.01 for c in _pl))
+ok("no planning when the run already has enough new-page topics", _a1.plan_topics(_eo, 0, _sm, _led, []) == [])
+_cb = _cfg.load_sites(only=["cruise24.me"], include_hold=True)[0]
+ok("a site that has not opted in (cms.topic_planner) is never planned for", _a1.plan_topics(_cb, 3, set(), _led, []) == [])
+_llm.complete_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("quota"))
+ok("a planner outage returns nothing instead of failing the scout run", _a1.plan_topics(_eo, 3, _sm, _led, []) == [])
+_llm.complete_json = lambda *a, **k: ({"topics": [
+    {"query": "Saudi Arabia travel guide AlUla", "offer": "", "why": "reordered seed"},
+    {"query": "dahabiya Nile cruise guide", "offer": "", "why": "reordered ledger entry"},
+    {"query": "Hegra tombs visit", "offer": "", "why": "ok"}]}, {})
+_pl2 = _a1.plan_topics(_eo, 3, set(), _led, [])
+ok("planned topics are capped at 2 per site per run even when the run could take 5 (review load)",
+   len(_a1.plan_topics(_eo, 5, set(), {"entries": []}, [])) <= 2)
+ok("a reordered seed or written topic is the same topic — the planner drops it",
+   [c["query"] for c in _pl2] == ["Hegra tombs visit"])
+_a1._offer_titles, _llm.complete_json = _saved_offers, _saved_cj2
+
+_calls_r = []
+def _busy(system, prompt, schema, **k):
+    _calls_r.append(k.get("provider"))
+    if k.get("provider") != "anthropic":
+        class ServerError(Exception):     # google-genai's own type, not ours
+            pass
+        raise ServerError("503 UNAVAILABLE. This model is currently experiencing high demand.")
+    return {"topics": []}, {"provider": "anthropic"}
+_saved_env_key = os.environ.get("ANTHROPIC_API_KEY")
+os.environ["ANTHROPIC_API_KEY"] = "test-not-a-key"
+_llm.complete_json = _busy
+_res, _m = _llm.complete_json_resilient("s", "p", {}, waits=(0, 0))
+_llm.complete_json = _saved_cj2
+if _saved_env_key is None:
+    os.environ.pop("ANTHROPIC_API_KEY", None)
+else:
+    os.environ["ANTHROPIC_API_KEY"] = _saved_env_key
+ok("a busy Gemini is retried, then the planner falls back to Anthropic (6 Oct: 503 on 5 of 6 sites)",
+   _m["provider"] == "anthropic" and _calls_r[-1] == "anthropic" and len(_calls_r) == 3)
+
+# ── English slugs (6 Oct: /keruz-bedoon-viza-iranian on boutimarfarsi #7) ──
+_bi = _cfg.load_sites(only=["boutimar.ir"], include_hold=True)[0]
+_saved_cjr = _llm.complete_json_resilient
+_llm.complete_json_resilient = lambda *a, **k: ({"slug": "Visa-Free Cruises for Iranians"}, {})
+_ep = _a1.english_path(_bi, "/daryanameh/keruz-bedoon-viza-iranian", "کروز بدون ویزا برای ایرانیان")
+_keep = _a1.english_path(_bi, "/visa-for-cruise-iranians", "x")
+_llm.complete_json_resilient = lambda *a, **k: ({"slug": "kroz-bedoon-viza"}, {})
+_still = _a1.english_path(_bi, "/keruz-bedoon-viza-iranian", "x")
+_llm.complete_json_resilient = _saved_cjr
+ok("a Finglish slug is replaced by an English one; an English slug is left alone",
+   _ep == "/daryanameh/visa-free-cruises-for-iranians" and _keep == "/visa-for-cruise-iranians")
+ok("a Finglish answer to the retry is refused (kept and flagged, never swapped for more Finglish)",
+   _still == "/keruz-bedoon-viza-iranian")
+ok("the analysis prompt now asks for English slugs, not transliteration",
+   "do NOT transliterate" in _a1._analysis_system_prompt(_bi))
+
+import agent2_writer_batch as _a2b
+_arch = json.loads(json.dumps({"draft": {"_image": {"bytes": b"\xff\xd8abc", "title": "x"}}}, default=_a2b._jsonable))
+ok("a draft carrying its photo bytes archives as JSON (6 Oct: 4 EO PRs opened, then counted 'failed')",
+   _arch["draft"]["_image"]["bytes"] == "<5 bytes>")
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "tools"))
+import health_report as _hr
+ok("Health ignores dry runs and self-skips/cancels but still counts real failures (6 Oct false '3 broke')",
+   not _hr._counts({"display_title": "Agent 1 — SEO Scout (dry run)", "conclusion": "success"})
+   and not _hr._counts({"display_title": "Agent 2 — Writer", "conclusion": "skipped"})
+   and not _hr._counts({"display_title": "Agent 1 — SEO Scout", "conclusion": "cancelled"})
+   and _hr._counts({"display_title": "Agent 2 — Writer", "conclusion": "failure"}))
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

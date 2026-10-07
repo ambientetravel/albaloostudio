@@ -98,8 +98,21 @@ def latest_runs(token: str) -> dict[str, dict]:
     d = _json(f"{API}/repos/{REPO}/actions/runs?per_page=100", token)
     out: dict[str, dict] = {}
     for r in d.get("workflow_runs", []):
+        if not _counts(r):
+            continue
         out.setdefault(r["name"], r)  # list is newest-first
     return out
+
+
+def _counts(r: dict) -> bool:
+    """Is this run a real cycle result? Not a test dry run (titled "(dry run)"),
+    not the writer/broadcaster correctly skipping one, not the Sunday fallback
+    cancelling itself after cron-job.org already ran. 6 Oct: a one-site dry run
+    plus the writer's correct skip read as "3 broke" and emailed. A genuinely
+    skipped writer still surfaces: the run upstream of it shows as failed."""
+    if "dry run" in str(r.get("display_title") or "").lower():
+        return False
+    return r.get("conclusion") not in ("skipped", "cancelled")
 
 
 def latest_artifact(token: str, name: str, index: int = 0) -> dict | None:
@@ -166,9 +179,14 @@ def build(token: str, bridge_token: str) -> dict:
 
     # ── 2. scout: briefs, dead letters, degraded ──────────────────────
     scout = None
-    art = latest_artifact(token, "seo-scout-run")
-    if art:
-        scout = artifact_file(token, art, "manifest.json")
+    for i in range(10):                       # newest REAL scout, not a dry run
+        art = latest_artifact(token, "seo-scout-run", i)
+        if not art:
+            break
+        m = artifact_file(token, art, "manifest.json")
+        if m and not m.get("dry_run"):
+            scout = m
+            break
     if scout:
         doms = scout.get("domains", [])
         briefs = sum(d.get("briefs_emitted") or 0 for d in doms)
@@ -266,8 +284,12 @@ def build(token: str, bridge_token: str) -> dict:
     art = latest_artifact(token, "ai-visibility")
     aiv = artifact_file(token, art, ".json") if art else None
     if isinstance(aiv, dict) and aiv.get("properties"):
-        named = sum(1 for p in aiv["properties"].values() if p.get("mentioned_any"))
-        numbers.update(ai_recall=f"{named}/{len(aiv['properties'])} properties named")
+        props = aiv["properties"]
+        props = list(props.values()) if isinstance(props, dict) else props
+        named = sum(1 for p in props if isinstance(p, dict) and p.get("mentioned_any"))
+        models = sum(1 for r in aiv.get("runs", []) if r.get("status") == "ok")
+        numbers.update(ai_recall=f"{named}/{len(props)} properties named"
+                       + (f" by ≥1 of {models} models" if models else ""))
 
     return {"generated": _now().isoformat(timespec="minutes"), "critical": critical,
             "needs_you": needs_you, "warn": warn, "fine": fine, "numbers": numbers,

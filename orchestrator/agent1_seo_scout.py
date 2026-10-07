@@ -295,8 +295,34 @@ def fetch_sitemap_urls(site: Site, session: requests.Session, depth: int = 0) ->
             if loc.text:
                 urls.add(loc.text.strip())
 
+    # Extra sitemaps the site declares in robots.txt (same host only). cruisebaz
+    # lists its published blog articles in a second, function-served sitemap;
+    # reading only sitemap.xml would make the scout re-propose live articles.
+    for extra in _robots_sitemaps(site, session):
+        if extra.rstrip("/") != site.sitemap.rstrip("/"):
+            urls |= _fetch_child_sitemap(extra, session)
+
     log.info("%s — sitemap lists %d URLs", site.domain, len(urls))
     return urls
+
+
+def _robots_sitemaps(site: Site, session: requests.Session) -> list[str]:
+    """`Sitemap:` lines from robots.txt that point at the site's own host."""
+    host = urlparse(site.base_url).netloc.removeprefix("www.")
+    try:
+        r = session.get(site.base_url.rstrip("/") + "/robots.txt", timeout=15,
+                        headers={"User-Agent": config.USER_AGENT})
+        if r.status_code != 200:
+            return []
+    except requests.RequestException:
+        return []
+    out = []
+    for line in r.text.splitlines():
+        if line.lower().startswith("sitemap:"):
+            u = line.split(":", 1)[1].strip()
+            if urlparse(u).netloc.removeprefix("www.") == host and u not in out:
+                out.append(u)
+    return out
 
 
 def _fetch_child_sitemap(url: str, session: requests.Session) -> set[str]:
@@ -552,6 +578,80 @@ def _excluded(site: Site, candidates: list[dict[str, Any]]) -> set[str]:
     return {c["query"] for c in candidates if any(p.search(c["query"]) for p in pats)}
 
 
+_FA_NORM = str.maketrans({"ي": "ی", "ك": "ک", "\u200c": " ", "ة": "ه"})
+_DIGITS = re.compile(r"[0-9۰-۹٠-٩]+")
+
+
+def _norm_phrase(s: str) -> str:
+    """Spelling-insensitive form for comparing a query with a head term:
+    Arabic→Persian letters, ZWNJ→space, digits (years like ۱۴۰۵/2026) dropped,
+    punctuation and repeated spaces collapsed."""
+    s = _DIGITS.sub(" ", str(s).translate(_FA_NORM).lower())
+    s = re.sub(r"[^\w\s]", " ", s)
+    return " ".join(s.split())
+
+
+def _head_term_hits(site: Site, candidates: list[dict[str, Any]]) -> set[str]:
+    """Candidate queries that ARE the site's head term (± a year). The homepage
+    owns that search; a new page on it only splits the result (cruisebaz
+    /tor-keshti, 2 Oct 2026)."""
+    heads = {_norm_phrase(h) for h in (getattr(site, "head_terms", None) or [])}
+    heads.discard("")
+    return {c["query"] for c in candidates if _norm_phrase(c["query"]) in heads}
+
+
+# Per-run: the paths the site already publishes, set before analysis and read
+# by the prompt (same module-dict pattern as _SIBLING_COVERAGE).
+_EXISTING_PAGES: dict[str, list[str]] = {}
+
+
+def _existing_paths(site: Site, sitemap_urls: set[str], cap: int = 250) -> list[str]:
+    """Sitemap URLs as site-relative paths, articles first, capped for the prompt."""
+    paths = sorted({urlparse(u).path or "/" for u in sitemap_urls})
+    art = re.compile(r"/(journal|daryanameh|blog|guides|aroya|cruise-line|destinations)/")
+    return ([p for p in paths if art.search(p)] + [p for p in paths if not art.search(p)])[:cap]
+
+
+# Finglish words seen in pipeline slugs. A slug made of these is a transliteration,
+# spelled differently every time (keruz / kroz / kruz) — 6 Oct, boutimarfarsi #7.
+_FINGLISH = set("""keruz kroz kruz kerooz keshti kashti safar daryaei dariyayi daryayi bedoon
+bedun baraye barayeh rahnamaye rahnama behtarin zaman chist chegoone chegune tafavot vizaye
+viza irani iraniyan bandar entekhab entekhabe kabin khanevade khanevadegi chamedan baste bandi
+monaseb navgan raznamaye barnamerizi norooz jazire jazayer gheimat arzan luks mikonad hazine
+hazineh jambi tour-e safare""".split())
+
+
+def _finglish(slug: str) -> bool:
+    return any(t in _FINGLISH for t in slug.lower().split("-"))
+
+
+def english_path(site: Site, path: str, title: str) -> str:
+    """Keep the URL in English. If the model still transliterated, ask once for an
+    English slug of the title; if that fails too, keep the path and say so loudly
+    — a reviewer can rename it before merge, which is cheaper than a lost brief."""
+    slug = path.rstrip("/").split("/")[-1]
+    base = slug[:-5] if slug.endswith(".html") else slug
+    if not base or not _finglish(base):
+        return path
+    try:
+        import llm
+        out, _ = llm.complete_json_resilient(
+            "You write short English URL slugs.",
+            f"Article title: {title}\nReturn JSON {{\"slug\": \"3-6 lowercase English words joined by "
+            f"hyphens, no transliterated Persian\"}}.",
+            {"type": "object", "additionalProperties": False,
+             "properties": {"slug": {"type": "string"}}, "required": ["slug"]},
+            max_tokens=300, purpose="english slug", waits=(0,))
+        new = re.sub(r"[^a-z0-9-]+", "-", str(out.get("slug", "")).lower()).strip("-")[:80]
+        if new and not _finglish(new):
+            log.info("%s — Finglish slug %r replaced by %r", site.domain, base, new)
+            return path.replace(base, new, 1)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("%s — could not English-ise slug %r: %s", site.domain, base, exc)
+    log.warning("%s — slug %r is Finglish; rename it before merging", site.domain, base)
+    return path
+
+
 def apply_path_template(site: Site, path: str) -> str:
     """Force the site's URL contract onto a proposed path. cruise24.ir's build
     accepts only /blog/<slug>/ and SystemExits on anything else — the WHOLE site
@@ -569,6 +669,124 @@ def _improves_existing(site: Site) -> bool:
     """True only when this site's adapter can edit an existing page in place.
     None can today; a site opts in with cms.improve_existing: true once one does."""
     return bool((site.cms or {}).get("improve_existing"))
+
+
+def _plans_topics(site: Site) -> bool:
+    """A site opts in with cms.topic_planner: true (sites.yml)."""
+    return bool((site.cms or {}).get("topic_planner"))
+
+
+def _offer_titles(site: Site, cap: int = 60) -> list[str]:
+    """Titles of what the site really sells (offer.v1 feed), never prices.
+    Fail-soft: an unreachable feed just means the planner works without it."""
+    if not site.offer_feed:
+        return []
+    try:
+        r = requests.get(site.offer_feed, timeout=15, headers={"User-Agent": config.USER_AGENT})
+        r.raise_for_status()
+        payload = r.json()
+        items = payload.get("offerings") if isinstance(payload, dict) else payload
+        return [str(o.get("title")) for o in (items or []) if isinstance(o, dict) and o.get("title")][:cap]
+    except (requests.RequestException, ValueError) as exc:
+        log.warning("%s — offer feed unavailable for the topic planner: %s", site.domain, exc)
+        return []
+
+
+def plan_topics(site: Site, need: int, sitemap_urls: set[str], ledger: dict[str, Any] | None,
+                have: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Fresh missing-page topics for a site whose measured gaps and seed list have
+    run dry. On 4 Oct exploreorient.com and ambientetravel.com produced NOTHING:
+    one candidate each, both inside the 45-day cooldown; cruisebaz had 12 in
+    cooldown and no seeds. A young site has too little Search Console footprint
+    to gap-find from, and a hand-written seed list is used up in a few weeks.
+
+    The model proposes search phrases tied to what the site actually sells (its
+    offer feed) and to pages it does NOT already have. Every proposal then goes
+    through the same tests as a seed — sitemap coverage, the ledger cooldown,
+    sibling ownership, exclusions, head terms — so a planned topic can never be
+    a twin of a live page or of a topic another site already owns. Its
+    local_score sits below seeds: measured demand and curated seeds rank first.
+    Fail-soft: no model, no feed or no survivors means no planned topics.
+    """
+    if not _plans_topics(site):
+        return []
+    # Review is the bottleneck, not ideas (12 Aug: 35 drafts a week went unread).
+    # Planned topics top a site up by at most cms.topic_planner_max (default 2).
+    need = min(need, int((site.cms or {}).get("topic_planner_max") or 2))
+    if need <= 0:
+        return []
+    entries = (ledger or {}).get("entries", [])
+    written = sorted({e["query"] for e in entries if e.get("domain") == site.domain})[:150]
+    siblings = config.audience_siblings(site)
+    sib = sorted({e["query"] for e in entries if e.get("domain") in siblings})[:150]
+    offers = _offer_titles(site)
+    paths = _existing_paths(site, sitemap_urls, cap=200)
+    lang = "Farsi" if str(site.locale).lower().startswith("fa") else "English"
+    ask = need + 4                               # head-room for the filters below
+    try:
+        import llm
+        out, _ = llm.complete_json_resilient(
+            "You plan articles for a travel company's website. You never invent products, "
+            "prices, dates or facts.",
+            f"Site: {site.domain} ({site.brand}); market: {site.market}; write topics in {lang}.\n"
+            f"What it sells (offer feed titles): {json.dumps(offers, ensure_ascii=False)}\n"
+            f"Pages it already has (paths): {json.dumps(paths, ensure_ascii=False)}\n"
+            f"Topics already written for it: {json.dumps(written, ensure_ascii=False)}\n"
+            f"Topics its sister sites own (do not repeat): {json.dumps(sib, ensure_ascii=False)}\n\n"
+            f"Propose {ask} NEW article topics as the exact search phrase a traveller would type "
+            f"({lang}, 2–7 words). Each must lead to something this site sells or a destination it "
+            f"covers, must NOT duplicate an existing page or a written topic, and must not depend on "
+            f"a price, a departure date or a fact you would have to invent. Prefer practical guides "
+            f"and comparisons with clear search intent. Return JSON "
+            f'{{"topics": [{{"query": "...", "offer": "exact offer title or empty", "why": "one line"}}]}}.',
+            {"type": "object", "additionalProperties": False,
+             "properties": {"topics": {"type": "array", "items": {
+                 "type": "object", "additionalProperties": False,
+                 "properties": {"query": {"type": "string"}, "offer": {"type": "string"},
+                                "why": {"type": "string"}},
+                 "required": ["query", "offer", "why"]}}},
+             "required": ["topics"]},
+            max_tokens=2000, purpose="topic planner")
+    except Exception as exc:  # noqa: BLE001 — a planner outage must never cost a scout run
+        log.warning("%s — topic planner unavailable: %s: %s", site.domain, type(exc).__name__,
+                    str(exc)[:160])
+        return []
+
+    # Same words in another order are the same topic: "Saudi Arabia travel guide
+    # AlUla" re-proposed the written "AlUla travel guide Saudi Arabia" (6 Oct dry
+    # run) — the ledger filter compares this site's own history by exact phrase.
+    have_keys = ({_ledger.topic_key(c["query"]) for c in have}
+                 | {_ledger.topic_key(e["query"]) for e in entries if e.get("domain") == site.domain}
+                 | {_ledger.topic_key(k) for k in (site.seed_keywords or [])})
+    sitemap_tokens = [_slug_tokens(u) for u in sitemap_urls]
+    planned: list[dict[str, Any]] = []
+    for t in (out.get("topics") or []):
+        q = " ".join(str(t.get("query") or "").split())
+        if len(q) < 4 or _ledger.topic_key(q) in have_keys:
+            continue
+        qt = {w for w in _SLUG_SPLIT.split(q.lower()) if len(w) > 2}
+        if any(qt and len(qt & toks) >= max(1, (len(qt) + 1) // 2) for toks in sitemap_tokens):
+            continue                              # a live page already covers it
+        have_keys.add(_ledger.topic_key(q))
+        planned.append({
+            "query": q, "gap_type": "missing_page",
+            "impressions": 0, "clicks": 0, "ctr": 0.0,
+            "position": site.max_position, "best_position": site.max_position,
+            "trend": "planned", "current_url": None, "competing_urls": [],
+            "top_country": None, "device_split": {}, "covered_by_sitemap": False,
+            "local_score": round(0.001 / (len(planned) + 1), 6),
+            "seed": True, "planned": True,
+            "planner_offer": str(t.get("offer") or "")[:160],
+            "planner_why": str(t.get("why") or "")[:200],
+        })
+    if ledger is not None:
+        planned, _ = _ledger.filter_candidates(planned, ledger, site.domain, siblings=siblings)
+    excl = _excluded(site, planned) | _head_term_hits(site, planned)
+    planned = [c for c in planned if c["query"] not in excl][:need]
+    log.info("%s — topic planner added %d topic(s): %s", site.domain, len(planned),
+             ", ".join(c["query"] for c in planned))
+    return planned
 
 
 def seed_candidates(site: Site, sitemap_urls: set[str],
@@ -707,9 +925,12 @@ def _analysis_system_prompt(site: Site) -> str:
         f"Write every brief field in the site's language ({site.locale}); keep "
         "keywords exactly as they appear in the Search Console data.",
         "",
-        "target_url_path must be a lowercase ASCII slug beginning with '/' even "
-        "for Farsi pages — the sites do not use percent-encoded URLs. Transliterate "
-        "rather than leaving a placeholder.",
+        "target_url_path must be a lowercase slug of ENGLISH words beginning with '/' "
+        "— also for Farsi pages: translate the topic, do NOT transliterate it. Every "
+        "site's own pages use English addresses (boutimar.ir/visa-for-cruise-iranians, "
+        "cruise24.ir/cruise-persian-gulf.html, cruisebaz.com/cruise-line/msc); Finglish "
+        "like /keruz-bedoon-viza-iranian has no fixed spelling (keruz/kroz/kruz) and "
+        "matches nothing anyone types. Good: /visa-free-cruises-for-iranians.",
         "Never propose a path that already exists in the supplied sitemap sample.",
         "",
         compliance.prompt_constraints(site.compliance_profile),
@@ -765,6 +986,21 @@ _SIBLING_COVERAGE: dict[str, list[dict[str, str]]] = {}
 def _analysis_user_prompt(site: Site, candidates: list[dict[str, Any]], limit: int) -> str:
     sib = _SIBLING_COVERAGE.get(site.domain) or []
     extra = {}
+    have = _EXISTING_PAGES.get(site.domain) or []
+    if have:
+        extra["existing_pages"] = have
+        extra["existing_pages_rule"] = (
+            "These pages ALREADY exist on this site (URL paths; Farsi sites use "
+            "Latin/finglish slugs, e.g. /aroya/price is the AROYA price page, "
+            "/aroya/jeddah-red-sea the Jeddah–Red Sea route). If a candidate's "
+            "intent is already served by one of them, REJECT it — do not brief a "
+            "second page on the same intent under a new slug. On 2 Oct four "
+            "near-identical 'what is AROYA' drafts and two duplicates of "
+            "/aroya/price were produced exactly this way."
+        )
+    heads = getattr(site, "head_terms", None) or []
+    if heads:
+        extra["homepage_head_terms"] = heads
     if sib:
         extra = {
             "sibling_sites_already_cover": sib[:40],
@@ -788,7 +1024,9 @@ def _analysis_user_prompt(site: Site, candidates: list[dict[str, Any]], limit: i
                 "do not justify more. Score priority 0-100 using volume, position "
                 "proximity, commercial value and effort. Reject candidates that are "
                 "brand-navigational, and MERGE any that share an intent — two "
-                "spellings of one query are one page, not two. NAMED SUBJECTS: if a "
+                "spellings of one query are one page, not two, and four phrasings "
+                "of 'what is X' are ONE brief at most. Never brief the homepage's "
+                "head term (homepage_head_terms) as a new page. NAMED SUBJECTS: if a "
                 "candidate is built around a specific company, ship, hotel, venue or "
                 "product, brief it ONLY if you are certain it exists exactly as "
                 "spelled and is something this site can speak to. Search queries are "
@@ -1409,6 +1647,7 @@ def build_brief_payload(
     path = analysis["target_url_path"]
     if not path.startswith("/"):
         path = "/" + path
+    path = english_path(site, path, analysis.get("working_title") or analysis.get("primary_keyword", ""))
     path = apply_path_template(site, path)
 
     # A must_include item that names a banned term is the model restating a
@@ -1709,6 +1948,14 @@ def process_site(
             stat["excluded_queries"] = sorted(excl)
             log.info("%s — %d excluded query(ies) dropped: %s", site.domain,
                      len(excl), ", ".join(sorted(excl)[:5]))
+        # The homepage's own head term is never a new page (sites.yml head_terms).
+        heads = _head_term_hits(site, candidates)
+        if heads:
+            candidates = [c for c in candidates if c["query"] not in heads]
+            stat["head_term_skipped"] = sorted(heads)
+            log.info("%s — %d head-term query(ies) left to the homepage: %s",
+                     site.domain, len(heads), ", ".join(sorted(heads)[:5]))
+        _EXISTING_PAGES[site.domain] = _existing_paths(site, sitemap_urls)
         stat["candidates"] = len(candidates)
 
         # Pages Google already ranks that the sitemap never mentions. Both
@@ -1729,11 +1976,16 @@ def process_site(
         # A held site is not live. Keep gathering its demand — knowing what
         # people already search for is exactly what you want on launch day —
         # but write nothing for a site that cannot publish it.
-        if site.on_hold:
+        # cms.briefs_paused: "<reason>" does the same for a LIVE site whose CMS
+        # cannot take an article yet, without dropping it from audits the way
+        # status: hold does. 6 Oct: ambientetravel's base44 app has no Article
+        # entity, so a draft was written, paid for and lost on a 404.
+        paused = str((site.cms or {}).get("briefs_paused") or "").strip()
+        if site.on_hold or paused:
             stat["status"] = "hold"
             stat["note"] = (
                 f"{len(candidates)} gap candidate(s) recorded; no briefs emitted "
-                "because the site is on hold"
+                + (f"— briefs paused: {paused}" if paused else "because the site is on hold")
             )
             (run_dir / "demand").mkdir(parents=True, exist_ok=True)
             (run_dir / "demand" / f"{site.domain}.json").write_text(
@@ -1743,7 +1995,8 @@ def process_site(
                     ensure_ascii=False, indent=2),
                 encoding="utf-8",
             )
-            log.info("%s — on hold; demand banked, no briefs", site.domain)
+            log.info("%s — %s; demand banked, no briefs", site.domain,
+                     f"briefs paused ({paused})" if paused else "on hold")
             return stat
 
         if not candidates:
@@ -1763,10 +2016,19 @@ def process_site(
                 log.info("%s — %d candidate(s) skipped, still in cooldown: %s",
                          site.domain, len(skipped), ", ".join(skipped[:5]))
             candidates = kept
-            if not candidates:
-                stat["note"] = ("all gap candidates are within the briefing "
-                                "cooldown; nothing new to write this run")
-                return stat
+
+        # Refill: fewer new-page topics than this run can brief → plan more.
+        new_pages = [c for c in candidates
+                     if c.get("gap_type") == "missing_page" or _improves_existing(site)]
+        planned = (plan_topics(site, limit - len(new_pages), sitemap_urls, ledger, candidates)
+                   if use_llm else [])
+        if planned:
+            candidates = candidates + planned
+            stat["planned_topics"] = [c["query"] for c in planned]
+        if not candidates:
+            stat["note"] = ("all gap candidates are within the briefing "
+                            "cooldown; nothing new to write this run")
+            return stat
 
         # An improvement gap (thin_content, serp_feature_loss, cannibalisation)
         # says "this EXISTING page underperforms". Every publishing adapter can

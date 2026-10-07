@@ -65,7 +65,11 @@ jobs:
           ARGS=""
           if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
           if [ "${{ inputs.include_hold }}" != "false" ]; then ARGS="$ARGS --include-hold"; fi
-          if [ "${{ inputs.inspect || '0' }}" != "0" ]; then ARGS="$ARGS --inspect ${{ inputs.inspect }}"; fi
+          # 25 URL Inspections per site on the weekly run (quota is 2000/day/property).
+          # Answers "is it indexed?" only once the service account is FULL on the
+          # property; until then each site reports the permission fact, not a failure.
+          INSPECT="${{ inputs.inspect || '25' }}"
+          if [ "$INSPECT" != "0" ]; then ARGS="$ARGS --inspect $INSPECT"; fi
 
           python3 tools/index_coverage.py $ARGS --format md \
             --out "reports/index-coverage-$STAMP.md"
@@ -75,6 +79,19 @@ jobs:
           # The report is the deliverable, so it goes where it is read without a
           # download rather than only into the artifact.
           cat "reports/index-coverage-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Page speed — Google PageSpeed / Chrome UX Report (mobile)
+        # Real-visitor LCP / INP / CLS where Google has them, plus the Lighthouse
+        # score and biggest savings. Needs PAGESPEED_API_KEY (Google now refuses
+        # keyless calls); without it each page reports the 429 as a note.
+        continue-on-error: true
+        env:
+          PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+        run: |
+          STAMP=$(date -u +%Y-%m-%d)
+          DOM=""; if [ -n "${{ inputs.domain }}" ]; then DOM="--domain ${{ inputs.domain }}"; fi
+          python3 tools/pagespeed_check.py $DOM --format md > "reports/pagespeed-$STAMP.md" || true
+          cat "reports/pagespeed-$STAMP.md" >> "$GITHUB_STEP_SUMMARY" || true
 
       - name: Flag the sites carrying the most dead weight
         if: always()

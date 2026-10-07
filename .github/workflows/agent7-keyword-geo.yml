@@ -84,6 +84,22 @@ jobs:
           # download: the run summary.
           cat "reports/geo-$STAMP.md" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Google Trends — seasonality, momentum, rising searches
+        # Never fails the agent: Trends rate-limits datacenter IPs, and a
+        # missing trends section is a note, not a broken week.
+        continue-on-error: true
+        run: |
+          STAMP=$(date -u +%Y-%m-%d)
+          DOM=""; if [ -n "${{ inputs.domain }}" ]; then DOM="--domain ${{ inputs.domain }}"; fi
+          python3 tools/trends_scan.py $DOM --format json > "reports/trends-$STAMP.json" || true
+          python3 - "reports/trends-$STAMP.json" > "reports/trends-$STAMP.md" <<'PY'
+          import json, sys
+          sys.path.insert(0, "tools")
+          import trends_scan
+          print(trends_scan.to_md(json.load(open(sys.argv[1], encoding="utf-8"))))
+          PY
+          cat "reports/trends-$STAMP.md" >> "$GITHUB_STEP_SUMMARY" || true
+
       - name: Flag any market misalignment
         run: |
           set -euo pipefail

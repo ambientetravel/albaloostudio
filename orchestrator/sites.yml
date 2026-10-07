@@ -60,6 +60,13 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.com/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: en
+    indexnow_key: "df15c8e37a36b2f11481c4112661278c"   # public by design; site must serve /df15c8e37a36b2f11481c4112661278c.txt containing it
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - Iran tour
+      - Iran travel
+      - Iran visa
+      - Persepolis
+      - Iran trade fair
     # 27 Sep: GSC gaps here are almost all improvement-type (now reported, not briefed),
     # so without seeds the site briefs nothing new. Each seed = an informational guide
     # for a tour the site SELLS (offer.json) — the guide links to the tour, never twins it.
@@ -131,6 +138,16 @@ sites:
       adapter: astro_pr
       content_root: "src/content/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
+      images:                    # real Commons photo + its own credit (orchestrator/images.py)
+        # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
+        avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
+        dir: public/img/journal
+        url_prefix: /img/journal
+        field: image              # journal template uses it for og:image
+        inline: true              # [slug].astro renders no hero, so the photo leads the body
       # Agent 2 writes into an Astro content collection, and Astro will refuse
       # to build a file that does not match the collection's zod schema. So the
       # schema lives here rather than in the adapter: boutimar.com's `journal`
@@ -160,6 +177,14 @@ sites:
     brand: Boutimar
     offer_feed: "https://boutimar.ir/offer.json"   # offer.v1 — built+deployed by the site's own export; see bridge/OFFER-FEED-CONTRACT.md
     locale: fa-IR
+    indexnow_key: "d926d866154a4982b8674635e4fc6065"   # the key boutimar.ir has served since 24 Jul (its own _indexnow.py uses it); 4122… was never hosted
+    head_terms:   # the homepage owns this search — never briefed as a new page (2 Oct, /tor-keshti)
+      - تور کشتی کروز
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - کروز دبی        # bare «کروز» = Land Cruiser / Penélope Cruz / cruise missile noise (29 Sep)
+      - تور کشتی
+      - کشتی کروز
+      - تور کشتی کروز
     # 27 Sep: informational guides for regions it SELLS (offer.json) — best-time / how-to
     # angles the product pages do not cover. Distinct from cruise24.ir's seeds (fa_cruise).
     seed_keywords:
@@ -195,6 +220,14 @@ sites:
       adapter: boutimar_ir_static
       content_root: "/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
+      images:
+        # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
+        avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
+        prefer: ["MSC", "Explora Journeys", "Celestyal", "AROYA", "Variety Cruises"]   # lines these sites sell
+        dir: img/daryanameh       # article.image is a repo-relative path, like img/dest/greece.jpg
       # boutimar.ir stores articles as DATA, not files. `article.html` is a
       # shell that renders one entry of data/articles.json via ?a=<slug>, so
       # publishing adds an object to an array — no new HTML file, no rebuild,
@@ -264,6 +297,12 @@ sites:
       - Armenia monasteries tour guide                      # /tour/monasteries-and-brandy/
       - Morocco kasbah route travel guide                   # /tour/kasbahs-and-caravans/
     locale: en
+    indexnow_key: "acec5a04bb01c7c7c9cd861334eb46cb"   # public by design; site must serve /acec5a04bb01c7c7c9cd861334eb46cb.txt containing it
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - Uzbekistan tour
+      - Silk Road tour
+      - Georgia travel
+      - Petra tour
     market: INT
     base_url: "https://exploreorient.com"
     # Where the bytes actually live. Recorded because it was tribal
@@ -303,6 +342,16 @@ sites:
       adapter: astro_pr          # opens a PR against the exploreorient repo
       content_root: "src/content/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
+      images:
+        # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
+        avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
+        dir: public/img/journal
+        url_prefix: /img/journal
+        field: heroImage          # resolveHeroImage() prefers it over the destination hero
+        inline: false
       # Read from exploreorient's own src/content.config.ts. Its five
       # collections are destinations, tours, blog, corridors and venues; only
       # `blog` takes an article. The other four carry structural data — mapId,
@@ -376,6 +425,11 @@ sites:
     brand: Ambiente Travel
     compliance_profile: orient_v1   # non-cruise: no AROYA/Seychelles/Schengen rules injected
     locale: en
+    indexnow_key: "1abeb52849005e0d08847e405b2e2e76"   # public by design; site must serve /1abeb52849005e0d08847e405b2e2e76.txt containing it
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - Iran Reise
+      - Usbekistan Rundreise
+      - Kreuzfahrt Orient
     # Never brief these (regex, case-insensitive). 'avintura' is a GSC misspelling of
     # Avantura — ONE 49 m yacht, Split–Dubrovnik; a 13 Aug draft invented a fleet and
     # Seychelles/Gulf itineraries for it. The rest are brand-navigational noise that
@@ -402,6 +456,13 @@ sites:
       entity: Article                    # created by the owning site session (contract: _push_base44_entity)
       content_root: "/"
       publish_mode: draft
+      # The app (ambientetravel/ambiente-voyage) has NO Article entity yet, so every
+      # draft 404s after it is written and paid for. Remove this line once Alireza
+      # decides articles live here (vs Explore Orient only) and the entity exists.
+      briefs_paused: "no Article entity in the base44 app — awaiting the articles decision (6 Oct)"
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
     channels:
       - name: linkedin
         audience: b2b
@@ -438,9 +499,16 @@ sites:
     # A domain property would still be tidier one day; it is not worth a DNS
     # round-trip when this one already has full coverage.
     property_uri: "https://cruisebaz.com/"
-    gsc_account: "UNCONFIRMED"
+    gsc_account: "alimozzarella@gmail.com"   # confirmed 30 Sep 2026 (not under contactmozaffari)
     brand: CruiseBaz
     locale: fa-IR
+    indexnow_key: "6ee0c8e240f47be5d7e63ad224835a79"   # public by design; site must serve /6ee0c8e240f47be5d7e63ad224835a79.txt containing it
+    head_terms:   # the homepage owns this search — never briefed as a new page (2 Oct, /tor-keshti)
+      - تور کشتی کروز
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - آرویا
+      - کروز خلیج فارس
+      - تور کشتی
     audience_group: fa_cruise   # one Farsi cruise audience + the «دریانامه» Telegram — a topic is briefed on ONE of these sites
     market: IR
     base_url: "https://cruisebaz.com"
@@ -459,6 +527,9 @@ sites:
       entity: Article                    # created by the owning site session (contract: _push_base44_entity)
       content_root: "/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
     channels:
       - name: telegram
         audience: d2c
@@ -496,6 +567,14 @@ sites:
       - برنامه‌ریزی کروز نوروز ۱۴۰۶                         # cruise-nowruz-1406.html
       - انتخاب کشتی مناسب در ناوگان MSC                      # msc.html
     locale: fa-IR              # Farsi build shipped — live <html lang="fa" dir="rtl">; was `en`, so 17 Sep's 4 guides came out English (fixed 25 Sep)
+    indexnow_key: "afe2aa16ad7cad86fee55eb79893deb2"   # public by design; site must serve /afe2aa16ad7cad86fee55eb79893deb2.txt containing it
+    head_terms:   # the homepage owns this search — never briefed as a new page (2 Oct, /tor-keshti)
+      - تور کشتی کروز
+    trend_terms:   # short head terms for Google Trends (Agent 7)
+      - کشتی کروز
+      - تور دبی
+      - تور ترکیه
+      - آرویا
     audience_group: fa_cruise   # one Farsi cruise audience + the «دریانامه» Telegram — a topic is briefed on ONE of these sites
     market: IR
     status: active
@@ -512,11 +591,19 @@ sites:
       type: static
       adapter: bundle_pr         # opens a PR of content/blog/<record_id>/{index.md,manifest.json}
       path_template: "/blog/{slug}/"   # c24blog.py render_post() SystemExits on any other shape — the whole site build
+      images:
+        # competitor-branded ships never illustrate our pages (cruise24.ir PR #8, 6 Oct)
+        avoid: ["Royal Caribbean", "of the Seas", "Cunard", "Queen Mary", "Queen Elizabeth", "Queen Victoria", "Queen Anne", "Holland America", "Carnival Cruise", "Carnival Vista", "Carnival Horizon", "Carnival Panorama", "Carnival Breeze", "Carnival Magic", "Carnival Dream", "Carnival Sunrise", "Carnival Radiance", "Carnival Celebration", "Carnival Jubilee", "Norwegian Cruise", "Norwegian Epic", "Norwegian Bliss", "Norwegian Prima", "Norwegian Getaway", "Norwegian Breakaway", "Norwegian Escape", "Norwegian Joy", "Princess Cruises", "Celebrity Cruises", "Celebrity Edge", "Celebrity Apex", "Celebrity Beyond", "Celebrity Eclipse", "Viking", "Disney", "Costa Cruises", "Costa Diadema", "Costa Fascinosa", "Costa Toscana", "Costa Firenze", "Costa Pacifica", "Costa Favolosa", "Costa Deliziosa", "Costa Fortuna", "AIDA", "TUI Cruises", "Mein Schiff", "P&O"]
+        prefer: ["MSC", "Explora Journeys", "Celestyal", "AROYA", "Variety Cruises"]   # lines these sites sell
+        dir: content/blog            # hero.<ext> + manifest.hero_image (cruise24-ir c2c765d contract)
                                  # into ambientetravel/cruise24-ir (ASTRO_REPO_CRUISE24_IR).
                                  # tools/build.py renders it; deploy-cruise24-ir.sh ships public_html/.
                                  # Degrades to disk-staging if the repo var/token are unset.
       content_root: "/"
       publish_mode: draft
+      # When measured gaps + seeds run dry, plan fresh topics from the offer feed
+      # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
+      topic_planner: true
     channels:
       - name: telegram
         audience: d2c
@@ -530,45 +617,45 @@ sites:
     property_uri: "sc-domain:cruise24.me"
     gsc_account: "contactmozaffari@gmail.com"
     brand: Cruise24
-    # 30 Sep 2026: the site moved off GoDaddy Website Builder to a static build in
-    # this repo (cruise24-me/), live on GoDaddy cPanel. Owning session:
-    # "Cruise24.me website tools". Handoff notes: cruise24-me/HANDOFF*.md.
+    # 30 Sep 2026: moved OFF the GoDaddy Website Builder onto GoDaddy cPanel
+    # (Apache, 92.205.251.216): 1,715 static English pages, https + www→apex
+    # 301s live, noindex scoped to staging only. Source: cruise24-me/ in this
+    # repo (build_journeys.py), owned by the session "Cruise24.me website tools";
+    # handoff notes in cruise24-me/HANDOFF*.md. Drafts are staged for a manual
+    # upload (static_bundle) — there is no publishing API on this hosting.
     offer_feed: "https://cruise24.me/offer.json"     # offer.v1, built by cruise24-me/build_offer_feed.py
-    lead_source: "https://cruise24.me/api/leads.php" # signed GET; Agent 4 pulls new enquiries
+    lead_source: "https://cruise24.me/api/leads.php" # signed GET (LEADS_SIGNING_SECRET); Agent 4 pulls new enquiries
     # Brand-neutral towards the group: a Cruise24 reply or article must not name or link
     # Boutimar. Otherwise the same cruise rules (Persian Gulf, visa accuracy, never invent).
     compliance_profile: partner_widget_v1
-    seed_keywords:            # starter topics — the new site has no GSC history yet
-      - "Explora Journeys cruise guide"
-      - "luxury small ship cruises Mediterranean"
+    seed_keywords:            # English guides for lines/regions the site sells (offer.json)
+      - "Explora Journeys review first cruise"
+      - "Variety Cruises Greek islands small ship"
+      - "small ship cruise Croatia Adriatic"
+      - "Star Clippers tall ship cruise guide"
+      - "European river cruise first time guide"
       - "Persian Gulf cruise from Dubai guide"
-      - "Greek islands yacht cruise guide"
-      - "Danube river cruise guide"
       - "Schengen visa for a Mediterranean cruise"
-      - "Red Sea cruise from Jeddah guide"
-      - "MICE incentive trip on a cruise ship"
+    trend_terms:
+      - Explora Journeys
+      - Variety Cruises
+      - Greek islands cruise
+      - river cruise Europe
     locale: en
-    market: INT                # the world-audience twin of cruise24.ir (English, Middle East)
+    indexnow_key: "32848188bc802588ccb8b2f6b390a74f"   # public by design; site must serve /32848188bc802588ccb8b2f6b390a74f.txt containing it
+    market: INT                # the world-audience twin of cruise24.ir
     base_url: "https://cruise24.me"
-    # Where the bytes actually live. Recorded because it was tribal
-    # knowledge and got it wrong on 20 Aug: a DirectAdmin upload was
-    # written for a GoDaddy site. Hosting is NOT the CMS — the two
-    # differ on every property here.
     hosting: godaddy_cpanel
     hosting_note: >-
-      Apache on GoDaddy cPanel (Economy, cPanel user ekrd2r2976p9, server 92.205.251.216).
+      Static site on GoDaddy cPanel (Economy, cPanel user ekrd2r2976p9, Apache, 92.205.251.216).
       Deploy = cruise24-me/build_bundle.py, then upload the parts in cPanel File Manager and
       extract into public_html. Let's Encrypt via acme.sh (AutoSSL is off on this plan).
-    sitemap: "https://cruise24.me/sitemap.xml"   # a urlset: 12 static pages + 1,703 sailing pages
+      robots.txt + sitemap.xml (1,715 URLs) live; /api/ protected (leads.php is HMAC-signed for Agent 4).
+    sitemap: "https://cruise24.me/sitemap.xml"
     cms:
-      type: static_build
-      # A static site generated in the repo (build_journeys.py) and uploaded by hand.
-      # `unimplemented` stays deliberate: there is no publishing API, so Agent 2 must
-      # stage drafts, never report a live_url it did not create.
-      adapter: unimplemented
-      unsupported_reason: >-
-        Static site built in the repo and uploaded to GoDaddy cPanel by hand: there is no
-        publishing API. Articles are staged as drafts and ship with the next deploy bundle.
+      type: static
+      # Stages the article bundle for a manual upload; it ships with the next deploy bundle.
+      adapter: static_bundle
       content_root: "/"
       publish_mode: draft
     channels:
@@ -579,6 +666,7 @@ sites:
     notes:
       - "LinkedIn company page: https://www.linkedin.com/company/cruise24/ (edited 28 Sep)."
       - "Enquiries: api/enquiry.php stores them and copies each to res@cruise24.me."
+      - "Launched 30 Sep 2026. Open source-side fixes: 952 pages share 269 titles (departures of one route), JSON-LD on the homepage only, 5,214 of 8,307 images without alt, sitemap lastmod all 2026-09-28, no llms.txt."
 
   - domain: albaloostudio.com
     property_uri: "sc-domain:albaloostudio.com"
