@@ -1,0 +1,156 @@
+# cruise24.me — inventory sync, spread over the week
+# Architecture credit: Albaloo Studio — albaloostudio.com
+# Owner: Alireza Mozaffari
+#
+# Fares and departures on cruise24.me come from two sources (cruise24-me/sync/):
+#   CruiseHost (Ambiente Tours contract)  ~254 result pages, 10 sailings each
+#   Variety Cruises' own site             19 itineraries
+#
+# Never all at once. Every day this refreshes ONE SEVENTH of each CruiseHost family
+# (--spread 7: about 40 requests, 3-6 s apart, ~3 minutes), so the whole catalogue is
+# refreshed once a week and CruiseHost never sees the ~250-request burst of a full walk.
+# Variety is read on Sundays only (its own day, a different host).
+#
+# Then it rebuilds the pages, works out which files differ from what cruise24.me actually
+# serves (read back live, cruise24-me/deploy_update.py), and:
+#   * with the repo secret CRUISE24_SSH_KEY: uploads exactly those over SSH and reads them
+#     back to confirm; sailing pages that are over are moved to ~/retired/, never deleted;
+#   * without it: leaves them as the artifact "cruise24-update" for a manual upload.
+# Finally it commits the refreshed source data and the live-hash record to main.
+#
+# On a pull request touching the sync it does a dry run: selftests, one CruiseHost count
+# request (proves the runner can reach it), a build from the committed data. No writes.
+
+name: cruise24.me — inventory sync
+
+on:
+  schedule:
+    - cron: "17 3 * * *"        # 03:17 UTC daily, a quiet hour for both sources
+  workflow_dispatch:
+    inputs:
+      variety:
+        description: "Also read Variety Cruises today (normally Sundays only)"
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - "cruise24-me/sync/**"
+      - "cruise24-me/build_journeys.py"
+      - "cruise24-me/build_bundle.py"
+      - "cruise24-me/deploy_update.py"
+      - ".github/workflows/cruise24-inventory-sync.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cruise24-inventory-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: cruise24-me
+    env:
+      DRY: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Selftests
+        run: python3 sync/cruisehost_sync.py --selftest
+
+      - name: CruiseHost, one seventh of the catalogue
+        run: |
+          set -euo pipefail
+          if [ "$DRY" = "true" ]; then
+            python3 sync/cruisehost_sync.py --check
+            exit 0
+          fi
+          python3 sync/cruisehost_sync.py --spread 7 --write
+          echo "### CruiseHost slice" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat sync/last-report.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Variety Cruises (Sundays)
+        if: env.DRY != 'true' && (inputs.variety || github.event_name == 'schedule')
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.variety }}" != "true" ] && [ "$(date -u +%u)" != "7" ]; then
+            echo "Not Sunday: Variety is read once a week."
+            exit 0
+          fi
+          python3 sync/variety_sync.py
+
+      - name: Rebuild the pages
+        run: |
+          set -euo pipefail
+          python3 build_journeys.py
+          python3 build_offer_feed.py
+
+      - name: Ship what changed
+        if: env.DRY != 'true'
+        env:
+          SSH_KEY: ${{ secrets.CRUISE24_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -n "${SSH_KEY:-}" ]; then
+            key="$RUNNER_TEMP/cruise24_key"
+            printf '%s\n' "$SSH_KEY" > "$key"
+            chmod 600 "$key"
+            CRUISE24_SSH_KEY_FILE="$key" python3 deploy_update.py --ssh | tee "$RUNNER_TEMP/ship.txt"
+            rm -f "$key"
+          else
+            python3 deploy_update.py | tee "$RUNNER_TEMP/ship.txt"
+            if ls dist/update-*.zip >/dev/null 2>&1; then
+              echo "::notice title=Manual upload::No CRUISE24_SSH_KEY secret, so nothing was uploaded. Download the cruise24-update artifact and extract it into public_html."
+            fi
+          fi
+          { echo "### Shipping"; echo '```'; cat "$RUNNER_TEMP/ship.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Dry run — what would ship
+        if: env.DRY == 'true'
+        run: python3 deploy_update.py --explain 4
+
+      - uses: actions/upload-artifact@v6
+        if: env.DRY != 'true' && hashFiles('cruise24-me/dist/update-*') != ''
+        with:
+          name: cruise24-update
+          path: cruise24-me/dist/update-*
+          retention-days: 14
+
+      - name: Commit the refreshed data
+        if: env.DRY != 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "cruise24-sync"
+          git config user.email "cruise24-sync@users.noreply.github.com"
+          # What the sync produced (kept across a retry) and what the build regenerates
+          # from it (rebuilt on a retry, so a hand edit pushed meanwhile is never undone).
+          kept="data/sources sync/state.json sync/last-report.json media/cruisehost deploy"
+          built="index.html journeys.html destinations.html ports.html sitemap.xml data/data-checks.json offer.json"
+          msg="cruise24.me inventory: $(python3 -c "import json;r=json.load(open('sync/last-report.json'));print(r['ran'], r['mode'], '-', r['updated'], 'updated,', r['new'], 'new,', r['expired'], 'expired,', r.get('stale', 0), 'stale')")"
+          save="$RUNNER_TEMP/kept"
+          present() { for f in "$@"; do [ -e "$f" ] && echo "$f"; done; }
+          for i in 1 2 3 4 5; do
+            git add -A -- $(present $kept $built)
+            git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+            git commit -q -m "$msg"
+            git push -q origin HEAD:main && exit 0
+            sleep $((i * 5))
+            # main moved: carry the sync output onto the newest main and rebuild there.
+            mkdir -p "$save" && tar cf "$save/k.tar" $(present $kept)
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            tar xf "$save/k.tar"
+            python3 build_journeys.py >/dev/null
+            python3 build_offer_feed.py >/dev/null
+          done
+          echo "::warning title=Not committed::main kept moving; the refreshed data is in this run only."
+          exit 1

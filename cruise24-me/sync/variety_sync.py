@@ -209,6 +209,15 @@ def main():
             print(f"  {s:48} {len(rec['departures']):>3} departures  {', '.join(rec['ships'])}  " + (f"from €{min(fares):,}" if fares else "fare on request"), flush=True)
         else:
             skipped.append((s, "no future departures or no trip data"))
+    # A blocked or broken run must not empty the site: keep the last good file instead.
+    try:
+        before = len(json.load(open(OUT, encoding="utf-8")).get("sailings", []))
+    except (OSError, ValueError):
+        before = 0
+    if not args.limit and len(out) < max(1, before // 2):
+        for s, why in skipped[:10]:
+            print("  skipped", s, "-", why)
+        sys.exit(f"refused: only {len(out)} itineraries read (last good file has {before}); {OUT} left as it was")
     json.dump({"_about": "Variety Cruises sailings read from varietycruises.com cruise pages (the line's own booking data). "
                          "priceFrom = cheapest cabin category with cabins left, EUR per person, port charges excluded; soldOut when none are left.",
                "source": "Variety Cruises", "synced": today, "sailings": out}, open(OUT, "w"), ensure_ascii=False, indent=1)

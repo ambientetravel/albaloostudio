@@ -38,8 +38,16 @@ Usage
     python3 sync/cruisehost_sync.py --check                 # 1 request: how big is the catalogue
     python3 sync/cruisehost_sync.py --full [--limit N]      # walk, report, write nothing
     python3 sync/cruisehost_sync.py --full --write          # ... and update the inventory
-    python3 sync/cruisehost_sync.py --rolling 10 --write    # daily: 10 pages from the cursor
+    python3 sync/cruisehost_sync.py --rolling 10 --write    # 10 pages per family from the cursor
+    python3 sync/cruisehost_sync.py --spread 7 --write      # daily: 1/7 of every family, so the
+                                                            # whole catalogue is refreshed once a week
     then:  python3 build_journeys.py
+
+Spread (the scheduled mode, .github/workflows/cruise24-inventory-sync.yml): CruiseHost sees
+about 40 requests a day, 3-6 s apart, instead of ~250 in one go. A slice is pages, and pages
+drift as departures sail and new ones appear, so a sailing can be missed in one cycle. It is
+only hidden once it has not been seen for --stale-after days (default: three cycles), which
+is the rolling stand-in for the vanished-sailing rule a --full walk applies.
 
 Before enabling a schedule: confirm with CruiseHost that systematic retrieval under this
 contract is permitted (the boutimar.ir README raises the same point).
@@ -56,7 +64,7 @@ import sys
 import time
 import urllib.parse
 import urllib.request
-from datetime import date
+from datetime import date, timedelta
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -203,10 +211,12 @@ def group(rows):
     return list(out.values())
 
 
-def apply(existing, fetched, today, authoritative):
-    """Merge fetched into existing. authoritative=True only for a complete walk."""
+def apply(existing, fetched, today, authoritative, stale_before=None):
+    """Merge fetched into existing. authoritative=True only for a complete walk.
+    stale_before (ISO date, partial walks only): a sailing not refreshed since then is hidden,
+    since a sailing CruiseHost dropped is otherwise never noticed by a rolling walk."""
     fresh = {s["cruisehostId"]: s for s in fetched}
-    stats = dict(new=0, updated=0, unchanged=0, expired=0, vanished=0, untouched=0)
+    stats = dict(new=0, updated=0, unchanged=0, expired=0, vanished=0, untouched=0, stale=0)
     out = []
     for s in existing:
         sid = s["cruisehostId"]
@@ -220,6 +230,9 @@ def apply(existing, fetched, today, authoritative):
             stats["vanished"] += 1
         else:
             stats["untouched"] += 1
+            if stale_before and (s.get("syncedAt") or "") < stale_before and not s.get("hidden"):
+                s["hidden"] = True
+                stats["stale"] += 1
         future = [d for d in s.get("departures", []) if d["date"] >= today]
         if len(future) != len(s.get("departures", [])):
             s["departures"] = future
@@ -298,8 +311,10 @@ def groups(lines):
     return out
 
 
-def walk(today, lines, max_pages=None, pages_wanted=None, verbose=True):
-    """Walk every request family. Returns rows (each tagged with its kind), total, pages per family."""
+def walk(today, lines, max_pages=None, pick=None, verbose=True):
+    """Walk every request family. Returns rows (each tagged with its kind), total, pages per family.
+    pick(family, pages) -> the page numbers to fetch; page 1 is always fetched, because it is
+    the request that says how many pages there are."""
     rows, total, pages_by = [], 0, {}
     for kind, areas, slugs in groups(lines):
         fam = kind + ":" + "+".join(slugs)
@@ -308,12 +323,11 @@ def walk(today, lines, max_pages=None, pages_wanted=None, verbose=True):
         pages = int(first.get("pages") or 0)
         total += int(first.get("allentries") or 0)
         pages_by[fam] = pages
-        want = list(range(1, pages + 1)) if pages_wanted is None else [p for p in pages_wanted.get(fam, []) if p <= pages]
+        want = list(range(1, pages + 1)) if pick is None else [p for p in pick(fam, pages) if 1 <= p <= pages]
         if max_pages:
             want = want[:max_pages]
         tag = lambda rs: [dict(r, _kind=kind) for r in rs]
-        if 1 in want:
-            rows += tag(rows_of(first))
+        rows += tag(rows_of(first))   # fetched anyway for the page count, so never wasted
         for n, p in enumerate([p for p in want if p != 1]):
             time.sleep(random.uniform(*JITTER))
             try:
@@ -325,6 +339,19 @@ def walk(today, lines, max_pages=None, pages_wanted=None, verbose=True):
         if verbose:
             print("  %s: %d pages, %d rows so far" % (fam, pages, len(rows)), flush=True)
     return rows, total, pages_by
+
+
+def slice_size(pages: int, days: int) -> int:
+    """Pages per run so that `days` runs cover every page of a family once."""
+    return max(1, -(-pages // max(1, days)))
+
+
+def rolling_pages(start: int, pages: int, size: int) -> list[int]:
+    """`size` page numbers from `start`, wrapping round at `pages`."""
+    if pages <= 0:
+        return []
+    start = (start - 1) % pages + 1
+    return [((start - 1 + i) % pages) + 1 for i in range(min(size, pages))]
 
 
 def selftest():
@@ -356,10 +383,29 @@ def selftest():
     merged, st = apply([dict(x) for x in existing], [b], today, authoritative=True)
     assert next(s for s in merged if s["cruisehostId"] == "C3").get("hidden") and st["vanished"] == 2, st
     assert len(merged) == 3, "nothing is ever deleted"
+    # a partial walk hides only what has gone unseen past the cutoff, and never deletes it
+    seen = dict(existing[1], cruisehostId="C4", syncedAt="2026-09-20")
+    old = dict(existing[1], cruisehostId="C5", syncedAt="2026-08-01")
+    merged, st = apply([seen, old], [], today, authoritative=False, stale_before="2026-09-06")
+    assert st["stale"] == 1 and len(merged) == 2, st
+    assert not merged[0].get("hidden") and merged[1].get("hidden"), merged
+    back = {k: v for k, v in old.items() if k != "hidden"}
+    merged, st = apply([dict(old, hidden=True)], [back], today, authoritative=False, stale_before="2026-09-06")
+    assert not merged[0].get("hidden") and st["updated"] + st["unchanged"] == 1, "seen again -> shown again"
+    # spread: every page of every family exactly once per cycle, about 1/7 a day
+    for n in (1, 6, 39, 106, 109):
+        cur, cover = 1, []
+        for _ in range(7):
+            got_p = rolling_pages(cur, n, slice_size(n, 7))
+            cover += got_p
+            cur = got_p[-1] % n + 1
+        assert sorted(set(cover)) == list(range(1, n + 1)), (n, cover)
+        assert len(cover) - n < 7, ("a cycle refetches at most a few pages", n, len(cover))
+    assert slice_size(106, 7) + slice_size(39, 7) + slice_size(109, 7) == 38
     assert not re.search(r"ambiente|boutimar|albaloo|cruise24", UA, re.I), "no company name in outbound headers"
     u = build_url(BASE, "SEA", FOCUS_AREAS[:2], ["Explora_Journeys"], date(2026, 9, 27), 2)
     assert "url=SEA/Eastern_Mediterranean+Central_Mediterranean_/Explora_Journeys/all/September2026/March2028/all" in u and "page=2" in u, u
-    print("selftest OK: page shapes, grouping, Persian Gulf, merge/prune, rolling vs full, neutral UA, URL form")
+    print("selftest OK: page shapes, grouping, Persian Gulf, merge/prune, rolling vs full, stale hiding, weekly spread, neutral UA, URL form")
 
 
 def main():
@@ -369,6 +415,8 @@ def main():
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--full", action="store_true")
     ap.add_argument("--rolling", type=int, metavar="PAGES")
+    ap.add_argument("--spread", type=int, metavar="DAYS", help="refresh 1/DAYS of every family per run")
+    ap.add_argument("--stale-after", type=int, metavar="DAYS", help="partial walks: hide a sailing not seen for DAYS (default 3 x --spread, else off)")
     ap.add_argument("--limit", type=int)
     ap.add_argument("--write", action="store_true")
     args = ap.parse_args()
@@ -391,21 +439,33 @@ def main():
     if args.write and args.full and args.limit:
         sys.exit("--write refuses a truncated --full walk")
 
-    if args.rolling:
+    stale_before = None
+    if args.rolling or args.spread:
         cur = state.get("cursor") or {}
-        _, _, pages = walk(today, lines, max_pages=1, verbose=False)
-        want = {k: [((int(cur.get(k, 1)) - 1 + i) % n) + 1 for i in range(min(args.rolling, n))] for k, n in pages.items() if n}
-        rows, total, _ = walk(today, lines, pages_wanted=want)
-        state["cursor"] = {k: ((want[k][-1]) % pages[k]) + 1 for k in want}
+        chosen = {}
+
+        def pick(fam, n):
+            size = args.rolling or slice_size(n, args.spread)
+            chosen[fam] = (n, rolling_pages(int(cur.get(fam, 1)), n, size))
+            return chosen[fam][1]
+
+        rows, total, pages = walk(today, lines, pick=pick)
+        state["cursor"] = {**cur, **{k: (want[-1] % n) + 1 for k, (n, want) in chosen.items() if want}}
         authoritative = False
+        days = args.stale_after if args.stale_after is not None else (3 * args.spread if args.spread else 0)
+        if days:
+            stale_before = (today - timedelta(days=days)).isoformat()
     else:
         rows, total, _ = walk(today, lines, max_pages=args.limit)
         authoritative = args.limit is None
 
     fetched = group([map_row(r, names) for r in rows])
     existing = load_json(OUT, {}).get("sailings", [])
-    merged, stats = apply(existing, fetched, today.isoformat(), authoritative)
-    report = {"ran": today.isoformat(), "mode": "rolling" if args.rolling else "full", "catalogue": total, "rows": len(rows), "sailings": len(fetched), **stats}
+    merged, stats = apply(existing, fetched, today.isoformat(), authoritative, stale_before)
+    mode = "spread/%d" % args.spread if args.spread else "rolling" if args.rolling else "full"
+    report = {"ran": today.isoformat(), "mode": mode, "catalogue": total, "rows": len(rows), "sailings": len(fetched), **stats}
+    if args.rolling or args.spread:
+        report["slice"] = {k: "%d of %d pages, from %d" % (len(w), n, w[0]) for k, (n, w) in chosen.items() if w}
     print(json.dumps(report))
     json.dump(report, open(REPORT, "w"), indent=1)
     if args.write:

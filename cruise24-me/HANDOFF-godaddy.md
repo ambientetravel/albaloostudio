@@ -537,3 +537,47 @@ secret (since 30 Sep).
 GoDaddy is a US company, so the privacy page must name the GoDaddy contracting entity and the basis
 for the transfer to the US. Take both from GoDaddy's own Data Processing Addendum for this account;
 do not write them from memory.
+
+## Inventory sync: fares refreshed daily, spread over the week (7 Oct)
+
+Workflow `.github/workflows/cruise24-inventory-sync.yml`, daily at 03:17 UTC:
+
+| Source | When | Load on the source |
+|---|---|---|
+| CruiseHost (Ambiente Tours contract) | every day, 1/7 of each result family (`--spread 7`) | ~40 requests a day, 3–6 s apart, ~3 min; the whole catalogue (~254 pages) once a week |
+| Variety Cruises (varietycruises.com) | Sundays | 19 pages, 2–4 s apart |
+
+Then it rebuilds the pages (`build_journeys.py`, `build_offer_feed.py`) and runs
+`deploy_update.py`, which reads the live site back and ships only the files that differ.
+
+- **With the repo secret `CRUISE24_SSH_KEY`:** the changed files are uploaded over SSH and read back
+  from https://cruise24.me to confirm. Sailing pages that are over are moved to `~/retired/<date>/`
+  on the server, never deleted.
+- **Without it:** nothing is uploaded. The run leaves an artifact `cruise24-update` (a zip, plus a
+  list of pages to retire) to extract into public_html by hand.
+- Each run commits the refreshed sources, `sync/state.json` (the cursor) and `deploy/live.sha256`
+  (what was last seen live) to main.
+
+**Safety rules in the code:**
+- A sailing missed by the weekly cycle is hidden only after 21 days unseen (three cycles), and
+  shown again if it comes back.
+- A Variety run that reads less than half of the last good set is refused, and the old file is kept.
+- Nothing ships if the pre-launch check (`build_bundle.check`) fails.
+- The sitemap now gives each sailing its own sync date as `lastmod`, instead of stamping all
+  1,700 URLs with today's date.
+
+**Setting up the SSH key (Mac, once):**
+1. Terminal: `ssh-keygen -t ed25519 -N "" -C cruise24-deploy -f ~/.ssh/cruise24_deploy`
+2. Copy the public key: `pbcopy < ~/.ssh/cruise24_deploy.pub`
+3. In cPanel, open SSH Access → Manage SSH Keys → Import Key. Name it `cruise24_deploy`, paste
+   into "Public Key", then Import. Back in the list, click Manage next to it, then Authorize.
+4. Test it: `ssh -i ~/.ssh/cruise24_deploy ekrd2r2976p9@92.205.251.216 'ls public_html | head -3'`.
+   It must list files without asking for a password.
+5. Copy the private key: `pbcopy < ~/.ssh/cruise24_deploy`. On GitHub, create the repo secret
+   `CRUISE24_SSH_KEY` and paste it. Then copy any other text to clear the clipboard.
+
+To remove the key later: in cPanel, Deauthorize or Delete it, and delete the GitHub secret.
+
+**Still open:** CruiseHost has not been asked whether scheduled retrieval under the contract is
+fine (`cruisehost_sync.py` docstring). The schedule was set up on 7 Oct at Alireza's request,
+spread to about 40 requests a day.

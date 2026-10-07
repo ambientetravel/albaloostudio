@@ -5,7 +5,7 @@ build_journeys.py — turn the inventory sources into the pages people can book 
 Architecture credit: Albaloo Studio — albaloostudio.com
 Owner: Alireza Mozaffari
 
-Reads    data/sources/*.json            (CruiseHost Explora sailings, Variety catalogue)
+Reads    data/sources/*.json            (CruiseHost sailings, Variety Cruises sailings and catalogue)
 Writes   data/sailings.json             one merged inventory, English, provenance per record
          journeys.html                  every sailing as a card, filterable, no JS needed to read
          journeys/<id>.html             one page per sailing: route, days, fares, visa, ship
@@ -460,6 +460,23 @@ def card(s) -> str:
             + '</div></div></a>')
 
 
+def and_list(items: list[str]) -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def fare_sources(sailings) -> str:
+    """Say where the fares on the page come from, from the records themselves."""
+    src = {s["source"] for s in sailings}
+    parts = []
+    if any(x.startswith("CruiseHost") for x in src):
+        parts.append("CruiseHost (the cruise lines' booking system)")
+    if "Variety Cruises" in src:
+        parts.append("Variety Cruises' own booking pages")
+    if any("catalogue" in x for x in src):
+        parts.append("the Variety Cruises 2026–27 catalogue")
+    return ("Fares are read from " + and_list(parts) + ", and each sailing shows the date it was read.") if parts else ""
+
+
 def listing(sailings, head, nav, foot) -> str:
     months = sorted({mo for s in sailings for mo in s["months"]})
     n_focus = sum(1 for s in sailings if s["focus"])
@@ -470,7 +487,7 @@ def listing(sailings, head, nav, foot) -> str:
     body = f'''<section class="page-hero" style="min-height:auto;padding-bottom:40px">
   <img src="{esc(m("Thumbnail-Vertical.jpg"))}" alt="" loading="eager">
   <div class="wrap"><span class="kicker">Journeys</span><h1>Sailings you can book</h1>
-  <p>{len(sailings)} sailings from {" and ".join(dict.fromkeys(s["line"] for s in sailings))}. {n_focus} of them call in Türkiye, Greece or Italy, and those come first. Explora fares are CruiseHost's current lead fare; Variety fares are the line's 2026–27 catalogue. Every fare is confirmed with the line before you commit.</p></div>
+  <p>{len(sailings)} sailings from {and_list(sorted({s["line"] for s in sailings}))}. {n_focus} of them call in Türkiye, Greece or Italy, and those come first. {fare_sources(sailings)} Every fare is confirmed with the line before you commit.</p></div>
 </section>
 <section class="section light" style="padding-top:28px">
   <div class="wrap">
@@ -492,7 +509,7 @@ def listing(sailings, head, nav, foot) -> str:
 </section>
 '''
     return page(head, nav, foot, slug="journeys.html", title="Journeys · Cruise24",
-                desc=f"{len(sailings)} Explora Journeys and Variety Cruises sailings, with Türkiye, Greece and Italy first. Real fares, dates and routes, confirmed with the line before you book.",
+                desc=f"{len(sailings)} sailings from {len({s['line'] for s in sailings})} cruise lines, with Türkiye, Greece and Italy first. Real fares, dates and routes, confirmed with the line before you book.",
                 body=body)
 
 
@@ -671,9 +688,15 @@ def main() -> int:
     # ships.html and itineraries.html are redirects now (to lines.html#ships, destinations.html#itineraries)
     static = ["", "journeys.html", "destinations.html", "ports.html", "lines.html", "mice.html", "about.html",
               "journal.html", "contact.html", "conditions.html", "imprint.html", "privacy.html"]
-    urls = [f"https://cruise24.me/{p}" for p in static] + [f"https://cruise24.me/{s['url']}" for s in sailings]
+    # lastmod only where it is known: a sailing changes when its source was last synced, the
+    # generated listings with every build, the hand-written pages have no date to give. With a
+    # daily rebuild, stamping every URL with today would tell search engines all 1,700 changed.
+    built = {"", "journeys.html", "destinations.html", "ports.html"}
+    entries = [(f"https://cruise24.me/{p}", TODAY if p in built else None) for p in static] + \
+              [(f"https://cruise24.me/{s['url']}", s.get("asOf")) for s in sailings]
     out["sitemap.xml"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-                          + "".join(f"  <url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>\n" for u in urls) + "</urlset>\n")
+                          + "".join(f"  <url><loc>{u}</loc>" + (f"<lastmod>{m}</lastmod>" if m else "") + "</url>\n" for u, m in entries)
+                          + "</urlset>\n")
     for s in sailings:
         out[s["url"]] = detail(s, head, nav, foot)
     for k, text in out.items():
