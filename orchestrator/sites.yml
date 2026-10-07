@@ -530,6 +530,10 @@ sites:
       # When measured gaps + seeds run dry, plan fresh topics from the offer feed
       # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
       topic_planner: true
+      images:
+        # Article has image_url / image_credit / image_source since 7 Oct (base44 builder).
+        # No avoid list: cruisebaz sells many lines, Royal Caribbean and Norwegian included.
+        base44_upload: true
     channels:
       - name: telegram
         audience: d2c

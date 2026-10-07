@@ -38,7 +38,7 @@ import config  # noqa: E402
 import images  # noqa: E402
 
 DOMAIN = {"boutimar": "boutimar.com", "exploreorient": "exploreorient.com",
-          "boutimarfarsi": "boutimar.ir", "cruise24-ir": "cruise24.ir"}
+          "boutimarfarsi": "boutimar.ir", "cruise24-ir": "cruise24.ir", "cruisebaz": "cruisebaz.com"}
 
 
 def image_cfg(repo: str) -> dict:
@@ -59,6 +59,9 @@ SITES = [
     {"repo": "ambientetravel/boutimarfarsi", "kind": "json", "path": "data/articles.json",
      "img_dir": "img/daryanameh", "lang": "fa"},
     {"repo": "ambientetravel/cruise24-ir", "kind": "bundle", "dir": "content/blog", "lang": "fa"},
+    # base44 app, not a repo: photo uploaded to the app's own storage and set on
+    # the Article record (image_url / image_credit / image_source, added 7 Oct).
+    {"repo": "base44/cruisebaz", "kind": "base44", "lang": "fa"},
 ]
 
 
@@ -124,6 +127,60 @@ def query_for(title: str, summary: str = "", lang: str = "en", prefer=()) -> tup
         return "", ""
 
 
+def _b44(site: dict) -> tuple[str, str, dict]:
+    """(entity base URL, app_id, headers) for a base44 site in sites.yml."""
+    import agent2_writer_listener as a2
+    cfg = config.load_sites(only=[DOMAIN[site["repo"].split("/")[1]]], include_hold=True)[0]
+    cms = cfg.cms if isinstance(cfg.cms, dict) else cfg.cms.model_dump()
+    app_id = str(cms.get("app_id") or "")
+    hdr = {"Authorization": f"Bearer {os.environ.get('BASE44_ACCESS_TOKEN', '')}",
+           "Content-Type": "application/json", "User-Agent": config.USER_AGENT}
+    return a2.base44_entity_url(app_id, str(cms.get("entity") or "Article")), app_id, hdr
+
+
+def base44_records(site: dict) -> list[dict]:
+    base, _, hdr = _b44(site)
+    r = requests.get(f"{base}/v2/list", headers=hdr, params={"limit": 500}, timeout=40)
+    r.raise_for_status()
+    d = r.json()
+    return d if isinstance(d, list) else (d.get("records") or d.get("items") or [])
+
+
+_KEEP = ("title", "body_markdown", "meta_description", "slug", "status")
+
+
+def base44_set_photo(site: dict, rec: dict, img: dict, data: bytes, lang: str, backup_dir: Path) -> str:
+    """Upload to the app's own storage and set ONLY the three photo fields.
+    The record is saved to disk first and read back after; if any text field
+    changed (an update that replaced instead of merged), it is restored."""
+    import agent2_writer_listener as a2
+    base, app_id, hdr = _b44(site)
+    rid = rec.get("id") or rec.get("_id")
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    (backup_dir / f"{rid}.json").write_text(json.dumps(rec, ensure_ascii=False, indent=2), encoding="utf-8")
+    name = f"{str(rec.get('slug') or rid).strip('/').replace('/', '-')}{img['ext']}"
+    up = requests.post(f"{a2.BASE44_API}/files/apps/{app_id}/upload",
+                       headers={"Authorization": hdr["Authorization"], "User-Agent": config.USER_AGENT},
+                       files={"file": (name, data, "image/jpeg" if img["ext"] == ".jpg" else "image/png")},
+                       data={"visibility": "public"}, timeout=60)
+    up.raise_for_status()
+    hosted = a2.base44_public_image_url(up.json() or {}, app_id)
+    if not hosted:
+        raise RuntimeError("uploaded, but no public URL serves the image")
+    patch = {"image_url": hosted, "image_credit": images.credit_line(img, lang),
+             "image_source": img["source_page"]}
+    requests.put(f"{base}/{rid}", headers=hdr, json=patch, timeout=40).raise_for_status()
+    after = requests.get(f"{base}/{rid}", headers=hdr, timeout=40)
+    after.raise_for_status()
+    now = after.json()
+    lost = [k for k in _KEEP if rec.get(k) and now.get(k) != rec.get(k)]
+    if lost:
+        restore = {k: v for k, v in rec.items() if k in _KEEP or k in ("meta_description", "faq", "language")}
+        requests.put(f"{base}/{rid}", headers=hdr, json={**restore, **patch}, timeout=40).raise_for_status()
+        return f"{hosted} (update replaced {lost}; restored from backup)"
+    return hosted
+
+
 def plan(site: dict) -> list[dict]:
     todo = []
     if site["kind"] == "md":
@@ -153,6 +210,13 @@ def plan(site: dict) -> list[dict]:
                 continue
             todo.append({"dir": f"{site['dir']}/{d['name']}", "slug": d["name"], "title": man.get("title", ""),
                          "summary": man.get("meta_description", ""), "manifest": man, "sha": sha})
+    elif site["kind"] == "base44":
+        for rec in base44_records(site):
+            if rec.get("image_url") or str(rec.get("status", "")).lower() != "published":
+                continue
+            todo.append({"slug": rec.get("slug", ""), "title": rec.get("title", ""), "record": rec,
+                         "summary": rec.get("meta_description", ""),
+                         "lang": rec.get("language") or site["lang"]})
     else:
         text, sha = raw(site["repo"], site["path"])
         store = json.loads(text)
@@ -163,7 +227,7 @@ def plan(site: dict) -> list[dict]:
     return todo
 
 
-def run(apply: bool, only: list[str] | None = None) -> list[str]:
+def run(apply: bool, only: list[str] | None = None, slugs: list[str] | None = None) -> list[str]:
     log = []
     # Minute stamp: a second run the same day must not collide with an open branch
     # (a PUT onto an existing file without its sha fails).
@@ -173,6 +237,8 @@ def run(apply: bool, only: list[str] | None = None) -> list[str]:
         if only and site["repo"].split("/")[1] not in only:
             continue
         todo = plan(site)
+        if slugs:
+            todo = [t for t in todo if any(x.strip("/") in str(t["slug"]).strip("/") for x in slugs)]
         cfg = image_cfg(site["repo"])
         found, used = [], set()
         for t in todo:
@@ -190,6 +256,21 @@ def run(apply: bool, only: list[str] | None = None) -> list[str]:
             if img:
                 found.append((t, img))
         if not apply or not found:
+            continue
+        if site["kind"] == "base44":
+            # base44 has no pull requests: the record is updated in place. Only
+            # PUBLISHED records without a photo are touched, and each is backed up.
+            for t, img in found:
+                data = images.fetch(img)
+                if not data:
+                    log.append(f"  {t['slug']}: download failed — skipped")
+                    continue
+                try:
+                    url = base44_set_photo(site, t["record"], img, data, t.get("lang", "fa"),
+                                           ROOT / "runs" / f"base44-photo-backup-{stamp}")
+                    log.append(f"  {t['slug']}: image_url = {url}")
+                except Exception as exc:  # noqa: BLE001
+                    log.append(f"  {t['slug']}: FAILED — {type(exc).__name__}: {str(exc)[:160]}")
             continue
         repo, branch = site["repo"], f"agent2/photos-{stamp}"
         base_sha = gh("GET", f"/repos/{repo}/git/ref/heads/main").json()["object"]["sha"]
@@ -257,8 +338,9 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--only", action="append", help="repo name filter, e.g. cruise24-ir")
+    ap.add_argument("--slug", action="append", help="only articles whose slug contains this")
     a = ap.parse_args(argv)
-    print("\n".join(run(a.apply, a.only)))
+    print("\n".join(run(a.apply, a.only, a.slug)))
     print(f"vetting: {images.VET['ok']} passed, {images.VET['rejected']} rejected, {images.VET['error']} errors (fail-open)")
     return 0
 
