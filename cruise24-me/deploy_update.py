@@ -32,9 +32,11 @@ from __future__ import annotations
 import argparse
 import concurrent.futures as cf
 import datetime as dt
+import difflib
 import hashlib
 import io
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -80,20 +82,44 @@ def save_manifest(m: dict[str, str]) -> None:
     MANIFEST.write_text("".join(f"{m[k]}  {k}\n" for k in sorted(m)), encoding="utf-8")
 
 
-def live_hash(rel: str) -> str | None:
-    """sha256 of the file as cruise24.me serves it; None when it is not there (or unreachable)."""
+def live_bytes(rel: str) -> bytes | None:
+    """The file as cruise24.me serves it; None when it is not there (or unreachable)."""
     url = SITE + urllib.parse.quote(rel)
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Cache-Control": "no-cache"})
     for _ in range(2):
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
-                return sha(r.read())
+                return r.read()
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 return None
         except (urllib.error.URLError, TimeoutError, OSError):
             pass
     return None
+
+
+def live_hash(rel: str) -> str | None:
+    b = live_bytes(rel)
+    return None if b is None else sha(b)
+
+
+def live_sailing_pages() -> set[str]:
+    """journeys/… pages the LIVE sitemap still lists: on a first run, before any record
+    exists, this is how pages that are over are found."""
+    b = live_bytes("sitemap.xml") or b""
+    return set(re.findall(r"<loc>https://cruise24\.me/(journeys/[^<]+)</loc>", b.decode("utf-8", "ignore")))
+
+
+def explain(rels: list[str], n: int) -> None:
+    """Print how the first n differing text files differ from live, to tell a real change
+    from something the server adds to every page."""
+    for r in [r for r in rels if r.endswith((".html", ".xml", ".json", ".txt"))][:n]:
+        live = (live_bytes(r) or b"").decode("utf-8", "ignore").splitlines()
+        mine = (HERE / r).read_text(encoding="utf-8").splitlines()
+        d = list(difflib.unified_diff(live, mine, "live/" + r, "built/" + r, n=0, lineterm=""))
+        print(f"--- {r}: {len(d)} diff lines")
+        for line in d[:24]:
+            print("   " + line[:220])
 
 
 def live_hashes(rels: list[str]) -> dict[str, str | None]:
@@ -109,6 +135,7 @@ def ssh(target: str, key: str, command: str, stdin: bytes | None = None) -> None
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--ssh", action="store_true", help="upload the changed files and confirm them live")
+    ap.add_argument("--explain", type=int, default=0, metavar="N", help="print how N differing files differ from live")
     args = ap.parse_args()
     today = dt.date.today().isoformat()
 
@@ -122,7 +149,8 @@ def main() -> int:
     known = load_manifest()
 
     candidates = sorted(r for r, h in local.items() if known.get(r) != h)
-    gone = sorted(r for r in known if r.startswith("journeys/") and r not in local)
+    gone = sorted({r for r in known if r.startswith("journeys/")} | live_sailing_pages())
+    gone = [r for r in gone if r not in local]
     print(f"{len(local)} files in scope; {len(candidates)} differ from the last-known live copy; "
           f"{len(gone)} sailing pages no longer built")
 
@@ -135,6 +163,8 @@ def main() -> int:
     for r in gone:
         if seen[r] is None:
             known.pop(r, None)                       # already off the server
+    if args.explain:
+        explain(changed, args.explain)
     print(f"to ship: {len(changed)} files ({sum((HERE / r).stat().st_size for r in changed) / 1e6:.1f} MB); "
           f"to retire: {len(retire)} pages")
 

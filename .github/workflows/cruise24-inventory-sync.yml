@@ -116,7 +116,7 @@ jobs:
 
       - name: Dry run — what would ship
         if: env.DRY == 'true'
-        run: python3 deploy_update.py
+        run: python3 deploy_update.py --explain 4
 
       - uses: actions/upload-artifact@v6
         if: env.DRY != 'true' && hashFiles('cruise24-me/dist/update-*') != ''
