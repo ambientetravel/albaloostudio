@@ -198,10 +198,43 @@ def fetch(img: dict[str, Any]) -> bytes | None:
 
 
 def credit_line(img: dict[str, Any], language: str) -> str:
-    """The caption, built only from the file's own metadata."""
+    """The caption, built only from the file's own metadata. A cropped photo says
+    so — CC BY / BY-SA require changes to be indicated."""
+    cut = bool(img.get("cropped"))
     if str(language).lower().startswith("fa"):
-        return f"عکس: {img['creator']} — {img['licence']}، از ویکی‌مدیا کامنز ({img['source_page']})"
-    return f"Photo: {img['creator']}, {img['licence']}, via [Wikimedia Commons]({img['source_page']})"
+        return (f"عکس: {img['creator']} — {img['licence']}، از ویکی‌مدیا کامنز ({img['source_page']})"
+                + ("، برش‌خورده" if cut else ""))
+    return (f"Photo: {img['creator']}, {img['licence']}, via [Wikimedia Commons]({img['source_page']})"
+            + (", cropped" if cut else ""))
+
+
+def by_file(title: str, width: int = 1600) -> dict[str, Any] | None:
+    """One named Commons file, through the same licence/credit/size checks as a
+    search hit (no place-word test — a human chose it)."""
+    t = title if title.startswith("File:") else f"File:{title}"
+    try:
+        r = requests.get(COMMONS, timeout=20, headers={"User-Agent": config.USER_AGENT}, params={
+            "action": "query", "format": "json", "titles": t, "prop": "imageinfo",
+            "iiprop": "url|size|mime|extmetadata", "iiurlwidth": width, "iiextmetadatalanguage": "en"})
+        r.raise_for_status()
+        pages = list(((r.json().get("query") or {}).get("pages") or {}).values())
+    except (requests.RequestException, ValueError) as exc:
+        log.warning("Commons file %r unavailable: %s", t, exc)
+        return None
+    return pick(pages, query="")
+
+
+def crop(data: bytes, box: tuple[float, float, float, float]) -> bytes:
+    """Crop by FRACTIONS (left, top, width, height) so the box does not depend on
+    which thumbnail width was downloaded. Returns JPEG bytes."""
+    import io
+    from PIL import Image
+    im = Image.open(io.BytesIO(data)).convert("RGB")
+    w, h = im.size
+    l, t, cw, ch = box
+    out = io.BytesIO()
+    im.crop((round(l * w), round(t * h), round((l + cw) * w), round((t + ch) * h))).save(out, "JPEG", quality=85)
+    return out.getvalue()
 
 
 # How the vetting step went this process — a check that silently fails open looks

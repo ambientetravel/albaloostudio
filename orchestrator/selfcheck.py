@@ -4180,5 +4180,14 @@ ok("Health ignores dry runs and self-skips/cancels but still counts real failure
    and not _hr._counts({"display_title": "Agent 1 — SEO Scout", "conclusion": "cancelled"})
    and _hr._counts({"display_title": "Agent 2 — Writer", "conclusion": "failure"}))
 
+import io as _io
+from PIL import Image as _Image
+_buf = _io.BytesIO(); _Image.new("RGB", (100, 300), "white").save(_buf, "JPEG")
+_cut = _Image.open(_io.BytesIO(_img.crop(_buf.getvalue(), (0, 0.25, 1, 0.5))))
+_cc = dict(_p); _cc["cropped"] = True
+ok("a chosen photo crops by fractions, and its credit says it was cropped (CC BY indicates changes)",
+   _cut.size == (100, 150) and _img.credit_line(_cc, "fa").endswith("برش‌خورده")
+   and _img.credit_line(_cc, "en").endswith(", cropped") and "cropped" not in _img.credit_line(_p, "en"))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

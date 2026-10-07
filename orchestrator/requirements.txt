@@ -47,3 +47,5 @@ jsonschema>=4.22.0              # validates payloads against schemas/*.json
 #   same requirements file when self-hosted.
 # * No SERP-API client is included: opportunity.serp is inferred from Search
 #   Console only (open decision O-4 in ARCHITECTURE.md).
+# Cropping a chosen article photo to a wide hero (images.crop), 7 Oct 2026.
+pillow>=10

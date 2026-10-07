@@ -181,6 +181,14 @@ def base44_set_photo(site: dict, rec: dict, img: dict, data: bytes, lang: str, b
     return hosted
 
 
+def _fetch(img: dict) -> bytes | None:
+    data = images.fetch(img)
+    if data and img.get("crop"):
+        data = images.crop(data, img["crop"])
+        img["ext"] = ".jpg"
+    return data
+
+
 def plan(site: dict) -> list[dict]:
     todo = []
     if site["kind"] == "md":
@@ -227,7 +235,8 @@ def plan(site: dict) -> list[dict]:
     return todo
 
 
-def run(apply: bool, only: list[str] | None = None, slugs: list[str] | None = None) -> list[str]:
+def run(apply: bool, only: list[str] | None = None, slugs: list[str] | None = None,
+        commons_file: str = "", crop_box: str = "") -> list[str]:
     log = []
     # Minute stamp: a second run the same day must not collide with an open branch
     # (a PUT onto an existing file without its sha fails).
@@ -241,10 +250,19 @@ def run(apply: bool, only: list[str] | None = None, slugs: list[str] | None = No
             todo = [t for t in todo if any(x.strip("/") in str(t["slug"]).strip("/") for x in slugs)]
         cfg = image_cfg(site["repo"])
         found, used = [], set()
+        if commons_file and len(todo) != 1:
+            log.append(f"{site['repo']}: --file needs exactly ONE article (use --slug); matched {len(todo)}")
+            continue
         for t in todo:
-            q, _ = query_for(t["title"], t.get("summary", ""), site["lang"], cfg.get("prefer") or ())
-            img = images.find_image(q, avoid=cfg.get("avoid") or (), exclude=used,
-                                    context=t["title"]) if q else None
+            if commons_file:            # a human chose this exact file
+                q, img = commons_file, images.by_file(commons_file)
+            else:
+                q, _ = query_for(t["title"], t.get("summary", ""), site["lang"], cfg.get("prefer") or ())
+                img = images.find_image(q, avoid=cfg.get("avoid") or (), exclude=used,
+                                        context=t["title"]) if q else None
+            if img and crop_box:
+                img["crop"] = tuple(float(x) for x in crop_box.split(","))
+                img["cropped"] = True
             if img:
                 used.add(img["source_page"])
                 # Alt from the CHOSEN file's own record, not from the article's wish.
@@ -261,7 +279,7 @@ def run(apply: bool, only: list[str] | None = None, slugs: list[str] | None = No
             # base44 has no pull requests: the record is updated in place. Only
             # PUBLISHED records without a photo are touched, and each is backed up.
             for t, img in found:
-                data = images.fetch(img)
+                data = _fetch(img)
                 if not data:
                     log.append(f"  {t['slug']}: download failed — skipped")
                     continue
@@ -283,7 +301,7 @@ def run(apply: bool, only: list[str] | None = None, slugs: list[str] | None = No
             store = json.loads(text)
         done = 0
         for t, img in found:
-            data = images.fetch(img)
+            data = _fetch(img)
             if not data:
                 continue
             path = (f"{t['dir']}/hero{img['ext']}" if site["kind"] == "bundle"
@@ -339,8 +357,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--only", action="append", help="repo name filter, e.g. cruise24-ir")
     ap.add_argument("--slug", action="append", help="only articles whose slug contains this")
+    ap.add_argument("--file", default="", help="use this exact Commons file (needs --slug matching ONE article)")
+    ap.add_argument("--crop", default="", help="crop as fractions left,top,width,height, e.g. 0,0.32,1,0.32")
     a = ap.parse_args(argv)
-    print("\n".join(run(a.apply, a.only, a.slug)))
+    print("\n".join(run(a.apply, a.only, a.slug, a.file, a.crop)))
     print(f"vetting: {images.VET['ok']} passed, {images.VET['rejected']} rejected, {images.VET['error']} errors (fail-open)")
     return 0
 

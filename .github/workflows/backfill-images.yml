@@ -21,6 +21,14 @@ on:
         description: "Only articles whose slug contains this (e.g. norouz-2027); blank = all"
         required: false
         default: ""
+      file:
+        description: "Use this exact Commons file (needs a slug matching ONE article)"
+        required: false
+        default: ""
+      crop:
+        description: "Crop fractions left,top,width,height (e.g. 0,0.3223,1,0.3164)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -50,8 +58,9 @@ jobs:
           ARGS=""
           for r in $(echo "${{ inputs.only }}" | tr ',' ' '); do ARGS="$ARGS --only $r"; done
           if [ -n "${{ inputs.slug }}" ]; then ARGS="$ARGS --slug ${{ inputs.slug }}"; fi
+          FILE_ARG="${{ inputs.file }}"; CROP_ARG="${{ inputs.crop }}"
           if [ "${{ inputs.apply }}" = "true" ]; then ARGS="$ARGS --apply"; fi
-          python3 tools/backfill_images.py $ARGS | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/backfill_images.py $ARGS --file "$FILE_ARG" --crop "$CROP_ARG" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Keep the base44 record backups
         # base44 records are edited in place (no PR); the pre-edit copy of every
         # record touched is kept here for 90 days.
