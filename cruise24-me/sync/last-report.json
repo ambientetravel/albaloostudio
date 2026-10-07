@@ -1,13 +1,19 @@
 {
- "ran": "2026-09-27",
- "mode": "full",
- "catalogue": 2526,
- "rows": 2526,
- "sailings": 1684,
- "new": 1684,
- "updated": 0,
- "unchanged": 0,
- "expired": 0,
+ "ran": "2026-10-07",
+ "mode": "spread/7",
+ "catalogue": 2612,
+ "rows": 390,
+ "sailings": 281,
+ "new": 18,
+ "updated": 75,
+ "unchanged": 188,
+ "expired": 13,
  "vanished": 0,
- "untouched": 0
+ "untouched": 1421,
+ "stale": 0,
+ "slice": {
+  "SEA:Explora_Journeys+Silversea+Scenic_Luxury_Cruises": "16 of 108 pages, from 1",
+  "SEA:Seabourn_Cruise_Line+Regent_Seven_Seas+PONANT+Seadream+Sea_Cloud+Star_Clipper": "6 of 40 pages, from 1",
+  "RIVER:Scenic_Luxury_Cruises": "17 of 114 pages, from 1"
+ }
 }
