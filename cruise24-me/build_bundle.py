@@ -30,7 +30,7 @@ from urllib.parse import urljoin, urlparse, unquote
 HERE = Path(__file__).resolve().parent
 
 # Never shipped. Mirrors "Do not deploy" in HANDOFF.md, plus the form's server-side state.
-EXCLUDE_DIRS = {"data/sources", "sync", "media-originals", "social", "dist", "__pycache__"}
+EXCLUDE_DIRS = {"data/sources", "sync", "media-originals", "social", "dist", "deploy", "__pycache__"}
 EXCLUDE_FILES = {"data/data-checks.json", "data/sailings.json", "_v1-illustrated.html",
                  "api/config.php", "api/config.sample.php", "media/.gitkeep"}
 EXCLUDE_SUFFIX = {".py", ".md", ".pyc"}

@@ -671,9 +671,15 @@ def main() -> int:
     # ships.html and itineraries.html are redirects now (to lines.html#ships, destinations.html#itineraries)
     static = ["", "journeys.html", "destinations.html", "ports.html", "lines.html", "mice.html", "about.html",
               "journal.html", "contact.html", "conditions.html", "imprint.html", "privacy.html"]
-    urls = [f"https://cruise24.me/{p}" for p in static] + [f"https://cruise24.me/{s['url']}" for s in sailings]
+    # lastmod only where it is known: a sailing changes when its source was last synced, the
+    # generated listings with every build, the hand-written pages have no date to give. With a
+    # daily rebuild, stamping every URL with today would tell search engines all 1,700 changed.
+    built = {"", "journeys.html", "destinations.html", "ports.html"}
+    entries = [(f"https://cruise24.me/{p}", TODAY if p in built else None) for p in static] + \
+              [(f"https://cruise24.me/{s['url']}", s.get("asOf")) for s in sailings]
     out["sitemap.xml"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-                          + "".join(f"  <url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>\n" for u in urls) + "</urlset>\n")
+                          + "".join(f"  <url><loc>{u}</loc>" + (f"<lastmod>{m}</lastmod>" if m else "") + "</url>\n" for u, m in entries)
+                          + "</urlset>\n")
     for s in sailings:
         out[s["url"]] = detail(s, head, nav, foot)
     for k, text in out.items():
