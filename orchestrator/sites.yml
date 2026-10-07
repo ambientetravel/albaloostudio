@@ -456,13 +456,13 @@ sites:
       entity: Article                    # created by the owning site session (contract: _push_base44_entity)
       content_root: "/"
       publish_mode: draft
-      # The app (ambientetravel/ambiente-voyage) has NO Article entity yet, so every
-      # draft 404s after it is written and paid for. Remove this line once Alireza
-      # decides articles live here (vs Explore Orient only) and the entity exists.
-      briefs_paused: "no Article entity in the base44 app — awaiting the articles decision (6 Oct)"
+      # DECIDED by Alireza 7 Oct 2026: "Explore Orient carries all the articles now."
+      # ambientetravel gets no articles; its search demand is still banked by the
+      # scout (and the site stays in audits), but nothing is briefed or written.
+      briefs_paused: "articles live on Explore Orient only (Alireza, 7 Oct 2026)"
       # When measured gaps + seeds run dry, plan fresh topics from the offer feed
       # (agent1_seo_scout.plan_topics). 6 Oct: EO + ambientetravel briefed nothing on 4 Oct.
-      topic_planner: true
+      topic_planner: false   # no articles here (7 Oct)
     channels:
       - name: linkedin
         audience: b2b
