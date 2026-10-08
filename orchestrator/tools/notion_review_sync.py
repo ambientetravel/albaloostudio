@@ -234,6 +234,41 @@ def pr_state(pid: str) -> tuple[str, dict]:
 # with the house-rules findings on top. (Added 5 Oct 2026 after "I see no link to
 # the actual writing".)
 TEXT_MARK = "Draft text"
+# Bump to rebuild every page's text. v2 (8 Oct): photos via Commons' direct
+# thumbnail URL — Notion does not follow the Special:FilePath redirect, so v1
+# pages showed empty image boxes — and in-text images rendered as images.
+TEXT_VERSION = "v2"
+
+
+_IMG_EXT = r"\.(?:jpe?g|png|webp|tiff?|gif)"
+# A Commons file named in a credit link. Non-greedy up to the image extension, so
+# a name with brackets — "Tatev_Monastery_(28206606321).jpg" — is not cut at ")".
+_COMMONS_FILE = re.compile(r"commons\.wikimedia\.org/wiki/(File:[^\s\]\"'<>]+?" + _IMG_EXT + r")", re.I)
+_THUMBS: dict[str, str] = {}
+
+
+def commons_thumb(fname: str, width: int = 900) -> str:
+    """Direct upload.wikimedia.org thumbnail URL for a Commons file ('' if unknown).
+    Notion embeds a direct image URL; it shows an empty box for a redirect."""
+    key = f"{fname}|{width}"
+    if key not in _THUMBS:
+        import urllib.parse
+        q = urllib.parse.urlencode({"action": "query", "format": "json", "prop": "imageinfo",
+                                    "iiprop": "url", "iiurlwidth": width,
+                                    "titles": "File:" + urllib.parse.unquote(fname).replace("_", " ")})
+        code, d = _curl("GET", f"https://commons.wikimedia.org/w/api.php?{q}", ["User-Agent: albaloo-review-sync"])
+        url = ""
+        if code == 200 and isinstance(d, dict):
+            for pg in ((d.get("query") or {}).get("pages") or {}).values():
+                ii = (pg.get("imageinfo") or [{}])[0]
+                url = ii.get("thumburl") or ii.get("url") or ""
+        _THUMBS[key] = url
+    return _THUMBS[key]
+
+
+def _image(url: str, caption: str = "") -> dict:
+    return {"object": "block", "type": "image",
+            "image": {"type": "external", "external": {"url": url}, "caption": _rt(caption)}}
 
 
 _MDLINK = re.compile(r"\[([^\]]+)\]\((https?://[^)\s]+)\)")
@@ -291,6 +326,16 @@ def md_blocks(md: str) -> list[dict]:
         t = line.strip()
         if not t:
             flush(); continue
+        im = re.match(r"^!\[([^\]]*)\]\(([^)\s]+)\)\s*(.*)$", t)
+        if im:
+            # A site-relative path (/img/journal/x.jpg) is not reachable from
+            # Notion; the photo gallery at the top of the page already shows it.
+            flush()
+            if im.group(2).startswith("http"):
+                out.append(_image(im.group(2), im.group(1)))
+            if im.group(3).strip():
+                para.append(im.group(3).strip())
+            continue
         m = re.match(r"^(#{1,6})\s+(.*)", t)
         if m:
             flush()
@@ -353,15 +398,14 @@ def article_blocks(repo: str, num: int, sha: str) -> list[dict]:
     # directly (the repo copies are private and Notion cannot fetch them).
     shown: set[str] = set()
     for f in files:
-        for m in re.finditer(r"commons\.wikimedia\.org/wiki/(File:[^\s)\]\\\"']+)", f.get("patch") or ""):
+        for m in _COMMONS_FILE.finditer(f.get("patch") or ""):
             fname = m.group(1)
             if fname in shown:
                 continue
             shown.add(fname)
-            out.append({"object": "block", "type": "image", "image": {
-                "type": "external",
-                "external": {"url": f"https://commons.wikimedia.org/wiki/Special:FilePath/{fname[5:]}?width=900"},
-                "caption": _rt(f"{name_of(f)} — {fname[5:]}")}})
+            url = commons_thumb(fname[5:])
+            if url:
+                out.append(_image(url, f"{name_of(f)} — {fname[5:]}"))
     for f in files:
         name = f.get("filename", "")
         if name.endswith("articles.json"):
@@ -383,11 +427,43 @@ def name_of(f: dict) -> str:
     return f.get("filename", "").rsplit("/", 1)[-1].rsplit(".", 1)[0]
 
 
+def _heading_text(b: dict) -> str:
+    return "".join(t.get("plain_text", "") for t in (b.get(b.get("type"), {}) or {}).get("rich_text", []))
+
+
 def page_has_text(page_id: str) -> bool:
+    """True only when the page carries the CURRENT text version."""
     code, d = notion("GET", f"/blocks/{page_id}/children?page_size=10")
     return code == 200 and any(
-        TEXT_MARK in "".join(t.get("plain_text", "") for t in (b.get(b.get("type"), {}) or {}).get("rich_text", []))
+        TEXT_MARK in _heading_text(b) and f"· {TEXT_VERSION}" in _heading_text(b)
         for b in d.get("results", []))
+
+
+_BOT_ID: list[str] = []
+
+
+def clear_generated(page_id: str) -> int:
+    """Remove the blocks THIS integration wrote (an older text version), never a
+    block a person typed — those carry the person's user id in created_by."""
+    if not _BOT_ID:
+        code, me = notion("GET", "/users/me")
+        _BOT_ID.append(me.get("id", "") if code == 200 and isinstance(me, dict) else "")
+    if not _BOT_ID[0]:
+        return 0
+    removed, cursor = 0, None
+    while True:
+        code, d = notion("GET", f"/blocks/{page_id}/children?page_size=100"
+                                + (f"&start_cursor={cursor}" if cursor else ""))
+        if code != 200:
+            break
+        for b in d.get("results", []):
+            if (b.get("created_by") or {}).get("id") == _BOT_ID[0]:
+                if notion("DELETE", f"/blocks/{b['id']}")[0] == 200:
+                    removed += 1
+        if not d.get("has_more"):
+            break
+        cursor = d.get("next_cursor")
+    return removed
 
 
 def write_text(page_id: str, r: dict) -> int:
@@ -397,7 +473,9 @@ def write_text(page_id: str, r: dict) -> int:
             + [b for x in r.get("faq") or [] for b in (_blk("heading_3", x.get("q", "")), _blk("paragraph", x.get("a", "")))]
     else:
         body = article_blocks(r["repo"], r["num"], r["sha"])
-    blocks = review_blocks(r.get("review") or {}) + [_blk("heading_3", f"{TEXT_MARK} — {r['pid']}")] + body
+    clear_generated(page_id)
+    blocks = review_blocks(r.get("review") or {}) + \
+        [_blk("heading_3", f"{TEXT_MARK} — {r['pid']} · {TEXT_VERSION}")] + body
     for i in range(0, len(blocks), 90):
         code, d = notion("PATCH", f"/blocks/{page_id}/children", {"children": blocks[i:i + 90]})
         if code != 200:

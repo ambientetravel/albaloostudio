@@ -4220,5 +4220,13 @@ ok("a social post that carries the photo carries its credit; a post without a ph
    _wc.endswith("📷 Photo: ninara, CC BY-SA 2.0") and _a3.with_photo_credit("x", []) == "x"
    and _a3.with_photo_credit(_wc, [{"credit": "Photo: ninara, CC BY-SA 2.0"}]) == _wc)
 
+import notion_review_sync as _nrs
+ok("Notion review: a Commons file name with brackets is read whole, not cut at ')'",
+   [m.group(1) for m in _nrs._COMMONS_FILE.finditer("[Commons](https://commons.wikimedia.org/wiki/File:Tatev_Monastery_(28206606321).jpg)*")]
+   == ["File:Tatev_Monastery_(28206606321).jpg"])
+_mb = _nrs.md_blocks("![a](/img/journal/x.jpg)\n*Photo: A*\n\n![b](https://upload.wikimedia.org/b.jpg)\n")
+ok("Notion review: a site-relative image line is dropped (not shown as raw text), an absolute one becomes an image",
+   [b["type"] for b in _mb] == ["paragraph", "image"] and "img/journal" not in json.dumps(_mb))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
