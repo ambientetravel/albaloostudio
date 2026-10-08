@@ -4228,5 +4228,51 @@ _mb = _nrs.md_blocks("![a](/img/journal/x.jpg)\n*Photo: A*\n\n![b](https://uploa
 ok("Notion review: a site-relative image line is dropped (not shown as raw text), an absolute one becomes an image",
    [b["type"] for b in _mb] == ["paragraph", "image"] and "img/journal" not in json.dumps(_mb))
 
+# ── Needs edits → automatic revision (8 Oct) ──
+import revise_drafts as _rv
+_calls_rv = []
+def _fake_gh(method, path, body=None):
+    _calls_rv.append((method, path, body))
+    if path.endswith("/pulls/9"):
+        return 200, {"number": 9, "state": "open", "labels": [], "head": {"ref": "agent2/x", "sha": "h1"},
+                     "base": {"ref": "main"}}
+    if "/comments" in path and method == "GET":
+        return 200, []
+    if "/files" in path:
+        return 200, [{"filename": "src/content/journal/x.md"}]
+    if "/contents/" in path and method == "GET":
+        md = "---\ntitle: X\n---\n\nIntro line one.\n\nFares start from $271 on this route.\n\nClosing line.\n"
+        return 200, {"content": base64.b64encode(md.encode()).decode(), "sha": "f1"}
+    return 200, {}
+import base64
+_saved = (_rv.nrs.gh, _rv.revise_text, _rv.nrs.write_text, _rv.nrs.notion, _rv.pr_review.review_pr)
+_rv.nrs.gh, _rv.nrs.write_text = _fake_gh, (lambda *a, **k: 0)
+_rv.nrs.notion = lambda *a, **k: (200, {})
+_rv.pr_review.review_pr = lambda *a, **k: {"verdict": "PASS"}
+_row = {"page_id": "pg", "status": "Needs edits", "feedback": "Remove the fare figure.", "gate": ""}
+def _rev(text):
+    return lambda kind, cur, fb, prof, lang: {"text": text, "summary": "removed the fare"}
+_rv.revise_text = _rev("Intro line one.\n\nFares are quoted on request for this route.\n\nClosing line.\n")
+_log = []; _calls_rv.clear(); _rv.revise_pr(_row, "boutimar#9", True, _log)
+_put = [c for c in _calls_rv if c[0] == "PUT"]
+ok("Needs edits: a clean revision is committed to the PR branch with the feedback marker",
+   len(_put) == 1 and "quoted on request" in base64.b64decode(_put[0][2]["content"]).decode()
+   and any(c[0] == "POST" and _rv.marker("Remove the fare figure.") in c[2]["body"] for c in _calls_rv))
+_rv.revise_text = _rev("Intro.")
+_log = []; _calls_rv.clear(); _rv.revise_pr(_row, "boutimar#9", True, _log)
+ok("Needs edits: a revision that lost over a third of the text is refused, nothing committed",
+   not [c for c in _calls_rv if c[0] == "PUT"] and "truncated" in " ".join(_log))
+_rv.revise_text = _rev("Intro line one.\n\nThe Arabian Gulf route costs less now than before.\n\nClosing line.\n")
+_log = []; _calls_rv.clear(); _rv.revise_pr(_row, "boutimar#9", True, _log)
+ok("Needs edits: a revision that still breaks a house rule is NOT committed; the PR gets the findings",
+   not [c for c in _calls_rv if c[0] == "PUT"] and "blocked" in " ".join(_log)
+   and any(c[0] == "POST" and "not committed" in c[2]["body"] for c in _calls_rv))
+_hold = dict(_fake_gh("GET", "/repos/x/pulls/9")[1]); _hold["labels"] = [{"name": "do-not-revise"}]
+_rv.nrs.gh = lambda m, p, b=None: (200, _hold) if p.endswith("/pulls/9") else _fake_gh(m, p, b)
+_log = []; _calls_rv.clear(); _rv.revise_pr(_row, "boutimar#9", True, _log)
+ok("Needs edits: a PR labelled do-not-revise is left to people", "hold" in " ".join(_log)
+   and not [c for c in _calls_rv if c[0] in ("PUT", "POST")])
+_rv.nrs.gh, _rv.revise_text, _rv.nrs.write_text, _rv.nrs.notion, _rv.pr_review.review_pr = _saved
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

@@ -49,3 +49,21 @@ jobs:
           else
             python3 tools/notion_review_sync.py --apply | tee -a "$GITHUB_STEP_SUMMARY"
           fi
+      - name: Revise drafts marked Needs edits
+        # The reviewer's Feedback is applied to the draft on its own PR, checked by
+        # the house rules (a surviving BLOCK is not committed), and the row goes
+        # back to "To review". Each Feedback text is acted on once. tools/revise_drafts.py
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
+          GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PROSE_PROVIDER: ${{ vars.PROSE_PROVIDER || 'anthropic' }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply }}" != "true" ]; then
+            python3 tools/revise_drafts.py | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            python3 tools/revise_drafts.py --apply | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
