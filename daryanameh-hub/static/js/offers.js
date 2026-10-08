@@ -1,4 +1,4 @@
-/* کروزنامه — offers.js: refresh the offers grid from the live sailing feed, visa from /data/visa.json. */
+/* دریانامه — offers.js: refresh the offers grid from the live sailing feed, visa from /data/visa.json. */
 (async function () {
   const grid = document.getElementById('offersFull') || document.getElementById('offersHome'); if (!grid) return;
   const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);

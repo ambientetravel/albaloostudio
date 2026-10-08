@@ -9,7 +9,7 @@
       <h1 class="display ghead__t">{{ item.title }}</h1>
       {% if item.latin and item.latin != item.title %}<p class="latin">{{ item.latin }}</p>{% endif %}
       <p class="ghead__dek">{{ item.summary }}</p>
-      <p class="byline">تحریریهٔ کروزنامه{% if story.minutes %} · {{ story.minutes|fa }} دقیقه خواندن{% else %} · راهنمای کوتاه{% endif %}</p>
+      <p class="byline">تحریریهٔ دریانامه{% if story.minutes %} · {{ story.minutes|fa }} دقیقه خواندن{% else %} · راهنمای کوتاه{% endif %}</p>
       {% if item.offline %}<button class="btn btn--ghost btn--sm" data-save-offline>ذخیره برای خواندن روی کشتی</button>{% endif %}
     </div>
     {% if item.image and item.image.src %}<figure class="ghead__photo"><img src="{{ item.image.src }}" alt="{{ item.image.alt or item.title }}">{% if item.image.credit %}<figcaption>عکس: {{ item.image.credit }}</figcaption>{% endif %}</figure>
@@ -24,7 +24,7 @@
     <aside class="facts">
       <h2 class="facts__h">در یک نگاه</h2>
       <dl>{% for k in coll.facts %}{% if item.facts.get(k) %}<div><dt>{{ labels.get(k, k) }}</dt><dd>{{ item.facts[k] }}</dd></div>{% endif %}{% endfor %}</dl>
-      {% if item.facts.visa %}<p class="tiny">وضعیت ویزا طبق قاعدهٔ خانهٔ کروزنامه؛ پیش از رزرو با آژانس بررسی کنید. <a href="/visa/">ویزانامه</a></p>{% endif %}
+      {% if item.facts.visa %}<p class="tiny">وضعیت ویزا طبق قاعدهٔ خانهٔ دریانامه؛ پیش از رزرو با آژانس بررسی کنید. <a href="/visa/">ویزانامه</a></p>{% endif %}
     </aside>
   </div>
   {% if related %}

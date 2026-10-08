@@ -95,15 +95,15 @@
   },
   {
    "properties": [
-    "cruisenameh.com"
+    "daryanameh.com"
    ],
    "title": "Daryanameh Farsi cruise domain brainstorm",
    "sessionId": "session_01ATjVLDfSDHRuvSzCdEPqwc",
    "confirmed_by_user": true,
-   "note": "Alireza asked this session to brainstorm and then build the hub (6 Sep 2026). Editorial hub for all Farsi cruise properties; never sells. Renamed from داریانامه/daryanameh.com to کروزنامه/cruisenameh.com on 7 Sep 2026. Farsi-first by decision (23 Sep 2026); English exists only as a separate Substack trade wire, never a translation of the magazine.",
+   "note": "Alireza asked this session to brainstorm and then build the hub (6 Sep 2026). Editorial hub for all Farsi cruise properties; never sells. Name history: started as دریانامه/daryanameh (6 Sep 2026), renamed to کروزنامه/cruisenameh (7 Sep), renamed back to دریانامه/daryanameh.com on 8 Oct 2026 — final. Repo dir daryanameh-hub/; the git branch is still named cruisenameh-hub (PR #6). English trade wire: Daryalog. The existing live section boutimar.ir/daryanameh/ (orchestrator target) carries the same name. Farsi-first by decision (23 Sep 2026); English exists only as a separate Substack trade wire, never a translation of the magazine.",
    "platform": "static HTML + PWA, Ambiente Turizm entity, DirectAdmin",
    "repo_paths": [
-    "cruisenameh-hub/"
+    "daryanameh-hub/"
    ],
    "area_owners": {
     "_comment": "Two people share this property. Route by area, not only by property — see CLAUDE.md § Area ownership.",
@@ -111,7 +111,7 @@
      "owner": "Golbarg — Rome. Tourism Management MSc. GitHub handle not yet supplied.",
      "confirmed_by_user": true,
      "paths": [
-      "cruisenameh-hub/content/"
+      "daryanameh-hub/content/"
      ],
      "note": "Confirmed by Alireza 11 Sep 2026. Collections JSON, news/*.md, articles/*.md. Bound by the hard rules; run build.py --check before pushing."
     },
@@ -119,17 +119,17 @@
      "owner": "this session",
      "confirmed_by_user": true,
      "paths": [
-      "cruisenameh-hub/build.py",
-      "cruisenameh-hub/jalali.py",
-      "cruisenameh-hub/templates/",
-      "cruisenameh-hub/static/",
-      "cruisenameh-hub/tools/"
+      "daryanameh-hub/build.py",
+      "daryanameh-hub/jalali.py",
+      "daryanameh-hub/templates/",
+      "daryanameh-hub/static/",
+      "daryanameh-hub/tools/"
      ]
     },
     "generated": {
      "owner": "nobody — never hand-edited",
      "paths": [
-      "cruisenameh-hub/public/"
+      "daryanameh-hub/public/"
      ],
      "note": "Build output. Conflicts here are resolved by rebuilding, never by merging."
     }

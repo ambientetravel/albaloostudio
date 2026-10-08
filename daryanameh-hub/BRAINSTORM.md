@@ -1,8 +1,8 @@
-# کروزنامه — the Farsi cruise hub: brainstorm v1 (2026-09-06)
+# دریانامه — the Farsi cruise hub: brainstorm v1 (2026-09-06)
 
 Owning session: "Daryanameh Farsi cruise domain brainstorm" (session title predates the rename) (branch claude/daryanameh-farsi-cruise-0sdppb).
-Status: ideas and decisions, nothing built yet. Existing asset: 4 Farsi articles under boutimar.ir/cruisenameh/ plus the
-orchestrator pipeline (agent2_writer_listener.py) that already writes into cruisenameh/<slug>.html.
+Status: ideas and decisions, nothing built yet. Existing asset: 4 Farsi articles under boutimar.ir/daryanameh/ plus the
+orchestrator pipeline (agent2_writer_listener.py) that already writes into daryanameh/<slug>.html.
 
 ## 1. Role in the portfolio
 
@@ -22,9 +22,9 @@ a rate, date, inclusion or photo credit.
 
 ## 2. Name
 
-### Verdict: keep کروزنامه as the editorial brand. The "-nameh" family is the strongest asset you have.
+### Verdict: keep دریانامه as the editorial brand. The "-nameh" family is the strongest asset you have.
 
-Persian already has روزنامه (newspaper), سفرنامه (travelogue), شاهنامه, واژه‌نامه. کروزنامه ("sea chronicle") slots into that
+Persian already has روزنامه (newspaper), سفرنامه (travelogue), شاهنامه, واژه‌نامه. دریانامه ("sea chronicle") slots into that
 family instantly and reads as *publication*, which is exactly the positioning. It also gives you a ready-made section
 architecture that no transliterated or coined name can:
 
@@ -35,7 +35,7 @@ architecture that no transliterated or coined name can:
 - واژه‌نامه — the cruise glossary
 - ویزانامه  — visa guide for Iranian passport holders
 
-Weakness: 10 Latin letters and the spelling drifts (cruisenameh / daryaname / darianameh). Mitigate by registering the
+Weakness: 10 Latin letters and the spelling drifts (daryanameh / daryaname / darianameh). Mitigate by registering the
 variants and by always pairing the wordmark with the Persian script.
 
 ### Alternatives worth registering anyway (defensive or as the print title)
@@ -49,7 +49,7 @@ variants and by always pairing the wordmark with the Persian script.
 | daryanavard.com | دریانورد — mariner                  | strong meaning, long                                       |
 
 Availability could not be checked from this container (outbound whois/RDAP blocked by network policy). Check
-cruisenameh.com / .net / .ir plus daryagard.com and karaneh.com at the registrar before any design work.
+daryanameh.com / .net / .ir plus daryagard.com and karaneh.com at the registrar before any design work.
 
 ## 3. Benchmarks and what to take from each
 
@@ -88,7 +88,7 @@ Evergreen data pages first, stories second. Data pages are what search engines s
 11. ناخدا پاسخ می‌دهد — ask-the-captain column; later a column by Iranian crew members.
 12. Reviews — Iranian passengers rate ships; short structured form, not free text.
 13. Directory — «ایران‌پسند» badge for Iranian-friendly services near ports and in home-port cities.
-14. Video/podcast — کروزنامه TV on YouTube and Telegram; short ship walk-throughs dubbed in Farsi.
+14. Video/podcast — دریانامه TV on YouTube and Telegram; short ship walk-throughs dubbed in Farsi.
 15. Events — diaspora "cruise nights" in Toronto, Vancouver, LA, Dubai, Hamburg, Istanbul, run with the sales sites.
 
 ## 5. Channels and cadence
@@ -142,10 +142,10 @@ Advertiser mix to target (in this order)
 ## 7. Technology, reusing what exists
 
 - Same static-HTML + DirectAdmin stack as boutimar.ir / cruise24.ir, so the same deploy bundle process.
-- The orchestrator already targets cruisenameh/<slug>.html. Add the hub as a new site profile with its own base_url;
+- The orchestrator already targets daryanameh/<slug>.html. Add the hub as a new site profile with its own base_url;
   the hub becomes canonical, the three sales sites show excerpts with canonical links back (no duplicate content).
 - Every page emits RSS/JSON feed. Zernio/Zapier consume the feed for Telegram; nitrosend composes the weekly digest
-  from the same feed; the sales sites embed a "تازه‌های کروزنامه" widget from it.
+  from the same feed; the sales sites embed a "تازه‌های دریانامه" widget from it.
 - Data pages (ships, ports) as JSON that both the hub and boutimar's embed widget can read.
 - Search: Pagefind (static). Ads: a JSON rotation first; Revive Adserver self-hosted only when there are 20+ paying
   advertisers.
@@ -162,7 +162,7 @@ Day 91      First invoices.
 
 ## 9. Assumptions I made
 
-- You keep کروزنامه as the name; alternatives are defensive registrations or the print title.
+- You keep دریانامه as the name; alternatives are defensive registrations or the print title.
 - The hub is hosted under Ambiente, not Boutimar, so it can take card payments from outside Iran.
 - Farsi only; a Latin wordmark for the logo but no English content.
 - The three existing sites keep their roles; nothing is merged.

@@ -13,8 +13,8 @@
     <p class="srcline">منبع: {% if item.source_url %}<a class="link" href="{{ item.source_url }}" rel="nofollow noopener" target="_blank">{{ item.source }}</a>{% else %}{{ item.source }}{% endif %}</p>
 
     {% if related %}
-    <nav class="related" aria-label="در کروزنامه">
-      <h2 class="display--sm">در کروزنامه</h2>
+    <nav class="related" aria-label="در دریانامه">
+      <h2 class="display--sm">در دریانامه</h2>
       <div class="related__row">{% for r in related %}<a class="chip" href="{{ r.href }}"><small>{{ r.kicker }}</small>{{ r.title }}</a>{% endfor %}</div>
     </nav>
     {% endif %}

@@ -73,16 +73,16 @@ done — not a request for the other session to go and do the task.
 ### Area ownership — when two people share one property
 
 Session routing answers *which session owns a site*. It does not answer *which
-person owns which part of it*, and on **cruisenameh** two people now do. Route by
+person owns which part of it*, and on **daryanameh** two people now do. Route by
 area as well as by property.
 
-**cruisenameh.com — کروزنامه**
+**daryanameh.com — دریانامه**
 
 | Area | Owner | Files |
 |------|-------|-------|
-| Content and editorial | **Golbarg** — Rome (GitHub handle: not yet supplied) | `cruisenameh-hub/content/**` — the collection JSON, `content/news/*.md`, `content/articles/*.md` |
+| Content and editorial | **Golbarg** — Rome (GitHub handle: not yet supplied) | `daryanameh-hub/content/**` — the collection JSON, `content/news/*.md`, `content/articles/*.md` |
 | Build, templates, deploy | This session | `build.py`, `jalali.py`, `templates/`, `static/`, `tools/` |
-| Generated output | Nobody | `cruisenameh-hub/public/` |
+| Generated output | Nobody | `daryanameh-hub/public/` |
 
 Three rules make that split hold:
 
@@ -103,7 +103,7 @@ Three rules make that split hold:
   worked around.
 
 If the content owner runs her own Claude session, that session owns the content
-area of cruisenameh and this one keeps build and deploy. Two sessions on one
+area of daryanameh and this one keeps build and deploy. Two sessions on one
 property is fine **only** with the area split above written into both; without it
 they will both think they own the whole site.
 

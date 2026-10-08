@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title %}راهنماها · {{ site.brand.fa }}{% endblock %}
-{% block description %}کتابخانهٔ مرجع کروزنامه: بندرها، کشتی‌ها، خطوط، رودخانه‌ها، میراث جهانی، ویزا و واژه‌ها.{% endblock %}
+{% block description %}کتابخانهٔ مرجع دریانامه: بندرها، کشتی‌ها، خطوط، رودخانه‌ها، میراث جهانی، ویزا و واژه‌ها.{% endblock %}
 {% block content %}
 <header class="dhead"><div class="wrap">
-  <p class="kicker"><a href="/journal/">مجلهٔ کروزنامه</a> · مرجع</p>
+  <p class="kicker"><a href="/journal/">مجلهٔ دریانامه</a> · مرجع</p>
   <h1 class="dhead__t">کتابخانهٔ راهنما</h1>
-  <p class="lede">پشت هر داستان کروزنامه یک مدخل مرجع هست: بندر، کشتی، رودخانه. این‌ها همان مدخل‌ها هستند، مرتب و کامل.</p>
+  <p class="lede">پشت هر داستان دریانامه یک مدخل مرجع هست: بندر، کشتی، رودخانه. این‌ها همان مدخل‌ها هستند، مرتب و کامل.</p>
 </div></header>
 <section class="sec sec--tight"><div class="wrap">
   {% for d in depts %}{% set gs = guides|selectattr('dept','equalto',d.slug)|list %}{% if gs %}

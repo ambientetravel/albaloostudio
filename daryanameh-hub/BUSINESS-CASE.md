@@ -1,4 +1,4 @@
-# کروزنامه — business case v1 (2026-09-06)
+# دریانامه — business case v1 (2026-09-06)
 
 Companion to BRAINSTORM.md. All numbers are estimates from comparable niche media, not measurements.
 Entity: Ambiente Turizm (Kuşadası, Türkiye). Currency EUR. v1.1: legal section rewritten for Turkish law;
@@ -14,7 +14,7 @@ It pays back three ways, in this order of certainty:
 3. Magazine subscriptions / paid membership (small, treat as print cost recovery).
 
 Kill-or-continue check at month 6, three numbers: newsletter >= 1,500 subscribers, >= 6 paying advertisers,
->= 5 referred bookings per month. Two of three missed -> fold back into boutimar.ir/cruisenameh, keep Telegram only.
+>= 5 referred bookings per month. Two of three missed -> fold back into boutimar.ir/daryanameh, keep Telegram only.
 
 ## 2. Reach and revenue, base case (conservative / upside in brackets)
 
@@ -87,7 +87,7 @@ Steps before issue 1 (all in Kuşadası)
    owner, sorumlu müdür. In Persian and Turkish.
 4. Teslim (Art. 10): two copies of every issue delivered to the Başsavcılık on publication day.
 5. ISSN from Milli Kütüphane (free, online).
-6. Trademark «کروزنامه» / CRUISENAMEH at TÜRKPATENT (classes 16, 35, 41; ~€100–200), then EUIPO when European
+6. Trademark «دریانامه» / DARYANAMEH at TÜRKPATENT (classes 16, 35, 41; ~€100–200), then EUIPO when European
    advertisers matter.
 7. Website/app: publish the Law 5651 contact info block. Registration as "internet haber sitesi" under the 2022
    amendment is optional and not needed for an editorial cruise site.
@@ -114,9 +114,9 @@ Everything outside Iran
 
 ## 5. What it is called
 
-Public: «کروزنامه» + descriptor «رسانهٔ فارسی‌زبان کروز و سفر دریایی».
+Public: «دریانامه» + descriptor «رسانهٔ فارسی‌زبان کروز و سفر دریایی».
 Slogan (ALEPH pattern): «نخستین رسانهٔ فارسی‌زبان کروز» / "The first Persian-language cruise media platform".
-Künye line: «کروزنامه» — Ambiente Turizm Seyahat Acentası yayınıdır, Kuşadası. Sorumlu müdür: [name].
+Künye line: «دریانامه» — Ambiente Turizm Seyahat Acentası yayınıdır, Kuşadası. Sorumlu müdür: [name].
 Call it a media platform, never just a magazine: web + newsletter + Telegram + podcast + quarterly print + app.
 
 ## 6. Podcast (AI, two hosts, Farsi, bi-weekly)
@@ -125,7 +125,7 @@ Call it a media platform, never just a magazine: web + newsletter + Telegram + p
   and a scripted route: Claude writes the script from that fortnight's published articles (facts already reviewed),
   ElevenLabs v3 renders two fixed Persian voices, 15–20 minutes. Use the scripted route: visa or rate errors in
   audio cannot be quietly corrected.
-- Name: «رادیو کروزنامه» (or «گفت‌وگوی عرشه», Deck Talk). Two named AI hosts, disclosed in the intro.
+- Name: «رادیو دریانامه» (or «گفت‌وگوی عرشه», Deck Talk). Two named AI hosts, disclosed in the intro.
 - Cost ~30–60 / month. Distribution: Castbox first (dominant among Iranians), Spotify, Apple, YouTube, Telegram.
 - Value is credibility and 6–8 short clips per episode for Telegram, not direct revenue.
 

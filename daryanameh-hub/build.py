@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""کروزنامه — static generator for the Farsi cruise hub + PWA.
+"""دریانامه — static generator for the Farsi cruise hub + PWA.
 
 Owner: Alireza Mozaffari · Ambiente Turizm, Kuşadası
 Architecture credit: Albaloo Studio — albaloostudio.com
@@ -79,7 +79,7 @@ def build_voyage(ports: list[dict]) -> dict:
     return {"stops": stops, "segs": segs}
 
 # ── The magazine ────────────────────────────────────────────────────────────
-# Cruisenameh is edited as a magazine, not browsed as a catalogue. Every page is a
+# Daryanameh is edited as a magazine, not browsed as a catalogue. Every page is a
 # story in one of four departments; the collections (ports, ships, …) are the guide
 # desk behind them. Department words live in site.json; which collection feeds which
 # department is structure, and lives here.
@@ -92,7 +92,7 @@ DEPT_OF_COLLECTION = {
 # Articles belong to editorial sections (روایت، گزارش، یادداشت …), set by `section:` in
 # their front matter; older pieces without it are placed by their kicker.
 SECTION_OF_KICKER = {"سرمقاله": "notes", "مدرسهٔ کروز": "school"}
-BYLINE = "تحریریهٔ کروزنامه"
+BYLINE = "تحریریهٔ دریانامه"
 WORDS_PER_MINUTE = 180  # Persian prose, read on a phone
 
 def read_minutes(text: str) -> int:
@@ -426,7 +426,7 @@ def build(check_only=False):
     (PUBLIC/"news").mkdir(parents=True, exist_ok=True)
     (PUBLIC/"news"/"feed.json").write_text(json.dumps(
         {"title": f"{site['brand']['fa']} · اخبار", "home": dom, "updated": built,
-         "terms": "نقل با ذکر نام کروزنامه و پیوند به صفحهٔ اصلی خبر آزاد است.",
+         "terms": "نقل با ذکر نام دریانامه و پیوند به صفحهٔ اصلی خبر آزاد است.",
          "items": feed_items}, ensure_ascii=False, indent=1), encoding="utf-8")
     rss = ["<?xml version='1.0' encoding='UTF-8'?>",
            "<rss version='2.0'><channel>",

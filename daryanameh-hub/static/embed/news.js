@@ -1,11 +1,11 @@
-/* کروزنامه — news column embed for partner sites.
+/* دریانامه — news column embed for partner sites.
  *
  * Attributed syndication, deliberately NOT the white-label offers widget: this one
- * carries the کروزنامه name, because a wire item is worth nothing without whose fact
+ * carries the دریانامه name, because a wire item is worth nothing without whose fact
  * it is. Teasers only, every headline links home — the canonical copy stays on
- * cruisenameh.com so search engines never have to choose between us and a partner.
+ * daryanameh.com so search engines never have to choose between us and a partner.
  *
- *   <script src="https://cruisenameh.com/embed/news.js" data-count="5"></script>
+ *   <script src="https://daryanameh.com/embed/news.js" data-count="5"></script>
  *
  * Optional attributes: data-count (1-10, default 5), data-category, data-theme
  * ("light" | "dark"), data-title. No cookies, no tracking, no dependencies.
@@ -54,7 +54,7 @@
         '</ul>' +
         '<p style="margin:.7rem 0 0;font-size:.72rem;color:' + muted + '">' +
         '<a href="' + ORIGIN + '/news/" target="_blank" rel="noopener" style="color:inherit">' +
-        'به نقل از کروزنامه</a></p>';
+        'به نقل از دریانامه</a></p>';
     })
     .catch(function () { box.remove(); });
 })();

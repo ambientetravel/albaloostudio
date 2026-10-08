@@ -1,4 +1,4 @@
-/* کروزنامه — story.js: the homepage, told by scroll.
+/* دریانامه — story.js: the homepage, told by scroll.
 
    One loop, no library. Scroll sets a target; the hero camera eases toward it so a
    flick of the wheel reads as a camera move, not a jump cut. Every other section

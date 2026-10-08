@@ -1,4 +1,4 @@
-# کروزنامه hub — handoff
+# دریانامه hub — handoff
 
 Owner: Alireza Mozaffari · Ambiente Turizm, Kuşadası. Architecture credit: Albaloo Studio — albaloostudio.com.
 Owning session: "Daryanameh Farsi cruise domain brainstorm" (session title predates the rename) (see `.claude/session-routing.json`).
@@ -7,7 +7,9 @@ Owning session: "Daryanameh Farsi cruise domain brainstorm" (session title preda
 
 A static Farsi cruise media site plus PWA, generated from JSON content.
 
-**Editorial position, decided 23 Sep 2026.** Cruisenameh is Farsi-first and stays that way. Most
+**Name, decided 8 Oct 2026: «دریانامه» / Daryanameh — final.** Descriptor keeps the search word: «رسانهٔ فارسی‌زبان کروز و سفر دریایی». The English Substack trade wire is **Daryalog** (a ship's log; "from the publishers of Daryanameh"). Domain: daryanameh.com (not yet registered). Telegram: t.me/daryanameh (placeholder; neither handle resolves to a channel yet). The git branch is still called `cruisenameh-hub`; the directory is `daryanameh-hub/`.
+
+**Editorial position, decided 23 Sep 2026.** Daryanameh is Farsi-first and stays that way. Most
 Iranian magazines that reach abroad publish in English for a different reader — Aleph in Canada, Trend
 for the elite inside Iran. This one goes the other way: the cruise, sea and river subject treated in a
 purely Persian manner, with as much content in Farsi as can be made. English exists in the project only
@@ -21,8 +23,8 @@ boutimar.ir (flat HTML on DirectAdmin), so the same deploy process.
     python3 build.py --check   # house rules: «خلیج فارس», no "visa-free" on easy-visa ports
     node tools/shots.mjs out/  # icons, screenshots through the scroll film, real offline test
 
-Deploy: upload the contents of `public/` to the document root of cruisenameh.com. Nothing else. Verify with
-`curl -sI https://cruisenameh.com/manifest.webmanifest` (200) and `curl -sI .../sw.js` (200, served from root).
+Deploy: upload the contents of `public/` to the document root of daryanameh.com. Nothing else. Verify with
+`curl -sI https://daryanameh.com/manifest.webmanifest` (200) and `curl -sI .../sw.js` (200, served from root).
 
 ## Adding content — this is the "where do I insert" answer
 
@@ -108,7 +110,7 @@ Built at every build, no server involved:
 - `/news/feed.xml` — the same as RSS
 - `/embed/news.js` — a drop-in column for a partner site:
 
-      <script src="https://cruisenameh.com/embed/news.js" data-count="5"></script>
+      <script src="https://daryanameh.com/embed/news.js" data-count="5"></script>
 
   Optional: `data-category`, `data-theme="dark"`, `data-title`. No cookies, no dependencies.
 
@@ -118,7 +120,7 @@ a stale rate republished on someone else's site under our name is the one mistak
 masthead cannot absorb.
 
 This is *not* the offers widget. That one is white-label because it runs as the agency; this
-one carries the کروزنامه name, because a wire item is worth nothing without attribution.
+one carries the دریانامه name, because a wire item is worth nothing without attribution.
 Keep them in separate files so nobody merges them.
 
 ## Dates — both calendars, always
@@ -160,7 +162,7 @@ Home Screen; Android prompts. Store wrappers (Capacitor, Cafe Bazaar, Myket) are
 
 - Port/article photographs. Only the four hero scenes exist (AI-generated, credited); everything else is a colour field until licensed photos exist.
 - Newsletter form posts nowhere yet (`site.json` → `channels.newsletter_action`); wire to nitrosend.
-- Telegram link is a placeholder handle (`t.me/cruisenameh`) until the channel exists.
+- Telegram link is a placeholder handle (`t.me/daryanameh`) until the channel exists.
 - Podcast section says «به‌زودی».
 - News is three seed items only; the desk needs 3–6 a week to do its job.
 - No Jalali date *input* — front matter dates are ISO Gregorian and converted for display.

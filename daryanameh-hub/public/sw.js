@@ -1,4 +1,4 @@
-/* کروزنامه service worker: shell precache, stale-while-revalidate pages, saved pages for offline reading. */
+/* دریانامه service worker: shell precache, stale-while-revalidate pages, saved pages for offline reading. */
 const VERSION_URL = '/precache.json'; let CACHE = 'dn-shell';
 self.addEventListener('install', e => { e.waitUntil((async () => { const m = await fetch(VERSION_URL).then(r => r.json()).catch(() => null); if (m) { CACHE = 'dn-' + m.version; const c = await caches.open(CACHE); await Promise.allSettled(m.shell.map(u => c.add(u))); } self.skipWaiting(); })()); });
 self.addEventListener('activate', e => { e.waitUntil((async () => { const keys = await caches.keys(); await Promise.all(keys.filter(k => k.startsWith('dn-') && k !== CACHE && k !== 'dn-saved').map(k => caches.delete(k))); self.clients.claim(); })()); });

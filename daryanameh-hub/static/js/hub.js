@@ -1,4 +1,4 @@
-/* کروزنامه — hub.js: nav, reveals, did-you-know, filter, search. */
+/* دریانامه — hub.js: nav, reveals, did-you-know, filter, search. */
 (function () {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
