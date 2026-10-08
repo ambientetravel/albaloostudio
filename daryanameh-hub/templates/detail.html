@@ -19,6 +19,7 @@
     <div class="detail__body">
       {% for p in item.body %}<p>{{ p }}</p>{% endfor %}
       {% if item.cta %}<a class="btn btn--ink" href="{{ item.cta.href }}">{{ item.cta.label }}</a>{% endif %}
+      {% if item.source %}<p class="srcline">منبع رقم‌ها: {{ item.source }}</p>{% endif %}
       {% if item.didyouknow %}<aside class="dyk-inline"><p class="kicker">می‌دانستید؟</p><p>{{ item.didyouknow }}</p></aside>{% endif %}
     </div>
     <aside class="facts">

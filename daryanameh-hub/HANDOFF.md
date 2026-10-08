@@ -7,6 +7,8 @@ Owning session: "Daryanameh Farsi cruise domain brainstorm" (session title preda
 
 A static Farsi cruise media site plus PWA, generated from JSON content.
 
+**Scope, decided 8 Oct 2026: a magazine of the waters, not of the cruise industry.** Sections are topics — اقیانوس‌ها و دریاها · قطب‌ها · رودها · سفر دریایی · گفت‌وگو · یادداشت · مدرسهٔ کروز — and cruising is one of them. The atlas (`content/atlas.json`, 16 entries: 5 oceans, 5 seas, Antarctica, 5 rivers) carries numbers with a `source:` line each; keep that discipline. Facts were taken from English Wikipedia on 8 Oct 2026; where sources disagree (Nile and Amazon length, Pacific area) the entry gives a range, not a pick.
+
 **Name, decided 8 Oct 2026: «دریانامه» / Daryanameh — final.** Descriptor keeps the search word: «رسانهٔ فارسی‌زبان کروز و سفر دریایی». The English Substack trade wire is **Daryalog** (a ship's log; "from the publishers of Daryanameh"). Domain: daryanameh.com (not yet registered). Telegram: t.me/daryanameh (placeholder — whether the handle is free is unverified: t.me was unreachable from the build container; check and claim it before launch). The git branch is still called `cruisenameh-hub`; the directory is `daryanameh-hub/`.
 
 **Editorial position, decided 23 Sep 2026.** Daryanameh is Farsi-first and stays that way. Most

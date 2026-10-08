@@ -4,23 +4,33 @@
  "label": "پیش‌شماره",
  "season": "پاییز ۱۴۰۵",
  "cover": {
-  "story": "journal/istanbul-az-eskele-ta-kabin",
-  "image": "img/scene-quay.webp",
-  "image_alt": "مسافران روی اسکلهٔ گالاتاپورت، زیر بدنهٔ کشتی",
-  "credit": "تصویر جلد تولیدشده با هوش مصنوعی (Higgsfield)"
+  "story": "journal/panj-oqyanus",
+  "image": "img/cover-oceans.svg",
+  "image_alt": "طرح جلد: خطوط ژرفای اقیانوس",
+  "credit": "طرح جلد: دریانامه"
  },
  "editorial": "journal/chera-daryanameh",
  "dossier": {
-  "title": "از کجا سوار شویم؟",
-  "dek": "بندر مبدأ نخستین تصمیمِ سفر است و کمتر از همه دربارهٔ آن فکر می‌شود. استانبول بی‌ویزاست، دبی ویزای آسان دارد، و هیچ‌کدام به‌تنهایی تعیین نمی‌کنند گذرنامه‌تان چه می‌خواهد.",
-  "stories": ["journal/istanbul-az-eskele-ta-kabin", "journal/dubai-zemestan", "journal/avalin-cruise-visa"]
+  "title": "آب‌های جهان",
+  "dek": "دریانامه از آب شروع می‌کند، نه از کشتی. پنج اقیانوس، دو قطب، دریای کم‌عمقِ خودمان، و رودی که هنوز کشتی را می‌برد.",
+  "stories": [
+   "journal/panj-oqyanus",
+   "journal/do-qotb",
+   "journal/khalij-fars-kamoq",
+   "journal/karun-arvand"
+  ]
  },
  "contents": [
   "journal/chera-daryanameh",
+  "journal/panj-oqyanus",
+  "journal/do-qotb",
+  "journal/khalij-fars-kamoq",
+  "journal/karun-arvand",
+  "journal/amudarya-aral",
   "journal/istanbul-az-eskele-ta-kabin",
   "journal/dubai-zemestan",
-  "journal/avalin-cruise-visa",
-  "journal/kusadasi-bandar-shahr"
+  "journal/kusadasi-bandar-shahr",
+  "journal/avalin-cruise-visa"
  ],
  "word": "بندر مبدأ (Home port / Embarkation port)",
  "next": "شمارهٔ نخست: نوروز ۱۴۰۶"

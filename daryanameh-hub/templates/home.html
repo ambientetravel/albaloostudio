@@ -64,7 +64,7 @@
    <p class="dos__d">{{ dos.dek }}</p>
   </header>
   {% set lead = dos.stories[0] %}
-  <article class="dos__lead st" data-i="1">
+  <article class="dos__lead{% if not lead.image %} dos__lead--text{% endif %} st" data-i="1">
    <a href="{{ lead.href }}">
     {% if lead.image %}<figure class="dos__img"><img src="{{ lead.image.src }}" alt="{{ lead.image.alt }}" loading="lazy" decoding="async" width="1600" height="900"></figure>{% endif %}
     <p class="dos__s">{{ lead.dept_label }}</p>
@@ -85,7 +85,28 @@
   </div>
  </div>
 </section>
-{% include "_voyage.html" %}
+{% endif %}
+
+{% if oceans %}
+<section class="oc" id="oceans-compared" data-story="oc" aria-labelledby="och">
+ <div class="wrap">
+  <header class="oc__head st">
+   <p class="dos__k">اطلس · یک نگاه</p>
+   <h2 class="oc__t" id="och">پنج اقیانوس، کنار هم</h2>
+   <p class="oc__d">نوار آبی، پهنه؛ نوار طلایی، بیشترین ژرفا. اقیانوس آرام به‌تنهایی نزدیک به نیمِ آب‌های زمین است و ژرف‌ترین نقطهٔ سیاره را هم دارد.</p>
+  </header>
+  <ol class="oc__list">
+   {% for o in oceans %}
+   <li class="oc__row st" data-i="{{ loop.index0 }}" style="--aw:{{ o.aw }};--dw:{{ o.dw }}">
+    <a href="/atlas/{{ o.slug }}/" class="oc__name">{{ o.title }}</a>
+    <span class="oc__bars" aria-hidden="true"><span class="oc__area"></span><span class="oc__depth"></span></span>
+    <span class="oc__num"><span>{{ o.area_fa }}</span><span>ژرفا: {{ o.depth_fa }}</span></span>
+   </li>
+   {% endfor %}
+  </ol>
+  <p class="oc__src">رقم‌ها: ویکی‌پدیای انگلیسی (Ocean و مقاله‌های هر اقیانوس)، ۸ اکتبر ۲۰۲۶. <a class="more" href="/atlas/">اطلس آب‌ها</a></p>
+ </div>
+</section>
 {% endif %}
 
 {% if issue.rest %}
@@ -103,6 +124,8 @@
  </div>
 </section>
 {% endif %}
+
+{% include "_voyage.html" %}
 
 <section class="cols" data-story="cols" aria-label="ستون‌ها">
  <div class="wrap cols__in">

@@ -44,6 +44,11 @@ FACT_LABELS = {
     "classic_route": "مسیر کلاسیک", "dock": "اسکله", "port": "بندر", "duration": "مدت", "type": "نوع",
     "distance": "فاصله", "inscribed": "سال ثبت", "nearest_port": "نزدیک‌ترین بندر", "chain": "زنجیره",
     "city": "شهر", "near_port": "تا بندر", "opened": "افتتاح", "era": "دوره", "status": "وضعیت",
+    # the atlas of waters
+    "kind": "گونه", "area": "مساحت", "length": "درازا", "share": "سهم از آب‌های زمین", "max_depth": "بیشترین ژرفا",
+    "deepest": "ژرف‌ترین نقطه", "width": "پهنا", "salinity": "شوری", "discharge": "آبدهی", "basin": "حوضه",
+    "source_river": "سرچشمه", "mouth": "دهانه", "ice": "یخ", "coldest": "سردترین دمای ثبت‌شده", "treaty": "پیمان",
+    "borders": "کشورهای کرانه",
 }
 VISA_LABEL = {"schengen": "شینگن", "hard": "ویزای دشوار (آمریکا/بریتانیا/کانادا)", "easy": "ویزای آسان",
               "free": "بدون ویزا", "unknown": "نیازمند بررسی"}
@@ -84,6 +89,7 @@ def build_voyage(ports: list[dict]) -> dict:
 # desk behind them. Department words live in site.json; which collection feeds which
 # department is structure, and lives here.
 DEPT_OF_COLLECTION = {
+    "atlas": "waters",
     "ports": "destinations", "river-ports": "destinations", "unesco": "destinations",
     "landmarks": "destinations", "excursions": "destinations", "hotels": "destinations",
     "rivers": "journeys", "gatherings": "journeys",
@@ -373,9 +379,16 @@ def build(check_only=False):
               colls=[g for g in base["guides"] if g["dept"] == d["slug"]])
     write("guides/index.html", "guides.html")
     issue = resolve_issue(load_issue(), stories, glossary)
+    oceans = [it for it in data.get("atlas", []) if it.get("nums")]
+    if oceans:
+        amax, dmax = max(o["nums"]["area"] for o in oceans), max(o["nums"]["depth"] for o in oceans)
+        oceans = [{"slug": o["slug"], "title": o["title"], "area": o["nums"]["area"], "depth": o["nums"]["depth"],
+                   "aw": round(100 * o["nums"]["area"] / amax, 1), "dw": round(100 * o["nums"]["depth"] / dmax, 1),
+                   "area_fa": o["facts"].get("share", ""), "depth_fa": o["facts"].get("max_depth", ""),
+                   "deepest": o["facts"].get("deepest", "")} for o in oceans]
     for sec in base["sections"]:
         write(f"{sec['slug']}/index.html", "section.html", sec=sec, stories=[x for x in editorial_stories if x["dept"] == sec["slug"]])
-    write("index.html", "home.html", featured=featured, voyage=build_voyage(data["ports"]), cover=cover, issue=issue,
+    write("index.html", "home.html", featured=featured, voyage=build_voyage(data["ports"]), cover=cover, issue=issue, oceans=oceans,
           stories=stories, by_dept=by_dept, didyouknow=didyouknow, offers=offers[:4],
           feed_status=feed_status, articles=articles[:3], gatherings=data["gatherings"][:3], news=news[:6])
     for c in collections:
@@ -488,6 +501,17 @@ def check():
     # Every editor's pick must name a page that exists: a typo would silently drop it.
     real = {f"journal/{a['slug']}" for a in load_articles()} | {f"{c['slug']}/{it['slug']}" for c in load("collections") for it in load(c["slug"])}
     bad += check_issue(load_issue(), real, {g["term"] for g in load("glossary")})
+    # Every article must sit in a section that exists, and every menu link must reach a page:
+    # a misspelt `section:` silently left /rivers-stories/ unbuilt while the menu pointed at it.
+    site = load("site"); secs = {x["slug"] for x in site.get("sections", [])}
+    arts = load_articles(); used = set()
+    for a in arts:
+        sec = a.get("section") or SECTION_OF_KICKER.get(a.get("kicker", ""), "features")
+        used.add(sec)
+        if sec not in secs: print("SECTION: unknown section", repr(sec), "in content/articles/" + a["slug"] + ".md"); bad += 1
+    pages = used | {c["slug"] for c in load("collections")} | {d["slug"] for d in site.get("departments", [])} | {"news", "journal", "guides", "visa", "glossary", "offers", "policy", ""}
+    for n in site.get("nav", []):
+        if n["href"].strip("/").split("/")[0] not in pages: print("NAV: menu link to a page that is not built:", n["href"]); bad += 1
     for p in load_picks():
         if p["story"].strip().strip("/") not in real: print("PICK: no such story:", p["story"], "in content/picks.json"); bad += 1
     for it in load("ports"):

@@ -673,3 +673,34 @@ html:not(.js) .chips,html:not(.js) [data-more]{display:none}
 .lf__back{display:flex;gap:1.4rem;margin:0}
 .hero__cue{margin:.6rem 0 0;font-size:.86rem;color:var(--champagne)}
 .lf--film .hero__copy--b{bottom:clamp(2rem,8vh,5rem)}
+
+/* ═══ THE WATERS — oceans, poles, rivers ═══════════════════════════════════ */
+.cover--waters,.cover--oceans{--c1:#123a5c;--c2:#0b2a45;--ac:#9cc3df}
+.cover--polar{--c1:#dfe9ef;--c2:#c7d8e2;--ac:#ffffff;color:#0b1220}
+.cover--polar::after{background:repeating-linear-gradient(180deg,transparent 0 11px,rgba(11,18,32,.06) 11px 12px),var(--c2)}
+.cover--rivers-stories{--c1:#3d5a3a;--c2:#2c4430;--ac:#d9c27a}
+.cover--voyages{--c1:#1d3b5c;--c2:#16304c;--ac:#e6c688}
+.icov__img[src$=".svg"]{object-position:50% 50%}
+
+.oc{padding:clamp(3.5rem,8vw,6rem) 0;background:#0e2a44;color:var(--ivory)}
+.oc__head{max-width:760px;margin-bottom:clamp(1.8rem,4vw,2.8rem)}
+.oc__t{margin:0 0 .6rem;font-family:var(--display);font-weight:700;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1.15}
+.oc__d{margin:0;color:rgba(245,240,231,.75);line-height:1.95;max-width:58ch}
+.oc__list{list-style:none;margin:0;padding:0;border-top:1px solid rgba(245,240,231,.25)}
+.oc__row{display:grid;grid-template-columns:11rem minmax(0,1fr) 14rem;gap:1rem 1.6rem;align-items:center;padding:1rem 0;border-bottom:1px solid rgba(245,240,231,.12)}
+.oc__name{font-family:var(--display);font-weight:700;font-size:1.2rem;border-bottom:1px solid transparent;justify-self:start}
+.oc__name:hover{border-color:var(--champagne)}
+.oc__bars{display:flex;flex-direction:column;gap:5px}
+.oc__area,.oc__depth{display:block;height:12px;border-radius:2px;transform-origin:right}
+.oc__area{width:calc(var(--aw) * 1%);background:#9cc3df}
+.oc__depth{width:calc(var(--dw) * 1%);background:repeating-linear-gradient(90deg,#c9a96a 0 6px,rgba(201,169,106,.55) 6px 8px);height:8px}
+.js-story [data-story] .oc__row .oc__area,.js-story [data-story] .oc__row .oc__depth{transform:scaleX(var(--e,1))}
+.oc__num{display:flex;flex-direction:column;font-size:.8rem;color:rgba(245,240,231,.75);line-height:1.6}
+.oc__src{margin:1.2rem 0 0;font-size:.76rem;color:rgba(245,240,231,.5);display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:baseline}
+.oc__src .more{color:var(--ivory)}
+@media (max-width:760px){.oc__row{grid-template-columns:1fr;gap:.5rem}.oc__num{flex-direction:row;gap:1rem}}
+.srcline{margin:2.4rem 0 0;padding-top:1rem;border-top:1px solid var(--line);font-size:.82rem;color:var(--muted)}
+.dos__lead--text a{grid-template-columns:1fr;grid-template-areas:"s" "h" "dek" "m";max-width:880px;margin-inline:auto;text-align:center}
+.dos__lead--text .dos__h{font-size:clamp(2.2rem,5vw,3.8rem)} .dos__lead--text .dos__dek{max-width:60ch;margin-inline:auto;font-size:1.1rem}
+.dos__cols:has(> :nth-child(3)){grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:800px){.dos__cols:has(> :nth-child(3)){grid-template-columns:1fr}}

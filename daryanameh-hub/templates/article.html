@@ -25,7 +25,7 @@
   {% endif %}
 
   <div class="lf__body">
-    <div class="wrap wrap--narrow prose prose--lf">{{ article.html|safe }}</div>
+    <div class="wrap wrap--narrow prose prose--lf">{{ article.html|safe }}{% if article.source %}<p class="srcline">منبع رقم‌ها: {{ article.source }}</p>{% endif %}</div>
   </div>
 
   <footer class="lf__end wrap wrap--narrow">
