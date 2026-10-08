@@ -6,17 +6,17 @@
 {% block content %}
 <header class="jhead"><div class="wrap">
   <p class="kicker">{{ site.brand.descriptor_fa }}</p>
-  <h1 class="jhead__t">مجلهٔ کروزنامه</h1>
+  <h1 class="jhead__t">آرشیو کروزنامه</h1>
   <p class="lede">دریا به روایت فارسی: هر بندر، هر کشتی و هر مسیر، با یک پرسش ثابت — برای گذرنامهٔ ایرانی چه معنایی دارد؟</p>
 </div></header>
-<section class="jcover"><div class="wrap">{{ S.card(cover, 'lead') }}</div></section>
+
 <section class="sec sec--tight" id="all"><div class="wrap">
   <div class="chips" role="tablist" aria-label="بخش‌ها" data-chips="#stories">
     <button class="chip2 is-on" data-f="" role="tab" aria-selected="true">همه <small>{{ stories|length|fa }}</small></button>
     {% if picks %}<button class="chip2 chip2--pick" data-f="picks" role="tab" aria-selected="false">برگزیدهٔ سردبیر <small>{{ picks|length|fa }}</small></button>{% endif %}
-    {% for d in depts %}<button class="chip2" data-f="{{ d.slug }}" role="tab" aria-selected="false">{{ d.label }} <small>{{ stories|selectattr('dept','equalto',d.slug)|list|length|fa }}</small></button>{% endfor %}
+    {% for d in sections %}<button class="chip2" data-f="{{ d.slug }}" role="tab" aria-selected="false">{{ d.label }} <small>{{ stories|selectattr('dept','equalto',d.slug)|list|length|fa }}</small></button>{% endfor %}
   </div>
-  <div class="sgrid" id="stories">{% for x in stories %}{% if x.href != cover.href %}{{ S.card(x, 'std', loop.index0 % 3) }}{% elif x.pick %}<div class="sgrid__only-pick" hidden data-only-pick>{{ S.card(x, 'std', 0) }}</div>{% endif %}{% endfor %}</div>
+  <div class="sgrid" id="stories">{% for x in stories %}{{ S.card(x, 'std', loop.index0 % 3) }}{% endfor %}</div>
   <p class="sgrid__more"><button class="btn btn--ghost" hidden data-more="#stories">داستان‌های بیشتر</button></p>
 </div></section>
 {% endblock %}

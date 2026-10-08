@@ -89,26 +89,33 @@ DEPT_OF_COLLECTION = {
     "rivers": "journeys", "gatherings": "journeys",
     "ships": "vessels", "river-ships": "vessels", "lines": "vessels",
 }
-DEPT_OF_KICKER = {"سرمقاله": "notes", "مدرسهٔ کروز": "journeys"}
+# Articles belong to editorial sections (روایت، گزارش، یادداشت …), set by `section:` in
+# their front matter; older pieces without it are placed by their kicker.
+SECTION_OF_KICKER = {"سرمقاله": "notes", "مدرسهٔ کروز": "school"}
+BYLINE = "تحریریهٔ کروزنامه"
 WORDS_PER_MINUTE = 180  # Persian prose, read on a phone
 
 def read_minutes(text: str) -> int:
     words = len(re.findall(r"\S+", re.sub(r"<[^>]+>", " ", text or "")))
     return max(1, round(words / WORDS_PER_MINUTE)) if words >= 60 else 0  # too short to promise a read time
 
-def build_stories(collections, data, articles, depts):
+def build_stories(collections, data, articles, depts, sections=()):
     """One list, newest editorial first: articles, then each collection's entries in
     the order the content owner keeps them. Nothing here invents a date: guide
     entries have none, so they carry none."""
     label = {d["slug"]: d["label"] for d in depts}
     out = []
+    sec_label = {x["slug"]: x["label"] for x in sections}
     for a in articles:
-        d = a.get("department") or DEPT_OF_KICKER.get(a.get("kicker", ""), "notes")
-        out.append({"kind": "article", "href": f"/journal/{a['slug']}/", "dept": d, "dept_label": label.get(d, ""),
+        d = a.get("section") or SECTION_OF_KICKER.get(a.get("kicker", ""), "features")
+        a["section"], a["section_label"] = d, sec_label.get(d, "")
+        a["byline"] = a.get("byline") or BYLINE
+        out.append({"kind": "article", "href": f"/journal/{a['slug']}/", "dept": d, "dept_label": sec_label.get(d, ""),
+                    "byline": a["byline"], "lead_html": "".join(re.findall(r"<p>.*?</p>", a.get("html", ""))[:2]),
                     "kicker": a.get("kicker", ""), "title": a["title"], "latin": "", "dek": a.get("summary", ""),
                     "minutes": read_minutes(a.get("html", "")), "date": a.get("date"),
                     "image": {"src": "/" + a["hero"], "alt": a.get("hero_alt") or a["title"], "credit": a.get("hero_credit", "")} if a.get("hero") else None,
-                    "slug": a["slug"], "coll": "journal", "coll_title": "مجله"})
+                    "slug": a["slug"], "coll": "journal", "coll_title": "مجله", "film": a.get("film") == "yes"})
     for c in collections:
         d = DEPT_OF_COLLECTION.get(c["slug"], "destinations")
         for it in data[c["slug"]]:
@@ -119,6 +126,38 @@ def build_stories(collections, data, articles, depts):
                         "slug": it["slug"], "coll": c["slug"], "coll_title": c.get("singular") or c["title"],
                         "visa": (it.get("facts") or {}).get("visa", "")})
     return out
+
+def load_issue() -> dict:
+    f = CONTENT/"issue.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+def resolve_issue(issue: dict, stories: list[dict], glossary: list[dict]) -> dict | None:
+    """Turn issue.json's page addresses into stories. Returns None when there is no
+    issue file, and the homepage falls back to the newest articles."""
+    if not issue: return None
+    by = {x["href"].strip("/"): x for x in stories}
+    get = lambda k: by.get((k or "").strip().strip("/"))
+    contents = [x for x in (get(k) for k in issue.get("contents", [])) if x]
+    dossier = dict(issue.get("dossier") or {})
+    dossier["stories"] = [x for x in (get(k) for k in dossier.get("stories", [])) if x]
+    in_dossier = {x["href"] for x in dossier["stories"]}
+    for x in contents: x["in_dossier"] = x["href"] in in_dossier
+    cover = dict(issue.get("cover") or {}); cover["story"] = get(cover.get("story"))
+    word = next((g for g in glossary if g["term"] == issue.get("word")), None)
+    ed = get(issue.get("editorial"))
+    rest = [x for x in contents if x["href"] not in in_dossier and x is not ed]
+    return {**issue, "contents": contents, "dossier": dossier, "cover": cover, "editorial": ed, "word": word, "rest": rest}
+
+def check_issue(issue: dict, real: set, terms: set) -> int:
+    bad = 0
+    refs = list(issue.get("contents", [])) + list((issue.get("dossier") or {}).get("stories", [])) \
+        + [(issue.get("cover") or {}).get("story"), issue.get("editorial")]
+    for r in refs:
+        if r and r.strip().strip("/") not in real: print("ISSUE: no such story:", r, "in content/issue.json"); bad += 1
+    if issue.get("word") and issue["word"] not in terms: print("ISSUE: word not in glossary.json:", issue["word"]); bad += 1
+    img = (issue.get("cover") or {}).get("image")
+    if img and not (STATIC/img).exists(): print("ISSUE: cover image missing:", img); bad += 1
+    return bad
 
 def load_picks() -> list[dict]:
     """Editor's picks, chosen by hand in content/picks.json (the content owner's file).
@@ -317,7 +356,10 @@ def build(check_only=False):
 
     featured = {c["slug"]: data[c["slug"]][:4] for c in collections}
     depts = site["departments"]
-    stories = build_stories(collections, data, articles, depts)
+    sections = site.get("sections", [])
+    stories = build_stories(collections, data, articles, depts, sections)
+    editorial_stories = [x for x in stories if x["kind"] == "article"]
+    base.update(sections=[x for x in sections if any(y["dept"] == x["slug"] for y in editorial_stories)])
     unknown_picks = apply_picks(stories, load_picks())
     if unknown_picks: print("  editor's picks not found (check the address): " + ", ".join(unknown_picks))
     picks = sorted((x for x in stories if x.get("pick")), key=lambda x: x["pick"])
@@ -330,7 +372,10 @@ def build(check_only=False):
         write(f"{d['slug']}/index.html", "department.html", dept=d, stories=by_dept[d["slug"]],
               colls=[g for g in base["guides"] if g["dept"] == d["slug"]])
     write("guides/index.html", "guides.html")
-    write("index.html", "home.html", featured=featured, voyage=build_voyage(data["ports"]), cover=cover,
+    issue = resolve_issue(load_issue(), stories, glossary)
+    for sec in base["sections"]:
+        write(f"{sec['slug']}/index.html", "section.html", sec=sec, stories=[x for x in editorial_stories if x["dept"] == sec["slug"]])
+    write("index.html", "home.html", featured=featured, voyage=build_voyage(data["ports"]), cover=cover, issue=issue,
           stories=stories, by_dept=by_dept, didyouknow=didyouknow, offers=offers[:4],
           feed_status=feed_status, articles=articles[:3], gatherings=data["gatherings"][:3], news=news[:6])
     for c in collections:
@@ -350,9 +395,14 @@ def build(check_only=False):
         rel = [r for r in (resolve(x) for x in n.get("related", [])) if r]
         write(f"news/{n['slug']}/index.html", "news-item.html", item=n, related=rel,
               more=[o for o in news if o["slug"] != n["slug"]][:3])
-    write("journal/index.html", "journal.html", articles=articles, stories=stories, cover=cover, picks=picks)
+    write("journal/index.html", "journal.html", articles=articles, stories=editorial_stories, cover=cover, picks=[x for x in picks if x["kind"] == "article"])
     for a in articles:
-        write(f"journal/{a['slug']}/index.html", "article.html", article=a)
+        st = next(x for x in stories if x["href"] == f"/journal/{a['slug']}/")
+        seq = (issue or {}).get("contents", [])
+        i = next((k for k, x in enumerate(seq) if x is st), None)
+        nxt = seq[(i + 1) % len(seq)] if i is not None and len(seq) > 1 else None
+        write(f"journal/{a['slug']}/index.html", "article.html", article=a, story=st, issue=issue,
+              in_issue=i is not None, next_in_issue=nxt, film=st.get("film"))
     write("policy/index.html", "policy.html")
     write("offline/index.html", "offline.html")
 
@@ -437,6 +487,7 @@ def check():
             if not (STATIC/ref).exists(): print("MISSING IMAGE:", ref, "in", p.relative_to(HERE)); bad += 1
     # Every editor's pick must name a page that exists: a typo would silently drop it.
     real = {f"journal/{a['slug']}" for a in load_articles()} | {f"{c['slug']}/{it['slug']}" for c in load("collections") for it in load(c["slug"])}
+    bad += check_issue(load_issue(), real, {g["term"] for g in load("glossary")})
     for p in load_picks():
         if p["story"].strip().strip("/") not in real: print("PICK: no such story:", p["story"], "in content/picks.json"); bad += 1
     for it in load("ports"):

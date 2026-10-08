@@ -1,0 +1,27 @@
+{
+ "_راهنما": "شمارهٔ جاری. صفحهٔ اول سایت از همین فایل ساخته می‌شود. نشانی‌ها مثل picks.json است: journal/نام-فایل-بدون-md. «contents» ترتیب فهرست «در این شماره» است. «dossier.stories» نوشته‌های پرونده‌اند (باید در contents هم باشند). «word» باید دقیقاً یکی از «term»های glossary.json باشد. پیش از فرستادن: python3 build.py --check",
+ "number": 0,
+ "label": "پیش‌شماره",
+ "season": "پاییز ۱۴۰۵",
+ "cover": {
+  "story": "journal/istanbul-az-eskele-ta-kabin",
+  "image": "img/scene-quay.webp",
+  "image_alt": "مسافران روی اسکلهٔ گالاتاپورت، زیر بدنهٔ کشتی",
+  "credit": "تصویر جلد تولیدشده با هوش مصنوعی (Higgsfield)"
+ },
+ "editorial": "journal/chera-cruisenameh",
+ "dossier": {
+  "title": "از کجا سوار شویم؟",
+  "dek": "بندر مبدأ نخستین تصمیمِ سفر است و کمتر از همه دربارهٔ آن فکر می‌شود. استانبول بی‌ویزاست، دبی ویزای آسان دارد، و هیچ‌کدام به‌تنهایی تعیین نمی‌کنند گذرنامه‌تان چه می‌خواهد.",
+  "stories": ["journal/istanbul-az-eskele-ta-kabin", "journal/dubai-zemestan", "journal/avalin-cruise-visa"]
+ },
+ "contents": [
+  "journal/chera-cruisenameh",
+  "journal/istanbul-az-eskele-ta-kabin",
+  "journal/dubai-zemestan",
+  "journal/avalin-cruise-visa",
+  "journal/kusadasi-bandar-shahr"
+ ],
+ "word": "بندر مبدأ (Home port / Embarkation port)",
+ "next": "شمارهٔ نخست: نوروز ۱۴۰۶"
+}

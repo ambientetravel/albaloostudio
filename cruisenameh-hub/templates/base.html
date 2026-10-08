@@ -62,7 +62,7 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
       <p class="foot__policy">{{ site.editorial_policy }}</p>
     </div>
     <div class="foot__cols">
-      <div><h4>مجله</h4><a href="/journal/">همهٔ داستان‌ها</a><a href="/news/">اخبار</a>{% for d in site.departments %}<a href="/{{ d.slug }}/">{{ d.label }}</a>{% endfor %}</div>
+      <div><h4>مجله</h4><a href="/">این شماره</a>{% for d in sections %}<a href="/{{ d.slug }}/">{{ d.label }}</a>{% endfor %}<a href="/news/">خبر</a><a href="/journal/">آرشیو</a></div>
       <div><h4>راهنما</h4>{% for c in collections %}<a href="/{{ c.slug }}/">{{ c.title }}</a>{% endfor %}<a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
       <div><h4>همراهان تجاری <span class="tag">آگهی</span></h4>{% for p in site.partners %}<a href="{{ p.href }}" rel="sponsored noopener" target="_blank">{{ p.name }} <small>· {{ p.role }}</small></a>{% endfor %}</div>
     </div>

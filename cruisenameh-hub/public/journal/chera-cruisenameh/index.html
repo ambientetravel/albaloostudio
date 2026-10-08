@@ -19,7 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <script>/* motion only when the reader allows it; without this class every page rests fully visible */
 document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('js-story')</script>
-<link rel="stylesheet" href="/css/hub.css?v=2026-09-30">
+<link rel="stylesheet" href="/css/hub.css?v=2026-10-08">
 
 </head>
 <body class="page longform">
@@ -28,7 +28,7 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
   <div class="nav__in">
     <a class="brand" href="/"><span class="brand__fa">کروزنامه</span><span class="brand__latin">CRUISENAMEH</span></a>
     <nav class="nav__links" aria-label="بخش‌ها">
-      <a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a><a href="/journal/">مجله</a><a href="/guides/">راهنماها</a>
+      <a href="/">این شماره</a><a href="/features/">روایت</a><a href="/reports/">گزارش</a><a href="/notes/">یادداشت</a><a href="/news/">خبر</a><a href="/journal/">آرشیو</a><a href="/guides/">راهنماها</a>
     </nav>
     <div class="nav__tools">
       <button class="nav__search" id="searchBtn" type="button" aria-label="جست‌وجو" aria-controls="searchPanel" aria-expanded="false"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
@@ -37,7 +37,7 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
     </div>
   </div>
   <div class="nav__sheet" id="sheet">
-    <a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a><a href="/journal/">مجله</a><a href="/guides/">راهنماها</a>
+    <a href="/">این شماره</a><a href="/features/">روایت</a><a href="/reports/">گزارش</a><a href="/notes/">یادداشت</a><a href="/news/">خبر</a><a href="/journal/">آرشیو</a><a href="/guides/">راهنماها</a>
     <a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامه</a><a href="/policy/">سیاست تحریریه</a>
   </div>
 </header>
@@ -56,6 +56,7 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
 <div class="reading" id="reading" aria-hidden="true"><span id="readingBar"></span></div>
 
 <article class="lf">
+  
   <header class="lf__open">
     
     <div class="lf__media" data-hero>
@@ -63,13 +64,15 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
     </div>
     
     <div class="lf__openin wrap">
-      <p class="kicker"><a href="/journal/">مجله</a> · سرمقاله · <time class="dt dt--c" datetime="2026-09-06"><span class="dt__j">۱۵ شهریور ۱۴۰۵</span><span class="dt__g">۶ سپتامبر ۲۰۲۶</span></time></p>
+      <p class="kicker"><a href="/notes/">یادداشت</a> · سرمقاله · <a href="/">پیش‌شماره</a></p>
       <h1 class="display lf__title">چرا کروزنامه</h1>
       <p class="lf__lede">یک رسانهٔ فارسی که چیزی نمی‌فروشد، تا بتواند همه‌چیز را بگوید.</p>
+      <p class="lf__by">تحریریهٔ کروزنامه · ۱ دقیقه خواندن · <time class="dt dt--c" datetime="2026-09-06"><span class="dt__j">۱۵ شهریور ۱۴۰۵</span><span class="dt__g">۶ سپتامبر ۲۰۲۶</span></time></p>
       <p class="lf__credit">تصویر تولیدشده با هوش مصنوعی (Higgsfield)</p>
     </div>
     <div class="lf__scroll" aria-hidden="true"><span></span></div>
   </header>
+  
 
   <div class="lf__body">
     <div class="wrap wrap--narrow prose prose--lf"><p>مسافر ایرانی کروز، سال‌هاست اطلاعاتش را از سه جا می‌گیرد: بروشور خط کروز به زبانی دیگر، آژانسی که می‌خواهد بفروشد، و گروه‌های تلگرامی که هر کس چیزی شنیده. هیچ‌کدام برای او نوشته نشده.</p>
@@ -87,8 +90,16 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
   </div>
 
   <footer class="lf__end wrap wrap--narrow">
+    <p class="lf__sign">تحریریهٔ کروزنامه</p>
+    
+    <a class="lf__next" href="/journal/istanbul-az-eskele-ta-kabin/">
+      <span class="lf__next-k">بعدی در پیش‌شماره · روایت</span>
+      <span class="lf__next-t">از اسکلهٔ گالاتاپورت تا بالکن کابین</span>
+      <span class="lf__next-d">در استانبول بی‌ویزا سوار می‌شوید. اما کشتی هنوز نگفته به کجا می‌رود، و همان مقصد است که تعیین می‌کند گذرنامه‌تان چه می‌خواهد.</span>
+    </a>
+    
+    <p class="lf__back"><a class="more" href="/">فهرست پیش‌شماره</a><a class="more" href="/journal/">آرشیو</a></p>
     <p class="tiny">آگهی‌های خانگی با برچسب «آگهی» و راهنماهای حمایت‌شده با برچسب «با حمایت» مشخص می‌شوند. نقد و امتیازِ خوانندگان هرگز فروخته نمی‌شود.</p>
-    <a class="btn btn--ghost" href="/journal/">همهٔ نوشته‌های مجله</a>
   </footer>
 </article>
 
@@ -101,7 +112,7 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
       <p class="foot__policy">آگهی‌های خانگی با برچسب «آگهی» و راهنماهای حمایت‌شده با برچسب «با حمایت» مشخص می‌شوند. نقد و امتیازِ خوانندگان هرگز فروخته نمی‌شود.</p>
     </div>
     <div class="foot__cols">
-      <div><h4>مجله</h4><a href="/journal/">همهٔ داستان‌ها</a><a href="/news/">اخبار</a><a href="/destinations/">مقصدها</a><a href="/journeys/">سفرها</a><a href="/vessels/">کشتی‌ها</a><a href="/notes/">یادداشت</a></div>
+      <div><h4>مجله</h4><a href="/">این شماره</a><a href="/features/">روایت</a><a href="/reports/">گزارش</a><a href="/notes/">یادداشت</a><a href="/school/">مدرسهٔ کروز</a><a href="/news/">خبر</a><a href="/journal/">آرشیو</a></div>
       <div><h4>راهنما</h4><a href="/ports/">بندرنامه</a><a href="/ships/">کشتی‌نامه</a><a href="/river-ships/">کشتی‌های رودخانه‌ای</a><a href="/lines/">خطوط کروز</a><a href="/rivers/">رودخانه‌ها</a><a href="/river-ports/">شهرهای رودخانه‌ای</a><a href="/excursions/">گشت و اقامت کوتاه</a><a href="/unesco/">میراث جهانی نزدیک بندرها</a><a href="/hotels/">هتل‌ها و زنجیره‌های مهمان‌نوازی</a><a href="/landmarks/">مکان‌های تاریخی در دسترس با کروز</a><a href="/gatherings/">نوروز و گردهمایی‌ها</a><a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
       <div><h4>همراهان تجاری <span class="tag">آگهی</span></h4><a href="https://cruise24.ir" rel="sponsored noopener" target="_blank">کروز۲۴ <small>· قیمت و رزرو، داخل ایران</small></a><a href="https://cruisebaz.com" rel="sponsored noopener" target="_blank">CruiseBaz <small>· ایرانیان خارج از کشور</small></a><a href="https://boutimar.ir" rel="sponsored noopener" target="_blank">بوتیمار <small>· آژانس‌ها و همکاران</small></a></div>
     </div>
@@ -112,8 +123,8 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
     </div>
   </div>
 </footer>
-<script src="/js/hub.js?v=2026-09-30" defer></script>
-<script src="/js/pwa.js?v=2026-09-30" defer></script>
+<script src="/js/hub.js?v=2026-10-08" defer></script>
+<script src="/js/pwa.js?v=2026-10-08" defer></script>
 
 </body>
 </html>

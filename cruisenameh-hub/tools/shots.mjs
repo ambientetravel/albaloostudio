@@ -33,9 +33,10 @@ try {
     const h = await page.evaluate(() => document.documentElement.scrollHeight);
     await page.close(); return h;
   };
-  const stops = [['0-galataport', 0], ['1-push', 0.9], ['2-hull', 1.9], ['3-balcony', 2.6], ['4-door', 3.05], ['5-cabin', 4.4], ['6-below', 6.2], ['7-ports', 7.5], ['8-ships', 9.2]];
+  const stops = [['0-cover', 0], ['1-opening', 0.6], ['2-contents', 1.5], ['3-editorial', 2.6], ['4-dossier', 3.4], ['5-voyage', 5.5], ['6-also', 8.6], ['7-columns', 9.6], ['8-desk', 10.4]];
   const h = await shoot({ width: 1440, height: 900 }, 'desk', '/', stops);
-  await shoot({ width: 390, height: 844 }, 'mob', '/', [['0', 0], ['5-cabin', 4.4], ['7', 7.2], ['9', 10]]);
+  await shoot({ width: 390, height: 844 }, 'mob', '/', [['0', 0], ['contents', 1.2], ['7', 7.2], ['9', 10]]);
+  await shoot({ width: 1440, height: 900 }, 'film', '/journal/istanbul-az-eskele-ta-kabin/', [['0-quay', 0], ['2-hull', 1.9], ['5-cabin', 4.4], ['6-body', 6.2]]);
   await shoot({ width: 1440, height: 900 }, 'port', '/ports/kusadasi/', [['top', 0], ['body', 0.9]]);
   await shoot({ width: 1440, height: 900 }, 'list', '/ports/', [['top', 0]]);
   await shoot({ width: 1440, height: 900 }, 'visa', '/visa/', [['top', 0]]);
@@ -44,7 +45,7 @@ try {
   // full page of home below the hero for a layout sanity pass
   const p = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await p.goto('http://127.0.0.1:8787/', { waitUntil: 'networkidle' }); await p.evaluate(() => window.scrollTo(0, innerHeight * 5)); await p.waitForTimeout(600);
-  await p.evaluate(() => { document.getElementById('hero').style.display = 'none'; document.querySelectorAll('.reveal').forEach(e => e.classList.add('is-in')); });
+  await p.evaluate(() => { const hero = document.getElementById('hero') || document.getElementById('cover'); if (hero) hero.style.display = 'none'; document.querySelectorAll('.reveal').forEach(e => e.classList.add('is-in')); });
   await p.screenshot({ path: `${OUT}/desk-fullpage.png`, fullPage: true });
   await p.close();
   const manifest = await (await browser.newPage()).goto('http://127.0.0.1:8787/manifest.webmanifest');

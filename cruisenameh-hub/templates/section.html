@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% import "_story.html" as S with context %}
+{% block title %}{{ sec.label }} · {{ site.brand.fa }}{% endblock %}
+{% block description %}{{ sec.desc }}{% endblock %}
+{% block bodyclass %}page section{% endblock %}
+{% block content %}
+<header class="dhead"><div class="wrap">
+  <p class="kicker"><a href="/">{{ site.brand.fa }}</a> · بخش</p>
+  <h1 class="dhead__t">{{ sec.label }}</h1>
+  <p class="lede">{{ sec.desc }}</p>
+</div></header>
+<section class="sec sec--tight"><div class="wrap">
+  <div class="also">
+  {% for x in stories %}
+  <article class="also__item"><a href="{{ x.href }}">
+   <p class="dos__s">{{ x.dept_label }}{% if x.kicker %} · {{ x.kicker }}{% endif %}</p>
+   <h2 class="also__h">{{ x.title }}</h2>
+   <p class="also__d">{{ x.dek }}</p>
+   <p class="dos__m">{{ x.byline }}{% if x.minutes %} · {{ x.minutes|fa }} دقیقه خواندن{% endif %}{% if x.date %} · {% with d=x.date, compact=True %}{% include "_date.html" %}{% endwith %}{% endif %}</p>
+  </a></article>
+  {% endfor %}
+  </div>
+</div></section>
+{% endblock %}

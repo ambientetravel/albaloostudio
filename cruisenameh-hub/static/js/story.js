@@ -70,7 +70,7 @@
       if (!sized) size();
       scenes.forEach(s => { const o = vis(SHOW[s.id], p); s.fig.style.opacity = o.toFixed(3); if (o > 0) camera(s, p); });
       // passing through the lit window: warm light blooms, then the room resolves behind it
-      glass.style.opacity = (seg(p, .49, .575) * (1 - seg(p, .585, .67))).toFixed(3);
+      if (glass) glass.style.opacity = (seg(p, .49, .575) * (1 - seg(p, .585, .67))).toFixed(3);
       const fa = seg(p, .045, .13); a.style.opacity = 1 - fa; a.style.transform = `translate3d(0,${(-40 * fa * fa).toFixed(1)}px,0)`;
       beats.forEach((el, i) => { const w = BEAT[i]; if (!w) return; const o = vis(w, p); el.style.opacity = o.toFixed(3); el.style.transform = `translate3d(0,${(18 * (1 - out(seg(p, w[0], w[1]))) - 18 * seg(p, w[2], w[3])).toFixed(1)}px,0)`; });
       let c = 0; CH.forEach((t, i) => { if (p >= t) c = i; });
@@ -78,13 +78,13 @@
       hero.style.setProperty('--hp', p.toFixed(4));
       // the page forms: the photograph settles into a framed card, the interface develops on it
       const f = out(seg(p, .86, 1));
-      frame.style.clipPath = f > 0 ? `inset(${(f * 2.6).toFixed(2)}vh ${(f * 2.4).toFixed(2)}vw round ${(f * 26).toFixed(1)}px)` : '';
-      const fb = seg(p, .84, .95); b.style.opacity = fb.toFixed(3); b.style.visibility = fb > 0 ? 'visible' : 'hidden';
+      if (frame) frame.style.clipPath = f > 0 ? `inset(${(f * 2.6).toFixed(2)}vh ${(f * 2.4).toFixed(2)}vw round ${(f * 26).toFixed(1)}px)` : '';
+      const fb = seg(p, .84, .95); if (b) b.style.opacity = fb.toFixed(3); b.style.visibility = fb > 0 ? 'visible' : 'hidden';
       bKids.forEach((k, i) => { const t = out(seg(p, .845 + i * .024, .925 + i * .024)); k.style.opacity = t.toFixed(3); k.style.transform = `translate3d(0,${(22 * (1 - t)).toFixed(1)}px,0)`; });
-      credit.style.opacity = (.55 * (1 - seg(p, .02, .08)) + .55 * seg(p, .9, 1)).toFixed(2);
+      if (credit) credit.style.opacity = (.55 * (1 - seg(p, .02, .08)) + .55 * seg(p, .9, 1)).toFixed(2);
       // the nameplate sets on the cover; the masthead waits until the cover has been read past
-      const fn = out(seg(p, .87, .97)); np.style.opacity = fn.toFixed(3); np.style.transform = `translate3d(0,${(-26 * (1 - fn)).toFixed(1)}px,0)`;
-      chBar.style.opacity = (1 - seg(p, .84, .9)).toFixed(3);
+      if (np) { const fn = out(seg(p, .87, .97)); np.style.opacity = fn.toFixed(3); np.style.transform = `translate3d(0,${(-26 * (1 - fn)).toFixed(1)}px,0)`; }
+      if (chBar) chBar.style.opacity = (1 - seg(p, .84, .9)).toFixed(3);
       const n = p > .985; if (n !== navOn) { nav && nav.classList.toggle('is-hidden', !n); navOn = n; }
     };
     scenes.forEach(s => s.img.complete ? null : s.img.addEventListener('load', () => { sized = false; kick(); }, { once: true }));

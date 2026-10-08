@@ -1,0 +1,36 @@
+<section class="voyage" id="voyage" data-story="voyage" data-pin aria-labelledby="voyh">
+ <div class="voyage__sticky">
+  <div class="wrap voyage__in">
+   <header class="voyage__head">
+    <p class="kicker">روایت تصویری · پرونده · مسیر نمونه</p>
+    <h2 class="display display--md" id="voyh">از استانبول سوار می‌شوید؛ ویزا را بندرِ بعدی تعیین می‌کند</h2>
+    <p class="voyage__note">مسیر نمونه برای نشان‌دادن قاعده است، نه برنامهٔ یک سفر واقعی؛ تاریخ و قیمت ندارد. وضعیت ویزا در هر توقف با همان طبقه‌بندیِ ویزانامه حساب می‌شود.</p>
+   </header>
+   <figure class="voyage__map">
+    <svg viewBox="0 0 400 460" role="img" aria-label="مسیر نمونه: {% for s in voyage.stops %}{{ s.short }}{% if not loop.last %}، {% endif %}{% endfor %}">
+     <text class="vland" x="378" y="228">ترکیه</text>
+     <text class="vland" x="30" y="196">یونان</text>
+     <text class="vsea" x="168" y="206">دریای اژه</text>
+     {% for g in voyage.segs %}<path class="vtrack" d="{{ g.d }}"/>{% endfor %}
+     {% for g in voyage.segs %}<path class="vseg vseg--{{ g.level }}" d="{{ g.d }}" data-seg="{{ loop.index0 }}"/>{% endfor %}
+     {% for s in voyage.stops %}<g class="vstop vstop--{{ s.level }}" data-k="{{ loop.index0 }}" transform="translate({{ s.x }} {{ s.y }})"><circle r="11" class="vstop__halo"/><circle r="5.5"/><text y="{{ -17 if loop.first else 27 }}">{{ s.short }}</text></g>{% endfor %}
+     <g class="vship" transform="translate({{ voyage.stops[0].x }} {{ voyage.stops[0].y }})"><path d="M-11 -1h22l-4 7h-14zM-5 -1v-5h8v5z"/></g>
+    </svg>
+   </figure>
+   <ol class="voyage__stops">
+    {% for s in voyage.stops %}
+    <li class="vcard" data-k="{{ loop.index0 }}">
+     <p class="kicker">توقف {{ loop.index|fa }} از {{ voyage.stops|length|fa }} · {{ s.kicker }}</p>
+     <h3><a href="/ports/{{ s.slug }}/">{{ s.title }}</a></h3>
+     <p class="vcard__sum">{{ s.summary }}</p>
+     <p class="vcard__row"><span>این بندر</span><span class="pill pill--{{ 'free' if 'بدون ویزا' in s.port_visa else ('schengen' if 'شینگن' in s.port_visa else 'easy') }}">{{ s.port_visa }}</span></p>
+     <p class="vcard__row vcard__route vcard__route--{{ s.level }}"><span>کلِ مسیر تا اینجا</span><strong>{{ 'ویزای شینگن لازم است' if s.level == 'schengen' else ('بدون ویزا — فقط بندرهای ترکیه' if s.level == 'free' else s.label) }}</strong></p>
+     {% if s.level == 'schengen' and loop.previtem and loop.previtem.level != 'schengen' %}<p class="vcard__flip">همین‌جا ورق برمی‌گردد: نخستین بندرِ یونانی کلِ سفر را شینگن می‌کند، حتی اگر از استانبول سوار شده باشید.</p>{% endif %}
+    </li>
+    {% endfor %}
+   </ol>
+   <div class="voyage__dots" aria-hidden="true">{% for s in voyage.stops %}<i data-k="{{ loop.index0 }}"></i>{% endfor %}</div>
+  </div>
+ </div>
+</section>
+

@@ -1,0 +1,29 @@
+{#- The quay → cabin camera move, used as the opening of a long read (film: yes). -#}
+<section class="hero" id="hero" aria-label="{{ article.title }}">
+ <div class="hero__sticky">
+  <div class="hero__frame">
+   <div class="hero__stage">
+    {% for s in site.hero.scenes %}
+    <figure class="scene scene--{{ s.id }}" data-scene="{{ s.id }}">
+      <img src="/{{ s.src }}" alt="{{ s.caption }}" width="1600" height="900" decoding="async" {% if loop.index0 > 1 %}loading="lazy"{% elif loop.first %}fetchpriority="high"{% endif %}>
+    </figure>
+    {% endfor %}
+    <div class="scene__glass" aria-hidden="true"></div>
+    <div class="hero__grain" aria-hidden="true"></div>
+   </div>
+   <div class="hero__copy hero__copy--a">
+    <p class="kicker">{{ article.section_label }} · {{ article.kicker }}</p>
+    <h1 class="display">{{ article.title }}</h1>
+    <p class="lede">{{ article.summary }}</p>
+    <p class="hero__hint"><span>آرام پایین بروید؛ از اسکله تا کابین</span><i></i></p>
+   </div>
+   {% for b in site.hero.beats %}<p class="hero__beat" data-beat="{{ loop.index0 }}" aria-hidden="true">{{ b }}</p>{% endfor %}
+   <ol class="hero__chapters" aria-hidden="true">{% for c in site.hero.chapters %}<li data-ch="{{ loop.index0 }}"><span>{{ c }}</span></li>{% endfor %}</ol>
+   <div class="hero__copy hero__copy--b">
+    <p class="hero__by">{{ article.byline }}{% if story.minutes %} · {{ story.minutes|fa }} دقیقه خواندن{% endif %} · {% with d=article.date, compact=True %}{% include "_date.html" %}{% endwith %}</p>
+    <p class="hero__cue">ادامهٔ روایت ↓</p>
+   </div>
+   <p class="scene__credit">{{ site.hero.scenes[0].credit }}</p>
+  </div>
+ </div>
+</section>
