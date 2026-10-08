@@ -7,7 +7,7 @@ Owning session: "Daryanameh Farsi cruise domain brainstorm" (session title preda
 
 A static Farsi cruise media site plus PWA, generated from JSON content.
 
-**Name, decided 8 Oct 2026: «دریانامه» / Daryanameh — final.** Descriptor keeps the search word: «رسانهٔ فارسی‌زبان کروز و سفر دریایی». The English Substack trade wire is **Daryalog** (a ship's log; "from the publishers of Daryanameh"). Domain: daryanameh.com (not yet registered). Telegram: t.me/daryanameh (placeholder; neither handle resolves to a channel yet). The git branch is still called `cruisenameh-hub`; the directory is `daryanameh-hub/`.
+**Name, decided 8 Oct 2026: «دریانامه» / Daryanameh — final.** Descriptor keeps the search word: «رسانهٔ فارسی‌زبان کروز و سفر دریایی». The English Substack trade wire is **Daryalog** (a ship's log; "from the publishers of Daryanameh"). Domain: daryanameh.com (not yet registered). Telegram: t.me/daryanameh (placeholder — whether the handle is free is unverified: t.me was unreachable from the build container; check and claim it before launch). The git branch is still called `cruisenameh-hub`; the directory is `daryanameh-hub/`.
 
 **Editorial position, decided 23 Sep 2026.** Daryanameh is Farsi-first and stays that way. Most
 Iranian magazines that reach abroad publish in English for a different reader — Aleph in Canada, Trend
