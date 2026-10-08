@@ -1,4 +1,4 @@
-# Orchestration health — 2026-10-07T14:23 UTC
+# Orchestration health — 2026-10-08T14:31 UTC
 
 **0 broke · 1 need you · 2 to watch.**
 
@@ -8,7 +8,7 @@
 
 ## 🟡 Needs you — only you can do these
 
-- **4 article PR(s) waiting on your merge** (oldest 10 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی; [boutimarfarsi#3](https://github.com/ambientetravel/boutimarfarsi/pull/3) دریانامه draft: راهنمای جامع سفر دریایی دور دنیا; [cruise24-ir#7](https://github.com/ambientetravel/cruise24-ir/pull/7) Agent 2 draft: تفاوت ویزای کروز ترکیه و کروز یون; [boutimarfarsi#4](https://github.com/ambientetravel/boutimarfarsi/pull/4) دریانامه draft: کروز لوکس چیست؛ تفاوت آن با کروز
+- **4 article PR(s) waiting on your merge** (oldest 11 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی; [boutimarfarsi#3](https://github.com/ambientetravel/boutimarfarsi/pull/3) دریانامه draft: راهنمای جامع سفر دریایی دور دنیا; [cruise24-ir#7](https://github.com/ambientetravel/cruise24-ir/pull/7) Agent 2 draft: تفاوت ویزای کروز ترکیه و کروز یون; [boutimarfarsi#4](https://github.com/ambientetravel/boutimarfarsi/pull/4) دریانامه draft: کروز لوکس چیست؛ تفاوت آن با کروز
 
 ## 👀 To watch
 
@@ -35,16 +35,16 @@
 | Agent | Last result | Age | |
 |---|---|---:|---|
 | Scout | · never ran | — |  |
-| Writer | ✓ success | 1.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439324302) |
-| Broadcaster | ✓ success | 1.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439672404) |
-| Closer | ✓ success | 0.3d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37586807227) |
+| Writer | ✓ success | 2.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439324302) |
+| Broadcaster | ✓ success | 2.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439672404) |
+| Closer | ✓ success | 0.3d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37736427227) |
 | Auditor+Analyst | · never ran | — |  |
-| Cartographer | ✓ success | 2.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115) |
+| Cartographer | · never ran | — |  |
 | Watcher | · never ran | — |  |
 | Oracle | · never ran | — |  |
-| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37634827489) |
-| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37624110936) |
-| Dashboard | ✓ success | 2.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37319951897) |
+| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37791945425) |
+| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37780997273) |
+| Dashboard | · never ran | — |  |
 
 ## ✓ Fine
 
