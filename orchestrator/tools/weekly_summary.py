@@ -241,7 +241,16 @@ def publish(s: dict, parent: str, owner: str, db: str) -> str:
             "children": as_blocks(s, owner)}
     code, d = nrs.notion("POST", "/pages", {"parent": {"page_id": parent}, **page})
     if code == 404:                       # "websites" not shared with the integration
-        code, d = nrs.notion("POST", "/pages", {"parent": {"page_id": _container(db)}, **page})
+        parent = _container(db)
+        code, d = nrs.notion("POST", "/pages", {"parent": {"page_id": parent}, **page})
+    if code == 400 and "Could not find user" in str(d):
+        # The integration lacks the "Read user information" capability, so it may
+        # not @mention anyone (10 Oct). The page still goes up — without the push.
+        page["children"][0]["callout"]["rich_text"][0] = {"type": "text", "text": {"content": "Alireza"}}
+        code, d = nrs.notion("POST", "/pages", {"parent": {"page_id": parent}, **page})
+        if code == 200:
+            print("note: no @mention (integration cannot read users) — enable 'Read user information' "
+                  "on the Notion integration to get the phone notification")
     if code != 200:
         raise RuntimeError(f"Notion {code}: {str(d)[:200]}")
     return d.get("url", "")
