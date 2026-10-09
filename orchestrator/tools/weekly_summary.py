@@ -117,9 +117,14 @@ def build(rows: list[dict], live: list[dict], cycle: dict, health: dict, now: da
     cost = sum(float(((cycle.get(k) or {}).get("usage") or {}).get("estimated_cost_usd") or 0)
                for k in ("writer", "scout"))
     return {"date": now.strftime("%-d %b %Y"), "waiting": waiting,
-            "live": [r for r in live if r.get("http") == 200],
-            "not_live": [r for r in live if r.get("http") != 200], "per_site": per_site,
-            "critical": health.get("critical") or [], "needs_you": health.get("needs_you") or [],
+            # No live link (photo PRs, rows the sync never filled) cannot be tested,
+            # so it is listed as live-unchecked — a false "NOT live" alarm trains the
+            # reader to ignore the section that matters.
+            "live": [r for r in live if r.get("http") == 200 or not r.get("live")],
+            "not_live": [r for r in live if r.get("live") and r.get("http") != 200], "per_site": per_site,
+            "critical": [_short(c) for c in health.get("critical") or []],
+            # "N article PR(s) waiting on your merge" repeats the Waiting list above.
+            "needs_you": [_short(n) for n in health.get("needs_you") or [] if "waiting on your merge" not in n],
             "cost": round(cost, 2), "drafted": w.get("drafted", 0)}
 
 
@@ -204,13 +209,41 @@ def as_blocks(s: dict, owner: str) -> list[dict]:
     return B
 
 
-def publish(s: dict, parent: str, owner: str) -> str:
-    code, d = nrs.notion("POST", "/pages", {
-        "parent": {"page_id": parent}, "icon": {"emoji": "📬"},
-        "properties": {"title": {"title": [{"type": "text", "text": {"content": f"Monday summary — {s['date']}"}}]}},
-        "children": as_blocks(s, owner)})
+def _short(text: str, n: int = 160) -> str:
+    """One phone-width line: Markdown link syntax dropped, cut at a word."""
+    import re
+    t = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", str(text)).replace("**", "")
+    return t if len(t) <= n else t[:n].rsplit(" ", 1)[0] + " …"
+
+
+CONTAINER_TITLE = "📬 Monday summaries"
+
+
+def _container(db: str) -> str:
+    """The integration only sees the Content Review database, not the "websites"
+    page above it (10 Oct: 404). So the summaries live under one container row on
+    that board — no Pipeline ID, no Status, ignored by the sync — found or made once."""
+    code, d = nrs.notion("POST", f"/databases/{db}/query", {"page_size": 5, "filter": {
+        "property": "Article", "title": {"equals": CONTAINER_TITLE}}})
+    if code == 200 and d.get("results"):
+        return d["results"][0]["id"]
+    code, d = nrs.notion("POST", "/pages", {"parent": {"database_id": db}, "icon": {"emoji": "📬"},
+                                            "properties": {"Article": {"title": [{"type": "text", "text": {
+                                                "content": CONTAINER_TITLE}}]}}})
     if code != 200:
-        raise RuntimeError(f"Notion {code}: {str(d)[:200]} — is the 'websites' page shared with the integration?")
+        raise RuntimeError(f"Notion {code} creating the summaries row: {str(d)[:200]}")
+    return d["id"]
+
+
+def publish(s: dict, parent: str, owner: str, db: str) -> str:
+    page = {"icon": {"emoji": "📬"},
+            "properties": {"title": {"title": [{"type": "text", "text": {"content": f"Monday summary — {s['date']}"}}]}},
+            "children": as_blocks(s, owner)}
+    code, d = nrs.notion("POST", "/pages", {"parent": {"page_id": parent}, **page})
+    if code == 404:                       # "websites" not shared with the integration
+        code, d = nrs.notion("POST", "/pages", {"parent": {"page_id": _container(db)}, **page})
+    if code != 200:
+        raise RuntimeError(f"Notion {code}: {str(d)[:200]}")
     return d.get("url", "")
 
 
@@ -231,7 +264,8 @@ def main(argv: list[str] | None = None) -> int:
     print(as_text(s))
     if a.apply:
         url = publish(s, os.environ.get("NOTION_SUMMARY_PARENT") or WEBSITES_PAGE,
-                      os.environ.get("NOTION_OWNER_ID") or OWNER)
+                      os.environ.get("NOTION_OWNER_ID") or OWNER,
+                      os.environ.get("NOTION_REVIEW_DB") or nrs.DEFAULT_DB)
         print(f"\nNotion page: {url}")
     return 0
 

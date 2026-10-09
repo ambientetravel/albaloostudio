@@ -4299,6 +4299,13 @@ ok("Monday summary: the page opens with an @mention of Alireza (the phone notifi
    and "1 merged but NOT live" in _blk[0]["callout"]["rich_text"][1]["text"]["content"]
    and _sm["per_site"]["boutimar.ir"] == {"drafted": ["k1"], "blocked": ["k2"], "failed": []} and _sm["cost"] == 0.5)
 ok("Monday summary: a flagged draft is marked in the list", "⚠ WARN" in _ws.as_text(_sm))
+_sm2 = _ws.build(_rows, [{**_rows[0], "title": "Photos", "live": "", "http": 0}], _cyc,
+                 {"needs_you": ["**12 article PR(s) waiting on your merge** (oldest 12 days): [x](https://y)",
+                                "3 social post(s) blocked for **missing media** — " + "z" * 300]},
+                 _dt(2026, 10, 12, tzinfo=_tz.utc))
+ok("Monday summary: a merge with no live link to test is NOT a 'NOT live' alarm; health lines are phone-short and not duplicated",
+   [r["title"] for r in _sm2["live"]] == ["Photos"] and not _sm2["not_live"]
+   and len(_sm2["needs_you"]) == 1 and len(_sm2["needs_you"][0]) <= 162 and "**" not in _sm2["needs_you"][0])
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
