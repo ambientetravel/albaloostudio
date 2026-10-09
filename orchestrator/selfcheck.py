@@ -4274,5 +4274,31 @@ ok("Needs edits: a PR labelled do-not-revise is left to people", "hold" in " ".j
    and not [c for c in _calls_rv if c[0] in ("PUT", "POST")])
 _rv.nrs.gh, _rv.revise_text, _rv.nrs.write_text, _rv.nrs.notion, _rv.pr_review.review_pr = _saved
 
+# ── Monday summary (10 Oct) ──
+import weekly_summary as _ws
+from datetime import datetime as _dt, timezone as _tz
+_rows = [{"url": "https://notion.so/a", "title": "Armenia", "site": "exploreorient.com", "status": "To review",
+          "pid": "exploreorient#19", "live": "", "gate": "PASS", "feedback": ""},
+         {"url": "https://notion.so/b", "title": "Visa TR/GR", "site": "cruise24.ir", "status": "To review",
+          "pid": "cruise24-ir#7", "live": "", "gate": "WARN", "feedback": ""},
+         {"url": "https://notion.so/c", "title": "Old", "site": "boutimar.com", "status": "Rejected",
+          "pid": "boutimar#31", "live": "", "gate": "PASS", "feedback": ""}]
+_live = [{**_rows[0], "title": "Food", "live": "https://x/ok", "http": 200},
+         {**_rows[0], "title": "Lux", "live": "https://x/404", "http": 404}]
+_cyc = {"writer": {"drafted": 2, "usage": {"estimated_cost_usd": 0.4},
+                   "outcomes": [{"domain": "boutimar.ir", "status": "drafted", "keyword": "k1"},
+                                {"domain": "boutimar.ir", "status": "blocked", "keyword": "k2"}]},
+        "scout": {"usage": {"estimated_cost_usd": 0.1}}}
+_sm = _ws.build(_rows, _live, _cyc, {"critical": [], "needs_you": ["x"]}, _dt(2026, 10, 12, tzinfo=_tz.utc))
+_blk = _ws.as_blocks(_sm, _ws.OWNER)
+ok("Monday summary: waiting = only rows needing a decision; merged-but-404 is split out from 'went live'",
+   [r["title"] for r in _sm["waiting"]] == ["Armenia", "Visa TR/GR"]
+   and [r["title"] for r in _sm["live"]] == ["Food"] and [r["title"] for r in _sm["not_live"]] == ["Lux"])
+ok("Monday summary: the page opens with an @mention of Alireza (the phone notification) and counts per site",
+   _blk[0]["callout"]["rich_text"][0]["mention"]["user"]["id"] == _ws.OWNER
+   and "1 merged but NOT live" in _blk[0]["callout"]["rich_text"][1]["text"]["content"]
+   and _sm["per_site"]["boutimar.ir"] == {"drafted": ["k1"], "blocked": ["k2"], "failed": []} and _sm["cost"] == 0.5)
+ok("Monday summary: a flagged draft is marked in the list", "⚠ WARN" in _ws.as_text(_sm))
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

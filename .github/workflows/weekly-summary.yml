@@ -1,0 +1,48 @@
+name: Monday summary (Notion, for the phone)
+
+# One Notion page a week under "websites": what waits for Alireza (tap-to-open),
+# what went live — and what merged but is NOT live —, Sunday's run per site,
+# health, spend. Opens with an @mention so the Notion app pushes it to his phone.
+# Read-only towards everything else. tools/weekly_summary.py
+
+on:
+  schedule:
+    - cron: "45 6 * * 1"        # Monday 06:45 UTC = 09:45 Istanbul, after the Monday checks
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Create the Notion page (unticked = print only)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  actions: read                 # read the writer / scout run artifacts
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Build the summary
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
+          GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+          GH_ALBALOO_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply }}" != "true" ]; then
+            python3 tools/weekly_summary.py | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            python3 tools/weekly_summary.py --apply | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
