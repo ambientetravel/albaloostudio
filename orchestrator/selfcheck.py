@@ -4304,7 +4304,7 @@ _sm2 = _ws.build(_rows, [{**_rows[0], "title": "Photos", "live": "", "http": 0}]
                                 "3 social post(s) blocked for **missing media** — " + "z" * 300]},
                  _dt(2026, 10, 12, tzinfo=_tz.utc))
 ok("Monday summary: a merge with no live link to test is NOT a 'NOT live' alarm; health lines are phone-short and not duplicated",
-   [r["title"] for r in _sm2["live"]] == ["Photos"] and not _sm2["not_live"]
+   [r["title"] for r in _sm2["unchecked"]] == ["Photos"] and not _sm2["live"] and not _sm2["not_live"]
    and len(_sm2["needs_you"]) == 1 and len(_sm2["needs_you"][0]) <= 162 and "**" not in _sm2["needs_you"][0])
 
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))

@@ -120,7 +120,8 @@ def build(rows: list[dict], live: list[dict], cycle: dict, health: dict, now: da
             # No live link (photo PRs, rows the sync never filled) cannot be tested,
             # so it is listed as live-unchecked — a false "NOT live" alarm trains the
             # reader to ignore the section that matters.
-            "live": [r for r in live if r.get("http") == 200 or not r.get("live")],
+            "live": [r for r in live if r.get("http") == 200],
+            "unchecked": [r for r in live if not r.get("live")],
             "not_live": [r for r in live if r.get("live") and r.get("http") != 200], "per_site": per_site,
             "critical": [_short(c) for c in health.get("critical") or []],
             # "N article PR(s) waiting on your merge" repeats the Waiting list above.
@@ -134,7 +135,10 @@ def as_text(s: dict) -> str:
     L += [f"- [{r['status']}] {r['site']} — {r['title']} {'⚠ ' + r['gate'] if r['gate'] in ('WARN', 'BLOCK') else ''}"
           for r in s["waiting"]] or ["- nothing"]
     L += ["", f"## Went live this week ({len(s['live'])})"]
-    L += [f"- {r['site']} — {r['title']} → {r['live'] or '(no link yet)'}" for r in s["live"]] or ["- nothing"]
+    L += [f"- {r['site']} — {r['title']} → {r['live']}" for r in s["live"]] or ["- nothing"]
+    if s["unchecked"]:
+        L += ["", f"## Merged, not checked ({len(s['unchecked'])}) — no page link to test"]
+        L += [f"- {r['site']} — {r['title']}" for r in s["unchecked"]]
     if s["not_live"]:
         L += ["", f"## ⚠ Merged but NOT live ({len(s['not_live'])})"]
         L += [f"- {r['site']} — {r['title']} → {r['live'] or '(no link)'} answers {r['http']}"
@@ -169,7 +173,7 @@ def as_blocks(s: dict, owner: str) -> list[dict]:
     head = {"object": "block", "type": "callout", "callout": {"icon": {"emoji": "📬"}, "rich_text": [
         {"type": "mention", "mention": {"type": "user", "user": {"id": owner}}},
         {"type": "text", "text": {"content": f" — {len(s['waiting'])} waiting for you, "
-                                              f"{len(s['live'])} went live, "
+                                              f"{len(s['live'])} confirmed live, "
                                               + (f"{len(s['not_live'])} merged but NOT live, "
                                                  if s["not_live"] else "")
                                               +
@@ -183,8 +187,13 @@ def as_blocks(s: dict, owner: str) -> list[dict]:
     else:
         B.append(_p("Nothing — the board is clear."))
     B.append(_h(f"Went live this week ({len(s['live'])})"))
-    B += [_li([(f"{r['site']} — ", ""), (r["title"], r["live"] or r["url"])]) for r in s["live"]] \
-        or [_p("Nothing merged in the last 7 days.")]
+    B += [_li([(f"{r['site']} — ", ""), (r["title"], r["live"])]) for r in s["live"]] \
+        or [_p("Nothing confirmed live in the last 7 days.")]
+    if s["unchecked"]:
+        B.append(_h(f"Merged, not checked ({len(s['unchecked'])})"))
+        B.append(_p("Merged, but there is no live page link to test — photo sets, or a site that "
+                    "deploys by hand (boutimar.ir)."))
+        B += [_li([(f"{r['site']} — ", ""), (r["title"], r["url"])]) for r in s["unchecked"]]
     if s["not_live"]:
         B.append(_h(f"⚠ Merged but NOT live ({len(s['not_live'])})"))
         B += [_li([(f"{r['site']} — ", ""), (r["title"], r["url"]),
