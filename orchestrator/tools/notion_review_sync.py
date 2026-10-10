@@ -96,7 +96,8 @@ def rows(db: str) -> dict[str, dict]:
                 out[pid] = {"page_id": p["id"],
                             "status": ((pr.get("Status") or {}).get("select") or {}).get("name", ""),
                             "gate": ((pr.get("House rules") or {}).get("select") or {}).get("name", ""),
-                            "feedback": _txt(pr.get("Feedback", {}))}
+                            "feedback": _txt(pr.get("Feedback", {})),
+                            "live": ((pr.get("Live page") or {}).get("url")) or ""}
         if not d.get("has_more"):
             return out
         cursor = d.get("next_cursor")
@@ -219,6 +220,61 @@ def base44_record(pid: str) -> tuple[str, dict] | None:
             items = _b44_items(d) if code == 200 else []
             return (app, items[0]) if items else None
     return None
+
+
+# Where a merged article lives, by the file the PR ADDED. Repo PR rows never got
+# a Live page (only base44 rows did), so the Monday summary could not confirm them
+# live — Iranian Food read "merged, not checked" while it answered 200 (10 Oct).
+# Patterns checked against live pages on 10 Oct. A PR that adds no article
+# (photo sets) gets no link — there is no single page to point at.
+LIVE_PATTERNS = {
+    "ambientetravel/boutimar": (r"^src/content/journal/([^/]+)\.mdx?$", "https://boutimar.com/journal/{}/"),
+    "ambientetravel/exploreorient": (r"^src/content/blog/([^/]+)\.mdx?$", "https://exploreorient.com/journal/{}/"),
+    # cruise24.ir serves content/blog/<dir>/ at /blog/<dir minus a leading "blog-">/
+    "ambientetravel/cruise24-ir": (r"^content/blog/([^/]+)/index\.md$", "https://cruise24.ir/blog/{}/"),
+}
+
+
+def live_url_for(repo: str, p: dict) -> str:
+    """The live address of the article a PR adds, or "" if it adds none."""
+    num = p.get("number")
+    code, files = gh("GET", f"/repos/{repo}/pulls/{num}/files?per_page=100")
+    if code != 200 or not isinstance(files, list):
+        return ""
+    added = [f.get("filename", "") for f in files if f.get("status") == "added"]
+    if repo in LIVE_PATTERNS:
+        pat, url = LIVE_PATTERNS[repo]
+        for name in added:
+            m = re.match(pat, name)
+            if m:
+                slug = m.group(1)
+                if repo.endswith("cruise24-ir") and slug.startswith("blog-"):
+                    slug = slug[len("blog-"):]
+                return url.format(slug)
+        return ""
+    if repo == "ambientetravel/boutimarfarsi":
+        # The article is a NEW item in data/articles.json (base vs head of the PR).
+        if not any(f.get("filename") == "data/articles.json" for f in files):
+            return ""
+        def items(ref: str) -> list:
+            c, d = _curl("GET", f"https://api.github.com/repos/{repo}/contents/data/articles.json?ref={ref}",
+                         [f"Authorization: Bearer {os.environ.get('GITHUB_TOKEN', '')}",
+                          "Accept: application/vnd.github.raw"])
+            d = d if isinstance(d, (dict, list)) else {}
+            return d if isinstance(d, list) else next((v for v in d.values() if isinstance(v, list)), [])
+        before = {a.get("slug") for a in items((p.get("base") or {}).get("sha", "main"))}
+        new = [a.get("slug") for a in items((p.get("head") or {}).get("sha", "")) if a.get("slug") not in before]
+        return f"https://boutimar.ir/daryanameh/{new[0]}.html" if len(new) == 1 else ""
+    return ""
+
+
+def _days_since(iso: str) -> float:
+    return (datetime.now(timezone.utc) - datetime.fromisoformat(iso.replace("Z", "+00:00"))).total_seconds() / 86400
+
+
+def set_live(page_id: str, url: str) -> None:
+    if url:
+        notion("PATCH", f"/pages/{page_id}", {"properties": {"Live page": {"url": url}}})
 
 
 def pr_state(pid: str) -> tuple[str, dict]:
@@ -551,9 +607,20 @@ def sync(apply: bool, db: str) -> list[str]:
             continue
         num = p["number"]
         if p.get("merged_at") and row["status"] != "Published":
-            log.append(f"published   {pid}  (merged on GitHub)")
+            live = row.get("live") or live_url_for(repo, p)
+            log.append(f"published   {pid}  (merged on GitHub){'  → ' + live if live and not row.get('live') else ''}")
             if apply:
                 set_status(row["page_id"], "Published")
+                if not row.get("live"):
+                    set_live(row["page_id"], live)
+            continue
+        if p.get("merged_at") and not row.get("live") and _days_since(p["merged_at"]) <= 30:
+            # Published before Live page was filled in: backfill it once.
+            live = live_url_for(repo, p)
+            if live:
+                log.append(f"live link   {pid}  → {live}")
+                if apply:
+                    set_live(row["page_id"], live)
             continue
         if p.get("state") == "closed" and not p.get("merged_at") and row["status"] not in ("Rejected",):
             log.append(f"rejected    {pid}  (closed on GitHub)")
@@ -579,6 +646,8 @@ def sync(apply: bool, db: str) -> list[str]:
                              {"merge_method": "squash", "commit_title": f"{p['title']} (#{num})"})
                 if code == 200:
                     set_status(row["page_id"], "Published")
+                    if not row.get("live"):
+                        set_live(row["page_id"], live_url_for(repo, p))
                 else:
                     log.append(f"  ! merge refused ({code}): {str(d)[:140]}")
         elif st in ("Needs edits", "Rejected") and row["feedback"]:

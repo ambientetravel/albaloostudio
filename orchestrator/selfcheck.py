@@ -4307,5 +4307,25 @@ ok("Monday summary: a merge with no live link to test is NOT a 'NOT live' alarm;
    [r["title"] for r in _sm2["unchecked"]] == ["Photos"] and not _sm2["live"] and not _sm2["not_live"]
    and len(_sm2["needs_you"]) == 1 and len(_sm2["needs_you"][0]) <= 162 and "**" not in _sm2["needs_you"][0])
 
+# ── Live page for merged PR articles (10 Oct) ──
+_saved_gh2 = _nrs.gh
+def _files(added, mod=()):
+    return lambda m, path, b=None: (200, [{"filename": f, "status": "added"} for f in added]
+                                     + [{"filename": f, "status": "modified"} for f in mod])
+_nrs.gh = _files(["src/content/journal/iranian-food-dishes-to-try.md", "public/img/journal/x.jpg"])
+_l1 = _nrs.live_url_for("ambientetravel/boutimar", {"number": 33})
+_nrs.gh = _files(["src/content/blog/guides-armenia-historic-monasteries.md"])
+_l2 = _nrs.live_url_for("ambientetravel/exploreorient", {"number": 19})
+_nrs.gh = _files(["content/blog/blog-rahnamaye-bandar-galataport-istanbul/index.md",
+                  "content/blog/blog-rahnamaye-bandar-galataport-istanbul/manifest.json"])
+_l3 = _nrs.live_url_for("ambientetravel/cruise24-ir", {"number": 5})
+_nrs.gh = _files(["public/img/journal/a.jpg"], mod=["src/content/journal/a.md"])
+_l4 = _nrs.live_url_for("ambientetravel/boutimar", {"number": 32})
+_nrs.gh = _saved_gh2
+ok("a merged article gets its live address per site; a photo-only PR (no new article) gets none",
+   _l1 == "https://boutimar.com/journal/iranian-food-dishes-to-try/"
+   and _l2 == "https://exploreorient.com/journal/guides-armenia-historic-monasteries/"
+   and _l3 == "https://cruise24.ir/blog/rahnamaye-bandar-galataport-istanbul/" and _l4 == "")
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)
