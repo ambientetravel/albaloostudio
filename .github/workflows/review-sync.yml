@@ -57,6 +57,8 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
           GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+          # cruisebaz drafts are revised in place on their base44 Article record
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PROSE_PROVIDER: ${{ vars.PROSE_PROVIDER || 'anthropic' }}
@@ -66,4 +68,11 @@ jobs:
           else
             python3 tools/revise_drafts.py --apply | tee -a "$GITHUB_STEP_SUMMARY"
           fi
-
+      - name: Keep the base44 backups taken before a revision
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: base44-revise-backups-${{ github.run_id }}
+          path: orchestrator/runs/base44-revise-backup-*
+          if-no-files-found: ignore
+          retention-days: 90

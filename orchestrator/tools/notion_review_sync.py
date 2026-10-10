@@ -177,10 +177,21 @@ def _b44_items(d) -> list[dict]:
     return d if isinstance(d, list) else (d.get("items") or d.get("records") or []) if isinstance(d, dict) else []
 
 
+def base44_gate(a: dict, profile: str) -> tuple[str, dict]:
+    """House-rules verdict for a base44 Article record: title, summary, body and FAQ."""
+    import compliance  # noqa: PLC0415 — orchestrator/ is on sys.path via pr_review
+    text = "\n".join([a.get("title", ""), a.get("meta_description", ""), str(a.get("body_markdown") or "")] +
+                     [f"{x.get('q', '')} {x.get('a', '')}" for x in a.get("faq") or []])
+    blocks, warns = [], []
+    for v in compliance.check(text, profile):
+        row = {"rule": v.rule, "excerpt": v.excerpt, "fix": v.message}
+        (blocks if v.severity == compliance.BLOCK else warns).append(row)
+    return ("BLOCK" if blocks else ("WARN" if warns else "PASS")), {"blocks": blocks, "warns": warns}
+
+
 def base44_drafts() -> list[dict]:
     if not os.environ.get("BASE44_ACCESS_TOKEN"):
         return []
-    import compliance  # noqa: PLC0415 — orchestrator/ is on sys.path via pr_review
     out = []
     for domain, (app, profile) in BASE44_SITES.items():
         code, d = b44("GET", f"/{app}/entities/Article/v2/list?q=" +
@@ -191,17 +202,11 @@ def base44_drafts() -> list[dict]:
             continue
         for a in _b44_items(d):
             body = str(a.get("body_markdown") or "")
-            text = "\n".join([a.get("title", ""), a.get("meta_description", ""), body] +
-                             [f"{x.get('q', '')} {x.get('a', '')}" for x in a.get("faq") or []])
-            blocks, warns = [], []
-            for v in compliance.check(text, profile):
-                row = {"rule": v.rule, "excerpt": v.excerpt, "fix": v.message}
-                (blocks if v.severity == compliance.BLOCK else warns).append(row)
-            verdict = "BLOCK" if blocks else ("WARN" if warns else "PASS")
+            verdict, review = base44_gate(a, profile)
             slug = a.get("slug", "")
             out.append({"pid": f"{domain}{slug}", "kind": "base44", "app": app, "record": a.get("id"),
                         "site": domain, "url": f"https://{domain}{slug}", "gate": verdict,
-                        "review": {"blocks": blocks, "warns": warns},
+                        "review": review,
                         "title": a.get("title", slug), "md": body, "faq": a.get("faq") or [],
                         "summary": a.get("meta_description", ""),
                         "written": str(a.get("generated_at") or a.get("created_date") or "")[:10] or

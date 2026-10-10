@@ -4274,6 +4274,65 @@ ok("Needs edits: a PR labelled do-not-revise is left to people", "hold" in " ".j
    and not [c for c in _calls_rv if c[0] in ("PUT", "POST")])
 _rv.nrs.gh, _rv.revise_text, _rv.nrs.write_text, _rv.nrs.notion, _rv.pr_review.review_pr = _saved
 
+# ── Needs edits on a base44 (cruisebaz) draft → revised in place (10 Oct) ──
+_store = {}
+def _b44_reset(status="draft"):
+    _store.clear(); _store.update({"id": "r1", "slug": "/blog/x", "status": status, "image_url": "u",
+        "title": "کروز مدیترانه", "meta_description": "خلاصه",
+        "body_markdown": "مقدمه.\n\nقیمت از ۲۷۱ یورو.\n\nپایان.", "faq": [{"q": "س", "a": "ج"}]})
+_b44_calls, _np = [], []
+def _fake_b44(method, path, body=None, drop=False):
+    _b44_calls.append((method, body))
+    if method == "PUT" and not drop:
+        _store.update(body)
+    return 200, dict(_store)
+_saved_b = (_rv.nrs.base44_record, _rv.nrs.b44, _rv.revise_text, _rv.nrs.notion, _rv.nrs.write_text)
+_rv.nrs.base44_record = lambda pid: ("app", dict(_store))
+_rv.nrs.b44 = _fake_b44
+_rv.nrs.notion = lambda m, path, b=None: (_np.append(b), (200, {}))[1]
+_wt = []
+_rv.nrs.write_text = lambda pg, r: _wt.append(r) or 1
+def _brev(**kw):
+    def f(kind, cur, fb, prof, lang):
+        item = json.loads(cur); item.update(kw); return {"item": item, "summary": "removed the fare"}
+    return f
+_brow = {"page_id": "pg", "status": "Needs edits", "feedback": "قیمت را حذف کن", "gate": ""}
+_b44_reset(); _b44_calls.clear(); _np.clear(); _wt.clear(); _log = []
+_rv.revise_text = _brev(body_markdown="مقدمه.\n\nقیمت را با ما هماهنگ کنید.\n\nپایان.")
+_rv.revise_base44(_brow, "cruisebaz.com/blog/x", True, _log)
+_puts = [b for m, b in _b44_calls if m == "PUT"]
+ok("base44 Needs edits: only the changed field is written, the page is rebuilt and goes back to To review",
+   _puts == [{"body_markdown": "مقدمه.\n\nقیمت را با ما هماهنگ کنید.\n\nپایان."}]
+   and _wt and _wt[0]["kind"] == "base44" and "هماهنگ" in _wt[0]["md"]
+   and _np[-1]["properties"]["Status"]["select"]["name"] == "To review"
+   and _np[-1]["properties"]["Feedback"]["rich_text"][0]["text"]["content"].startswith("[Done "))
+_b44_reset(); _b44_calls.clear(); _np.clear(); _log = []
+_rv.revise_text = _brev(body_markdown="مقدمه.\n\nسفر در Arabian Gulf ارزان‌تر شده است امسال.\n\nپایان.")
+_rv.revise_base44(_brow, "cruisebaz.com/blog/x", True, _log)
+ok("base44 Needs edits: a revision that still breaks a house rule is not written; the row's Feedback says so",
+   not [1 for m, _ in _b44_calls if m == "PUT"] and "blocked" in " ".join(_log)
+   and _np and _np[-1]["properties"]["Feedback"]["rich_text"][0]["text"]["content"].startswith(_rv.BLOCKED_TAG))
+_b44_reset("published"); _b44_calls.clear(); _log = []
+_rv.revise_text = _brev(body_markdown="مقدمه.\n\nقیمت را با ما هماهنگ کنید.\n\nپایان.")
+_rv.revise_base44(_brow, "cruisebaz.com/blog/x", True, _log)
+ok("base44 Needs edits: a published article is never rewritten live",
+   not _b44_calls and "only drafts" in " ".join(_log))
+_b44_reset(); _b44_calls.clear(); _log = []
+_rv.revise_text = _brev(slug="/blog/y")
+_rv.revise_base44(_brow, "cruisebaz.com/blog/x", True, _log)
+ok("base44 Needs edits: a revision that adds or renames fields (e.g. the slug) is refused",
+   not _b44_calls and "refused" in " ".join(_log))
+_b44_reset(); _b44_calls.clear(); _log = []
+_rv.nrs.b44 = lambda m, path, b=None: _fake_b44(m, path, b, drop=(len(_b44_calls) == 0))
+_rv.revise_text = _brev(body_markdown="مقدمه.\n\nقیمت را با ما هماهنگ کنید.\n\nپایان.")
+try:
+    _rv.revise_base44(_brow, "cruisebaz.com/blog/x", True, _log); _rb = ""
+except RuntimeError as e:
+    _rb = str(e)
+ok("base44 Needs edits: a write that does not read back is restored from the backup and reported",
+   "restored" in _rb and len(_b44_calls) == 2 and _b44_calls[1][1]["body_markdown"] == "مقدمه.\n\nقیمت از ۲۷۱ یورو.\n\nپایان.")
+_rv.nrs.base44_record, _rv.nrs.b44, _rv.revise_text, _rv.nrs.notion, _rv.nrs.write_text = _saved_b
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz

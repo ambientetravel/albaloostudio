@@ -21,7 +21,14 @@ has not acted on yet:
 
 Each Feedback text is acted on once (a hash marker on the PR). A PR labelled
 `do-not-revise` is left to people — boutimarfarsi#1 is held by its site session.
-base44 drafts (cruisebaz) are not revised here yet.
+
+base44 drafts (cruisebaz.com, since 10 Oct) have no PR: the Article record's
+title, meta description, body and FAQ are revised together (slug untouched), the
+same gate and shrink guard apply, the record is backed up to runs/ before the
+write and restored if the read-back differs, and only a record still in "draft"
+is touched — a published article is never rewritten live. A blocked revision is
+recorded in the row's Feedback ("[Revision blocked …]") so it is not retried
+until the reviewer writes new Feedback.
 
     python3 tools/revise_drafts.py            # dry run: what it would revise
     python3 tools/revise_drafts.py --apply
@@ -205,16 +212,109 @@ def revise_pr(row: dict, pid: str, apply: bool, log: list[str]) -> None:
         **({"House rules": {"select": {"name": review.get("verdict")}}} if review.get("verdict") else {})}})
 
 
+B44_FIELDS = ("title", "meta_description", "body_markdown", "faq")
+BLOCKED_TAG = "[Revision blocked"
+
+
+def _b44_text(item: dict) -> str:
+    return "\n".join([str(item.get("title") or ""), str(item.get("meta_description") or ""),
+                      str(item.get("body_markdown") or "")]
+                     + [f"{x.get('q', '')} {x.get('a', '')}" for x in item.get("faq") or [] if isinstance(x, dict)])
+
+
+def _feedback(page_id: str, text: str) -> None:
+    nrs.notion("PATCH", f"/pages/{page_id}", {"properties": {
+        "Feedback": {"rich_text": [{"type": "text", "text": {"content": text[:1900]}}]}}})
+
+
+def revise_base44(row: dict, pid: str, apply: bool, log: list[str]) -> None:
+    domain = next(d for d in nrs.BASE44_SITES if pid.startswith(d + "/"))
+    profile = nrs.BASE44_SITES[domain][1]
+    found = nrs.base44_record(pid)
+    if not found:
+        log.append(f"skip        {pid}  no base44 record with this slug")
+        return
+    app, rec = found
+    if str(rec.get("status", "")).lower() != "draft":
+        log.append(f"skip        {pid}  record is '{rec.get('status')}' — only drafts are revised")
+        return
+    fb = row["feedback"].strip()
+    item = {k: rec.get(k) for k in B44_FIELDS if k in rec}
+    if "body_markdown" not in item:
+        log.append(f"skip        {pid}  record has no body_markdown")
+        return
+    lang = "fa" if re.search(r"[؀-ۿ]", str(item.get("body_markdown") or "")) else "en"
+    out = revise_text("json", json.dumps(item, ensure_ascii=False), fb, profile, lang)
+    new = out.get("item") or {}
+    if set(new) != set(item) or not isinstance(new.get("body_markdown"), str) \
+            or ("faq" in new and not isinstance(new["faq"], list)):
+        log.append(f"refused     {pid}  the revision changed the article's fields")
+        return
+    before, after = _b44_text(item), _b44_text(new)
+    if len(after) < MIN_KEEP * len(before):
+        log.append(f"refused     {pid}  revision is {len(after)} chars vs {len(before)} — looks truncated")
+        return
+    findings = compliance.check(after, profile)
+    blocks = [v for v in findings if v.severity == compliance.BLOCK]
+    summary = str(out.get("summary") or "").strip()[:300]
+    stamp = datetime.now(timezone.utc).strftime("%-d %b")
+    if blocks:
+        why = "; ".join(f"{v.rule}: {v.excerpt[:60]}" for v in blocks[:3])
+        log.append(f"blocked     {pid}  revision still breaks the house rules: {why}")
+        if apply:
+            _feedback(row["page_id"], f"{BLOCKED_TAG} {stamp} — {why[:300]}] {fb}")
+        return
+    changed = {k: new[k] for k in item if new[k] != item[k]}
+    if not changed:
+        log.append(f"skip        {pid}  the model changed nothing")
+        return
+    log.append(f"revise      {pid}  {summary[:100]}  (fields: {', '.join(changed)})")
+    if not apply:
+        return
+
+    bdir = ROOT / "runs" / f"base44-revise-backup-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
+    bdir.mkdir(parents=True, exist_ok=True)
+    (bdir / f"{rec['id']}.json").write_text(json.dumps(rec, ensure_ascii=False, indent=2), encoding="utf-8")
+    code, d = nrs.b44("PUT", f"/{app}/entities/Article/{rec['id']}", changed)
+    if code != 200:
+        raise RuntimeError(f"base44 write refused ({code}): {str(d)[:160]}")
+    found2 = nrs.base44_record(pid)
+    now = found2[1] if found2 else {}
+    keep = ("slug", "status", "image_url", "image_credit", "image_source")
+    drift = [k for k in keep if rec.get(k) != now.get(k)]
+    if any(now.get(k) != v for k, v in changed.items()) or drift:
+        nrs.b44("PUT", f"/{app}/entities/Article/{rec['id']}",
+                {k: rec.get(k) for k in tuple(changed) + keep if k in rec})
+        raise RuntimeError(f"unexpected read-back (changed {drift or 'the revised fields'}) — restored from backup")
+
+    verdict, review = nrs.base44_gate(now, profile)
+    nrs.write_text(row["page_id"], {"kind": "base44", "pid": pid, "title": now.get("title", ""),
+                                    "summary": now.get("meta_description", ""),
+                                    "md": str(now.get("body_markdown") or ""), "faq": now.get("faq") or [],
+                                    "review": review})
+    nrs.notion("PATCH", f"/pages/{row['page_id']}", {"properties": {
+        "Status": {"select": {"name": "To review"}},
+        "House rules": {"select": {"name": verdict}},
+        "Feedback": {"rich_text": [{"type": "text", "text": {
+            "content": f"[Done {stamp} — {summary[:160]}] {fb}"[:1900]}}]}}})
+
+
 def run(apply: bool) -> list[str]:
     log: list[str] = []
     board = nrs.rows(os.environ.get("NOTION_REVIEW_DB") or nrs.DEFAULT_DB)
     for pid, row in board.items():
-        if row["status"] != "Needs edits" or not row["feedback"].strip() or "#" not in pid:
-            continue                      # base44 rows (domain/slug) are not revised here yet
-        if row["feedback"].lstrip().startswith("[Done "):
-            continue                      # already revised; waiting for the reviewer
+        if row["status"] != "Needs edits" or not row["feedback"].strip():
+            continue
+        if row["feedback"].lstrip().startswith(("[Done ", BLOCKED_TAG)):
+            continue                      # already acted on; waiting for the reviewer
+        b44 = any(pid.startswith(d + "/") for d in nrs.BASE44_SITES)
+        if not b44 and "#" not in pid:
+            continue
+        if b44 and not os.environ.get("BASE44_ACCESS_TOKEN"):
+            log.append(f"skip        {pid}  BASE44_ACCESS_TOKEN not set")
+            continue
         try:
-            revise_pr(row, pid, apply, log)
+            (revise_base44 if b44 else revise_pr)(row, pid, apply, log)
         except Exception as exc:  # noqa: BLE001 — one draft never stops the others
             log.append(f"  ! {pid}: {type(exc).__name__}: {str(exc)[:200]}")
     return log or ["nothing marked Needs edits with new feedback"]
