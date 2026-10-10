@@ -1,4 +1,4 @@
-# Orchestration health — 2026-10-09T14:18 UTC
+# Orchestration health — 2026-10-10T11:32 UTC
 
 **0 broke · 1 need you · 2 to watch.**
 
@@ -8,7 +8,7 @@
 
 ## 🟡 Needs you — only you can do these
 
-- **12 article PR(s) waiting on your merge** (oldest 12 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی; [boutimarfarsi#3](https://github.com/ambientetravel/boutimarfarsi/pull/3) دریانامه draft: راهنمای جامع سفر دریایی دور دنیا; [cruise24-ir#7](https://github.com/ambientetravel/cruise24-ir/pull/7) Agent 2 draft: تفاوت ویزای کروز ترکیه و کروز یون; [boutimarfarsi#6](https://github.com/ambientetravel/boutimarfarsi/pull/6) Agent 2 draft: photos for 1 article(s); [cruise24-ir#9](https://github.com/ambientetravel/cruise24-ir/pull/9) Agent 2 draft: photos for 6 article(s); [boutimar#32](https://github.com/ambientetravel/boutimar/pull/32) Agent 2 draft: photos for 8 article(s); [exploreorient#18](https://github.com/ambientetravel/exploreorient/pull/18) Agent 2 draft: photos for 9 article(s); [exploreorient#19](https://github.com/ambientetravel/exploreorient/pull/19) Agent 2 draft: Armenia's Historic Monasteries: A; [exploreorient#20](https://github.com/ambientetravel/exploreorient/pull/20) Agent 2 draft: Visiting Hegra & AlUla: A Practic; [exploreorient#21](https://github.com/ambientetravel/exploreorient/pull/21) Agent 2 draft: Jordan Itinerary: Petra and Wadi ; [exploreorient#22](https://github.com/ambientetravel/exploreorient/pull/22) Agent 2 draft: Fann Mountains Trekking Guide | T; [exploreorient#23](https://github.com/ambientetravel/exploreorient/pull/23) Agent 2 draft: A Guide to Lycian Coast Gulet Cru
+- **8 article PR(s) waiting on your merge** (oldest 13 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی; [boutimarfarsi#3](https://github.com/ambientetravel/boutimarfarsi/pull/3) دریانامه draft: راهنمای جامع سفر دریایی دور دنیا; [cruise24-ir#7](https://github.com/ambientetravel/cruise24-ir/pull/7) Agent 2 draft: تفاوت ویزای کروز ترکیه و کروز یون; [exploreorient#19](https://github.com/ambientetravel/exploreorient/pull/19) Agent 2 draft: Armenia's Historic Monasteries: A; [exploreorient#20](https://github.com/ambientetravel/exploreorient/pull/20) Agent 2 draft: Visiting Hegra & AlUla: A Practic; [exploreorient#21](https://github.com/ambientetravel/exploreorient/pull/21) Agent 2 draft: Jordan Itinerary: Petra and Wadi ; [exploreorient#22](https://github.com/ambientetravel/exploreorient/pull/22) Agent 2 draft: Fann Mountains Trekking Guide | T; [exploreorient#23](https://github.com/ambientetravel/exploreorient/pull/23) Agent 2 draft: A Guide to Lycian Coast Gulet Cru
 
 ## 👀 To watch
 
@@ -27,24 +27,24 @@
 | Briefs deferred by cap | 0 | |
 | Model spend | — | $0.570 |
 | Social: campaigns / posts held / no-media | 5 / 3 / 3 | |
-| Article PRs open | 12 | |
+| Article PRs open | 8 | |
 | AI recall (Oracle, monthly) | 0/8 properties named by ≥1 of 2 models | |
 
 ## Agents
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | · never ran | — |  |
-| Writer | ✓ success | 3.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439324302) |
-| Broadcaster | ✓ success | 3.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439672404) |
-| Closer | ✓ success | 0.3d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37892695345) |
-| Auditor+Analyst | · never ran | — |  |
-| Cartographer | · never ran | — |  |
-| Watcher | · never ran | — |  |
-| Oracle | · never ran | — |  |
-| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37941927937) |
-| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37932311207) |
-| Dashboard | · never ran | — |  |
+| Scout | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37195789418) |
+| Writer | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439324302) |
+| Broadcaster | ✓ success | 4.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37439672404) |
+| Closer | ✓ success | 0.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/38029374354) |
+| Auditor+Analyst | ✓ success | 5.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475) |
+| Cartographer | ✓ success | 5.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115) |
+| Watcher | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37199470106) |
+| Oracle | ✓ success | 8.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426) |
+| Merge-watch | ✓ success | 0.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37941927937) |
+| PR gate | ✓ success | 0.3d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/38025673578) |
+| Dashboard | ✓ success | 4.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37319951897) |
 
 ## ✓ Fine
 
