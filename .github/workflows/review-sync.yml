@@ -17,6 +17,12 @@ on:
         description: "Apply (unticked = dry run)"
         type: boolean
         default: true
+      rehearse:
+        description: "Dry-run the reviser on one draft instead (Pipeline ID, or a domain for its first base44 draft)"
+        default: ""
+      feedback:
+        description: "Feedback text for the rehearsal"
+        default: ""
 
 permissions:
   contents: read
@@ -62,8 +68,13 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PROSE_PROVIDER: ${{ vars.PROSE_PROVIDER || 'anthropic' }}
+          # inputs reach the shell as env, never interpolated into the script
+          REHEARSE: ${{ inputs.rehearse }}
+          FEEDBACK: ${{ inputs.feedback }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply }}" != "true" ]; then
+          if [ -n "$REHEARSE" ]; then
+            python3 tools/revise_drafts.py --rehearse "$REHEARSE" --feedback "$FEEDBACK" | tee -a "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply }}" != "true" ]; then
             python3 tools/revise_drafts.py | tee -a "$GITHUB_STEP_SUMMARY"
           else
             python3 tools/revise_drafts.py --apply | tee -a "$GITHUB_STEP_SUMMARY"

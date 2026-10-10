@@ -270,6 +270,9 @@ def revise_base44(row: dict, pid: str, apply: bool, log: list[str]) -> None:
         return
     log.append(f"revise      {pid}  {summary[:100]}  (fields: {', '.join(changed)})")
     if not apply:
+        for k, v in changed.items():
+            a, b = json.dumps(item[k], ensure_ascii=False), json.dumps(v, ensure_ascii=False)
+            log.append(f"            {k}: {len(a)} → {len(b)} chars")
         return
 
     bdir = ROOT / "runs" / f"base44-revise-backup-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
@@ -323,10 +326,22 @@ def run(apply: bool) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--rehearse", metavar="PID", help="dry-run one draft with --feedback, whatever its Status "
+                    "(a bare domain = its first base44 draft); never writes")
+    ap.add_argument("--feedback", default="")
     a = ap.parse_args(argv)
     missing = [k for k in ("NOTION_TOKEN", "GITHUB_TOKEN") if not os.environ.get(k)]
     if missing:
         print(f"not configured: {', '.join(missing)} — nothing revised")
+        return 0
+    if a.rehearse:
+        pid = a.rehearse
+        if pid in nrs.BASE44_SITES:
+            pid = next((r["pid"] for r in nrs.base44_drafts() if r["site"] == pid), pid)
+        log: list[str] = []
+        row = {"page_id": "", "status": "Needs edits", "feedback": a.feedback}
+        (revise_base44 if any(pid.startswith(d + "/") for d in nrs.BASE44_SITES) else revise_pr)(row, pid, False, log)
+        print(f"rehearsal (nothing written) — {pid}\n" + "\n".join(log or ["(no output)"]))
         return 0
     print("\n".join(run(a.apply)))
     return 0
