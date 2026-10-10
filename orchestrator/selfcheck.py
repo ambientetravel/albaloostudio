@@ -4354,6 +4354,16 @@ def _closed(sc):
 ok("reviser: every object in its output schemas is closed, and a JSON article comes back parsed",
    len(_schemas) == 2 and all(_closed(x) for x in _schemas) and _oj["item"] == {"slug": "a", "title": "T2"})
 
+# Health: a weekly agent pushed off the first page of runs by the hourly sync is not "never ran" (10 Oct)
+_saved_hj = _hr._json
+_pages = {1: [{"name": "Content Review sync (Notion ⇄ GitHub)", "conclusion": "success", "display_title": "x"}] * 100,
+          2: [{"name": "Agent 8 — Competitor Scout", "conclusion": "success", "display_title": "y"}]}
+_hr._json = lambda url, tok: {"workflow_runs": _pages.get(int(url.rsplit("page=", 1)[1]), [])}
+_lr = _hr.latest_runs("t")
+_hr._json = _saved_hj
+ok("health: agents on later pages of the run list are found, not reported as 'never ran'",
+   "Agent 8 — Competitor Scout" in _lr)
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz

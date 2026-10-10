@@ -93,14 +93,19 @@ def _json(url: str, token: str):
     return json.loads(body.decode("utf-8"))
 
 
-def latest_runs(token: str) -> dict[str, dict]:
-    """Newest run per workflow display name."""
-    d = _json(f"{API}/repos/{REPO}/actions/runs?per_page=100", token)
+def latest_runs(token: str, max_pages: int = 8) -> dict[str, dict]:
+    """Newest run per workflow display name. Pages back until every agent is found:
+    the hourly review sync alone fills 100 runs in ~4 days, so one page made the
+    weekly agents read "never ran" (10 Oct — they had run on 4–5 Oct)."""
     out: dict[str, dict] = {}
-    for r in d.get("workflow_runs", []):
-        if not _counts(r):
-            continue
-        out.setdefault(r["name"], r)  # list is newest-first
+    for page in range(1, max_pages + 1):
+        d = _json(f"{API}/repos/{REPO}/actions/runs?per_page=100&page={page}", token)
+        batch = d.get("workflow_runs", [])
+        for r in batch:
+            if _counts(r):
+                out.setdefault(r["name"], r)  # list is newest-first
+        if len(batch) < 100 or all(name in out for name in AGENTS):
+            break
     return out
 
 
