@@ -4333,6 +4333,27 @@ ok("base44 Needs edits: a write that does not read back is restored from the bac
    "restored" in _rb and len(_b44_calls) == 2 and _b44_calls[1][1]["body_markdown"] == "مقدمه.\n\nقیمت از ۲۷۱ یورو.\n\nپایان.")
 _rv.nrs.base44_record, _rv.nrs.b44, _rv.revise_text, _rv.nrs.notion, _rv.nrs.write_text = _saved_b
 
+# Structured output refuses an open-ended object; the 10 Oct rehearsal hit a 400 on {"type": "object"}.
+import llm as _llm_rv
+_saved_cj = _llm_rv.complete_json_resilient
+_schemas = []
+def _cj(system, prompt, schema, **kw):
+    _schemas.append(schema)
+    return ({"item_json": '{"slug": "a", "title": "T2"}', "summary": "s"} if "item_json" in schema["properties"]
+            else {"text": "x", "summary": "s"}), {}
+_llm_rv.complete_json_resilient = _cj
+_oj = _rv.revise_text("json", '{"slug": "a", "title": "T"}', "fb", "boutimar_v1", "fa")
+_rv.revise_text("markdown", "body", "fb", "boutimar_v1", "fa")
+_llm_rv.complete_json_resilient = _saved_cj
+def _closed(sc):
+    if not isinstance(sc, dict):
+        return True
+    if sc.get("type") == "object" and sc.get("additionalProperties") is not False:
+        return False
+    return all(_closed(v) for v in list((sc.get("properties") or {}).values()) + [sc.get("items")])
+ok("reviser: every object in its output schemas is closed, and a JSON article comes back parsed",
+   len(_schemas) == 2 and all(_closed(x) for x in _schemas) and _oj["item"] == {"slug": "a", "title": "T2"})
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz

@@ -50,6 +50,7 @@ jobs:
           # cruisebaz.com + ambientetravel.com drafts are base44 Article records
           BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
         run: |
+          set -o pipefail   # `| tee` must not turn a crash green
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply }}" != "true" ]; then
             python3 tools/notion_review_sync.py | tee -a "$GITHUB_STEP_SUMMARY"
           else
@@ -72,6 +73,7 @@ jobs:
           REHEARSE: ${{ inputs.rehearse }}
           FEEDBACK: ${{ inputs.feedback }}
         run: |
+          set -o pipefail   # `| tee` must not turn a crash green
           if [ -n "$REHEARSE" ]; then
             python3 tools/revise_drafts.py --rehearse "$REHEARSE" --feedback "$FEEDBACK" | tee -a "$GITHUB_STEP_SUMMARY"
           elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply }}" != "true" ]; then

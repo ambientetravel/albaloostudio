@@ -92,11 +92,15 @@ def revise_text(kind: str, current: str, feedback: str, profile: str, language: 
               + compliance.prompt_constraints(profile))
     if kind == "json":
         prompt = (f"Reviewer feedback:\n{feedback}\n\nThe article as a JSON object (language {language}):\n"
-                  f"{current}\n\nReturn JSON {{\"item\": <the same object with the feedback applied — same keys, "
-                  f"same slug, same structure>, \"summary\": \"one line: what you changed\"}}.")
+                  f"{current}\n\nReturn JSON {{\"item_json\": \"<the same object with the feedback applied, "
+                  f"serialised as a JSON string — same keys, same slug, same structure>\", "
+                  f"\"summary\": \"one line: what you changed\"}}.")
+        # The article's own shape varies by site, and structured output refuses an
+        # open-ended object (every object needs additionalProperties: false), so the
+        # item travels as a JSON string and is parsed here.
         schema = {"type": "object", "additionalProperties": False,
-                  "properties": {"item": {"type": "object"}, "summary": {"type": "string"}},
-                  "required": ["item", "summary"]}
+                  "properties": {"item_json": {"type": "string"}, "summary": {"type": "string"}},
+                  "required": ["item_json", "summary"]}
     else:
         prompt = (f"Reviewer feedback:\n{feedback}\n\nThe article body in Markdown (language {language}):\n"
                   f"{current}\n\nReturn JSON {{\"text\": \"<the full Markdown body with the feedback applied>\", "
@@ -106,6 +110,12 @@ def revise_text(kind: str, current: str, feedback: str, profile: str, language: 
                   "required": ["text", "summary"]}
     out, _ = llm.complete_json_resilient(system, prompt, schema, max_tokens=16000,
                                          purpose="draft revision", waits=(0,))
+    if kind == "json":
+        try:
+            item = json.loads(out.get("item_json") or "")
+        except ValueError:
+            item = None
+        out = {"item": item if isinstance(item, dict) else {}, "summary": out.get("summary", "")}
     return out
 
 
