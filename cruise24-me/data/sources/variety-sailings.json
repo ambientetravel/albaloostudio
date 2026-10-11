@@ -1,7 +1,7 @@
 {
  "_about": "Variety Cruises sailings read from varietycruises.com cruise pages (the line's own booking data). priceFrom = cheapest cabin category with cabins left, EUR per person, port charges excluded; soldOut when none are left.",
  "source": "Variety Cruises",
- "synced": "2026-09-27",
+ "synced": "2026-10-11",
  "sailings": [
   {
    "id": "VAR-antiquity-to-byzantium-canal-crossing",
@@ -187,8 +187,7 @@
    "region": "Greek Islands",
    "ships": [
     "Harmony G",
-    "Harmony V",
-    "Variety Voyager"
+    "Harmony V"
    ],
    "nights": 7,
    "route": [
@@ -250,30 +249,11 @@
    "notIncluded": [
     "Beverages (except those mentioned above).",
     "Shore excursions on the islands or other land arrangements.",
-    "A government-mandated sustainability fee applies",
-    "only to the Variety Voyager",
-    "(October 2, 2026 departure) and is not included in the cruise fare.",
     "Crew tips.",
     "Passenger personal expenses.",
     "Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-10-02",
-     "code": "CGVV261002",
-     "ship": "Variety Voyager",
-     "nights": 7,
-     "priceFrom": 3590,
-     "soldOut": false
-    },
-    {
-     "date": "2026-10-09",
-     "code": "CGHG261009",
-     "ship": "Harmony G",
-     "nights": 7,
-     "priceFrom": 2850,
-     "soldOut": false
-    },
     {
      "date": "2027-04-16",
      "code": "CGHG270416",
@@ -653,14 +633,6 @@
      "soldOut": false
     },
     {
-     "date": "2027-08-20",
-     "code": null,
-     "ship": "Callisto",
-     "nights": 7,
-     "priceFrom": null,
-     "soldOut": false
-    },
-    {
      "date": "2027-09-03",
      "code": null,
      "ship": "Callisto",
@@ -780,8 +752,7 @@
    "summary": "Discover the timeless treasures of the Aegean Sea on an unforgettable journey through Greece and Turkey. Sail between iconic Greek islands, exploring highlights such as Delos &amp; Mykonos, Syros, Patmos, Naxos, and Sifnos, alongside the legendary ruins of Ephesus in Kusadasi . This carefully curated itinerary offers a perfectly balanced exploration of the Cyclades and the Eastern Aegean, blending rich history, stunning island landscapes, and authentic local culture, all enjoyed at a relaxed pace aboard an intimate yacht-style cruise. Enhancing your experience, enjoy two complimentary shore excursions to the archaeological site of Delos and the ancient city of Ephesus in Kusadasi, allowing you to delve deeper into the region’s extraordinary heritage. Perfect for travelers seeking a refined yet immersive Greece and Turkey cruise experience, this voyage offers effortless exploration, cultural depth, and breathtaking scenery at every stop.",
    "region": "Greek Islands & Türkiye",
    "ships": [
-    "Panorama",
-    "Variety Voyager"
+    "Panorama"
    ],
    "nights": 7,
    "route": [
@@ -850,14 +821,6 @@
     "Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-10-09",
-     "code": "AOVV261009",
-     "ship": "Variety Voyager",
-     "nights": 7,
-     "priceFrom": 2850,
-     "soldOut": false
-    },
     {
      "date": "2027-04-30",
      "code": "AOPI270430",
@@ -1201,8 +1164,8 @@
    "summary": "Cyclades: Dazzling white villages, golden beaches and clear azure water are just the start of what these islands have to offer. Ancient Greek geographers gave this unique cluster of islands the name Cyclades because they saw that they formed a circle ('kyklos\" in Greek) of sorts around the sacred island of Delos. According to myth, the islands were the debris that remained after a battle between giants. In reality, they resulted from colossal geological events like earthquakes and volcanic eruptions.",
    "region": "Greek Islands",
    "ships": [
-    "Panorama",
-    "Galileo"
+    "Galileo",
+    "Panorama"
    ],
    "nights": 7,
    "route": [
@@ -1269,22 +1232,6 @@
     "Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-10-02",
-     "code": "CJPAN261002",
-     "ship": "Panorama",
-     "nights": 7,
-     "priceFrom": 2590,
-     "soldOut": false
-    },
-    {
-     "date": "2026-10-09",
-     "code": "CJ261009",
-     "ship": "Galileo",
-     "nights": 7,
-     "priceFrom": 3290,
-     "soldOut": false
-    },
     {
      "date": "2026-10-16",
      "code": "CJ261016",
@@ -1655,22 +1602,6 @@
     "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
    ],
    "departures": [
-    {
-     "date": "2026-09-30",
-     "code": "SEY260930D3",
-     "ship": "Pegasus",
-     "nights": 3,
-     "priceFrom": 2380,
-     "soldOut": false
-    },
-    {
-     "date": "2026-10-07",
-     "code": "SEY261007D3",
-     "ship": "Pegasus",
-     "nights": 3,
-     "priceFrom": 2380,
-     "soldOut": false
-    },
     {
      "date": "2026-10-14",
      "code": "SEY261014D3",
@@ -2114,22 +2045,6 @@
     "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
    ],
    "departures": [
-    {
-     "date": "2026-10-03",
-     "code": "SEY261003D5",
-     "ship": "Pegasus",
-     "nights": 4,
-     "priceFrom": 2150,
-     "soldOut": false
-    },
-    {
-     "date": "2026-10-10",
-     "code": "SEY261010D5",
-     "ship": "Pegasus",
-     "nights": 4,
-     "priceFrom": 2950,
-     "soldOut": false
-    },
     {
      "date": "2026-10-17",
      "code": "SEY261017D5",
@@ -2589,22 +2504,6 @@
     "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
    ],
    "departures": [
-    {
-     "date": "2026-10-03",
-     "code": "SEY261003D7",
-     "ship": "Pegasus",
-     "nights": 7,
-     "priceFrom": 2850,
-     "soldOut": false
-    },
-    {
-     "date": "2026-10-10",
-     "code": "SEY261010D7",
-     "ship": "Pegasus",
-     "nights": 7,
-     "priceFrom": 4150,
-     "soldOut": false
-    },
     {
      "date": "2026-10-17",
      "code": "SEY261017D7",
@@ -3477,22 +3376,6 @@
    ],
    "departures": [
     {
-     "date": "2026-10-02",
-     "code": "TAH7D261002",
-     "ship": "Panorama II",
-     "nights": 7,
-     "priceFrom": 2550,
-     "soldOut": false
-    },
-    {
-     "date": "2026-10-09",
-     "code": "TAH7D261009",
-     "ship": "Panorama II",
-     "nights": 7,
-     "priceFrom": 2990,
-     "soldOut": false
-    },
-    {
      "date": "2026-11-06",
      "code": "TAH7D261106",
      "ship": "Panorama II",
@@ -3895,14 +3778,6 @@
     "Wi-Fi (available at charge)"
    ],
    "departures": [
-    {
-     "date": "2026-10-09",
-     "code": "UNEXPAN261009",
-     "ship": "Panorama",
-     "nights": 7,
-     "priceFrom": 3140,
-     "soldOut": false
-    },
     {
      "date": "2027-05-07",
      "code": "UNEXPAN270507",
