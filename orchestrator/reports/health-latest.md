@@ -1,4 +1,4 @@
-# Orchestration health — 2026-10-11T08:29 UTC
+# Orchestration health — 2026-10-11T08:31 UTC
 
 **0 broke · 1 need you · 1 to watch.**
 
@@ -22,11 +22,11 @@
 | Gap candidates → briefs | 99 → **12** | |
 | Skipped by ledger (already briefed) | 66 | |
 | Dead-lettered / degraded | 0 / 0 | |
-| Articles drafted (as PRs) | **1** | 7 |
+| Articles drafted (as PRs) | **1** | 1 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $0.302 | $1.009 |
+| Model spend | $0.298 | $0.302 |
 | Social: campaigns / posts held / no-media | 5 / 3 / 3 | |
-| Article PRs open | 13 | |
+| Article PRs open | 14 | |
 | AI recall (Oracle, monthly) | 0/8 properties named by ≥1 of 2 models | |
 
 ## Agents
@@ -34,10 +34,10 @@
 | Agent | Last result | Age | |
 |---|---|---:|---|
 | Scout | ✓ success | 0.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/38110997793) |
-| Writer | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/38124902655) |
-| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/38124847155) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/38124902655) |
+| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/38125084359) |
 | Closer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/38124256255) |
-| Auditor+Analyst | ✓ success | 5.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475) |
+| Auditor+Analyst | ✓ success | 5.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475) |
 | Cartographer | ✓ success | 5.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115) |
 | Watcher | ✓ success | 6.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/37199470106) |
 | Oracle | ✓ success | 9.7d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426) |

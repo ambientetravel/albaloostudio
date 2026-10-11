@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-11T08:29+00:00",
+ "generated": "2026-10-11T08:31+00:00",
  "critical": [],
  "needs_you": [
   "**8 article PR(s) waiting on your merge** (oldest 14 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی; [boutimarfarsi#3](https://github.com/ambientetravel/boutimarfarsi/pull/3) دریانامه draft: راهنمای جامع سفر دریایی دور دنیا; [cruise24-ir#7](https://github.com/ambientetravel/cruise24-ir/pull/7) Agent 2 draft: تفاوت ویزای کروز ترکیه و کروز یون; [exploreorient#19](https://github.com/ambientetravel/exploreorient/pull/19) Agent 2 draft: Armenia's Historic Monasteries: A; [exploreorient#20](https://github.com/ambientetravel/exploreorient/pull/20) Agent 2 draft: Visiting Hegra & AlUla: A Practic; [exploreorient#21](https://github.com/ambientetravel/exploreorient/pull/21) Agent 2 draft: Jordan Itinerary: Petra and Wadi ; [exploreorient#22](https://github.com/ambientetravel/exploreorient/pull/22) Agent 2 draft: Fann Mountains Trekking Guide | T; [exploreorient#23](https://github.com/ambientetravel/exploreorient/pull/23) Agent 2 draft: A Guide to Lycian Coast Gulet Cru"
@@ -22,14 +22,14 @@
   "writer_failed": 0,
   "deferred": 0,
   "briefs_seen": 12,
-  "cost_usd": 0.301881,
-  "prev_cost_usd": 1.008873,
-  "prev_articles": 7,
+  "cost_usd": 0.298131,
+  "prev_cost_usd": 0.301881,
+  "prev_articles": 1,
   "posts": 6,
   "posts_held": 3,
   "posts_no_media": 3,
   "campaigns": 5,
-  "open_prs": 13,
+  "open_prs": 14,
   "ai_recall": "0/8 properties named by ≥1 of 2 models"
  },
  "agents": [
@@ -42,17 +42,17 @@
   },
   {
    "agent": "Writer",
-   "result": "in_progress",
+   "result": "success",
    "age_days": 0.0,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38124902655",
    "run": 69
   },
   {
    "agent": "Broadcaster",
-   "result": "success",
+   "result": "in_progress",
    "age_days": 0.0,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38124847155",
-   "run": 67
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38125084359",
+   "run": 68
   },
   {
    "agent": "Closer",
@@ -64,7 +64,7 @@
   {
    "agent": "Auditor+Analyst",
    "result": "success",
-   "age_days": 5.8,
+   "age_days": 5.9,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475",
    "run": 11
   },
