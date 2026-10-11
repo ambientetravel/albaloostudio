@@ -202,8 +202,14 @@ _man = {"outcomes": [
     {"domain": "a.com", "keyword": "k5", "status": "deferred"},
     {"domain": "a.com", "keyword": "k1", "status": "blocked"}]}
 _rel = _cr.collect(_man)
-ok("collect_releases frees only blocked+failed, deduped (not drafted/config/deferred)",
-   {(r["domain"], r["query"]) for r in _rel} == {("a.com", "k1"), ("a.com", "k2")})
+ok("collect_releases frees blocked+failed+deferred, deduped (not drafted/config)",
+   {(r["domain"], r["query"]) for r in _rel} == {("a.com", "k1"), ("a.com", "k2"), ("a.com", "k5")})
+# 11 Oct: a one-site re-run became 'the latest writer run' and would have hidden the
+# Sunday run's deferred briefs; and a keyword drafted on the re-run must not be freed.
+_rel2 = _cr.collect_many([_man, {"outcomes": [{"domain": "a.com", "keyword": "k1", "status": "drafted"},
+                                              {"domain": "b.com", "keyword": "k9", "status": "deferred"}]}])
+ok("collect_releases over several writer runs: union of releases, minus anything drafted in any of them",
+   {(r["domain"], r["query"]) for r in _rel2} == {("a.com", "k2"), ("a.com", "k5"), ("b.com", "k9")})
 _doc = {"entries": [{"domain": "a.com", "query": q} for q in ("k1", "k2", "k3")]}
 _freed = _led.apply_releases(_doc, [(r["domain"], r["query"]) for r in _rel])
 ok("apply_releases removes exactly the freed keywords and keeps the drafted one",

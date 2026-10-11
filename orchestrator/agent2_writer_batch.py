@@ -421,7 +421,10 @@ def main(argv: list[str] | None = None) -> int:
                 outcomes.append(Outcome(
                     brief_file=rest.get("envelope", {}).get("message_id", "unknown"),
                     domain=str(rest.get("site", {}).get("domain", "")),
-                    keyword=str(rest.get("brief", {}).get("primary_keyword", "")),
+                    # the keyword lives under opportunity, not brief — read from
+                    # brief it was blank, so a deferred brief could never be released
+                    keyword=str(rest.get("opportunity", {}).get("primary_keyword", "")
+                                or rest.get("brief", {}).get("primary_keyword", "")),
                     status="deferred", error=halt))
             break
 

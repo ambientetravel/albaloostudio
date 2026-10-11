@@ -139,13 +139,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set +e
-          rid=$(gh run list --workflow agent2-writer.yml --status success \
-                  --limit 1 --json databaseId --jq '.[0].databaseId' 2>/dev/null)
-          if [ -n "$rid" ]; then
-            gh run download "$rid" -n agent2-written --dir "$RUNNER_TEMP/a2" 2>/dev/null
-            man=$(find "$RUNNER_TEMP/a2" -name manifest.json 2>/dev/null | head -1)
-            [ -n "$man" ] && python3 tools/collect_releases.py "$man" written/releases.json
-          fi
+          # Every successful writer run of the last 8 days, not just the newest:
+          # a one-site re-run (11 Oct, boutimar.ir) would otherwise hide the main
+          # Sunday run's blocked/deferred outcomes. A keyword drafted in any of
+          # them is never released.
+          since=$(date -u -d '8 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          rids=$(gh run list --workflow agent2-writer.yml --status success --limit 8 \
+                   --json databaseId,createdAt --jq ".[] | select(.createdAt >= \"$since\") | .databaseId" 2>/dev/null)
+          for rid in $rids; do
+            gh run download "$rid" -n agent2-written --dir "$RUNNER_TEMP/a2/$rid" 2>/dev/null
+          done
+          mans=$(find "$RUNNER_TEMP/a2" -name manifest.json 2>/dev/null)
+          [ -n "$mans" ] && python3 tools/collect_releases.py $mans --out written/releases.json
           true
 
       - name: Run the scout
