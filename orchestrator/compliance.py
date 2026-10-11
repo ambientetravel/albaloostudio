@@ -113,7 +113,10 @@ _VISA_RULE_SUBJECT = re.compile(r"(?i)aroya|seychelles|آرویا|آروای
 # به‌صورت واقعاً بدون ویزا … است» was blocked as if it called the Gulf visa-free.
 # A forbidden place with no contrast word before it still blocks.
 _CONTRAST_BEFORE = re.compile(
-    r"(?i)\b(unlike|except(\s+for)?|apart\s+from|other\s+than|as\s+opposed\s+to)\b[^.!?؟\n,،]{0,20}$"
+    r"(?i)\b(unlike|except(\s+for)?|apart\s+from|other\s+than|as\s+opposed\s+to|not(?!\s+only\b))\b[^.!?؟\n,،]{0,20}$"
+    # «…آرویا (ترکیه و مصر) و سیشل هستند، نه خلیج فارس» — "…, NOT the Persian Gulf"
+    # (11 Oct, blocked twice). «نه تنها» / "not only" is the opposite and still blocks.
+    r"|(?<![؀-ۿ])نه(?![؀-ۿ])(?!\s*تنها)[^.!?؟\n,،]{0,20}$"
     # «جز» only as a whole word — bare, it sits inside «جزایر» (islands), and
     # «جزایر خلیج فارس بدون ویزا» must still block.
     r"|(برخلاف|بر\s*خلاف|(?<![؀-ۿ])(به[‌\s]*جز|بجز|جز)(?![؀-ۿ])|به[‌\s]*استثنای|در\s*مقابل)[^.!?؟\n,،]{0,20}$"

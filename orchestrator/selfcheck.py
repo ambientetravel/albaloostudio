@@ -4413,7 +4413,9 @@ _ok_rule = [
 _ok_gulf = "مسیرهای آرویا در ترکیه و مصر و همچنین کروز سیشل، برخلاف مسیر خلیج فارس، به‌صورت واقعاً بدون ویزا برای مسافر ایرانی قابل‌رزرو هستند."
 ok("visa gate: the AROYA/Seychelles rule stated in a Greek-itinerary article, and a link titled 'visa-free cruises', pass",
    all(not _vb(t, _greek) for t in _ok_rule))
-ok("visa gate: 'Seychelles, unlike the Persian Gulf route, is visa-free' passes", not _vb(_ok_gulf))
+_ok_not = "این مسیر ویزای امارات لازم دارد، نه بدون ویزا؛ باید پیش از سفر اقدام شود مسیرهای واقعاً بدون ویزا برای ایرانیان آرویا (ترکیه و مصر) و سیشل هستند، نه خلیج فارس."
+ok("visa gate: 'Seychelles, unlike the Persian Gulf route, is visa-free' and '…AROYA and Seychelles, not the Persian Gulf' pass",
+   not _vb(_ok_gulf) and not _vb(_ok_not))
 _lies = [
     ("کروز خلیج فارس از دبی برای ایرانیان بدون ویزا است.", None),
     ("سفر به جزایر خلیج فارس بدون نیاز به ویزا است.", None),
@@ -4421,6 +4423,8 @@ _lies = [
     ("کروز آرویا به سانتورینی بدون نیاز به ویزا است.", None),
     ("این کروز از استانبول بدون نیاز به ویزا است.", _greek),
     ("[کروز دبی بدون ویزا](https://x/dubai)", None),
+    ("نه تنها دبی بلکه قطر هم برای ایرانیان بدون نیاز به ویزا است.", None),
+    ("Not only Dubai but the whole Persian Gulf route is visa-free.", None),
 ]
 ok("visa gate: the lies still block — Gulf/Dubai visa-free, 'islands of the Persian Gulf', AROYA to Santorini, a Greek itinerary from Istanbul, a Dubai link title",
    all(_vb(t, p) for t, p in _lies))
