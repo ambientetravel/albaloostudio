@@ -4364,6 +4364,35 @@ _hr._json = _saved_hj
 ok("health: agents on later pages of the run list are found, not reported as 'never ran'",
    "Agent 8 — Competitor Scout" in _lr)
 
+# ── Closer: one dropped connection to a lead source is retried, not a red run (11 Oct) ──
+import agent4_sales_closer_batch as _a4b
+import requests as _rq
+_saved_a4 = (_rq.get, _a4b._sleep)
+class _R:
+    def __init__(self, code, data=None): self.status_code, self._d, self.text = code, data, ""
+    def json(self): return self._d
+_seq, _slept = [], []
+def _fake_get(url, headers=None, timeout=None):
+    x = _seq.pop(0)
+    if isinstance(x, Exception): raise x
+    return x
+_rq.get, _a4b._sleep = _fake_get, (lambda s: _slept.append(s))
+_seq[:] = [_rq.ConnectTimeout("timed out"), _R(503), _R(200, {"leads": [{"id": 1}]})]
+_got = _a4b._fetch_leads("https://x/api/leads.php")
+_seq[:] = [_rq.ConnectTimeout("t")] * 3
+try:
+    _a4b._fetch_leads("https://x/api/leads.php"); _persist = False
+except _rq.ConnectionError:
+    _persist = True
+_seq[:] = [_R(401)]; _slept.clear()
+try:
+    _a4b._fetch_leads("https://x/api/leads.php"); _auth = False
+except _rq.HTTPError:
+    _auth = not _slept
+_rq.get, _a4b._sleep = _saved_a4
+ok("Closer: a timeout then a 503 are retried and the leads still load; a lasting outage still fails; a 401 fails at once",
+   _got == [{"id": 1}] and _persist and _auth)
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz

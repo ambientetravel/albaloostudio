@@ -198,6 +198,14 @@ def close_one(raw: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Outcome:
         return oc
 
 
+LEAD_FETCH_RETRY_WAITS = (20, 60)   # seconds before the 2nd and 3rd attempt
+
+
+def _sleep(seconds: float) -> None:
+    import time
+    time.sleep(seconds)
+
+
 def _fetch_leads(url: str) -> list[dict[str, Any]]:
     """
     Pull leads from an endpoint — the portal at res.boutimar.ir, a Make
@@ -223,13 +231,29 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
         log.info("lead-pull secret: %d chars, fingerprint %s",
                  len(secret), hashlib.sha256(secret.encode("utf-8")).hexdigest()[:8])
     body = b""
-    headers = (config.signed_headers(secret, body, "agent4-lead-pull")
-               if secret else {"User-Agent": config.USER_AGENT})
     if not secret:
         log.warning("LEADS_SIGNING_SECRET / WEBHOOK_SIGNING_SECRET not set — pulling leads unsigned. "
                     "The source cannot tell this request from anyone else's.")
 
-    resp = requests.get(url, headers=headers, timeout=config.WEBHOOK_TIMEOUT_S)
+    # A shared host that drops one connection must not turn the run red: 11 Oct
+    # 05:56 UTC cruise24.me timed out once, answered in 0.4 s minutes later, and
+    # the whole Closer run failed and emailed. Connection errors and 5xx are
+    # retried (signed afresh each time — the signature carries a timestamp); a
+    # 4xx is an answer, not an outage, and fails at once.
+    for attempt, wait in enumerate((0,) + LEAD_FETCH_RETRY_WAITS):
+        if wait:
+            log.warning("lead source %s unreachable — retrying in %ds", url, wait)
+            _sleep(wait)
+        headers = (config.signed_headers(secret, body, "agent4-lead-pull")
+                   if secret else {"User-Agent": config.USER_AGENT})
+        try:
+            resp = requests.get(url, headers=headers, timeout=config.WEBHOOK_TIMEOUT_S)
+        except (requests.ConnectionError, requests.Timeout):
+            if attempt == len(LEAD_FETCH_RETRY_WAITS):
+                raise
+            continue
+        if resp.status_code < 500 or attempt == len(LEAD_FETCH_RETRY_WAITS):
+            break
     if resp.status_code >= 400:
         # The source's own reason ("unsigned", "stale", "signature") is what tells a wrong
         # secret from a host that strips the X- headers; raise_for_status alone drops it.
