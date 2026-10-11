@@ -100,6 +100,30 @@ _VISA_EXEMPT_DEST = re.compile(
     r"|ترکیه|تركيه|مصر|سیشل|سیشیل"
 )
 
+# The rule itself names its subject: AROYA's Türkiye/Egypt routes or Seychelles.
+# A clause that puts the visa-free claim on THAT subject is stating the policy,
+# even inside an article about a Schengen itinerary — 11 Oct, the Celestyal
+# Greek-islands draft was dead-lettered four times for writing «تنها مسیرهای
+# ترکیه و مصر با آرویا و سیشل … بدون نیاز به ویزا هستند», the sentence the rule
+# asks for. Must appear BEFORE the claim, so "visa-free, unlike AROYA" is not it.
+_VISA_RULE_SUBJECT = re.compile(r"(?i)aroya|seychelles|آرویا|آروایا|سیشل|سیشیل")
+
+# "unlike the Persian Gulf route", «برخلاف مسیر خلیج فارس»: the forbidden place is
+# named to be EXCLUDED from the claim. 11 Oct: «کروز سیشل، برخلاف مسیر خلیج فارس،
+# به‌صورت واقعاً بدون ویزا … است» was blocked as if it called the Gulf visa-free.
+# A forbidden place with no contrast word before it still blocks.
+_CONTRAST_BEFORE = re.compile(
+    r"(?i)\b(unlike|except(\s+for)?|apart\s+from|other\s+than|as\s+opposed\s+to)\b[^.!?؟\n,،]{0,20}$"
+    # «جز» only as a whole word — bare, it sits inside «جزایر» (islands), and
+    # «جزایر خلیج فارس بدون ویزا» must still block.
+    r"|(برخلاف|بر\s*خلاف|(?<![؀-ۿ])(به[‌\s]*جز|بجز|جز)(?![؀-ۿ])|به[‌\s]*استثنای|در\s*مقابل)[^.!?؟\n,،]{0,20}$"
+)
+
+# A markdown link label — «[کروز بدون ویزا برای ایرانیان](…/no-visa-cruises.html)» —
+# names a page; it does not assert anything about a destination.
+_MD_LINK = re.compile(r"\[([^\]\n]{1,160})\]\([^)\s]+\)")
+
+
 # Schengen ports named in the prose itself. `itinerary_ports` in the context is
 # the authoritative signal, but Agent 1 has no itinerary to pass — so a brief
 # saying "Santorini, visa-free" sailed straight through. Deliberately a SUBSET
@@ -542,8 +566,16 @@ def check(
                 ))
                 continue
 
-            forbidden = _VISA_FORBIDDEN_DEST.search(clause)
+            claim_at = m.start() - lo
+            if any(lk.start(1) <= m.start() and m.end() <= lk.end(1) and not _VISA_FORBIDDEN_DEST.search(lk.group(1))
+                   for lk in _MD_LINK.finditer(text, max(0, lo - 160), min(len(text), hi + 160))):
+                continue  # the title of a linked page, not a claim
+            # A forbidden place named only to be excluded ("unlike the Persian Gulf")
+            # does not carry the claim.
+            forbidden = next((fm for fm in _VISA_FORBIDDEN_DEST.finditer(clause)
+                              if not _CONTRAST_BEFORE.search(clause[max(0, fm.start() - 30):fm.start()])), None)
             exempt = _VISA_EXEMPT_DEST.search(clause)
+            states_rule = bool(_VISA_RULE_SUBJECT.search(clause[:claim_at]))
             # A clause that classifies the forbidden destination as easy-visa is
             # stating the rule, not breaking it. But the marker must AFFIRM easy
             # visa: "Dubai is visa-free rather than easy-visa" and "Dubai is
@@ -561,7 +593,9 @@ def check(
                     "Only AROYA's Türkiye+Egypt routes and Seychelles are visa-free. "
                     "Persian Gulf and Dubai are EASY VISA, not visa-free.",
                 ))
-            elif schengen or _schengen_place_unclassified(clause, m.start() - lo):
+            elif states_rule and not _schengen_place_unclassified(clause[:m.end() - lo], claim_at):
+                continue  # AROYA/Seychelles named as the visa-free subject: the rule, stated
+            elif schengen or _schengen_place_unclassified(clause, claim_at):
                 out.append(Violation(
                     "visa_accuracy", BLOCK, _excerpt(text, m),
                     "One Schengen port makes the whole itinerary Schengen — even "

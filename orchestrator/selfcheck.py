@@ -4393,6 +4393,32 @@ _rq.get, _a4b._sleep = _saved_a4
 ok("Closer: a timeout then a 503 are retried and the leads still load; a lasting outage still fails; a 401 fails at once",
    _got == [{"id": 1}] and _persist and _auth)
 
+# ── visa gate: the rule stated correctly is not blocked; the lies still are (11 Oct) ──
+import compliance as _cv
+def _vb(t, ports=None):
+    return [v for v in _cv.check(t, "boutimar_v1", context={"itinerary_ports": ports} if ports else None)
+            if v.rule == "visa_accuracy" and v.severity == _cv.BLOCK]
+_greek = ["Piraeus", "Mykonos", "Santorini"]
+_ok_rule = [
+    "در حالی که مسیرهای یونان نیاز به ویزای شنگن دارند، مسیرهای ترکیه و مصر **[آرویا](https://boutimar.ir/aroya.html)** و همچنین سیشل، برای مسافر ایرانی بدون نیاز به ویزا برگزار می‌شوند؛ تفاوت دقیق هر مسیر را می‌توانید در راهنمای **[کروز بدون ویزا برای ایرانیان](https://boutimar.ir/no-visa-cruises.html)** بخوانید.",
+    "سلستیال از استانبول؛ تنها مسیرهای ترکیه و مصر با آرویا و سیشل برای ایرانیان بدون نیاز به ویزا هستند فصل اوج دریانوردی یونان معمولاً از اواخر بهار است.",
+    "کروز یونان به ویزای شنگن نیاز دارد، اما مسیرهای آرویا در ترکیه و مصر برای مسافر ایرانی بدون نیاز به ویزا برگزار می‌شوند؛ این دو را نباید با هم اشتباه گرفت.",
+]
+_ok_gulf = "مسیرهای آرویا در ترکیه و مصر و همچنین کروز سیشل، برخلاف مسیر خلیج فارس، به‌صورت واقعاً بدون ویزا برای مسافر ایرانی قابل‌رزرو هستند."
+ok("visa gate: the AROYA/Seychelles rule stated in a Greek-itinerary article, and a link titled 'visa-free cruises', pass",
+   all(not _vb(t, _greek) for t in _ok_rule))
+ok("visa gate: 'Seychelles, unlike the Persian Gulf route, is visa-free' passes", not _vb(_ok_gulf))
+_lies = [
+    ("کروز خلیج فارس از دبی برای ایرانیان بدون ویزا است.", None),
+    ("سفر به جزایر خلیج فارس بدون نیاز به ویزا است.", None),
+    ("Dubai, unlike Europe, is visa-free for Iranians.", None),
+    ("کروز آرویا به سانتورینی بدون نیاز به ویزا است.", None),
+    ("این کروز از استانبول بدون نیاز به ویزا است.", _greek),
+    ("[کروز دبی بدون ویزا](https://x/dubai)", None),
+]
+ok("visa gate: the lies still block — Gulf/Dubai visa-free, 'islands of the Persian Gulf', AROYA to Santorini, a Greek itinerary from Istanbul, a Dubai link title",
+   all(_vb(t, p) for t, p in _lies))
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz
