@@ -233,6 +233,9 @@ _NEG_BEFORE = re.compile(
     # visa-free". The negator is «نیست که», which precedes the claim; without
     # it the cruisenameh visa explainer was flagged for correcting the myth.
     r"|(نه|نمی|بدون\s+اینکه|نیست\s+که)[^.!?؟\n]{0,24}$"
+    # «هرگز این سفر را «بدون ویزا» ندانید» — "never think of this trip as
+    # visa-free" (11 Oct, Celestyal Greek-islands draft, blocked).
+    r"|هرگز[^.!?؟\n]{0,24}$"
 )
 
 # «نرخ بدون ویزا» on a fare label is "price EXCLUDING the visa", not "visa-free".
@@ -579,6 +582,14 @@ def check(
                               if not _CONTRAST_BEFORE.search(clause[max(0, fm.start() - 30):fm.start()])), None)
             exempt = _VISA_EXEMPT_DEST.search(clause)
             states_rule = bool(_VISA_RULE_SUBJECT.search(clause[:claim_at]))
+            if not states_rule:
+                # "the truly visa-free routes for Iranians are only AROYA (Türkiye…)":
+                # the subject right AFTER the claim, nothing in between that names a
+                # forbidden or Schengen place ("visa-free to Mykonos on AROYA" fails).
+                tail = clause[m.end() - lo:m.end() - lo + 45]
+                subj = _VISA_RULE_SUBJECT.search(tail)
+                states_rule = bool(subj) and not _VISA_FORBIDDEN_DEST.search(tail[:subj.start()]) \
+                    and not _SCHENGEN_IN_TEXT.search(tail[:subj.start()])
             # A clause that classifies the forbidden destination as easy-visa is
             # stating the rule, not breaking it. But the marker must AFFIRM easy
             # visa: "Dubai is visa-free rather than easy-visa" and "Dubai is
