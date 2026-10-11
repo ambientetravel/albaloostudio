@@ -1,113 +1,112 @@
 {
- "generated": "2026-10-10T13:31+00:00",
+ "generated": "2026-10-11T04:35+00:00",
  "critical": [],
  "needs_you": [
-  "**8 article PR(s) waiting on your merge** (oldest 13 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی; [boutimarfarsi#3](https://github.com/ambientetravel/boutimarfarsi/pull/3) دریانامه draft: راهنمای جامع سفر دریایی دور دنیا; [cruise24-ir#7](https://github.com/ambientetravel/cruise24-ir/pull/7) Agent 2 draft: تفاوت ویزای کروز ترکیه و کروز یون; [exploreorient#19](https://github.com/ambientetravel/exploreorient/pull/19) Agent 2 draft: Armenia's Historic Monasteries: A; [exploreorient#20](https://github.com/ambientetravel/exploreorient/pull/20) Agent 2 draft: Visiting Hegra & AlUla: A Practic; [exploreorient#21](https://github.com/ambientetravel/exploreorient/pull/21) Agent 2 draft: Jordan Itinerary: Petra and Wadi ; [exploreorient#22](https://github.com/ambientetravel/exploreorient/pull/22) Agent 2 draft: Fann Mountains Trekking Guide | T; [exploreorient#23](https://github.com/ambientetravel/exploreorient/pull/23) Agent 2 draft: A Guide to Lycian Coast Gulet Cru"
+  "**8 article PR(s) waiting on your merge** (oldest 14 days): [boutimarfarsi#1](https://github.com/ambientetravel/boutimarfarsi/pull/1) دریانامه draft: سفر دریایی به ژاپن و کره با کشتی; [boutimarfarsi#3](https://github.com/ambientetravel/boutimarfarsi/pull/3) دریانامه draft: راهنمای جامع سفر دریایی دور دنیا; [cruise24-ir#7](https://github.com/ambientetravel/cruise24-ir/pull/7) Agent 2 draft: تفاوت ویزای کروز ترکیه و کروز یون; [exploreorient#19](https://github.com/ambientetravel/exploreorient/pull/19) Agent 2 draft: Armenia's Historic Monasteries: A; [exploreorient#20](https://github.com/ambientetravel/exploreorient/pull/20) Agent 2 draft: Visiting Hegra & AlUla: A Practic; [exploreorient#21](https://github.com/ambientetravel/exploreorient/pull/21) Agent 2 draft: Jordan Itinerary: Petra and Wadi ; [exploreorient#22](https://github.com/ambientetravel/exploreorient/pull/22) Agent 2 draft: Fann Mountains Trekking Guide | T; [exploreorient#23](https://github.com/ambientetravel/exploreorient/pull/23) Agent 2 draft: A Guide to Lycian Coast Gulet Cru"
  ],
  "warn": [
-  "1 brief(s) dead-lettered by the compliance gate (gate working; review the DLQ for anything worth a human rewrite)",
   "3 Instagram post(s) without an image — from articles drafted before photos were attached to social posts (7 Oct); new articles carry their photo and credit"
  ],
  "fine": [
   "3 social post(s) composed and held at the autopost gate (switched off, as designed)"
  ],
  "numbers": {
-  "briefs": 6,
-  "candidates": 94,
-  "dlq": 1,
+  "briefs": 12,
+  "candidates": 99,
+  "dlq": 0,
   "degraded": 0,
-  "ledger_skipped": 63,
+  "ledger_skipped": 66,
   "sites_scanned": 10,
-  "scout_run": "run_20261004T1034Z_d6ec",
-  "articles": 0,
+  "scout_run": "run_20261011T0415Z_d24c",
+  "articles": 7,
   "writer_failed": 0,
   "deferred": 0,
-  "briefs_seen": 0,
-  "cost_usd": null,
-  "prev_cost_usd": 0.57036,
-  "prev_articles": 2,
+  "briefs_seen": 12,
+  "cost_usd": 1.008873,
+  "prev_cost_usd": null,
+  "prev_articles": null,
   "posts": 6,
   "posts_held": 3,
   "posts_no_media": 3,
   "campaigns": 5,
-  "open_prs": 8,
+  "open_prs": 12,
   "ai_recall": "0/8 properties named by ≥1 of 2 models"
  },
  "agents": [
   {
    "agent": "Scout",
    "result": "success",
-   "age_days": 6.1,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37195789418",
-   "run": 47
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38110997793",
+   "run": 54
   },
   {
    "agent": "Writer",
    "result": "success",
-   "age_days": 4.2,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37439324302",
-   "run": 63
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38111470454",
+   "run": 67
   },
   {
    "agent": "Broadcaster",
-   "result": "success",
-   "age_days": 4.2,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37439672404",
-   "run": 62
+   "result": "in_progress",
+   "age_days": 0.0,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38112044170",
+   "run": 66
   },
   {
    "agent": "Closer",
    "result": "success",
-   "age_days": 0.3,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38029374354",
-   "run": 15
+   "age_days": 0.2,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38095634310",
+   "run": 18
   },
   {
    "agent": "Auditor+Analyst",
    "result": "success",
-   "age_days": 5.1,
+   "age_days": 5.7,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37307139475",
    "run": 11
   },
   {
    "agent": "Cartographer",
    "result": "success",
-   "age_days": 5.0,
+   "age_days": 5.7,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37310021115",
    "run": 14
   },
   {
    "agent": "Watcher",
    "result": "success",
-   "age_days": 6.1,
+   "age_days": 6.7,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37199470106",
    "run": 11
   },
   {
    "agent": "Oracle",
    "result": "success",
-   "age_days": 8.9,
+   "age_days": 9.6,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426",
    "run": 2
   },
   {
    "agent": "Merge-watch",
    "result": "success",
-   "age_days": 0.0,
+   "age_days": 0.6,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38055149017",
    "run": 59
   },
   {
    "agent": "PR gate",
    "result": "success",
-   "age_days": 0.1,
-   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38050694459",
-   "run": 133
+   "age_days": 0.3,
+   "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/38087093323",
+   "run": 134
   },
   {
    "agent": "Dashboard",
    "result": "success",
-   "age_days": 5.0,
+   "age_days": 5.6,
    "url": "https://github.com/ambientetravel/albaloostudio/actions/runs/37319951897",
    "run": 14
   }
