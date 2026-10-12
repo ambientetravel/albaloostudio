@@ -1,7 +1,7 @@
 {
  "schema_version": "offer.v1",
  "site": "cruise24.me",
- "generated_at": "2026-10-11T10:06:37Z",
+ "generated_at": "2026-10-12T10:55:21Z",
  "offerings": [
   {
    "slug": "explora-journeys",
@@ -45,8 +45,8 @@
     "polar",
     "africa-arabia",
     "adriatic",
-    "greece",
     "tahiti",
+    "greece",
     "turkiye",
     "seychelles"
    ],
@@ -94,13 +94,14 @@
     "italy",
     "turkiye",
     "greece",
+    "tahiti",
+    "asia-pacific",
     "adriatic",
-    "africa-arabia",
-    "asia-pacific"
+    "africa-arabia"
    ],
    "countries": [
-    "türkiye",
     "greece",
+    "türkiye",
     "italy"
    ]
   },
@@ -176,8 +177,8 @@
    "regions": [
     "western-med",
     "italy",
-    "greece",
     "atlantic",
+    "greece",
     "adriatic",
     "turkiye"
    ],
@@ -321,16 +322,6 @@
    ]
   },
   {
-   "slug": "adriatic",
-   "title": "Croatia and the Adriatic",
-   "type": "destination",
-   "summary": "Cruises in Croatia and the Adriatic, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
-   "url": "https://cruise24.me/journeys.html#adriatic.any",
-   "regions": [
-    "adriatic"
-   ]
-  },
-  {
    "slug": "atlantic",
    "title": "Atlantic islands and crossings",
    "type": "destination",
@@ -338,6 +329,16 @@
    "url": "https://cruise24.me/journeys.html#atlantic.any",
    "regions": [
     "atlantic"
+   ]
+  },
+  {
+   "slug": "adriatic",
+   "title": "Croatia and the Adriatic",
+   "type": "destination",
+   "summary": "Cruises in Croatia and the Adriatic, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#adriatic.any",
+   "regions": [
+    "adriatic"
    ]
   },
   {
