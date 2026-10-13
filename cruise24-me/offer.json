@@ -1,7 +1,7 @@
 {
  "schema_version": "offer.v1",
  "site": "cruise24.me",
- "generated_at": "2026-10-12T10:55:21Z",
+ "generated_at": "2026-10-13T10:41:17Z",
  "offerings": [
   {
    "slug": "explora-journeys",
@@ -92,16 +92,16 @@
     "western-med",
     "atlantic",
     "italy",
-    "turkiye",
     "greece",
+    "turkiye",
     "tahiti",
     "asia-pacific",
     "adriatic",
     "africa-arabia"
    ],
    "countries": [
-    "greece",
     "türkiye",
+    "greece",
     "italy"
    ]
   },
