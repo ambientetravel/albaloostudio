@@ -170,3 +170,16 @@ Home Screen; Android prompts. Store wrappers (Capacitor, Cafe Bazaar, Myket) are
 - No Jalali date *input* — front matter dates are ISO Gregorian and converted for display.
 - Domain not registered; nothing deployed.
 - Fonts load from Google Fonts. Self-host Vazirmatn before launch for readers inside Iran.
+
+## Parked ideas
+
+- **More Caspian and Persian Gulf stories** (parked 13 Oct 2026, Alireza). The two
+  seas we share deserve a run of their own, not one atlas entry each. Starting
+  points already in `content/atlas.json`: Caspian (largest enclosed body of water,
+  ~28 m below sea level, a third of seawater's salinity, Volga ~80% of inflow,
+  six sturgeon species, Caspian seal down to under 10% of a century ago) and
+  Persian Gulf (50 m average depth, 90 m max, saltier than the ocean, ~7,500
+  dugongs, pearl oysters). Candidate pieces: the Caspian seal; sturgeon and
+  caviar; why the Caspian level moves; pearling in the Persian Gulf; the dugong;
+  Hormuz, Qeshm and the islands; the Sea of Oman as the deep door. Same rule as
+  the atlas: every number with a source line, ranges where sources disagree.
