@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}همکاری با ما · {{ site.brand.fa }}{% endblock %}
+{% block content %}
+<section class="pagehead"><div class="wrap"><p class="kicker">همکاری با ما</p><h1 class="display display--md">با خوانندهٔ دریانامه آشنا شوید</h1></div></section>
+<section class="sec adv"><div class="wrap wrap--narrow">
+  <div class="prose">
+    <p>{{ ad.lede }}</p>
+    <p class="adv__aud">{{ ad.audience.text }} <small class="src">منبع: {{ ad.audience.source }}</small></p>
+  </div>
+
+  <div class="adv__found" id="founding">
+    <p class="kicker">{{ ad.founding.title }}، تنها {{ ad.founding.seats|fa }} جایگاه</p>
+    <div class="adv__price"><strong>{{ ad.founding.price|eur }}</strong><span>ارزش همین جایگاه‌ها با نرخ عادی: {{ ad.founding.rack|eur }}</span></div>
+    <p>{{ ad.founding.text }}</p>
+    <ul>{% for i in ad.founding["items"] %}<li>{{ i }}</li>{% endfor %}</ul>
+  </div>
+
+  <h2 class="adv__h" id="rates">نرخ‌ها</h2>
+  {% for g in ad.groups %}
+  <div class="adv__tbl">
+    <table>
+      <caption>{{ g.title }}</caption>
+      <thead><tr><th>جایگاه</th><th>مبنا</th><th class="num">نرخ</th></tr></thead>
+      <tbody>{% for r in g.rows %}<tr><td>{{ r.place }}</td><td class="basis">{{ r.basis }}</td><td class="num">{% if r.eur %}{{ r.eur|eur }}{% else %}{{ r.text }}{% endif %}</td></tr>{% endfor %}</tbody>
+    </table>
+    {% if g.note %}<p class="adv__note">{{ g.note }}</p>{% endif %}
+  </div>
+  {% endfor %}
+  <p class="adv__note">{{ ad.terms }}</p>
+
+  <h2 class="adv__h" id="how">چگونه</h2>
+  <ol class="adv__steps">{% for s in ad.steps %}<li><strong>{{ s.title }}</strong> {{ s.text }}</li>{% endfor %}</ol>
+
+  <h2 class="adv__h">آنچه نمی‌فروشیم</h2>
+  <ul class="adv__never">{% for n in ad.never %}<li>{{ n }}</li>{% endfor %}</ul>
+
+  <div class="adv__contact" id="contact">
+    {% if site.channels.partners_email %}
+    <p>برای همکاری بنویسید به <span class="adv__mail" dir="ltr">{{ site.channels.partners_email }}</span></p>
+    {% else %}
+    <p>نشانی ایمیل همکاری پس از ثبت دامنه در همین‌جا می‌آید.</p>
+    {% endif %}
+    <p class="adv__note">برای صنعت کروز به انگلیسی: <span dir="ltr">Daryalog</span>، خبرنامهٔ هفتگی تقاضای سفر ایرانیان. <a href="/policy/">سیاست تحریریه و آگهی</a></p>
+  </div>
+</div></section>
+{% endblock %}

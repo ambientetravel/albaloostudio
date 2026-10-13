@@ -160,6 +160,24 @@ The engine is `static/js/hub.js` (no library; a sticky stage scrubbed against sc
 killed: a saved port guide opens, an unsaved page shows the offline screen. iOS installs via Share → Add to
 Home Screen; Android prompts. Store wrappers (Capacitor, Cafe Bazaar, Myket) are a later step.
 
+## Commercial page and distribution (13 Oct 2026)
+
+- **Rates approved** by Alireza, 13 Oct 2026. They live in `content/advertise.json` and render at
+  `/work-with-us/` («همکاری با ما»), linked from the footer, the menu's extra links, the policy page
+  and search. That file is commercial, owned by Alireza, not by the content owner (see CLAUDE.md).
+  `--check` fails on a rate row with no price.
+- The page quotes rates per thousand readers and never an audience size: there is none measured yet.
+  The diaspora line cites the foreign ministry's 2021 figure (4,037,258), not the 7 million in
+  circulation, which has no source we could find.
+- **Contact address missing.** `site.json` → `channels.partners_email` is unset, so the page says
+  the address comes after the domain is registered; the build prints a note until it is set.
+- **Distribution decision:** the Farsi weekly letter goes on Substack, free for everyone, with a
+  paid tier for the diaspora (€5 / €48 / €120 founding). The planned €24 site membership is
+  dropped, so nothing is sold in two places. Daryalog (English) also on Substack. Before the paid
+  tier opens: confirm Stripe payouts (Türkiye has not been a Stripe country) and test Farsi
+  right-to-left in a free test publication. The full case is in the "Daryanameh Channels and
+  Rates" brief.
+
 ## Not done, deliberately
 
 - Port/article photographs. Only the four hero scenes exist (AI-generated, credited); everything else is a colour field until licensed photos exist.
@@ -169,6 +187,7 @@ Home Screen; Android prompts. Store wrappers (Capacitor, Cafe Bazaar, Myket) are
 - News is three seed items only; the desk needs 3–6 a week to do its job.
 - No Jalali date *input* — front matter dates are ISO Gregorian and converted for display.
 - Domain not registered; nothing deployed.
+- `/work-with-us/` has no contact address until `channels.partners_email` is set.
 - Fonts load from Google Fonts. Self-host Vazirmatn before launch for readers inside Iran.
 
 ## Parked ideas

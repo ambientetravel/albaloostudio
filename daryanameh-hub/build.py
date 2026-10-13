@@ -185,6 +185,10 @@ def apply_picks(stories: list[dict], picks: list[dict]) -> list[str]:
 def fa(n) -> str:
     return str(n).translate(FA_DIGITS)
 
+def eur(n) -> str:
+    """1500 → '۱٬۵۰۰ یورو'."""
+    return fa(f"{int(n):,}".replace(",", "٬")) + " یورو"
+
 def jdate(iso) -> str:
     """'2026-09-06' → '۱۵ شهریور ۱۴۰۵'."""
     return jalali.jalali_str(iso)
@@ -329,6 +333,7 @@ def build(check_only=False):
 
     env = Environment(loader=FileSystemLoader(str(TEMPLATES)), autoescape=select_autoescape(["html"]))
     env.filters["fa"] = fa
+    env.filters["eur"] = eur
     env.filters["jdate"] = jdate
     env.filters["gdate"] = gdate
     built = datetime.date.today().isoformat()
@@ -350,7 +355,8 @@ def build(check_only=False):
                "c": c["singular"]} for c in collections for it in data[c["slug"]]]
     search += [{"u": f"/journal/{a['slug']}/", "t": a["title"], "l": "", "k": a.get("kicker", ""), "c": "مجله"} for a in articles]
     search += [{"u": f"/news/{n['slug']}/", "t": n["title"], "l": "", "k": n.get("category", ""), "c": "خبر"} for n in news]
-    search += [{"u": "/visa/", "t": "ویزانامه", "l": "visa", "k": "ویزا", "c": "راهنما"}, {"u": "/glossary/", "t": "واژه‌نامهٔ کروز", "l": "glossary", "k": "", "c": "راهنما"}]
+    search += [{"u": "/visa/", "t": "ویزانامه", "l": "visa", "k": "ویزا", "c": "راهنما"}, {"u": "/glossary/", "t": "واژه‌نامهٔ کروز", "l": "glossary", "k": "", "c": "راهنما"},
+               {"u": "/work-with-us/", "t": "همکاری با ما", "l": "advertise", "k": "آگهی و حمایت", "c": "دریانامه"}]
     (PUBLIC/"data"/"search.json").write_text(json.dumps(search, ensure_ascii=False), encoding="utf-8")
 
     urls = []
@@ -417,6 +423,9 @@ def build(check_only=False):
         write(f"journal/{a['slug']}/index.html", "article.html", article=a, story=st, issue=issue,
               in_issue=i is not None, next_in_issue=nxt, film=st.get("film"))
     write("policy/index.html", "policy.html")
+    write("work-with-us/index.html", "advertise.html", ad=load("advertise"))
+    if not site.get("channels", {}).get("partners_email"):
+        print("  /work-with-us/: no partners_email in site.json channels, so the page says the address comes later")
     write("offline/index.html", "offline.html")
 
     sm = ["<?xml version='1.0' encoding='UTF-8'?>", "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"]
@@ -509,9 +518,12 @@ def check():
         sec = a.get("section") or SECTION_OF_KICKER.get(a.get("kicker", ""), "features")
         used.add(sec)
         if sec not in secs: print("SECTION: unknown section", repr(sec), "in content/articles/" + a["slug"] + ".md"); bad += 1
-    pages = used | {c["slug"] for c in load("collections")} | {d["slug"] for d in site.get("departments", [])} | {"news", "journal", "guides", "visa", "glossary", "offers", "policy", ""}
+    pages = used | {c["slug"] for c in load("collections")} | {d["slug"] for d in site.get("departments", [])} | {"news", "journal", "guides", "visa", "glossary", "offers", "policy", "work-with-us", ""}
     for n in site.get("nav", []):
         if n["href"].strip("/").split("/")[0] not in pages: print("NAV: menu link to a page that is not built:", n["href"]); bad += 1
+    for g in load("advertise")["groups"]:
+        for r in g["rows"]:
+            if not (isinstance(r.get("eur"), int) or r.get("text")): print("RATE: row without a price in content/advertise.json:", r.get("place")); bad += 1
     for p in load_picks():
         if p["story"].strip().strip("/") not in real: print("PICK: no such story:", p["story"], "in content/picks.json"); bad += 1
     for it in load("ports"):

@@ -82,6 +82,7 @@ area as well as by property.
 |------|-------|-------|
 | Content and editorial | **Golbarg** — Rome (GitHub handle: not yet supplied) | `daryanameh-hub/content/**` — the collection JSON, `content/news/*.md`, `content/articles/*.md` |
 | Build, templates, deploy | This session | `build.py`, `jalali.py`, `templates/`, `static/`, `tools/` |
+| Commercial rates, «همکاری با ما» | **Alireza** (edits via this session) | `daryanameh-hub/content/advertise.json` — sits in `content/` because the build reads it there, but it is not editorial copy |
 | Generated output | Nobody | `daryanameh-hub/public/` |
 
 Three rules make that split hold:

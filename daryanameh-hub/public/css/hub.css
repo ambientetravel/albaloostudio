@@ -704,3 +704,21 @@ html:not(.js) .chips,html:not(.js) [data-more]{display:none}
 .dos__lead--text .dos__h{font-size:clamp(2.2rem,5vw,3.8rem)} .dos__lead--text .dos__dek{max-width:60ch;margin-inline:auto;font-size:1.1rem}
 .dos__cols:has(> :nth-child(3)){grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:800px){.dos__cols:has(> :nth-child(3)){grid-template-columns:1fr}}
+/* «همکاری با ما» — /work-with-us/ */
+.adv .wrap--narrow{display:flex;flex-direction:column;gap:2rem}
+.adv__aud{color:var(--sea)} .adv__aud .src,.adv .src{display:block;font-size:.8rem;color:var(--muted);line-height:1.7;margin-top:.4rem}
+.adv__found{background:var(--ink);color:var(--ivory);border-radius:4px;padding:clamp(1.4rem,4vw,2.4rem);display:flex;flex-direction:column;gap:.8rem}
+.adv__found .kicker{color:var(--champagne)} .adv__found ul{margin:0;padding-inline-start:1.2rem;display:grid;gap:.3rem}
+.adv__price{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem 1rem} .adv__price strong{font-family:var(--display);font-size:clamp(2rem,5vw,2.8rem);line-height:1.2}
+.adv__price span{font-size:.92rem;opacity:.75}
+.adv__h{font-family:var(--display);font-size:clamp(1.5rem,2.6vw,2rem);margin:1rem 0 0}
+.adv__tbl{overflow-x:auto} .adv__tbl table{width:100%;border-collapse:collapse;font-size:.95rem}
+.adv__tbl caption{text-align:start;font-weight:700;color:var(--sea);padding-bottom:.5rem}
+.adv__tbl th{font-weight:500;font-size:.8rem;color:var(--muted);text-align:start;border-bottom:1px solid var(--line);padding:.4rem .5rem}
+.adv__tbl td{border-bottom:1px solid var(--line);padding:.6rem .5rem;vertical-align:top}
+.adv__tbl .num{text-align:end;white-space:nowrap;font-variant-numeric:tabular-nums}
+.adv__note{font-size:.88rem;color:var(--muted);margin:.5rem 0 0;line-height:1.9}
+.adv__steps,.adv__never{margin:0;padding-inline-start:1.3rem;display:grid;gap:.7rem;line-height:1.95;max-width:64ch}
+.adv__contact{border-top:1px solid var(--line);padding-top:1.5rem} .adv__contact a{border-bottom:1px solid var(--champagne)}
+.adv__mail{font-family:var(--latin);font-size:1.1rem;user-select:all}
+.adv__tbl .basis{white-space:nowrap;color:var(--muted);font-size:.88rem}

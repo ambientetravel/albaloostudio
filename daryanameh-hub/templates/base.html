@@ -38,7 +38,7 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
   </div>
   <div class="nav__sheet" id="sheet">
     {% for n in nav %}<a href="/{{ n.href }}">{{ n.label }}</a>{% endfor %}
-    <a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامه</a><a href="/policy/">سیاست تحریریه</a>
+    <a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامه</a><a href="/policy/">سیاست تحریریه</a><a href="/work-with-us/">همکاری با ما</a>
   </div>
 </header>
 <div class="search" id="searchPanel" role="dialog" aria-label="جست‌وجو در دریانامه" hidden>
@@ -64,7 +64,7 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
     <div class="foot__cols">
       <div><h4>مجله</h4><a href="/">این شماره</a>{% for d in sections %}<a href="/{{ d.slug }}/">{{ d.label }}</a>{% endfor %}<a href="/news/">خبر</a><a href="/journal/">آرشیو</a></div>
       <div><h4>راهنما</h4>{% for c in collections %}<a href="/{{ c.slug }}/">{{ c.title }}</a>{% endfor %}<a href="/visa/">ویزانامه</a><a href="/glossary/">واژه‌نامهٔ کروز</a><a href="/policy/">سیاست تحریریه و آگهی</a></div>
-      <div><h4>همراهان تجاری <span class="tag">آگهی</span></h4>{% for p in site.partners %}<a href="{{ p.href }}" rel="sponsored noopener" target="_blank">{{ p.name }} <small>· {{ p.role }}</small></a>{% endfor %}</div>
+      <div><h4>همراهان تجاری <span class="tag">آگهی</span></h4>{% for p in site.partners %}<a href="{{ p.href }}" rel="sponsored noopener" target="_blank">{{ p.name }} <small>· {{ p.role }}</small></a>{% endfor %}<a href="/work-with-us/">همکاری با ما <small>· نرخ‌ها و همراهان بنیان‌گذار</small></a></div>
     </div>
     <div class="foot__kunye">
       <span>{{ site.brand.fa }} یک نشریهٔ {{ site.kunye.owner }} است · {{ site.kunye.city }}</span>

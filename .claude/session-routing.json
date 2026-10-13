@@ -132,6 +132,14 @@
       "daryanameh-hub/public/"
      ],
      "note": "Build output. Conflicts here are resolved by rebuilding, never by merging."
+    },
+    "commercial": {
+     "owner": "Alireza; edits made by the build session",
+     "confirmed_by_user": true,
+     "paths": [
+      "daryanameh-hub/content/advertise.json"
+     ],
+     "note": "Rates approved by Alireza 13 Oct 2026. Lives in content/ only because build.py reads content/; not the content owner's file."
     }
    }
   }
