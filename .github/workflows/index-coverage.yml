@@ -65,10 +65,10 @@ jobs:
           ARGS=""
           if [ -n "${{ inputs.domain }}" ]; then ARGS="$ARGS --domain ${{ inputs.domain }}"; fi
           if [ "${{ inputs.include_hold }}" != "false" ]; then ARGS="$ARGS --include-hold"; fi
-          # 25 URL Inspections per site on the weekly run (quota is 2000/day/property).
+          # 50 URL Inspections per site on the weekly run (quota is 2000/day/property).
           # Answers "is it indexed?" only once the service account is FULL on the
           # property; until then each site reports the permission fact, not a failure.
-          INSPECT="${{ inputs.inspect || '25' }}"
+          INSPECT="${{ inputs.inspect || '50' }}"
           if [ "$INSPECT" != "0" ]; then ARGS="$ARGS --inspect $INSPECT"; fi
 
           # ONE pass writes both files (two passes ran ~36 min and hit the limit).

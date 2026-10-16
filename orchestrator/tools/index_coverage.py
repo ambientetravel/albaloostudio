@@ -208,6 +208,10 @@ def inspect_urls(service, site: config.Site, urls: list[str]) -> dict[str, Any]:
             "indexing_state": idx.get("indexingState"),
             "last_crawl": idx.get("lastCrawlTime"),
             "robots_state": idx.get("robotsTxtState"),
+            # For a "Duplicate…" state, which page Google kept instead (16 Oct:
+            # boutimar.ir/persian-gulf-ports.html, with no way to see which).
+            "google_canonical": idx.get("googleCanonical"),
+            "user_canonical": idx.get("userCanonical"),
         })
     return {"permitted": True, "reason": None, "results": out}
 
@@ -342,8 +346,11 @@ def render_markdown(rows: list[dict[str, Any]]) -> str:
             L.append("| URL | Verdict | Coverage state | Last crawl |")
             L.append("|---|---|---|---|")
             for i in insp["results"]:
+                state = i['coverage_state'] or '—'
+                if i.get("google_canonical") and i["google_canonical"] != i["url"]:
+                    state += f" → Google kept `{i['google_canonical']}`"
                 L.append(f"| `{i['url']}` | {i['verdict'] or '—'} | "
-                         f"{i['coverage_state'] or '—'} | {i['last_crawl'] or 'never'} |")
+                         f"{state} | {i['last_crawl'] or 'never'} |")
             L.append("")
     return "\n".join(L)
 
