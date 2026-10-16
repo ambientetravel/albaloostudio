@@ -356,6 +356,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--inspect", nargs="?", type=int, const=DEFAULT_INSPECT_SAMPLE,
                     default=0, help="also read real index status for N URLs per site")
     ap.add_argument("--out", type=Path)
+    # One assessment, both files: the weekly workflow used to run the whole thing
+    # twice (md, then json) at ~2m40s a site — 36 min against a 25-min limit, so
+    # the 5 and 12 Oct runs were killed before either report was kept.
+    ap.add_argument("--json-out", type=Path, help="also write the JSON rows here")
     args = ap.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO,
@@ -397,6 +401,10 @@ def main(argv: list[str] | None = None) -> int:
         log.info("wrote %s (%d bytes)", args.out, len(text))
     else:
         print(text)
+    if args.json_out:
+        args.json_out.parent.mkdir(parents=True, exist_ok=True)
+        args.json_out.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+        log.info("wrote %s", args.json_out)
     return 0
 
 

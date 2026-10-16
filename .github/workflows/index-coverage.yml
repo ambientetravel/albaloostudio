@@ -38,7 +38,7 @@ concurrency:
 jobs:
   assess:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     defaults:
       run:
         working-directory: orchestrator
@@ -71,10 +71,9 @@ jobs:
           INSPECT="${{ inputs.inspect || '25' }}"
           if [ "$INSPECT" != "0" ]; then ARGS="$ARGS --inspect $INSPECT"; fi
 
+          # ONE pass writes both files (two passes ran ~36 min and hit the limit).
           python3 tools/index_coverage.py $ARGS --format md \
-            --out "reports/index-coverage-$STAMP.md"
-          python3 tools/index_coverage.py $ARGS --format json \
-            --out "reports/index-coverage-$STAMP.json"
+            --out "reports/index-coverage-$STAMP.md" --json-out "reports/index-coverage-$STAMP.json"
 
           # The report is the deliverable, so it goes where it is read without a
           # download rather than only into the artifact.
