@@ -2,7 +2,7 @@
  "_about": "Records to verify against the line before launch. Internal: do not deploy.",
  "checks": {
   "_unknownPorts": {
-   "St. John": 34,
+   "St. John": 35,
    "St. Georges": 33,
    "Pirau": 32,
    "Castro": 11,
@@ -20,6 +20,7 @@
    "Ceuta": 4,
    "Chalon-Sur-Saone": 4,
    "Tournus": 4,
+   "Charlestown": 3,
    "Coron": 3,
    "Puerto Princesa, Palawan": 3,
    "Kota Kinabalu": 3,
@@ -34,7 +35,6 @@
    "Churchill": 3,
    "Ponta Delgada, Azores": 3,
    "Alexander Selkirk Island": 3,
-   "Charlestown": 2,
    "Komatsushima": 2,
    "Niigata": 2,
    "Douglas, Isle of Man": 2,
