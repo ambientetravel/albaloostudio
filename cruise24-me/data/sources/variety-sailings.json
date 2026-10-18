@@ -1,7 +1,7 @@
 {
  "_about": "Variety Cruises sailings read from varietycruises.com cruise pages (the line's own booking data). priceFrom = cheapest cabin category with cabins left, EUR per person, port charges excluded; soldOut when none are left.",
  "source": "Variety Cruises",
- "synced": "2026-10-11",
+ "synced": "2026-10-18",
  "sailings": [
   {
    "id": "VAR-antiquity-to-byzantium-canal-crossing",
@@ -756,19 +756,20 @@
    ],
    "nights": 7,
    "route": [
-    "Athens (Lavrio Port)",
-    "Syros Or Kea",
+    "Athens (Marina Zeas Or Lavrio Port)",
+    "Kea",
     "Delos",
     "Mykonos",
     "Samos",
     "Kusadasi (Turkey)",
     "Patmos",
     "Naxos",
-    "Sifnos"
+    "Sifnos",
+    "Athens (Lavrio Port)"
    ],
    "itinerary": [
     [
-     "Athens (Lavrio Port) - Syros Or Kea",
+     "Athens (Marina Zeas Or Lavrio Port) - Kea",
      ""
     ],
     [
@@ -1233,14 +1234,6 @@
    ],
    "departures": [
     {
-     "date": "2026-10-16",
-     "code": "CJ261016",
-     "ship": "Galileo",
-     "nights": 7,
-     "priceFrom": 2590,
-     "soldOut": false
-    },
-    {
      "date": "2026-10-23",
      "code": "CJPAN261023",
      "ship": "Panorama",
@@ -1602,14 +1595,6 @@
     "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
    ],
    "departures": [
-    {
-     "date": "2026-10-14",
-     "code": "SEY261014D3",
-     "ship": "Pegasus",
-     "nights": 3,
-     "priceFrom": 2380,
-     "soldOut": false
-    },
     {
      "date": "2026-10-21",
      "code": "SEY261021D3",
@@ -2045,14 +2030,6 @@
     "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
    ],
    "departures": [
-    {
-     "date": "2026-10-17",
-     "code": "SEY261017D5",
-     "ship": "Pegasus",
-     "nights": 4,
-     "priceFrom": 3150,
-     "soldOut": false
-    },
     {
      "date": "2026-11-07",
      "code": "SEY261107D5",
@@ -2505,14 +2482,6 @@
    ],
    "departures": [
     {
-     "date": "2026-10-17",
-     "code": "SEY261017D7",
-     "ship": "Pegasus",
-     "nights": 7,
-     "priceFrom": 4350,
-     "soldOut": false
-    },
-    {
      "date": "2026-11-07",
      "code": "SEY261107D7",
      "ship": "Pegasus",
@@ -2944,14 +2913,6 @@
     "Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-10-16",
-     "code": "TAH10D261016",
-     "ship": "Panorama II",
-     "nights": 10,
-     "priceFrom": 3590,
-     "soldOut": false
-    },
     {
      "date": "2026-11-13",
      "code": "TAH10D261113",
