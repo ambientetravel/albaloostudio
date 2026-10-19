@@ -35,6 +35,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 import compliance
+import ig_polish
 import config
 import llm
 from config import build_envelope, rfc3339, utc_now
@@ -344,10 +345,18 @@ CHANNEL_BRIEFS = {
         "commission, seasonality. 120–200 words, no emoji, no hashtag spam "
         "(2 at most). A first line that works as a standalone hook."
     ),
+    # The instagram-agent skill's caption rules (ig-caption, Job B — the caption
+    # is the content), so CI writes to the same standard as /instagram-agent on
+    # Alireza's Mac. ig_polish.py then humanizes and lints the result.
     "instagram": (
-        "D2C. Caption for a single image. Open with an image that is a sentence, "
-        "not a slogan. 60–120 words. Sensory and specific. Emoji sparingly (0–2). "
-        "Hashtags at the end, 5–10, mixed reach."
+        "D2C. Caption for a single image; the caption IS the content. The first "
+        "line is the hook and must land whole inside ~125 characters: a concrete "
+        "sentence with a place, a number or a name, never a greeting, a hashtag, "
+        "an emoji or a question like 'Did you know'. Then 2–4 short paragraphs "
+        "that use the words people actually search. Exactly one ask (save, send "
+        "to someone, or 'link in bio'). No links in the caption. Emoji only as "
+        "punctuation, 0–2. Hashtags: at most 5, specific to the place or topic, "
+        "never #viral #fyp #explorepage #travel-style filler. 60–150 words."
     ),
     "telegram": (
         "D2C, Iran. Short broadcast message, 50–100 words. Direct and practical: "
@@ -664,6 +673,7 @@ def run_broadcast_job(event: PublishingEvent, raw_payload: dict[str, Any]) -> No
             "price_asof": event.content_summary.offer.price_asof if priced else None,
             "itinerary_ports": event.content_summary.key_points,
         }
+        ig_polish.polish_drafts(drafts, [event.content_summary.primary_keyword])
         warnings: list[compliance.Violation] = []
         for draft in drafts:
             surface = draft["body"] + " " + " ".join(draft.get("hashtags", []))
@@ -704,6 +714,7 @@ def run_broadcast_job(event: PublishingEvent, raw_payload: dict[str, Any]) -> No
                 "assets": event.distribution_hints.assets,
                 "angle": draft.get("angle"),
                 "error": None,
+                **({"ig_lint": draft["ig_lint"]} if draft.get("ig_lint") else {}),
             }
 
             result = SCHEDULER.schedule(

@@ -40,6 +40,7 @@ from typing import Any
 
 import _ledger
 import compliance
+import ig_polish
 import config
 import llm
 from agent3_broadcaster import (
@@ -249,6 +250,8 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
             "price_asof": event.content_summary.offer.price_asof if priced else None,
             "itinerary_ports": event.content_summary.key_points,
         }
+        # The instagram-agent skill's polish and lint, in CI (ig_polish.py).
+        ig_polish.polish_drafts(drafts, [event.content_summary.primary_keyword])
         warnings: list[compliance.Violation] = []
         for d in drafts:
             surface = compliance.assertive_surface([d["body"], d.get("hashtags", [])])
@@ -298,6 +301,7 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
                 "assets": event.distribution_hints.assets,
                 "angle": d.get("angle"),
                 "error": None,
+                **({"ig_lint": d["ig_lint"]} if d.get("ig_lint") else {}),
             }
             result = SCHEDULER.schedule(
                 post=post, channel_cfg=cfg, campaign_id=oc.campaign_id,

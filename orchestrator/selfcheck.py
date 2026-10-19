@@ -4435,6 +4435,36 @@ _lies = [
 ok("visa gate: the lies still block — Gulf/Dubai visa-free, 'islands of the Persian Gulf', AROYA to Santorini, a Greek itinerary from Istanbul, a Dubai link title",
    all(_vb(t, p) for t, p in _lies))
 
+# ── instagram-agent skill in the pipeline (19 Oct) ──
+import ig_polish as _igp
+_en = _igp.polish("Seven nights from Dubai to Doha — let's delve into it.\n\nSave this.",
+                  ["#viral", "#PersianGulf", "#cruise", "#Dubai", "#Doha", "#Qatar", "#explorepage"])
+ok("ig polish: em dash and slop words removed, generic tags dropped first, at most five hashtags",
+   "—" not in _en["body"] and "delve" not in _en["body"] and len(_en["hashtags"]) == 5
+   and "#viral" not in _en["hashtags"] and _en["receipt"]["verdict"] in ("FIX", "REVIEW", "READY"))
+_fa = _igp.polish("کروز خلیج فارس از دبی هفت شب طول می\u200cکشد.", ["#کروز"])
+ok("ig polish: Persian text keeps its zero-width non-joiner (the humanizer would delete it)",
+   "\u200c" in _fa["body"] and "skipped" in str(_fa["receipt"]["changes"]["humanize"]))
+_drafts = [{"channel": "instagram", "body": "Dubai — Doha.", "hashtags": ["#a"]},
+           {"channel": "telegram", "body": "x — y", "hashtags": []}]
+_igp.polish_drafts(_drafts)
+ok("ig polish: only Instagram drafts are touched and they carry an ig_lint receipt",
+   "ig_lint" in _drafts[0] and "ig_lint" not in _drafts[1] and _drafts[1]["body"] == "x — y")
+import agent3_broadcaster as _a3ig
+ok("Broadcaster's Instagram brief follows the skill: one hook line, at most 5 hashtags, no links",
+   "at most 5" in _a3ig.CHANNEL_BRIEFS["instagram"] and "No links" in _a3ig.CHANNEL_BRIEFS["instagram"])
+_igsites = [(st.domain, c) for st in config.load_sites(include_hold=True) for c in st.channels
+            if c.get("name") == "instagram"]
+_byhandle = {}
+for _d, _c in _igsites:
+    if _c.get("handle"):
+        _byhandle.setdefault(str(_c["handle"]).lower(), set()).add(_c.get("cluster"))
+_cl = {d: c.get("cluster") for d, c in _igsites}
+ok("Instagram handles: none shared across clusters; Explore Orient never in Boutimar's cluster",
+   all(len(v) == 1 for v in _byhandle.values())
+   and all(c.get("cluster") in ("persian", "ambiente", "albaloo", "personal") for _, c in _igsites)
+   and _cl.get("exploreorient.com") == "ambiente" and _cl.get("boutimar.ir") == "persian")
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz

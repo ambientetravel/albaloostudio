@@ -57,6 +57,7 @@
             "description": "Why this post is not live: a missing required asset, or which of the two autopost gates was shut."
           },
           "angle": { "type": ["string", "null"] },
+          "ig_lint": { "type": "object", "description": "Instagram only: the instagram-agent skill's caption lint + humanizer receipt (verdict FIX/REVIEW/READY, visible window, fails, warns, changes, human_score). Advisory; never blocks on its own." },
           "scheduled_for": { "type": ["string", "null"], "format": "date-time" },
           "published_at": { "type": ["string", "null"], "format": "date-time" },
           "external_id": { "type": ["string", "null"] },
