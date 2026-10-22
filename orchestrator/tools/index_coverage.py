@@ -284,7 +284,12 @@ def assess(service, site: config.Site, session: requests.Session,
         # canonical" email, whose page list has no API (22 Oct, boutimar.ir).
         metrics = page_metrics(service, site)
         canon = sorted(declared)[:QUOTA_PER_RUN]
-        res = inspect_urls(service, site, inspectable(canon, declared_raw))
+        urls = inspectable(canon, declared_raw)
+        # Plus every URL Google SHOWED that the sitemap never declared — query-
+        # string variants (journey.html?id=…) are where "Google chose a different
+        # canonical" lives, and they are in no sitemap.
+        urls += [f"https://{u}" for u in undeclared][:max(0, QUOTA_PER_RUN - len(urls))]
+        res = inspect_urls(service, site, urls)
         for item in res.get("results", []):
             item.update(metrics.get(a1._canon_url(item["url"]), {"impressions": 0, "clicks": 0}))
         row["inspection"] = res
