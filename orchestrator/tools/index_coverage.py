@@ -293,7 +293,7 @@ def assess(service, site: config.Site, session: requests.Session,
         for item in res.get("results", []):
             item.update(metrics.get(a1._canon_url(item["url"]), {"impressions": 0, "clicks": 0}))
         row["inspection"] = res
-    elif inspect and never:
+    elif inspect and (never or undeclared):
         # Pipeline articles first: whether a page the writer shipped actually got
         # indexed is the question this quota is best spent on.
         art = re.compile(r"/(journal|daryanameh|blog|guides)/")
@@ -303,8 +303,12 @@ def assess(service, site: config.Site, session: requests.Session,
         # answers 403 "not part of this property", which reads exactly like a
         # Restricted grant: that is how Full users kept being reported as
         # Restricted (30 Sep). Map each key back to the sitemap's own spelling.
+        # Plus the same number of URLs Google SHOWS that no sitemap declares —
+        # query-string variants like journey.html?id=… are where canonical and
+        # noindex decisions land (22 Oct), and they are in no sitemap.
         row["inspection"] = inspect_urls(service, site,
-                                         inspectable(order[:inspect], declared_raw))
+                                         inspectable(order[:inspect], declared_raw)
+                                         + [f"https://{u}" for u in undeclared[:inspect]])
     return row
 
 
