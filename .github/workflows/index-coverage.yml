@@ -22,6 +22,11 @@ on:
         required: false
         default: true
         type: boolean
+      inspect_all:
+        description: "Inspect EVERY sitemap URL with its impressions/clicks (use with a domain)"
+        required: false
+        default: false
+        type: boolean
       inspect:
         description: "URLs per site to read REAL index status for (0 = off; needs Full user)"
         required: false
@@ -70,6 +75,7 @@ jobs:
           # property; until then each site reports the permission fact, not a failure.
           INSPECT="${{ inputs.inspect || '50' }}"
           if [ "$INSPECT" != "0" ]; then ARGS="$ARGS --inspect $INSPECT"; fi
+          if [ "${{ inputs.inspect_all }}" = "true" ]; then ARGS="$ARGS --inspect-all"; fi
 
           # ONE pass writes both files (two passes ran ~36 min and hit the limit).
           python3 tools/index_coverage.py $ARGS --format md \

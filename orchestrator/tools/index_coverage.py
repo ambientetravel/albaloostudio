@@ -133,6 +133,22 @@ def surfaced_urls(service, site: config.Site) -> tuple[set[str], int]:
     return urls, impressions
 
 
+def page_metrics(service, site: config.Site) -> dict[str, dict[str, int]]:
+    """Impressions and clicks per page (canonical key) over the long window."""
+    from datetime import timedelta
+    end = (a1.utc_now() - timedelta(days=site.data_lag_days)).date()
+    start = end - timedelta(days=site.lookback_days)
+    out: dict[str, dict[str, int]] = {}
+    for r in a1._search_analytics(service, site.property_uri,
+                                  start.isoformat(), end.isoformat(), ["page"]):
+        keys = r.get("keys") or []
+        if keys:
+            m = out.setdefault(a1._canon_url(keys[0]), {"impressions": 0, "clicks": 0})
+            m["impressions"] += int(r.get("impressions", 0) or 0)
+            m["clicks"] += int(r.get("clicks", 0) or 0)
+    return out
+
+
 def robots_blocked(site: config.Site, sitemap_urls: set[str],
                    session: requests.Session) -> dict[str, Any]:
     """
@@ -156,6 +172,9 @@ def robots_blocked(site: config.Site, sitemap_urls: set[str],
 
     blocked = [u for u in sorted(sitemap_urls) if not rp.can_fetch("Googlebot", u)]
     return {"available": True, "reason": None, "blocked": blocked}
+
+
+QUOTA_PER_RUN = 1900      # URL Inspection allows 2000/day/property; leave headroom
 
 
 def inspectable(canon: list[str], raw: Iterable[str]) -> list[str]:
@@ -217,7 +236,7 @@ def inspect_urls(service, site: config.Site, urls: list[str]) -> dict[str, Any]:
 
 
 def assess(service, site: config.Site, session: requests.Session,
-           *, inspect: int = 0) -> dict[str, Any]:
+           *, inspect: int = 0, inspect_all: bool = False) -> dict[str, Any]:
     declared_raw, sitemap_error = fetch_declared(site, session)
     declared = {a1._canon_url(u) for u in declared_raw}
     try:
@@ -259,7 +278,17 @@ def assess(service, site: config.Site, session: requests.Session,
         "sample_never_surfaced": never[:15],
         "sample_undeclared": undeclared[:15],
     }
-    if inspect and never:
+    if inspect_all and declared:
+        # Every declared page, each with its own impressions/clicks — the per-URL
+        # answer to a Search Console "Duplicate, Google chose different
+        # canonical" email, whose page list has no API (22 Oct, boutimar.ir).
+        metrics = page_metrics(service, site)
+        canon = sorted(declared)[:QUOTA_PER_RUN]
+        res = inspect_urls(service, site, inspectable(canon, declared_raw))
+        for item in res.get("results", []):
+            item.update(metrics.get(a1._canon_url(item["url"]), {"impressions": 0, "clicks": 0}))
+        row["inspection"] = res
+    elif inspect and never:
         # Pipeline articles first: whether a page the writer shipped actually got
         # indexed is the question this quota is best spent on.
         art = re.compile(r"/(journal|daryanameh|blog|guides)/")
@@ -343,14 +372,19 @@ def render_markdown(rows: list[dict[str, Any]]) -> str:
             L.append(f"> Index status not read: {insp['reason']}")
             L.append("")
         elif insp and insp["results"]:
-            L.append("| URL | Verdict | Coverage state | Last crawl |")
-            L.append("|---|---|---|---|")
+            from collections import Counter
+            for state, n in Counter(i["coverage_state"] or "—" for i in insp["results"]).most_common():
+                L.append(f"- {state}: **{n}**")
+            L.append("")
+            L.append("| URL | Verdict | Coverage state | Last crawl | Impr. | Clicks |")
+            L.append("|---|---|---|---|---:|---:|")
             for i in insp["results"]:
                 state = i['coverage_state'] or '—'
                 if i.get("google_canonical") and i["google_canonical"] != i["url"]:
                     state += f" → Google kept `{i['google_canonical']}`"
                 L.append(f"| `{i['url']}` | {i['verdict'] or '—'} | "
-                         f"{state} | {i['last_crawl'] or 'never'} |")
+                         f"{state} | {i['last_crawl'] or 'never'} | "
+                         f"{i.get('impressions', '')} | {i.get('clicks', '')} |")
             L.append("")
     return "\n".join(L)
 
@@ -362,6 +396,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--format", choices=["md", "json"], default="md")
     ap.add_argument("--inspect", nargs="?", type=int, const=DEFAULT_INSPECT_SAMPLE,
                     default=0, help="also read real index status for N URLs per site")
+    ap.add_argument("--inspect-all", action="store_true",
+                    help="inspect EVERY sitemap URL (with its impressions/clicks); use with --domain")
     ap.add_argument("--out", type=Path)
     # One assessment, both files: the weekly workflow used to run the whole thing
     # twice (md, then json) at ~2m40s a site — 36 min against a 25-min limit, so
@@ -383,7 +419,8 @@ def main(argv: list[str] | None = None) -> int:
     rows = []
     for site in sites:
         try:
-            rows.append(assess(service, site, session, inspect=args.inspect))
+            rows.append(assess(service, site, session, inspect=args.inspect,
+                               inspect_all=args.inspect_all))
         except PermissionError as exc:
             log.error("%s — skipped: %s", site.domain, config.redact(str(exc))[:160])
         else:
