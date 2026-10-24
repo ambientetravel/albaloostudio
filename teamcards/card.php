@@ -31,8 +31,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     elseif (post('email') === '' && post('phone') === '') $err = 'Please leave an email or a phone number.';
     elseif (post('email') !== '' && !filter_var(post('email'), FILTER_VALIDATE_EMAIL)) $err = 'That email address looks wrong.';
     else {
-        $q = db()->prepare("SELECT COUNT(*) FROM leads WHERE ip_hash = ? AND created_at >= datetime('now','-1 hour')");
-        $q->execute([ip_hash()]);
+        $q = db()->prepare('SELECT COUNT(*) FROM leads WHERE ip_hash = ? AND created_at >= ?');
+        $q->execute([ip_hash(), utc('-1 hour')]);
         if ((int)$q->fetchColumn() >= 8) $err = 'Too many submissions from this network — please try again later.';
         else {
             $suspect = post('company_url') !== '' ? 1 : 0;   // honeypot field, hidden from people

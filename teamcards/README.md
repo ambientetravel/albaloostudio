@@ -5,6 +5,14 @@ Digital business cards + QR + wallet passes + contact capture, for every brand
 the DirectAdmin server: PHP 8.1+ and SQLite, no build step, no monthly fee, the
 contact list stays on our own server.
 
+## Database
+
+MySQL/MariaDB (set `db` in config.php) or SQLite (leave `db.dsn` empty; needs
+`pdo_sqlite`). Both are tested with the same suite, MySQL in strict
+`ONLY_FULL_GROUP_BY` mode. Tables are created on first load. boutimar.com's host
+has no pdo_sqlite and restricts PHP to the subdomain folder (open_basedir), so it
+runs on MySQL.
+
 ## Who is who
 
 TeamCards runs as a small platform with you on top:

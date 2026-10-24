@@ -74,7 +74,7 @@ case 'home':
     [$where, $args] = is_admin() ? ['l.brand_id = ?', [ws_id()]] : ['l.brand_id = ? AND l.user_id = ?', [ws_id(), $u['id']]];
     $stat = function (string $sql) use ($args) { $q = db()->prepare($sql); $q->execute($args); return (int)$q->fetchColumn(); };
     $total = $stat("SELECT COUNT(*) FROM leads l WHERE $where AND l.suspect = 0");
-    $week  = $stat("SELECT COUNT(*) FROM leads l WHERE $where AND l.suspect = 0 AND l.created_at >= datetime('now','-7 days')");
+    $week  = $stat("SELECT COUNT(*) FROM leads l WHERE $where AND l.suspect = 0 AND l.created_at >= '" . utc('-7 days') . "'");
     $cards = $stat("SELECT COUNT(*) FROM cards l WHERE $where");
     $views = $stat("SELECT COALESCE(SUM(views),0) FROM cards l WHERE $where");
     [$used, $max] = ws_seats(ws_id());
@@ -83,7 +83,7 @@ case 'home':
        . "<div><b>$total</b>contacts</div><div><b>$week</b>last 7 days</div><div><b>$cards</b>cards" . (is_admin() && $max ? " <span class=\"muted\">of $max</span>" : '') . "</div><div><b>$views</b>card views</div></div>";
     if (is_admin()) {
         $q = db()->prepare("SELECT u.name, COUNT(l.id) n FROM users u LEFT JOIN leads l ON l.user_id = u.id AND l.suspect = 0 AND l.brand_id = u.brand_id
-            WHERE u.brand_id = ? GROUP BY u.id ORDER BY n DESC LIMIT 12");
+            WHERE u.brand_id = ? GROUP BY u.id, u.name ORDER BY n DESC LIMIT 12");
         $q->execute([ws_id()]);
         echo '<h2>By team member</h2><div class="stats small">';
         foreach ($q as $r) echo '<div><b>' . (int)$r['n'] . '</b>' . h($r['name']) . '</div>';
@@ -393,7 +393,7 @@ case 'import':
             'event' => ['event', 'tag', 'tags', 'location'], 'created_at' => ['date', 'created', 'created at', 'scanned at', 'timestamp']];
         foreach ($aliases as $k => $names) foreach ($head as $i => $col) if (in_array($col, $names, true)) { $map[$k] = $i; break; }
         $ok = 0; $skip = 0; $dupe = 0;
-        $exists = db()->prepare('SELECT 1 FROM leads WHERE brand_id = ? AND email != "" AND email = ? COLLATE NOCASE');
+        $exists = db()->prepare("SELECT 1 FROM leads WHERE brand_id = ? AND email != '' AND LOWER(email) = LOWER(?)");
         while (($r = fgetcsv($fh, null, ',', '"', '')) !== false) {
             $g = fn($k) => isset($map[$k]) ? clean((string)($r[$map[$k]] ?? ''), $k === 'note' ? 2000 : 200) : '';
             $name = $g('name') ?: trim($g('first') . ' ' . $g('last'));
@@ -473,8 +473,8 @@ case 'team':
 case 'invite':
     // Public: an invited person (or a reset) sets their password from the emailed / copied link.
     $tok = (string)($_GET['t'] ?? '');
-    $q = db()->prepare("SELECT * FROM users WHERE invite_token = ? AND invite_token != '' AND invite_expires > datetime('now')");
-    $q->execute([hash('sha256', $tok)]); $t = $q->fetch();
+    $q = db()->prepare("SELECT * FROM users WHERE invite_token = ? AND invite_token != '' AND invite_expires > ?");
+    $q->execute([hash('sha256', $tok), utc()]); $t = $q->fetch();
     $err = '';
     if ($t && $isPost) {
         $pw = (string)($_POST['password'] ?? '');
@@ -558,9 +558,9 @@ case 'owner':
             if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) { flash('The admin email looks wrong.'); redirect('index.php?p=owner'); }
             if ($email !== '') { $q = db()->prepare('SELECT 1 FROM users WHERE email = ?'); $q->execute([$email]); if ($q->fetch()) { flash("$email already has an account."); redirect('index.php?p=owner'); } }
             $hex = fn($k, $d) => preg_match('/^#[0-9a-f]{6}$/i', post($k)) ? post($k) : $d;
-            db()->prepare("INSERT INTO brands (slug, name, domain, color, accent, max_cards, status, created_at) VALUES (?,?,?,?,?,?, 'active', datetime('now'))")
+            db()->prepare("INSERT INTO brands (slug, name, domain, color, accent, max_cards, status, created_at) VALUES (?,?,?,?,?,?, 'active', ?)")
                 ->execute([slugify($name) . '-' . bin2hex(random_bytes(2)), $name, strtolower(preg_replace('~^https?://|/.*$~i', '', post('domain', 120))),
-                           $hex('color', '#0f3d5e'), $hex('accent', '#e8b04a'), max(0, (int)($_POST['max_cards'] ?? 0))]);
+                           $hex('color', '#0f3d5e'), $hex('accent', '#e8b04a'), max(0, (int)($_POST['max_cards'] ?? 0)), utc()]);
             $wsId = (int)db()->lastInsertId();
             $msg = "Workspace “{$name}” created.";
             if ($email !== '') {
@@ -589,12 +589,14 @@ case 'owner':
         }
         redirect('index.php?p=owner');
     }
+    $since30 = utc('-30 days');
+    $concat = is_mysql() ? "GROUP_CONCAT(u.name SEPARATOR ', ')" : "GROUP_CONCAT(u.name, ', ')";
     $rows = db()->query("SELECT b.*,
         (SELECT COUNT(*) FROM cards c WHERE c.brand_id = b.id) cards,
         (SELECT COUNT(*) FROM users u WHERE u.brand_id = b.id) people,
-        (SELECT GROUP_CONCAT(u.name, ', ') FROM users u WHERE u.brand_id = b.id AND u.role = 'admin') admins,
+        (SELECT $concat FROM users u WHERE u.brand_id = b.id AND u.role = 'admin') admins,
         (SELECT COUNT(*) FROM leads l WHERE l.brand_id = b.id AND l.suspect = 0) leads,
-        (SELECT COUNT(*) FROM leads l WHERE l.brand_id = b.id AND l.suspect = 0 AND l.created_at >= datetime('now','-30 days')) leads30,
+        (SELECT COUNT(*) FROM leads l WHERE l.brand_id = b.id AND l.suspect = 0 AND l.created_at >= '$since30') leads30,
         (SELECT COALESCE(SUM(views),0) FROM cards c WHERE c.brand_id = b.id) views,
         (SELECT MAX(created_at) FROM leads l WHERE l.brand_id = b.id) last_lead
         FROM brands b ORDER BY b.status, b.name")->fetchAll();
@@ -674,7 +676,9 @@ function lead_for_edit(int $id): array {
 
 function events_datalist(): string {
     $o = '<datalist id="events">';
-    foreach (db()->query("SELECT DISTINCT event FROM leads WHERE event != '' ORDER BY id DESC LIMIT 50") as $e) $o .= '<option value="' . h($e['event']) . '">';
+    $q = db()->prepare("SELECT event FROM leads WHERE brand_id = ? AND event != '' GROUP BY event ORDER BY MAX(id) DESC LIMIT 50");
+    $q->execute([ws_id()]);
+    foreach ($q as $e) $o .= '<option value="' . h($e['event']) . '">';
     return $o . '</datalist>';
 }
 

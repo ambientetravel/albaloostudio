@@ -32,7 +32,16 @@ return [
     'webhook_url'    => '',
     'webhook_secret' => '',
 
-    // Where the SQLite database lives. Outside public_html is better when allowed:
+    // Database. MySQL/MariaDB (DirectAdmin → MySQL Management → create database + user).
+    // Leave 'dsn' empty to use a SQLite file in data_dir instead (needs PHP's pdo_sqlite).
+    // Tables are created automatically on the first page load.
+    'db' => [
+        'dsn'  => '',   // 'mysql:host=localhost;dbname=USER_cards;charset=utf8mb4'
+        'user' => '',
+        'pass' => '',
+    ],
+
+    // Where the SQLite database lives (SQLite only). Outside public_html is better when allowed:
     // 'data_dir' => '/home/USER/teamcards-data',
 
     // Apple Wallet — see WALLET.md. Paths are server paths, keep them outside public_html.

@@ -43,15 +43,75 @@ function data_dir(): string {
     return $d;
 }
 
+/** MySQL/MariaDB when config.php has a 'db' dsn, otherwise a SQLite file in data_dir. */
+function is_mysql(): bool { return str_starts_with((string)(cfg('db', [])['dsn'] ?? ''), 'mysql:'); }
+
 function db(): PDO {
     static $pdo = null;
     if ($pdo) return $pdo;
-    $pdo = new PDO('sqlite:' . data_dir() . '/teamcards.sqlite');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $pdo->exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;');
-    migrate($pdo);
+    $opts = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC];
+    if (is_mysql()) {
+        $c = cfg('db');
+        $pdo = new PDO($c['dsn'], (string)($c['user'] ?? ''), (string)($c['pass'] ?? ''), $opts + [PDO::ATTR_EMULATE_PREPARES => false]);
+        $pdo->exec("SET NAMES utf8mb4, time_zone = '+00:00'");
+        migrate_mysql($pdo);
+    } else {
+        $pdo = new PDO('sqlite:' . data_dir() . '/teamcards.sqlite', null, null, $opts);
+        $pdo->exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;');
+        migrate($pdo);
+    }
     return $pdo;
+}
+
+/** UTC timestamp string, optionally shifted ('-7 days', '+1 hour'); bound as a parameter so the SQL stays portable. */
+function utc(string $shift = ''): string { return gmdate('Y-m-d H:i:s', $shift === '' ? time() : strtotime($shift)); }
+
+/** The current v1.2 schema in one go: MySQL installs start fresh, so no column-by-column upgrades. */
+function migrate_mysql(PDO $pdo): void {
+    if ($pdo->query("SHOW TABLES LIKE 'leads'")->fetchColumn()) return;
+    $t = 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+    $v = fn(int $n, string $d = '') => "VARCHAR($n) NOT NULL DEFAULT '$d'";
+    $pdo->exec("CREATE TABLE IF NOT EXISTS brands (
+        id INT AUTO_INCREMENT PRIMARY KEY, slug VARCHAR(80) NOT NULL UNIQUE, name VARCHAR(120) NOT NULL,
+        domain {$v(190)}, color {$v(7, '#0f3d5e')}, accent {$v(7, '#e8b04a')}, logo {$v(64)}, tagline {$v(200)},
+        company_name {$v(160)}, company_address {$v(255)}, company_phone {$v(40)}, company_email {$v(190)},
+        template {$v(20, 'classic')}, wallet_style {$v(20, 'brand')}, status {$v(20, 'active')},
+        max_cards INT NOT NULL DEFAULT 0, created_at {$v(19)}) $t");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(190) NOT NULL UNIQUE, name VARCHAR(160) NOT NULL,
+        password_hash VARCHAR(255) NOT NULL, role {$v(20, 'member')}, notify TINYINT NOT NULL DEFAULT 1,
+        status {$v(20, 'active')}, invite_token {$v(64)}, invite_expires {$v(19)}, phone {$v(40)},
+        brand_id INT NOT NULL DEFAULT 0, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP) $t");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS cards (
+        id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, brand_id INT NOT NULL, slug VARCHAR(64) NOT NULL UNIQUE,
+        full_name VARCHAR(160) NOT NULL, title {$v(160)}, email {$v(190)}, phone {$v(40)}, whatsapp {$v(40)},
+        website {$v(255)}, linkedin {$v(255)}, instagram {$v(160)}, address {$v(255)}, bio TEXT NULL, photo {$v(64)},
+        active TINYINT NOT NULL DEFAULT 1, views INT NOT NULL DEFAULT 0,
+        company_name {$v(160)}, company_website {$v(255)}, company_address {$v(255)}, company_phone {$v(40)}, company_email {$v(190)},
+        template {$v(20)}, wallet_style {$v(20)}, blocks MEDIUMTEXT NULL, auto_open TINYINT NOT NULL DEFAULT 0, updated_at {$v(19)},
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY (brand_id) REFERENCES brands(id)) $t");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS leads (
+        id INT AUTO_INCREMENT PRIMARY KEY, card_id INT NULL, user_id INT NULL, brand_id INT NULL,
+        name VARCHAR(160) NOT NULL, email {$v(190)}, phone {$v(40)}, company {$v(160)}, job_title {$v(160)},
+        note TEXT NULL, event {$v(160)}, source {$v(20, 'qr')}, status {$v(20, 'new')},
+        consent TINYINT NOT NULL DEFAULT 0, suspect TINYINT NOT NULL DEFAULT 0, ip_hash {$v(64)},
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX leads_user (user_id, created_at), INDEX leads_brand (brand_id, created_at), INDEX leads_ip (ip_hash, created_at),
+        FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE SET NULL, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+        FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE SET NULL) $t");
+    seed_brands($pdo);
+}
+
+function seed_brands(PDO $pdo): void {
+    if ((int)$pdo->query('SELECT COUNT(*) FROM brands')->fetchColumn() > 0) return;
+    // Names and domains only. Colours are placeholders — edit under Branding.
+    $seed = $pdo->prepare('INSERT INTO brands (slug, name, domain, color, accent, created_at) VALUES (?,?,?,?,?,?)');
+    foreach ([
+        ['boutimar', 'Boutimar', 'boutimar.com', '#0b3954', '#e0a458'],
+        ['ambiente', 'Ambiente Travel', 'ambientetravel.com', '#1d3a2f', '#c9a227'],
+        ['cruise24', 'Cruise24', 'cruise24.me', '#0a2a4a', '#3fa7d6'],
+    ] as $b) $seed->execute([...$b, utc()]);
 }
 
 function migrate(PDO $pdo): void {
@@ -110,15 +170,7 @@ function migrate(PDO $pdo): void {
         $pdo->exec("UPDATE users SET role = 'owner' WHERE role = 'admin'");
         $pdo->exec('UPDATE users SET brand_id = COALESCE((SELECT brand_id FROM cards WHERE cards.user_id = users.id ORDER BY id LIMIT 1), 0) WHERE role != \'owner\'');
     }
-    if ((int)$pdo->query('SELECT COUNT(*) FROM brands')->fetchColumn() === 0) {
-        // Names and domains only. Colours are placeholders — edit under Brands.
-        $seed = $pdo->prepare('INSERT INTO brands (slug, name, domain, color, accent) VALUES (?,?,?,?,?)');
-        foreach ([
-            ['boutimar', 'Boutimar', 'boutimar.com', '#0b3954', '#e0a458'],
-            ['ambiente', 'Ambiente Travel', 'ambientetravel.com', '#1d3a2f', '#c9a227'],
-            ['cruise24', 'Cruise24', 'cruise24.me', '#0a2a4a', '#3fa7d6'],
-        ] as $b) $seed->execute($b);
-    }
+    seed_brands($pdo);
 }
 
 function add_cols(PDO $pdo, string $table, array $cols): void {
@@ -128,7 +180,7 @@ function add_cols(PDO $pdo, string $table, array $cols): void {
 
 /* ── helpers ─────────────────────────────────────────────────────────── */
 
-function h(?string $s): string { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
+function h(mixed $s): string { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 
 function clean(string $s, int $max = 200): string {
     $s = trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $s) ?? '');
@@ -345,7 +397,7 @@ function lead_query(array $u): array {
     if (!empty($_GET['status'])) { $w[] = 'l.status = ?'; $a[] = (string)$_GET['status']; }
     if (!empty($_GET['event'])) { $w[] = 'l.event = ?'; $a[] = (string)$_GET['event']; }
     if (!empty($_GET['from'])) { $w[] = 'l.created_at >= ?'; $a[] = (string)$_GET['from']; }
-    if (!empty($_GET['to'])) { $w[] = 'l.created_at < date(?, \'+1 day\')'; $a[] = (string)$_GET['to']; }
+    if (!empty($_GET['to']) && ($t = strtotime((string)$_GET['to']))) { $w[] = 'l.created_at < ?'; $a[] = gmdate('Y-m-d', $t + 86400); }
     if (($_GET['q'] ?? '') !== '') { $w[] = '(l.name LIKE ? OR l.email LIKE ? OR l.company LIKE ? OR l.phone LIKE ? OR l.note LIKE ?)'; array_push($a, ...array_fill(0, 5, '%' . $_GET['q'] . '%')); }
     $w[] = empty($_GET['suspect']) ? 'l.suspect = 0' : 'l.suspect = 1';
     return ['SELECT l.*, b.name brand, u.name owner, c.full_name card_name FROM leads l LEFT JOIN brands b ON b.id = l.brand_id
@@ -495,7 +547,7 @@ function send_mail(string $to, string $subject, string $body, string $replyTo = 
 /** New 7-day invite token for a user; returns the link to set a password. */
 function issue_invite(int $userId): string {
     $t = bin2hex(random_bytes(20));
-    db()->prepare("UPDATE users SET invite_token = ?, invite_expires = datetime('now', '+7 days') WHERE id = ?")->execute([hash('sha256', $t), $userId]);
+    db()->prepare("UPDATE users SET invite_token = ?, invite_expires = ? WHERE id = ?")->execute([hash('sha256', $t), utc('+7 days'), $userId]);
     return base_url() . '/index.php?p=invite&t=' . $t;
 }
 
