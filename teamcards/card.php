@@ -14,7 +14,7 @@ require __DIR__ . '/lib.php';
 
 $slug = (string)($_GET['u'] ?? '');
 $c = $slug !== '' ? card_by_slug($slug) : null;
-if (!$c || !$c['active']) {
+if (!$c || !$c['active'] || $c['brand_status'] !== 'active') {
     http_response_code(404);
     echo '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Card not found</title><p style="font:16px system-ui;padding:2em">This card is not available.</p>';
     exit;

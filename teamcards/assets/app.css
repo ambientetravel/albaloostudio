@@ -136,3 +136,13 @@ body.print{background:#fff}.sheet{padding:20px}
 .tent{margin-top:12mm;width:120mm;text-align:center;border:1px dashed #bbb;padding:8mm}.tent .qr.big{width:80mm;margin:0 auto}
 .qr svg{display:block;width:100%;height:auto}
 @media print{.noprint{display:none}}
+
+/* owner / workspaces */
+.wsswitch select{background:#ffffff14;color:#fff;border:1px solid #ffffff33;border-radius:8px;padding:6px 8px;font:inherit;max-width:220px}
+.wsswitch option{color:#111}
+.wsname{color:#fff;font-weight:600;padding:4px 10px;border-radius:8px;background:#ffffff14}
+.pill.role{background:#ffffff26;font-size:.7em;vertical-align:1px;text-transform:capitalize}
+.btn.small,button.btn.small{padding:5px 10px;font-size:.85em}
+.inline-edit{display:inline-block;margin-left:8px}.inline-edit summary{cursor:pointer;color:var(--brand);text-decoration:underline}
+.inline-edit form{display:flex!important;gap:6px;margin-top:6px;align-items:center}.inline-edit input{width:120px;padding:5px;border:1px solid #cfd7de;border-radius:6px}
+.inline-edit input[type=number]{width:70px}

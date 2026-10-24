@@ -5,6 +5,21 @@ Digital business cards + QR + wallet passes + contact capture, for every brand
 the DirectAdmin server: PHP 8.1+ and SQLite, no build step, no monthly fee, the
 contact list stays on our own server.
 
+## Who is who
+
+TeamCards runs as a small platform with you on top:
+
+| Role | Sees and does |
+|---|---|
+| **Owner** (you, created at setup) | **Owner panel**: every sub-brand (workspace) with its admins, people, cards/limit, contacts, views and last activity. Create a workspace and invite its first admin, rename it, set its **card limit**, **suspend** it (team signed out, public cards offline, nothing deleted) or reactivate it, delete it while empty. **Enter** any workspace from the panel or the header switcher and work inside it as its admin. **Settings** (platform config). |
+| **Admin** of a workspace | Only that workspace: its cards, contacts, team, branding, bulk create, import. Cannot see other workspaces or the owner pages. |
+| **Member** | Their own cards and the contacts those cards collect. |
+
+A sub-brand is a workspace: Boutimar, Ambiente Travel and Cruise24 are created
+on first run (empty, no admin yet); add more from the Owner panel. One email = one
+account in one workspace. Upgrading a v1.0/1.1 install: its admins become owners and
+each member joins the brand of their first card.
+
 ## What it does
 
 Built to match HeyDrop Teams (mapped screen by screen on 24 Oct 2026) and go past it where a fair-going sales team needs more.

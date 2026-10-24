@@ -3,14 +3,20 @@
  * TeamCards — shared core: config, SQLite, auth, CSRF, layout.
  *
  * Self-hosted replacement for a HeyDrop-style digital business card +
- * lead capture tool. One install serves every brand (Boutimar, Ambiente
- * Travel, Cruise24 …); each card belongs to one person and one brand, and
- * every contact captured through a card is attributed to both.
+ * lead capture tool, run as a platform:
+ *
+ *   Owner      — the platform owner. Creates sub-brands (workspaces), sets
+ *                their card limits, suspends them, and can step into any one.
+ *   Workspace  — one sub-brand (a row in `brands`). Its own admins, team,
+ *                cards, contacts and branding; it sees nothing of the others.
+ *   Admin      — runs one workspace.   Member — own cards and contacts only.
+ *
+ * Every query that touches users, cards or leads is scoped by ws_id().
  */
 
 declare(strict_types=1);
 
-const TC_VERSION = '1.1.0';
+const TC_VERSION = '1.2.0';
 
 $CFG = is_file(__DIR__ . '/config.php') ? (require __DIR__ . '/config.php') : [];
 
@@ -94,6 +100,16 @@ function migrate(PDO $pdo): void {
         'template' => "TEXT NOT NULL DEFAULT 'classic'", 'wallet_style' => "TEXT NOT NULL DEFAULT 'brand'"]);
     add_cols($pdo, 'users', ['status' => "TEXT NOT NULL DEFAULT 'active'", 'invite_token' => "TEXT NOT NULL DEFAULT ''",
         'invite_expires' => "TEXT NOT NULL DEFAULT ''", 'phone' => "TEXT NOT NULL DEFAULT ''"]);
+    // v1.2 workspaces: users belong to one brand; the owner to none.
+    $hadWs = in_array('brand_id', array_column($pdo->query('PRAGMA table_info(users)')->fetchAll(PDO::FETCH_ASSOC), 'name'), true);
+    add_cols($pdo, 'users', ['brand_id' => 'INTEGER NOT NULL DEFAULT 0']);
+    add_cols($pdo, 'brands', ['status' => "TEXT NOT NULL DEFAULT 'active'", 'max_cards' => 'INTEGER NOT NULL DEFAULT 0',
+        'created_at' => "TEXT NOT NULL DEFAULT ''"]);
+    if (!$hadWs) {
+        // Upgrading a single-team install: its admins become owners; members join the brand of their first card.
+        $pdo->exec("UPDATE users SET role = 'owner' WHERE role = 'admin'");
+        $pdo->exec('UPDATE users SET brand_id = COALESCE((SELECT brand_id FROM cards WHERE cards.user_id = users.id ORDER BY id LIMIT 1), 0) WHERE role != \'owner\'');
+    }
     if ((int)$pdo->query('SELECT COUNT(*) FROM brands')->fetchColumn() === 0) {
         // Names and domains only. Colours are placeholders — edit under Brands.
         $seed = $pdo->prepare('INSERT INTO brands (slug, name, domain, color, accent) VALUES (?,?,?,?,?)');
@@ -164,18 +180,57 @@ function me(): ?array {
     return $u;
 }
 
-function is_admin(): bool { return (me()['role'] ?? '') === 'admin'; }
+function is_owner(): bool { return (me()['role'] ?? '') === 'owner'; }
 
+/** Admin of the current workspace. The owner counts as admin of whichever workspace they are in. */
+function is_admin(): bool { return in_array(me()['role'] ?? '', ['admin', 'owner'], true); }
+
+/** The workspace being worked in: a user's own, or the one the owner stepped into. */
+function ws(): ?array {
+    static $ws = false;
+    if ($ws !== false) return $ws;
+    $u = me();
+    $id = !$u ? 0 : ($u['role'] === 'owner' ? (int)($_SESSION['ws'] ?? 0) : (int)$u['brand_id']);
+    return $ws = $id ? brand($id) : null;
+}
+
+function ws_id(): int { return (int)(ws()['id'] ?? 0); }
+
+/** Signed in, and inside a usable workspace. The owner without one goes to the owner panel. */
 function require_login(): array {
     $u = me();
     if (!$u) redirect('index.php?p=login');
+    if ($u['role'] === 'owner') { if (!ws()) redirect('index.php?p=owner'); return $u; }
+    if (!ws() || ws()['status'] !== 'active') {
+        $_SESSION = [];
+        flash(ws() ? 'This workspace is suspended. Contact the platform owner.' : 'Your account is not attached to a workspace.');
+        redirect('index.php?p=login');
+    }
     return $u;
 }
 
 function require_admin(): array {
     $u = require_login();
-    if ($u['role'] !== 'admin') { http_response_code(403); exit('Admins only.'); }
+    if (!is_admin()) { http_response_code(403); exit('Admins only.'); }
     return $u;
+}
+
+function require_owner(): array {
+    $u = me();
+    if (!$u) redirect('index.php?p=login');
+    if ($u['role'] !== 'owner') { http_response_code(403); exit('Platform owner only.'); }
+    return $u;
+}
+
+/** Card limit for the workspace: [used, max] — max 0 means unlimited. */
+function ws_seats(int $wsId): array {
+    $q = db()->prepare('SELECT COUNT(*) FROM cards WHERE brand_id = ?'); $q->execute([$wsId]);
+    return [(int)$q->fetchColumn(), (int)(brand($wsId)['max_cards'] ?? 0)];
+}
+
+/** Users of the current workspace (for owner pickers). */
+function ws_users(): array {
+    $q = db()->prepare('SELECT id, name FROM users WHERE brand_id = ? ORDER BY name'); $q->execute([ws_id()]); return $q->fetchAll();
 }
 
 function csrf(): string {
@@ -192,7 +247,7 @@ function check_csrf(): void {
 
 /* ── data access ─────────────────────────────────────────────────────── */
 
-function brands(): array { return db()->query('SELECT * FROM brands ORDER BY name')->fetchAll(); }
+function all_brands(): array { return db()->query('SELECT * FROM brands ORDER BY name')->fetchAll(); }
 
 function brand(int $id): ?array {
     $q = db()->prepare('SELECT * FROM brands WHERE id = ?'); $q->execute([$id]); return $q->fetch() ?: null;
@@ -200,7 +255,7 @@ function brand(int $id): ?array {
 
 const CARD_BRAND_COLS = 'b.name AS brand_name, b.domain AS brand_domain, b.color, b.accent, b.logo, b.tagline,
     b.company_name AS brand_company_name, b.company_address AS brand_company_address, b.company_phone AS brand_company_phone,
-    b.company_email AS brand_company_email, b.template AS brand_template, b.wallet_style AS brand_wallet_style';
+    b.company_email AS brand_company_email, b.template AS brand_template, b.wallet_style AS brand_wallet_style, b.status AS brand_status';
 
 function card_by_slug(string $slug): ?array {
     $q = db()->prepare("SELECT c.*, " . CARD_BRAND_COLS . "
@@ -214,8 +269,11 @@ function card_by_id(int $id): ?array {
     $q->execute([$id]); $c = $q->fetch(); return $c ? card_effective($c) : null;
 }
 
-/** A member may touch their own cards; an admin any. */
-function can_edit_card(array $card): bool { $u = me(); return $u && ($u['role'] === 'admin' || (int)$card['user_id'] === (int)$u['id']); }
+/** Only cards of the current workspace; a member only their own, an admin any of the workspace. */
+function can_edit_card(array $card): bool {
+    $u = me();
+    return $u && (int)$card['brand_id'] === ws_id() && (is_admin() || (int)$card['user_id'] === (int)$u['id']);
+}
 
 function photo_url(string $file): string { return $file === '' ? '' : base_url() . '/uploads/' . rawurlencode($file); }
 
@@ -253,11 +311,18 @@ function page_head(string $title, string $bodyClass = ''): void {
        . '<link rel="stylesheet" href="assets/app.css?v=' . TC_VERSION . '"></head><body class="' . h($bodyClass) . '">';
     if ($u) {
         $p = $_GET['p'] ?? 'home';
-        $nav = ['home' => 'Dashboard', 'cards' => 'Cards', 'leads' => 'Contacts', 'scan' => 'Quick add'];
-        if ($u['role'] === 'admin') $nav += ['team' => 'Team', 'brands' => 'Brands', 'settings' => 'Settings'];
-        echo '<header class="top"><a class="logo" href="index.php">TeamCards</a><nav>';
+        $nav = ws() ? ['home' => 'Dashboard', 'cards' => 'Cards', 'leads' => 'Contacts', 'scan' => 'Quick add'] : [];
+        if (ws() && is_admin()) $nav += ['team' => 'Team', 'brands' => 'Branding'];
+        if (is_owner()) $nav = ['owner' => 'Owner panel'] + $nav + ['settings' => 'Settings'];
+        echo '<header class="top"><a class="logo" href="index.php">TeamCards</a>';
+        if (is_owner()) {
+            echo '<form method="post" action="index.php?p=switch" class="wsswitch">' . csrf_field() . '<select name="ws" onchange="this.form.submit()"><option value="0">— all workspaces —</option>';
+            foreach (all_brands() as $b) echo '<option value="' . $b['id'] . '"' . ($b['id'] == ws_id() ? ' selected' : '') . '>' . h($b['name']) . ($b['status'] !== 'active' ? ' (suspended)' : '') . '</option>';
+            echo '</select><noscript><button>Go</button></noscript></form>';
+        } elseif (ws()) echo '<span class="wsname">' . h(ws()['name']) . '</span>';
+        echo '<nav>';
         foreach ($nav as $k => $v) echo '<a href="index.php?p=' . $k . '"' . ($p === $k ? ' class="on"' : '') . '>' . h($v) . '</a>';
-        echo '</nav><div class="who">' . h($u['name']) . ' · <a href="index.php?p=account">Account</a> · '
+        echo '</nav><div class="who">' . h($u['name']) . ' <span class="pill role">' . h($u['role']) . '</span> · <a href="index.php?p=account">Account</a> · '
            . '<form method="post" action="index.php?p=logout" class="inline">' . csrf_field() . '<button class="link">Sign out</button></form></div></header>';
     }
     echo '<main class="wrap">';
@@ -274,10 +339,9 @@ const LEAD_STATUSES = ['new', 'contacted', 'qualified', 'won', 'lost'];
 
 /** Shared with export.php: the filtered contact query for the current user. */
 function lead_query(array $u): array {
-    $w = ['1=1']; $a = [];
+    $w = ['l.brand_id = ?']; $a = [ws_id()];
     if (!is_admin()) { $w[] = 'l.user_id = ?'; $a[] = $u['id']; }
     elseif (!empty($_GET['owner'])) { $w[] = 'l.user_id = ?'; $a[] = (int)$_GET['owner']; }
-    if (!empty($_GET['brand'])) { $w[] = 'l.brand_id = ?'; $a[] = (int)$_GET['brand']; }
     if (!empty($_GET['status'])) { $w[] = 'l.status = ?'; $a[] = (string)$_GET['status']; }
     if (!empty($_GET['event'])) { $w[] = 'l.event = ?'; $a[] = (string)$_GET['event']; }
     if (!empty($_GET['from'])) { $w[] = 'l.created_at >= ?'; $a[] = (string)$_GET['from']; }

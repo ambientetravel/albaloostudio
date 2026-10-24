@@ -5,7 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/lib.php';
 
 $c = card_by_slug((string)($_GET['u'] ?? ''));
-if (!$c || !$c['active']) { http_response_code(404); exit('Not found'); }
+if (!$c || !$c['active'] || $c['brand_status'] !== 'active') { http_response_code(404); exit('Not found'); }
 
 $esc = fn(string $s) => str_replace(["\\", "\n", ',', ';'], ["\\\\", '\n', '\,', '\;'], $s);
 $parts = preg_split('/\s+/', trim($c['full_name'])) ?: [];
