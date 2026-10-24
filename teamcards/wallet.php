@@ -37,6 +37,15 @@ try {
     page_foot();
 }
 
+/** [background, foreground, label] hex for the card's wallet style. */
+function wallet_colors(array $c): array {
+    return match ($c['wstyle']) {
+        'dark'  => ['#2b2f33', '#ffffff', $c['accent']],
+        'white' => ['#ffffff', '#14202b', $c['color']],
+        default => [$c['color'], '#ffffff', $c['accent']],
+    };
+}
+
 function rgb(string $hex): string {
     [$r, $g, $b] = sscanf($hex, '#%02x%02x%02x') ?: [0, 0, 0];
     return "rgb($r, $g, $b)";
@@ -45,7 +54,7 @@ function rgb(string $hex): string {
 /** Brand-coloured square with the brand initial — Apple requires an icon even with a logo. */
 function brand_png(array $c, int $w, int $h, bool $initialOnly = true): string {
     $im = imagecreatetruecolor($w, $h);
-    [$r, $g, $b] = sscanf($c['color'], '#%02x%02x%02x') ?: [15, 61, 94];
+    [$r, $g, $b] = sscanf(wallet_colors($c)[0], '#%02x%02x%02x') ?: [15, 61, 94];
     imagefill($im, 0, 0, imagecolorallocate($im, $r, $g, $b));
     $logo = $c['logo'] ? __DIR__ . '/uploads/' . basename($c['logo']) : '';
     if ($logo && is_file($logo) && ($src = @imagecreatefromstring((string)file_get_contents($logo)))) {
@@ -54,7 +63,8 @@ function brand_png(array $c, int $w, int $h, bool $initialOnly = true): string {
         imagecopyresampled($im, $src, (int)(($w - $dw) / 2), (int)(($h - $dh) / 2), 0, 0, $dw, $dh, $sw, $sh);
     } else {
         $txt = $initialOnly ? mb_strtoupper(mb_substr($c['brand_name'], 0, 1)) : $c['brand_name'];
-        $white = imagecolorallocate($im, 255, 255, 255); $f = 5;
+        [$fr, $fg, $fb] = sscanf(wallet_colors($c)[1], '#%02x%02x%02x');
+        $white = imagecolorallocate($im, $fr, $fg, $fb); $f = 5;
         imagestring($im, $f, (int)(($w - imagefontwidth($f) * strlen($txt)) / 2), (int)(($h - imagefontheight($f)) / 2), $txt, $white);
     }
     ob_start(); imagepng($im); return (string)ob_get_clean();
@@ -88,19 +98,21 @@ function apple_pass(array $c, string $url): never {
     }
 
     $field = fn($k, $label, $v) => ['key' => $k, 'label' => $label, 'value' => $v];
+    $wc = wallet_colors($c);
     $pass = [
         'formatVersion' => 1, 'passTypeIdentifier' => $a['pass_type_id'], 'teamIdentifier' => $a['team_id'],
-        'serialNumber' => 'card-' . $c['id'] . '-' . $c['slug'], 'organizationName' => $c['brand_name'],
-        'description' => $c['brand_name'] . ' business card — ' . $c['full_name'], 'logoText' => $c['brand_name'],
-        'backgroundColor' => rgb($c['color']), 'foregroundColor' => 'rgb(255, 255, 255)', 'labelColor' => rgb($c['accent']),
+        'serialNumber' => 'card-' . $c['id'] . '-' . $c['slug'], 'organizationName' => $c['co_name'],
+        'description' => $c['co_name'] . ' business card — ' . $c['full_name'], 'logoText' => $c['co_name'],
+        'backgroundColor' => rgb($wc[0]), 'foregroundColor' => rgb($wc[1]), 'labelColor' => rgb($wc[2]),
         'sharingProhibited' => false,
         'generic' => [
             'primaryFields' => [$field('name', $c['title'] ?: 'Name', $c['full_name'])],
             'secondaryFields' => array_values(array_filter([$c['phone'] ? $field('phone', 'Phone', $c['phone']) : null, $c['email'] ? $field('email', 'Email', $c['email']) : null])),
+            'auxiliaryFields' => $c['co_address'] ? [$field('address', 'Address', $c['co_address'])] : [],
             'backFields' => array_values(array_filter([
                 $field('card', 'Card', $url),
-                $c['website'] ? $field('web', 'Website', $c['website']) : ($c['brand_domain'] ? $field('web', 'Website', 'https://' . $c['brand_domain']) : null),
-                $c['address'] ? $field('addr', 'Office', $c['address']) : null,
+                ($c['website'] ?: $c['co_website']) ? $field('web', 'Website', $c['website'] ?: $c['co_website']) : null,
+                $c['co_phone'] ? $field('office', 'Office', $c['co_phone']) : null,
                 $c['bio'] ? $field('bio', 'About', $c['bio']) : null,
             ])),
         ],
@@ -152,12 +164,13 @@ function google_pass(array $c, string $url): never {
     $object = [
         'id' => "$iss.card_" . $c['id'] . '_' . preg_replace('/[^A-Za-z0-9_.-]/', '_', $c['slug']),
         'classId' => $classId, 'state' => 'ACTIVE',
-        'cardTitle' => $tl($c['brand_name']), 'header' => $tl($c['full_name']), 'subheader' => $tl($c['title'] ?: 'Business card'),
-        'hexBackgroundColor' => $c['color'],
+        'cardTitle' => $tl($c['co_name']), 'header' => $tl($c['full_name']), 'subheader' => $tl($c['title'] ?: 'Business card'),
+        'hexBackgroundColor' => wallet_colors($c)[0],
         'barcode' => ['type' => 'QR_CODE', 'value' => $url, 'alternateText' => 'Scan to connect'],
         'textModulesData' => array_values(array_filter([
             $c['phone'] ? ['id' => 'phone', 'header' => 'Phone', 'body' => $c['phone']] : null,
             $c['email'] ? ['id' => 'email', 'header' => 'Email', 'body' => $c['email']] : null,
+            $c['co_address'] ? ['id' => 'address', 'header' => 'Address', 'body' => $c['co_address']] : null,
         ])),
         'linksModuleData' => ['uris' => [['uri' => $url, 'description' => 'Digital card', 'id' => 'card']]],
     ];

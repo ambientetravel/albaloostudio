@@ -21,6 +21,17 @@ return [
     // (e.g. cards@boutimar.com). Empty = no emails, contacts are still stored.
     'mail_from' => '',
 
+    // AI business-card scanner (Quick add → Read card). Key from console.anthropic.com → API keys.
+    // Each scan is one API call with one photo; the photo is not stored here. Empty = scanner off.
+    'anthropic_api_key' => '',
+    'scan_model'        => 'claude-opus-5-5',
+
+    // CRM hand-off: every new contact is POSTed here as JSON (Zapier / Make "catch hook",
+    // which can then create the HubSpot / Pipedrive / Google Sheets record). https only.
+    // Signed: X-Albaloo-Signature = "sha256=" + HMAC-SHA256(webhook_secret, "{timestamp}." + body).
+    'webhook_url'    => '',
+    'webhook_secret' => '',
+
     // Where the SQLite database lives. Outside public_html is better when allowed:
     // 'data_dir' => '/home/USER/teamcards-data',
 
