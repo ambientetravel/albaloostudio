@@ -1,0 +1,8 @@
+config.php
+data/*
+!data/.htaccess
+!data/index.php
+uploads/*
+!uploads/.htaccess
+wallet-keys/
+dist/

@@ -1,0 +1,14 @@
+# TeamCards — Apache / LiteSpeed (DirectAdmin)
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+# /u/<slug> → the public card. Set 'pretty_urls' => false in config.php if rewrites are off.
+RewriteRule ^u/([A-Za-z0-9-]+)/?$ card.php?u=$1 [L,QSA]
+</IfModule>
+
+# Never serve config, the database, docs, or build tools.
+<FilesMatch "^(config(\.sample)?\.php|lib\.php|.*\.(md|py|sqlite|sqlite-wal|sqlite-shm|bak|log))$">
+  Require all denied
+</FilesMatch>
