@@ -20,6 +20,7 @@
 # every internal hop is a workflow_run.
 
 name: Agent 2 — Writer
+run-name: "Agent 2 — Writer${{ inputs.no_llm && ' (dry run)' || '' }}"
 
 on:
   workflow_run:

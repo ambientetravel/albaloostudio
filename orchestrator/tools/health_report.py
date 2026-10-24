@@ -253,8 +253,18 @@ def build(token: str, bridge_token: str) -> dict:
                         f"— these are lost to the 45-day ledger cooldown, not queued")
 
     # ── 4. broadcaster ────────────────────────────────────────────────
-    art = latest_artifact(token, "agent3-broadcast")
-    bc = artifact_file(token, art, "manifest.json") if art else None
+    # The newest REAL broadcast: a no-model test run (no_llm, no images, nothing
+    # recorded) is not a cycle. 19 Oct: one made the report say "11 of 11 posts
+    # without media" for a week.
+    bc = None
+    for i in range(5):
+        art = latest_artifact(token, "agent3-broadcast", i)
+        if not art:
+            break
+        m = artifact_file(token, art, "manifest.json")
+        if m and not m.get("no_llm"):
+            bc = m
+            break
     if bc:
         numbers.update(posts=bc.get("posts_total"), posts_held=bc.get("posts_held"),
                        posts_no_media=bc.get("posts_blocked_media"),

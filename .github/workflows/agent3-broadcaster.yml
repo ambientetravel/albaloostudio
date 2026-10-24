@@ -13,6 +13,7 @@
 # worth writing and reviewing before an account exists to send it from.
 
 name: Agent 3 — Broadcaster
+run-name: "Agent 3 — Broadcaster${{ inputs.no_llm && ' (dry run)' || '' }}"
 
 on:
   workflow_run:
