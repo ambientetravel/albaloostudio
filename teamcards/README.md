@@ -71,27 +71,27 @@ Ahead of HeyDrop: multiple brands in one install, lead status / notes / events, 
 
 ## Deploy (DirectAdmin)
 
-Assumed address: **cards.boutimar.com** (internal tool; one install serves all
+Assumed address: **cards.ambientetravel.com** (see DEPLOY-AMBIENTE.md; one install serves all
 brands, each card shows its own brand). Any subdomain works — set `base_url` to
 it **before printing any QR**, because printed codes point there forever.
 
-1. DirectAdmin → Subdomain Management → create `cards` under boutimar.com.
+1. DirectAdmin → Subdomain Management → add the domain cards.ambientetravel.com (DNS: DEPLOY-AMBIENTE.md).
    Let's Encrypt SSL on it.
-2. File Manager → `domains/boutimar.com/public_html/cards/` (or the subdomain's
+2. File Manager → `domains/cards.ambientetravel.com/public_html/` (or the subdomain's
    own docroot if the panel created one) → upload `dist/teamcards-*.zip`,
    **extract there**. Paths in the zip are docroot-relative, no `public_html/` prefix.
 3. In that folder copy `config.sample.php` → `config.php`, fill `base_url`,
-   `setup_key` (12+ random chars), `ip_salt`, `mail_from` (e.g. `cards@boutimar.com`).
+   `setup_key` (12+ random chars), `ip_salt`, `mail_from` (e.g. `cards.ambientetravel.com`).
    Better: set `data_dir` to a folder outside public_html.
 4. Make `data/` and `uploads/` writable by PHP (755 is normally enough on DirectAdmin).
-5. Open `https://cards.boutimar.com/` → setup → create the admin → Brands
+5. Open `https://cards.ambientetravel.com/` → setup → create the admin → Brands
    (logos, colours) → Team → Cards.
 
 Check after deploy:
 
-    curl -sI https://cards.boutimar.com/config.php        # 403
-    curl -sI https://cards.boutimar.com/data/teamcards.sqlite  # 403
-    curl -sI https://cards.boutimar.com/u/<a-card-slug>   # 200
+    curl -sI https://cards.ambientetravel.com/config.php        # 403
+    curl -sI https://cards.ambientetravel.com/data/teamcards.sqlite  # 403
+    curl -sI https://cards.ambientetravel.com/u/<a-card-slug>   # 200
 
 ## Getting the most out of HeyDrop first
 

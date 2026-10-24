@@ -6,7 +6,7 @@
 return [
     // Public address of this install, no trailing slash. Card QR codes point here,
     // so pick it once and keep it — changing it later breaks printed QR codes.
-    'base_url' => 'https://cards.boutimar.com',
+    'base_url' => 'https://cards.ambientetravel.com',
 
     // /u/<slug> card links need mod_rewrite (DirectAdmin has it). false → card.php?u=<slug>.
     'pretty_urls' => true,
@@ -18,7 +18,7 @@ return [
     'ip_salt' => '',
 
     // Email the card owner when someone leaves details. An address on this domain
-    // (e.g. cards@boutimar.com). Empty = no emails, contacts are still stored.
+    // (e.g. cards@ambientetravel.com). Empty = no emails, contacts are still stored.
     'mail_from' => '',
 
     // AI business-card scanner (Quick add → Read card). Key from console.anthropic.com → API keys.
