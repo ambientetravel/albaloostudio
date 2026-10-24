@@ -178,9 +178,27 @@ Home Screen; Android prompts. Store wrappers (Capacitor, Cafe Bazaar, Myket) are
   right-to-left in a free test publication. The full case is in the "Daryanameh Channels and
   Rates" brief.
 
+## The balcony film (24 Oct 2026)
+
+- The «بالکن» chapter of the quay → cabin film (top of `/journal/istanbul-az-eskele-ta-kabin/`)
+  is now moving footage, not the AI still. Source: the cruise24.me hero
+  (`main:cruise24-me/media/hero-balcony-1920.mp4`), which is Explora Journeys' own hero film,
+  trimmed there to open on the balcony. Here: its first shot only (0–2.80 s), played forward then
+  back so the loop has no jump; trimmed and resized, no colour change. `static/video/scene-balcony`
+  `.webm` 177 KB, `.mp4` 211 KB, poster `img/scene-balcony-film.webp` 27 KB.
+- It plays only while the scene is on screen, never on Save-Data, and is never fetched with
+  reduced motion or without JavaScript (those readers never see that scene). The service worker
+  leaves video requests to the browser so range requests work.
+- Credit «فیلم: Explora Journeys» rides inside the scene; the AI credit is hidden while it plays.
+  `--check` fails on a hero scene with a missing file, no credit, or a film with no `source` note.
+- **Rights are not confirmed.** Same question as cruise24.me HANDOFF item 3: nobody has seen the
+  agreement behind "used with permission of the line". An editorial magazine is a different use
+  from an agency promoting the line. Confirm before daryanameh.com goes live; to revert, point
+  the balcony scene back at `img/scene-balcony.webp` (kept) and delete its `video` and `source`.
+
 ## Not done, deliberately
 
-- Port/article photographs. Only the four hero scenes exist (AI-generated, credited); everything else is a colour field until licensed photos exist.
+- Port/article photographs. Only the hero scenes exist (three AI-generated stills and the Explora balcony film, all credited); everything else is a colour field until licensed photos exist.
 - Newsletter form posts nowhere yet (`site.json` → `channels.newsletter_action`); wire to nitrosend.
 - Telegram link is a placeholder handle (`t.me/daryanameh`) until the channel exists.
 - Podcast section says «به‌زودی».
@@ -188,6 +206,7 @@ Home Screen; Android prompts. Store wrappers (Capacitor, Cafe Bazaar, Myket) are
 - No Jalali date *input* — front matter dates are ISO Gregorian and converted for display.
 - Domain not registered; nothing deployed.
 - `/work-with-us/` has no contact address until `channels.partners_email` is set.
+- Explora rights for the balcony film unconfirmed (see above).
 - Fonts load from Google Fonts. Self-host Vazirmatn before launch for readers inside Iran.
 
 ## Parked ideas

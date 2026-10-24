@@ -68,9 +68,14 @@
    },
    {
     "id": "balcony",
-    "src": "img/scene-balcony.webp",
-    "caption": "درِ بالکن",
-    "credit": "تصویر تولیدشده با هوش مصنوعی (Higgsfield)"
+    "src": "img/scene-balcony-film.webp",
+    "caption": "از درون کابین، درِ بالکن رو به دریا",
+    "credit": "فیلم: Explora Journeys",
+    "video": {
+     "mp4": "video/scene-balcony.mp4",
+     "webm": "video/scene-balcony.webm"
+    },
+    "source": "Explora Journeys hero film via cruise24.me (main: cruise24-me/media/hero-balcony-1920.mp4), first shot 0-2.80 s, played forward then back; trimmed and resized only. Rights: same open question as cruise24.me HANDOFF item 3."
    },
    {
     "id": "cabin",

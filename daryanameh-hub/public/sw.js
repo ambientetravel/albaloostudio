@@ -5,6 +5,7 @@ self.addEventListener('activate', e => { e.waitUntil((async () => { const keys =
 self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET') return; const url = new URL(req.url);
   if (url.origin !== location.origin) return; // fonts, CDN, feed: network only
+  if (/\.(mp4|webm)$/.test(url.pathname)) return; // films: let the browser do range requests itself
   e.respondWith((async () => {
     const saved = await caches.open('dn-saved'); const hit = await saved.match(req, { ignoreSearch: true }) || await caches.match(req, { ignoreSearch: true });
     const net = fetch(req).then(async r => { if (r.ok && (req.mode === 'navigate' || /\.(css|js|svg|json|png)$/.test(url.pathname))) { const c = await caches.open(CACHE); c.put(req, r.clone()); } return r; }).catch(() => null);

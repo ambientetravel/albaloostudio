@@ -521,6 +521,12 @@ def check():
     pages = used | {c["slug"] for c in load("collections")} | {d["slug"] for d in site.get("departments", [])} | {"news", "journal", "guides", "visa", "glossary", "offers", "policy", "work-with-us", ""}
     for n in site.get("nav", []):
         if n["href"].strip("/").split("/")[0] not in pages: print("NAV: menu link to a page that is not built:", n["href"]); bad += 1
+    # Every hero scene needs its files and a credit; a film scene names its source in site.json.
+    for sc in site.get("hero", {}).get("scenes", []):
+        for ref in [sc["src"]] + list((sc.get("video") or {}).values()):
+            if not (STATIC/ref).exists(): print("MISSING HERO FILE:", ref, "in content/site.json hero.scenes"); bad += 1
+        if not sc.get("credit", "").strip(): print("CREDIT: hero scene without a credit:", sc["id"]); bad += 1
+        if sc.get("video") and not sc.get("source", "").strip(): print("SOURCE: film scene without a source note:", sc["id"]); bad += 1
     for g in load("advertise")["groups"]:
         for r in g["rows"]:
             if not (isinstance(r.get("eur"), int) or r.get("text")): print("RATE: row without a price in content/advertise.json:", r.get("place")); bad += 1

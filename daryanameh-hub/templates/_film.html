@@ -5,7 +5,11 @@
    <div class="hero__stage">
     {% for s in site.hero.scenes %}
     <figure class="scene scene--{{ s.id }}" data-scene="{{ s.id }}">
-      <img src="/{{ s.src }}" alt="{{ s.caption }}" width="1600" height="900" decoding="async" {% if loop.index0 > 1 %}loading="lazy"{% elif loop.first %}fetchpriority="high"{% endif %}>
+      {% if s.video %}<video muted playsinline loop preload="none" disablepictureinpicture poster="/{{ s.src }}" width="1280" height="720" aria-label="{{ s.caption }}" data-film>
+        <source src="/{{ s.video.webm }}" type="video/webm"><source src="/{{ s.video.mp4 }}" type="video/mp4">
+      </video>
+      <figcaption class="scene__credit scene__credit--own">{{ s.credit }}</figcaption>
+      {% else %}<img src="/{{ s.src }}" alt="{{ s.caption }}" width="1600" height="900" decoding="async" {% if loop.index0 > 1 %}loading="lazy"{% elif loop.first %}fetchpriority="high"{% endif %}>{% endif %}
     </figure>
     {% endfor %}
     <div class="scene__glass" aria-hidden="true"></div>

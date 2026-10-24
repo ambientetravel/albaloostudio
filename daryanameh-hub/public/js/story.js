@@ -30,7 +30,7 @@
     //        p     fx    fy    zoom
     quay:    [[0,   .50,  .58,  1.00], [.05, .50, .58, 1.02], [.19, .45, .34, 1.22], [.36, .36, .25, 2.7]],
     ship:    [[.29, .56,  .50,  1.06], [.60, .84, .81, 4.6]],
-    balcony: [[.56, .14,  .50,  2.3],  [.79, .50, .52, 1.0]],
+    balcony: [[.56, .56,  .46,  2.3],  [.79, .50, .52, 1.0]],   // film: opens on the sea through the door, pulls back into the cabin
     cabin:   [[.74, .50,  .33,  1.55], [.93, .50, .52, 1.0]],
   };
   // opacity windows: [fade-in start, fade-in end, fade-out start, fade-out end]
@@ -40,15 +40,19 @@
 
   let heroRun = null, heroResize = () => {};
   if (hero) {
-    const frame = $('.hero__frame', hero), glass = $('.scene__glass', hero), credit = $('.scene__credit', hero);
+    const frame = $('.hero__frame', hero), glass = $('.scene__glass', hero), credit = $('p.scene__credit', hero); // the film's own credit rides inside its figure
     const a = $('.hero__copy--a', hero), b = $('.hero__copy--b', hero), bKids = $$('.hero__copy--b > *', hero);
     const beats = $$('.hero__beat', hero), chs = $$('.hero__chapters li', hero), np = $('.hero__nameplate', hero), chBar = $('.hero__chapters', hero);
-    const scenes = $$('.scene', hero).map(fig => ({ fig, id: fig.dataset.scene, img: fig.querySelector('img') }))
+    // A scene may be a short film instead of a still: it plays only while it is on screen,
+    // never on Save-Data, and the camera moves it exactly as it moves a photograph.
+    const saveData = !!(navigator.connection && navigator.connection.saveData);
+    const scenes = $$('.scene', hero).map(fig => ({ fig, id: fig.dataset.scene, img: fig.querySelector('img, video[data-film]') }))
       .filter(s => CAM[s.id]);
     let sized = false;
     const size = () => {
       scenes.forEach(s => {
-        const iw = s.img.naturalWidth || 1600, ih = s.img.naturalHeight || 900, k = Math.max(vw / iw, vh / ih);
+        const iw = s.img.naturalWidth || s.img.videoWidth || +s.img.getAttribute('width') || 1600,
+              ih = s.img.naturalHeight || s.img.videoHeight || +s.img.getAttribute('height') || 900, k = Math.max(vw / iw, vh / ih);
         s.w = iw * k; s.h = ih * k; s.img.style.width = s.w + 'px'; s.img.style.height = s.h + 'px';
       });
       sized = true;
@@ -64,11 +68,17 @@
       s.img.style.transform = `translate3d(${tx.toFixed(1)}px,${ty.toFixed(1)}px,0) scale(${z.toFixed(4)})`;
     };
     const vis = (w, p) => seg(p, w[0], w[1]) * (1 - seg(p, w[2], w[3]));
+    scenes.forEach(s => { s.film = s.img.tagName === 'VIDEO' && !saveData; });
+    const film = (s, on) => {
+      const v = s.img;
+      if (on && v.paused && !s.asked) { s.asked = true; const go = v.play(); if (go) go.catch(() => {}).finally(() => { s.asked = false; }); else s.asked = false; }
+      else if (!on && !v.paused) v.pause();
+    };
     heroResize = () => { sized = false; };
     let chOn = -1, navOn = null;
     heroRun = p => {
       if (!sized) size();
-      scenes.forEach(s => { const o = vis(SHOW[s.id], p); s.fig.style.opacity = o.toFixed(3); if (o > 0) camera(s, p); });
+      scenes.forEach(s => { const o = vis(SHOW[s.id], p); s.fig.style.opacity = o.toFixed(3); if (o > 0) camera(s, p); if (s.film) film(s, o > .02); });
       // passing through the lit window: warm light blooms, then the room resolves behind it
       if (glass) glass.style.opacity = (seg(p, .49, .575) * (1 - seg(p, .585, .67))).toFixed(3);
       const fa = seg(p, .045, .13); a.style.opacity = 1 - fa; a.style.transform = `translate3d(0,${(-40 * fa * fa).toFixed(1)}px,0)`;
@@ -87,7 +97,9 @@
       if (chBar) chBar.style.opacity = (1 - seg(p, .84, .9)).toFixed(3);
       const n = p > .985; if (n !== navOn) { nav && nav.classList.toggle('is-hidden', !n); navOn = n; }
     };
-    scenes.forEach(s => s.img.complete ? null : s.img.addEventListener('load', () => { sized = false; kick(); }, { once: true }));
+    scenes.forEach(s => s.img.tagName === 'VIDEO'
+      ? s.img.addEventListener('loadedmetadata', () => { sized = false; kick(); }, { once: true })
+      : s.img.complete ? null : s.img.addEventListener('load', () => { sized = false; kick(); }, { once: true }));
   }
 
   /* ═══ SECTIONS ═════════════════════════════════════════════════════════════════

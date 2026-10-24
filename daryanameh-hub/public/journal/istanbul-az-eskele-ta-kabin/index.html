@@ -19,7 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <script>/* motion only when the reader allows it; without this class every page rests fully visible */
 document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('js-story')</script>
-<link rel="stylesheet" href="/css/hub.css?v=2026-10-13">
+<link rel="stylesheet" href="/css/hub.css?v=2026-10-24">
 
 </head>
 <body class="page longform">
@@ -70,7 +70,11 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
     </figure>
     
     <figure class="scene scene--balcony" data-scene="balcony">
-      <img src="/img/scene-balcony.webp" alt="درِ بالکن" width="1600" height="900" decoding="async" loading="lazy">
+      <video muted playsinline loop preload="none" disablepictureinpicture poster="/img/scene-balcony-film.webp" width="1280" height="720" aria-label="از درون کابین، درِ بالکن رو به دریا" data-film>
+        <source src="/video/scene-balcony.webm" type="video/webm"><source src="/video/scene-balcony.mp4" type="video/mp4">
+      </video>
+      <figcaption class="scene__credit scene__credit--own">فیلم: Explora Journeys</figcaption>
+      
     </figure>
     
     <figure class="scene scene--cabin" data-scene="cabin">
@@ -145,8 +149,8 @@ document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-mo
     </div>
   </div>
 </footer>
-<script src="/js/hub.js?v=2026-10-13" defer></script>
-<script src="/js/pwa.js?v=2026-10-13" defer></script>
-<script src="/js/story.js?v=2026-10-13" defer></script>
+<script src="/js/hub.js?v=2026-10-24" defer></script>
+<script src="/js/pwa.js?v=2026-10-24" defer></script>
+<script src="/js/story.js?v=2026-10-24" defer></script>
 </body>
 </html>
