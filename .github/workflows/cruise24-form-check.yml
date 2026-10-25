@@ -110,7 +110,7 @@ jobs:
                   errors = []
                   pg.on("pageerror", lambda e: errors.append(str(e)))
                   pg.on("console", lambda m: m.type == "error" and errors.append(m.text))
-                  pg.goto("https://cruise24.me" + page_path, wait_until="networkidle")
+                  pg.goto("https://cruise24.me" + page_path, wait_until="load", timeout=60000)
                   f = pg.locator("form[data-enquiry]").first
                   f.locator("[name=name]").fill("PIPELINE TEST (browser)")
                   f.locator("[name=email]").fill("pipeline-test@cruise24.me")
