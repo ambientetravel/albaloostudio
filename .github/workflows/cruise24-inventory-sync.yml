@@ -70,7 +70,9 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$DRY" = "true" ]; then
-            python3 sync/cruisehost_sync.py --check
+            # A reachability probe only. CruiseHost refused it once (403, 25 Oct) while the
+            # nightly run that morning was fine; that must not stop the PR from testing the build.
+            python3 sync/cruisehost_sync.py --check || echo "::warning title=CruiseHost probe failed::The count request was refused; the build and dry run below still test this PR. The nightly sync stays strict."
             exit 0
           fi
           python3 sync/cruisehost_sync.py --spread 7 --write
