@@ -340,6 +340,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"probe: GET {nrs.B44}{_ent('/v2/list')} → HTTP {code}"
           + (f", {len(items)} row(s) returned (limit 5)" if code == 200 else f" — {str(d)[:300]}"))
     if a.probe:
+        for it in items:
+            print(f"  {_key(it)} · {it.get('status')} · {it.get('house_rules_verdict')} · "
+                  f"body {len(str(it.get('body_markdown') or ''))} chars · notes "
+                  f"{len(str(it.get('verdict_notes') or ''))} chars · {str(it.get('title') or '')[:50]}")
         return 0 if code == 200 else 1
     if code != 200:
         return 1
