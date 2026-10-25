@@ -54,6 +54,8 @@ jobs:
           OPS_ARTICLE_IMAGES: ${{ vars.OPS_ARTICLE_IMAGES || '1' }}
           # the Commons fallback vets each candidate photo with the model (images.suitable)
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Claude first: on 25 Oct Gemini answered 503 "high demand" and took 1–4 min per vet
+          PROSE_PROVIDER: anthropic
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           MODE: ${{ inputs.mode || 'apply' }}
         run: |
