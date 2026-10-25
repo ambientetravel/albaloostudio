@@ -175,6 +175,19 @@ def pr_photo(pid: str) -> str:
     code, files = nrs.gh("GET", f"/repos/{repo}/pulls/{num}/files?per_page=100")
     if not sha or code != 200 or not isinstance(files, list):
         return ""
+    # cruise24.ir bundles name their photo in manifest.json → hero_image.source_page
+    for f in files:
+        name = str(f.get("filename") or "")
+        if name.endswith("manifest.json") and f.get("status") != "removed":
+            c, meta = nrs.gh("GET", f"/repos/{repo}/contents/{name}?ref={sha}")
+            try:
+                import base64
+                hero = json.loads(base64.b64decode((meta or {}).get("content") or "")).get("hero_image") or {}
+            except (ValueError, TypeError, AttributeError):
+                hero = {}
+            own = credited_photo(str(hero.get("source_page") or ""))
+            if own:
+                return own
     for f in files:
         name = str(f.get("filename") or "")
         if name.lower().endswith(IMG_EXT) and f.get("status") != "removed":
