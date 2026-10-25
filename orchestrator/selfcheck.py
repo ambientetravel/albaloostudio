@@ -4575,6 +4575,26 @@ ok("ops-today: agents and metrics upsert, health lines are replaced, and a metri
    and [c[2] for c in _calls if c[0] == "DELETE"] == ["h1", "h2"]
    and [c for c in _calls if c[1] == "Metric" and c[2] == "m1"][0][3]["previous"] == 20)
 
+# ── ops-sync phase 4: the Social tab from Agent 3's held posts (25 Oct) ──
+import ops_social as _os4
+_post = {"channel": "instagram", "published_at": None,
+         "copy": {"body": "Hormuz in a day", "hashtags": ["hormuz", "#iran"], "cta_url": "https://www.boutimar.com/x?utm_source=ig"},
+         "assets": [{"type": "image", "url": "https://img/x.jpg", "credit": "Photo: A"}]}
+_sr = _os4.to_row(_post, "now")
+ok("ops-social: a card carries site, channel, copy with hashtags, the article photo and link, and starts held",
+   _sr["property"] == "boutimar.com" and _sr["copy"] == "Hormuz in a day\n\n#hormuz #iran"
+   and _sr["image_url"] == "https://img/x.jpg" and _sr["status"] == "held")
+_sp = _os4.plan([_post, _post, {**_post, "channel": "linkedin"}],
+                [{"id": "s1", **_os4.to_row({**_post, "channel": "linkedin"}, "t")},
+                 {"id": "s2", "channel": "x", "copy": "c", "status": "held", "decision": "approve"},
+                 {"id": "s3", "channel": "x", "copy": "d", "status": "rejected", "decision": "reject"}], "now")
+ok("ops-social: no duplicate cards; an app decision sets approved/rejected once; nothing else is touched",
+   [r["channel"] for r in _sp["create"]] == ["instagram"]
+   and [(h["id"], f["status"]) for h, f in _sp["update"]] == [("s2", "approved")])
+import inspect as _insp
+ok("ops-social: never publishes — no scheduler, Zernio or posting call exists in the module",
+   not any(w in _insp.getsource(_os4) for w in ("SCHEDULER", "schedule(", "publish_now", "zernio")))
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz
