@@ -1,7 +1,7 @@
 {
  "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
  "cooldown_days": 45,
- "updated_at": "2026-10-18T04:27:50+00:00",
+ "updated_at": "2026-10-25T04:32:30+00:00",
  "entries": [
   {
    "domain": "cruise24.me",
@@ -124,6 +124,14 @@
    "target_url_path": "/guides/oman-frankincense-trail-dhofar"
   },
   {
+   "domain": "boutimar.com",
+   "query": "Persepolis day trip from Shiraz",
+   "first_briefed": "2026-10-25T04:21:44+00:00",
+   "last_briefed": "2026-10-25T04:21:44+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/journal/persepolis-day-trip-from-shiraz/"
+  },
+  {
    "domain": "cruise24.me",
    "query": "Persian Gulf cruise from Dubai guide",
    "first_briefed": "2026-10-11T04:24:02+00:00",
@@ -162,6 +170,14 @@
    "last_briefed": "2026-09-27T10:01:08+00:00",
    "times_briefed": 1,
    "target_url_path": "/guides/stargazing-iranian-desert"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "Tehran to Isfahan by train",
+   "first_briefed": "2026-10-25T04:21:44+00:00",
+   "last_briefed": "2026-10-25T04:21:44+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/journal/tehran-to-isfahan-by-train/"
   },
   {
    "domain": "exploreorient.com",
@@ -829,11 +845,27 @@
   },
   {
    "domain": "cruise24.ir",
+   "query": "امکانات ام اس سی یات کلاب",
+   "first_briefed": "2026-10-25T04:32:30+00:00",
+   "last_briefed": "2026-10-25T04:32:30+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/blog/msc-yacht-club-amenities/"
+  },
+  {
+   "domain": "cruise24.ir",
    "query": "انتخاب کشتی مناسب در ناوگان MSC",
    "first_briefed": "2026-09-27T10:04:56+00:00",
    "last_briefed": "2026-09-27T10:04:56+00:00",
    "times_briefed": 1,
    "target_url_path": "/blog/entekhab-keshti-monaseb-navgan-msc/"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "اینترنت و وای‌فای در کشتی کروز",
+   "first_briefed": "2026-10-25T04:25:15+00:00",
+   "last_briefed": "2026-10-25T04:25:15+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/cruise-ship-wifi-internet-guide"
   },
   {
    "domain": "cruise24.ir",
@@ -981,11 +1013,27 @@
   },
   {
    "domain": "cruise24.ir",
+   "query": "مراحل سوار شدن به کشتی کروز",
+   "first_briefed": "2026-10-25T04:32:30+00:00",
+   "last_briefed": "2026-10-25T04:32:30+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/blog/cruise-ship-embarkation-guide/"
+  },
+  {
+   "domain": "cruise24.ir",
    "query": "هزینه‌های پنهان کشتی کروز چیست",
    "first_briefed": "2026-10-11T04:23:00+00:00",
    "last_briefed": "2026-10-11T04:23:00+00:00",
    "times_briefed": 1,
    "target_url_path": "/blog/hidden-costs-of-cruise-ships/"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "چه لباسی در کشتی کروز بپوشیم",
+   "first_briefed": "2026-10-25T04:25:15+00:00",
+   "last_briefed": "2026-10-25T04:25:15+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/cruise-dress-code-guide"
   },
   {
    "domain": "cruisebaz.com",
@@ -1005,11 +1053,27 @@
   },
   {
    "domain": "cruisebaz.com",
+   "query": "کروز رودخانه دورو پرتغال",
+   "first_briefed": "2026-10-25T04:28:03+00:00",
+   "last_briefed": "2026-10-25T04:28:03+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/douro-river-cruise-portugal-spain-guide"
+  },
+  {
+   "domain": "cruisebaz.com",
    "query": "کروز رودخانه راین آمستردام تا بازل",
    "first_briefed": "2026-10-18T04:26:06+00:00",
    "last_briefed": "2026-10-18T04:26:06+00:00",
    "times_briefed": 1,
    "target_url_path": "/rhine-river-cruise-amsterdam-basel"
+  },
+  {
+   "domain": "cruisebaz.com",
+   "query": "کروز رودخانه سن پاریس",
+   "first_briefed": "2026-10-25T04:28:03+00:00",
+   "last_briefed": "2026-10-25T04:28:03+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/seine-river-cruise-paris-guide"
   },
   {
    "domain": "boutimar.ir",
