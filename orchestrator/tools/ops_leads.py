@@ -88,6 +88,9 @@ def to_row(rec: dict, host: str, locale: str, now: datetime) -> dict:
         "property": host,
         "partner_id": "",
         "source": f"{rec.get('channel') or 'unknown'}:{rec['lead_id']}",
+        "contact": str(rec.get("from_ref") or ""),
+        # the name the customer typed; never made up — the address stands in when there is none
+        "display_name": str(rec.get("display_name") or rec.get("from_ref") or "")[:120],
         "language": str(q.get("reply_language") or locale or "en")[:5],
         "summary": summary(rec),
         "qualification": band(q, esc),

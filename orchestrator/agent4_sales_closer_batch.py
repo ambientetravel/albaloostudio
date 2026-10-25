@@ -171,6 +171,7 @@ def close_one(raw: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Outcome:
             "received_at": lead.received_at or rfc3339(),
             "channel": lead.channel,
             "from_ref": lead.from_ref,
+            "display_name": lead.display_name or "",
             "message_redacted": clean,
             "redactions": redactions,
             "attributed_campaign": oc.attributed_campaign,

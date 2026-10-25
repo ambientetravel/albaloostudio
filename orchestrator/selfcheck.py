@@ -4536,6 +4536,9 @@ ok("ops-leads: a row is keyed channel:lead_id, carries who to reply to, starts a
    _lr["source"] == "site_form:L1" and _lr["summary"].startswith("Reply to: a@b.example")
    and _lr["status"] == "new" and _lr["reply_released"] == "no" and _lr["draft_reply"] == ""
    and _lr["property"] == "cruise24.me")
+_lr2 = _ol.to_row({**_lrec("L3"), "display_name": "Sara K."}, "cruise24.me", "en", _now)
+ok("ops-leads: contact is the reply address and display_name is the name the customer typed (address when none)",
+   _lr2["contact"] == "a@b.example" and _lr2["display_name"] == "Sara K." and _lr["display_name"] == "a@b.example")
 _ld = _OP(_otf.mkdtemp())
 for _sub, _id in (("cruise24.me/replies", "L1"), ("cruise24.me/escalations", "L2")):
     (_ld / _sub).mkdir(parents=True, exist_ok=True)
