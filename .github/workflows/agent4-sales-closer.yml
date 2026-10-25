@@ -179,6 +179,20 @@ jobs:
           done
           exit $FAILED
 
+      - name: Push leads to the Albaloo Ops app (Leads tab)
+        # leads.php hands each lead out once, so the records this run just wrote
+        # are pushed now. Only for leads pulled from a site, never for a test
+        # leads file. tools/ops_leads.py; staff fields belong to the app after create.
+        if: always() && steps.leads.outputs.skip != 'true' && steps.leads.outputs.path == ''
+        continue-on-error: true
+        env:
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
+        run: |
+          set -o pipefail
+          python3 tools/ops_leads.py --closed closed --apply | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Summarise
         if: always()
         run: |

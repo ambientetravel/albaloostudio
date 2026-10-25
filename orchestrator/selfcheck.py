@@ -4512,6 +4512,46 @@ ok("ops-sync: applying 'needs edits' writes Status + the feedback text to Notion
    and _np2["Feedback"]["rich_text"][0]["text"]["content"] == "Shorten the intro."
    and _bp["decision"] is None and _bp["status"] == "needs_edits")
 
+# ── ops-sync phase 2: Agent 4 leads → the Leads tab (25 Oct) ──
+import ops_leads as _ol
+import tempfile as _otf, json as _oj
+from pathlib import Path as _OP
+def _lrec(lid, **q):
+    base = {"intent": "booking_enquiry", "qualified": True, "party_size": 2, "travel_window": "Easter 2027",
+            "budget_band": "5k_15k", "estimated_value_eur": 0, "missing_information": ["dates"],
+            "suggested_reply": "Thanks — here are two sailings.", "reply_language": "en", "escalation_reason": ""}
+    base.update(q)
+    return {"lead_id": lid, "channel": "site_form", "from_ref": "a@b.example", "received_at": "2026-10-25T18:00:00Z",
+            "message_redacted": "Two of us, Greek islands.", "qualification": base, "suggested_reply": base["suggested_reply"],
+            "reply_blocked": False, "escalate": False, "escalation_reasons": [], "attributed_campaign": ""}
+ok("ops-leads: band is hot for a qualified buying enquiry worth >= EUR 5,000 or escalated, warm otherwise, cold for spam/unqualified",
+   _ol.band(_lrec("x", estimated_value_eur=6000)["qualification"], False) == "hot"
+   and _ol.band(_lrec("x")["qualification"], True) == "hot"
+   and _ol.band(_lrec("x")["qualification"], False) == "warm"
+   and _ol.band(_lrec("x", intent="spam")["qualification"], False) == "cold"
+   and _ol.band(_lrec("x", qualified=False)["qualification"], False) == "cold")
+_lr = _ol.to_row({**_lrec("L1"), "reply_blocked": True}, "cruise24.me", "en", _now)
+ok("ops-leads: a row is keyed channel:lead_id, carries who to reply to, starts as new / not released, "
+   "and a blocked reply never reaches the app",
+   _lr["source"] == "site_form:L1" and _lr["summary"].startswith("Reply to: a@b.example")
+   and _lr["status"] == "new" and _lr["reply_released"] == "no" and _lr["draft_reply"] == ""
+   and _lr["property"] == "cruise24.me")
+_ld = _OP(_otf.mkdtemp())
+for _sub, _id in (("cruise24.me/replies", "L1"), ("cruise24.me/escalations", "L2")):
+    (_ld / _sub).mkdir(parents=True, exist_ok=True)
+    (_ld / _sub / f"{_id}.json").write_text(_oj.dumps(_lrec(_id)), encoding="utf-8")
+(_ld / "cruise24.me" / "manifest.json").write_text("{}", encoding="utf-8")
+_lcalls = []
+_saved_ol = (_ol.nrs.b44, _ol.nrs.notion)
+_ol.nrs.b44 = lambda m, path, b=None: (_lcalls.append((m, path, b)),
+                                       (200, {"items": [{"source": "site_form:L1"}]}) if m == "GET" else (201, {}))[1]
+_ol.nrs.notion = lambda *a, **k: (200, {})
+_llog = _ol.run(_ld, True, {"cruise24.me": "en"})
+_ol.nrs.b44, _ol.nrs.notion = _saved_ol
+ok("ops-leads: reads replies/ and escalations/ (not the manifest), skips a lead the app already has, creates the rest",
+   [c[2]["source"] for c in _lcalls if c[0] == "POST"] == ["site_form:L2"]
+   and any("exists      site_form:L1" in x for x in _llog))
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz
