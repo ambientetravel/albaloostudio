@@ -4555,6 +4555,26 @@ ok("ops-leads: reads replies/ and escalations/ (not the manifest), skips a lead 
    [c[2]["source"] for c in _lcalls if c[0] == "POST"] == ["site_form:L2"]
    and any("exists      site_form:L1" in x for x in _llog))
 
+# ── ops-sync phase 3: the Today tab from the health report (25 Oct) ──
+import ops_today as _ot
+_rep = {"agents": [{"agent": "Scout", "result": "success", "age_days": 0.5, "url": "u1"},
+                   {"agent": "Closer", "result": "failure", "age_days": 0.1, "url": "u2"}],
+        "critical": [], "needs_you": ["**22 PRs** waiting: [x#1](https://github.com/x/1) title"],
+        "warn": ["3 posts without an image"], "fine": [],
+        "numbers": {"open_prs": 22, "articles": 8, "prev_articles": 10, "cost_usd": 0.9, "ai_recall": "0/8"}}
+_r, _i, _m = _ot.rows_from(_rep, "now")
+ok("ops-today: health lines become plain text (no markdown links or bold), each with its level",
+   [x["level"] for x in _i] == ["needs_you", "warn"] and _i[0]["text"] == "22 PRs waiting: x#1 title")
+ok("ops-today: numeric metrics only, with the report's own previous figure when it has one",
+   {x["name"]: x.get("previous") for x in _m} == {"Article PRs waiting": None, "Articles drafted (last cycle)": 10.0,
+                                                   "Model spend, USD (last cycle)": None})
+_calls = _ot.plan(_r, _i, _m, [{"id": "a1", "agent": "Scout"}], [{"id": "h1"}, {"id": "h2"}],
+                  [{"id": "m1", "name": "Article PRs waiting", "value": 20}])
+ok("ops-today: agents and metrics upsert, health lines are replaced, and a metric's previous is the value it replaced",
+   ("PUT", "AgentRun", "a1") == _calls[0][:3] and _calls[1][:2] == ("POST", "AgentRun")
+   and [c[2] for c in _calls if c[0] == "DELETE"] == ["h1", "h2"]
+   and [c for c in _calls if c[1] == "Metric" and c[2] == "m1"][0][3]["previous"] == 20)
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz

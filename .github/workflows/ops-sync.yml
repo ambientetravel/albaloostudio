@@ -57,3 +57,12 @@ jobs:
             dry_run) python3 tools/ops_sync.py | tee -a "$GITHUB_STEP_SUMMARY" ;;
             *)       python3 tools/ops_sync.py --apply | tee -a "$GITHUB_STEP_SUMMARY" ;;
           esac
+      - name: Today tab (agents, health lines, metrics from reports/health-latest.json)
+        if: always() && (inputs.mode || 'apply') != 'probe'
+        env:
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
+          MODE: ${{ inputs.mode || 'apply' }}
+        run: |
+          set -o pipefail
+          if [ "$MODE" = "apply" ]; then A="--apply"; else A=""; fi
+          python3 tools/ops_today.py $A | tee -a "$GITHUB_STEP_SUMMARY"
