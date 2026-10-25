@@ -6,7 +6,7 @@ Owner: Alireza Mozaffari. Spec written 25 Oct 2026 by session "24-hour project s
 ## The app
 
 - Published URL: **https://albaloo-ops-core.base44.app** (built 25 Oct 2026 from OPS-APP-PROMPT.md: Review, Today, Leads, Social, Team tabs; six entities).
-- App ID: _not yet recorded_. Alireza copies it from `app.base44.com/apps/<APP_ID>/…`. ops-sync needs it for the entity API.
+- App ID: **6ade14ab5b5e6721cc424fbe** (given by Alireza 25 Oct 2026). Entity API base: see `base44_entity_url()` in agent2_writer_listener.py.
 
 ## The rule
 
