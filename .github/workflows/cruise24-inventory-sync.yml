@@ -36,6 +36,7 @@ on:
     paths:
       - "cruise24-me/sync/**"
       - "cruise24-me/build_journeys.py"
+      - "cruise24-me/build_guides.py"
       - "cruise24-me/build_bundle.py"
       - "cruise24-me/deploy_update.py"
       - ".github/workflows/cruise24-inventory-sync.yml"
@@ -134,7 +135,7 @@ jobs:
           # What the sync produced (kept across a retry) and what the build regenerates
           # from it (rebuilt on a retry, so a hand edit pushed meanwhile is never undone).
           kept="data/sources sync/state.json sync/last-report.json media/cruisehost deploy"
-          built="index.html journeys.html destinations.html ports.html sitemap.xml data/data-checks.json offer.json"
+          built="index.html journeys.html destinations.html ports.html sitemap.xml data/data-checks.json offer.json guides guides.html"
           msg="cruise24.me inventory: $(python3 -c "import json;r=json.load(open('sync/last-report.json'));print(r['ran'], r['mode'], '-', r['updated'], 'updated,', r['new'], 'new,', r['expired'], 'expired,', r.get('stale', 0), 'stale')")"
           save="$RUNNER_TEMP/kept"
           present() { for f in "$@"; do [ -e "$f" ] && echo "$f"; done; }
