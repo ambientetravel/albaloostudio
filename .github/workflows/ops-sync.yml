@@ -17,7 +17,7 @@ on:
       mode:
         description: "probe = read-only GET of ArticleReview; dry_run = report only; apply = write"
         type: choice
-        options: [probe, dry_run, apply]
+        options: [probe, dry_run, apply, images_dry_run, images_apply]
         default: dry_run
 
 permissions:
@@ -50,12 +50,16 @@ jobs:
           NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
           # reads the draft text from the article PRs on the four site repos
           GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+          # set to "1" once the app's ArticleReview has an image_url field
+          OPS_ARTICLE_IMAGES: ${{ vars.OPS_ARTICLE_IMAGES }}
           MODE: ${{ inputs.mode || 'apply' }}
         run: |
           set -o pipefail   # `| tee` must not turn a crash green
           case "$MODE" in
             probe)   python3 tools/ops_sync.py --probe | tee -a "$GITHUB_STEP_SUMMARY" ;;
             dry_run) python3 tools/ops_sync.py | tee -a "$GITHUB_STEP_SUMMARY" ;;
+            images_dry_run) python3 tools/ops_sync.py --backfill-images | tee -a "$GITHUB_STEP_SUMMARY" ;;
+            images_apply)   python3 tools/ops_sync.py --backfill-images --apply | tee -a "$GITHUB_STEP_SUMMARY" ;;
             *)       python3 tools/ops_sync.py --apply | tee -a "$GITHUB_STEP_SUMMARY" ;;
           esac
       - name: Today tab (agents, health lines, metrics from reports/health-latest.json)

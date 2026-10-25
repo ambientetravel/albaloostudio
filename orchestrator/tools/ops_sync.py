@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -48,6 +49,8 @@ ENTITY = "ArticleReview"
 OWNER = "1e746a95-158f-4f48-91e6-728fa01dacd7"       # Alireza (Notion user)
 PING_TITLE = "🔔 New drafts"
 BODY_CAP = 60000
+# ArticleReview.image_url exists only once the app has that field; until then it is never sent.
+IMAGES_ON = bool(os.environ.get("OPS_ARTICLE_IMAGES"))
 
 STATUS_TO_APP = {"To review": "to_review", "Approved": "approved", "Needs edits": "needs_edits",
                  "Rejected": "rejected", "Published": "published"}
@@ -128,8 +131,29 @@ def age_days(written: str, now: datetime) -> int:
 
 
 # ── article text + verdict notes (only for rows the app does not have yet) ───
-def article_text(row: dict) -> tuple[str, str]:
-    """(body_markdown, verdict_notes). Never raises — a missing body is shown as such."""
+IMG_KEYS = ("image", "hero_image", "hero", "cover", "og_image", "thumbnail")
+
+
+def find_image(*sources) -> str:
+    """The article's own photo as a public http(s) URL, or "" — never a guess.
+    Sources: front-matter text, a JSON/base44 record (dict), or the body markdown."""
+    for s in sources:
+        if isinstance(s, dict):
+            for k in IMG_KEYS:
+                v = s.get(k)
+                v = v.get("url") or v.get("public_url") if isinstance(v, dict) else v
+                if isinstance(v, str) and v.startswith(("http://", "https://")):
+                    return v
+        elif isinstance(s, str) and s:
+            m = re.search(r"^\s*(?:%s)\s*:\s*[\"']?(https?://[^\s\"']+)" % "|".join(IMG_KEYS), s, re.M) \
+                or re.search(r"!\[[^\]]*\]\((https?://[^)\s]+)", s)
+            if m:
+                return m.group(1)
+    return ""
+
+
+def article_text(row: dict) -> tuple[str, str, str]:
+    """(body_markdown, verdict_notes, image_url). Never raises — a missing body is shown as such."""
     try:
         if "#" in row["pid"]:
             import pr_review
@@ -137,7 +161,7 @@ def article_text(row: dict) -> tuple[str, str]:
             repo, num, _ = pr_link(row["pid"])
             _, p = nrs.pr_state(row["pid"])
             target = rd.plan_target(repo, num, p["head"], p["base"]["ref"])
-            body = ""
+            body, image = "", ""
             if target:
                 text, _ = rd._file(repo, target["path"], p["head"]["ref"])
                 if target["kind"] == "json":
@@ -148,22 +172,25 @@ def article_text(row: dict) -> tuple[str, str]:
                     item = new[0] if new else {}
                     body = "\n\n".join(str(item.get(k) or "") for k in ("title", "summary", "body", "content")
                                        if item.get(k)) or json.dumps(item, ensure_ascii=False, indent=1)
+                    image = find_image(item, body)
                 else:
-                    body = rd._split_fm(text)[1]
+                    fm, body = rd._split_fm(text)
+                    image = find_image(fm, body)
             review = pr_review.review_pr(repo, num, pr_review.REPOS.get(repo, "boutimar_v1"))
         else:
             found = nrs.base44_record(row["pid"])
             rec = found[1] if found else {}
             body = str(rec.get("body_markdown") or "")
+            image = find_image(rec, body)
             domain = next(d for d in nrs.BASE44_SITES if row["pid"].startswith(d + "/"))
             _, review = nrs.base44_gate(rec, nrs.BASE44_SITES[domain][1])
         notes = [f"BLOCK {b.get('rule')}: «{str(b.get('excerpt'))[:160]}» → {b.get('fix') or b.get('message') or ''}"
                  for b in review.get("blocks") or []] + \
                 [f"WARN {w.get('rule')}: «{str(w.get('excerpt'))[:160]}» → {w.get('fix') or w.get('message') or ''}"
                  for w in review.get("warns") or []]
-        return body[:BODY_CAP], "\n".join(notes)[:8000]
+        return body[:BODY_CAP], "\n".join(notes)[:8000], image
     except Exception as exc:  # noqa: BLE001
-        return f"(article text could not be loaded: {type(exc).__name__})", ""
+        return f"(article text could not be loaded: {type(exc).__name__})", "", ""
 
 
 def to_app(row: dict, now: datetime, *, with_body: bool) -> dict:
@@ -187,7 +214,9 @@ def to_app(row: dict, now: datetime, *, with_body: bool) -> dict:
     if row["words"]:
         rec["word_count"] = int(float(row["words"]))
     if with_body:
-        rec["body_markdown"], rec["verdict_notes"] = article_text(row)
+        rec["body_markdown"], rec["verdict_notes"], img = article_text(row)
+        if img and IMAGES_ON:
+            rec["image_url"] = img
         if not rec.get("word_count"):
             rec["word_count"] = len(rec["body_markdown"].split())
     return rec
@@ -327,10 +356,33 @@ def run(apply: bool, db: str) -> list[str]:
     return log
 
 
+def backfill_images(apply: bool, db: str) -> list[str]:
+    """One-off: give rows already in the app the photo their draft carries."""
+    rows = {r["pid"]: r for r in board(db)}
+    log, found = [], 0
+    for have in app_rows():
+        if have.get("image_url") or have.get("status") not in ("to_review", "needs_edits", "approved"):
+            continue
+        r = rows.get(_key(have))
+        if not r:
+            continue
+        img = article_text(r)[2]
+        log.append(f"{'image ' if img else 'none  '}     {_key(have)}  {img[:90]}")
+        if img:
+            found += 1
+            if apply:
+                code, d = nrs.b44("PUT", _ent(f"/{have['id']}"), {"image_url": img})
+                if code != 200:
+                    log.append(f"  ! base44 {code}: {str(d)[:160]}")
+    log.append(f"summary: {found} photo(s) found" + ("" if apply else "  (dry run — nothing written)"))
+    return log
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--probe", action="store_true", help="read-only GET of the ArticleReview entity")
+    ap.add_argument("--backfill-images", action="store_true", help="one-off: photos for rows already in the app")
     a = ap.parse_args(argv)
     if not os.environ.get("BASE44_ACCESS_TOKEN"):
         print("not configured: BASE44_ACCESS_TOKEN — nothing synced")
@@ -350,7 +402,11 @@ def main(argv: list[str] | None = None) -> int:
     if not os.environ.get("NOTION_TOKEN") or not os.environ.get("GITHUB_TOKEN"):
         print("not configured: NOTION_TOKEN / GITHUB_TOKEN — nothing synced")
         return 0
-    print("\n".join(run(a.apply, os.environ.get("NOTION_REVIEW_DB") or nrs.DEFAULT_DB)))
+    db = os.environ.get("NOTION_REVIEW_DB") or nrs.DEFAULT_DB
+    if a.backfill_images:
+        print("\n".join(backfill_images(a.apply, db)))
+        return 0
+    print("\n".join(run(a.apply, db)))
     return 0
 
 

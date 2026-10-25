@@ -4512,6 +4512,12 @@ ok("ops-sync: applying 'needs edits' writes Status + the feedback text to Notion
    and _np2["Feedback"]["rich_text"][0]["text"]["content"] == "Shorten the intro."
    and _bp["decision"] is None and _bp["status"] == "needs_edits")
 
+ok("ops-sync: an article's photo is a real http(s) URL from its front matter, record or body — never a local path or a guess",
+   _ops.find_image('---\nimage: "https://u/a.jpg"\n---\n') == "https://u/a.jpg"
+   and _ops.find_image({"hero_image": {"url": "https://x/h.png"}}) == "https://x/h.png"
+   and _ops.find_image("", "t ![a](https://c/d.webp)") == "https://c/d.webp"
+   and _ops.find_image("image: img/local.jpg", {"image": "/rel.jpg"}) == "")
+
 # ── ops-sync phase 2: Agent 4 leads → the Leads tab (25 Oct) ──
 import ops_leads as _ol
 import tempfile as _otf, json as _oj
