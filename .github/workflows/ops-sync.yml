@@ -52,6 +52,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
           # on since 25 Oct 2026: the app's ArticleReview has image_url (visual redesign)
           OPS_ARTICLE_IMAGES: ${{ vars.OPS_ARTICLE_IMAGES || '1' }}
+          # the Commons fallback vets each candidate photo with the model (images.suitable)
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           MODE: ${{ inputs.mode || 'apply' }}
         run: |
           set -o pipefail   # `| tee` must not turn a crash green

@@ -4518,6 +4518,17 @@ ok("ops-sync: an article's photo is a real http(s) URL from its front matter, re
    and _ops.find_image("", "t ![a](https://c/d.webp)") == "https://c/d.webp"
    and _ops.find_image("image: img/local.jpg", {"image": "/rel.jpg"}) == "")
 
+_saved_ph = (_ops.pr_photo, _ops.commons_photo)
+_ops.pr_photo = lambda pid: "https://raw.githubusercontent.com/ambientetravel/boutimar/abc/img/x.jpg" if pid == "boutimar#1" else ""
+_ops.commons_photo = lambda title, site: ("https://upload.wikimedia.org/c.jpg", "PHOTO IN THE APP IS A SUGGESTION — Commons: c · A · CC BY-SA 4.0") if title == "Hormuz" else ("", "")
+ok("ops-sync photos: a URL the draft names wins, then the draft's own photo file, then a credited Commons "
+   "suggestion marked as such — and nothing when none exists",
+   _ops.resolve_photo({"pid": "boutimar#1", "title": "Hormuz"}, "https://u/a.jpg") == ("https://u/a.jpg", "")
+   and _ops.resolve_photo({"pid": "boutimar#1", "title": "Hormuz"})[0].startswith("https://raw.githubusercontent.com/")
+   and _ops.resolve_photo({"pid": "boutimar#2", "title": "Hormuz"})[1].startswith("PHOTO IN THE APP IS A SUGGESTION")
+   and _ops.resolve_photo({"pid": "boutimar#2", "title": "Nowhere"}) == ("", ""))
+_ops.pr_photo, _ops.commons_photo = _saved_ph
+
 # ── ops-sync phase 2: Agent 4 leads → the Leads tab (25 Oct) ──
 import ops_leads as _ol
 import tempfile as _otf, json as _oj

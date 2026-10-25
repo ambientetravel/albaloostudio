@@ -152,6 +152,64 @@ def find_image(*sources) -> str:
     return ""
 
 
+IMG_EXT = (".jpg", ".jpeg", ".png", ".webp")
+
+
+def _public(url: str) -> bool:
+    """True when anyone's browser can load the URL (no token): the app shows it as-is."""
+    import subprocess
+    out = subprocess.run(["curl", "-sS", "-o", "/dev/null", "-I", "-L", "--max-time", "20",
+                          "-w", "%{http_code}", url], capture_output=True, text=True).stdout
+    return out.strip() == "200"
+
+
+def pr_photo(pid: str) -> str:
+    """The draft's OWN photo file, from its PR, as a raw URL pinned to the head commit
+    (so it keeps working after the branch is deleted). "" when the PR has no image file
+    or its repo is not publicly readable."""
+    repo, num, _ = pr_link(pid)
+    if not repo:
+        return ""
+    _, p = nrs.pr_state(pid)
+    sha = (p.get("head") or {}).get("sha")
+    code, files = nrs.gh("GET", f"/repos/{repo}/pulls/{num}/files?per_page=100")
+    if not sha or code != 200 or not isinstance(files, list):
+        return ""
+    for f in files:
+        name = str(f.get("filename") or "")
+        if name.lower().endswith(IMG_EXT) and f.get("status") != "removed":
+            url = f"https://raw.githubusercontent.com/{repo}/{sha}/{name}"
+            return url if _public(url) else ""
+    return ""
+
+
+def commons_photo(title: str, site: str) -> tuple[str, str]:
+    """Fallback for a draft with no photo of its own: a freely licensed Wikimedia Commons
+    photo matching the title, with its real creator and licence. (url, note) or ("", "")."""
+    try:
+        import images
+        subject = re.split(r"\s*[:|–—]\s*", str(title or ""), maxsplit=1)[0]   # the place, not the angle
+        got = images.find_image(subject, width=1200, context=str(title or ""))
+    except Exception:  # noqa: BLE001 — a failed search only means no suggestion
+        got = None
+    if not got:
+        return "", ""
+    note = (f"PHOTO IN THE APP IS A SUGGESTION — the draft has no photo of its own. "
+            f"Wikimedia Commons: {got['title']} · {got['creator']} · {got['licence']} · {got['source_page']}")
+    return got["download_url"], note
+
+
+def resolve_photo(row: dict, found: str = "") -> tuple[str, str]:
+    """(image_url, note). Order: a public URL the draft names → the draft's own photo
+    file → a credited Commons suggestion. Never an unlicensed or uncredited image."""
+    if found:
+        return found, ""
+    own = pr_photo(row["pid"]) if "#" in row["pid"] else ""
+    if own:
+        return own, ""
+    return commons_photo(row.get("title") or "", row.get("site") or "")
+
+
 def article_text(row: dict) -> tuple[str, str, str]:
     """(body_markdown, verdict_notes, image_url). Never raises — a missing body is shown as such."""
     try:
@@ -215,8 +273,12 @@ def to_app(row: dict, now: datetime, *, with_body: bool) -> dict:
         rec["word_count"] = int(float(row["words"]))
     if with_body:
         rec["body_markdown"], rec["verdict_notes"], img = article_text(row)
-        if img and IMAGES_ON:
-            rec["image_url"] = img
+        if IMAGES_ON:
+            img, note = resolve_photo(row, img)
+            if img:
+                rec["image_url"] = img
+            if note:
+                rec["verdict_notes"] = (note + "\n" + rec["verdict_notes"]).strip()
         if not rec.get("word_count"):
             rec["word_count"] = len(rec["body_markdown"].split())
     return rec
@@ -366,12 +428,16 @@ def backfill_images(apply: bool, db: str) -> list[str]:
         r = rows.get(_key(have))
         if not r:
             continue
-        img = article_text(r)[2]
-        log.append(f"{'image ' if img else 'none  '}     {_key(have)}  {img[:90]}")
+        img, note = resolve_photo(r, article_text(r)[2])
+        kind = "none  " if not img else ("commons" if note else "own   ")
+        log.append(f"{kind}     {_key(have)}  {img[:90]}")
         if img:
             found += 1
             if apply:
-                code, d = nrs.b44("PUT", _ent(f"/{have['id']}"), {"image_url": img})
+                body = {"image_url": img}
+                if note:
+                    body["verdict_notes"] = (note + "\n" + str(have.get("verdict_notes") or "")).strip()[:8000]
+                code, d = nrs.b44("PUT", _ent(f"/{have['id']}"), body)
                 if code != 200:
                     log.append(f"  ! base44 {code}: {str(d)[:160]}")
     log.append(f"summary: {found} photo(s) found" + ("" if apply else "  (dry run — nothing written)"))
