@@ -1,0 +1,95 @@
+# cruise24.me enquiry form: end-to-end check, run by hand.
+#
+# Agent 4 has pulled cruise24.me/api/leads.php 75 times and never received a real
+# lead. The pull itself works (signed GET accepted, "no leads waiting"), so this
+# checks the half before it: is the form on the live pages, is the live form
+# script the one in the repo, does api/enquiry.php exist, and how many leads has
+# the server stored at all (count and dates only, never names or emails).
+#
+# submit_test=true also POSTs one enquiry marked TEST from pipeline-test@cruise24.me
+# and confirms it lands in leads.php. Agent 4 will then see it as a lead.
+name: cruise24.me form check
+
+on:
+  workflow_dispatch:
+    inputs:
+      submit_test:
+        description: "Also submit one TEST enquiry and confirm it is stored"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check the live form path
+        env:
+          LEADS_SIGNING_SECRET: ${{ secrets.LEADS_SIGNING_SECRET }}
+          SUBMIT_TEST: ${{ inputs.submit_test }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, hmac, json, os, time, urllib.request, urllib.parse, urllib.error
+          BASE = "https://cruise24.me"
+          UA = {"User-Agent": "Mozilla/5.0 (cruise24 form check)"}
+          def get(path, headers=None, method="GET", data=None):
+              req = urllib.request.Request(BASE + path, headers={**UA, **(headers or {})}, method=method, data=data)
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      return r.status, r.read()
+              except urllib.error.HTTPError as e:
+                  return e.code, e.read()
+          def sha(b): return hashlib.sha256(b).hexdigest()
+          def local(p): return sha(open("cruise24-me/" + p, "rb").read())
+
+          print("## 1. Pages and form script")
+          for p in ("index.html", "contact.html", "assets/site.js"):
+              st, body = get("/" + p)
+              same = "same as repo" if st == 200 and sha(body) == local(p) else "DIFFERENT from repo"
+              extra = ""
+              if p.endswith(".html"):
+                  t = body.decode("utf-8", "replace")
+                  extra = f" | form→api/enquiry.php: {'action=\"api/enquiry.php\"' in t} | data-enquiry: {'data-enquiry' in t}"
+              if p.endswith(".js"):
+                  extra = f" | posts to form action: {b'data-enquiry' in body}"
+              print(f"{p}: HTTP {st}, {len(body)} bytes, {same}{extra}")
+
+          print("\n## 2. Enquiry endpoint")
+          st, body = get("/api/enquiry.php")
+          print(f"GET api/enquiry.php: HTTP {st} (405 = present and refusing GET; 404 = NOT DEPLOYED) {body[:120]!r}")
+
+          secret = os.environ.get("LEADS_SIGNING_SECRET", "")
+          def stored():
+              ts = str(int(time.time()))
+              sig = "sha256=" + hmac.new(secret.encode(), (ts + ".").encode(), hashlib.sha256).hexdigest()
+              st, body = get("/api/leads.php?all=1", {"X-Albaloo-Signature": sig, "X-Albaloo-Timestamp": ts})
+              try: j = json.loads(body)
+              except Exception: j = {}
+              return st, j
+          print("\n## 3. Leads stored on the server (all time)")
+          st, j = stored()
+          leads = j.get("leads", [])
+          print(f"leads.php?all=1: HTTP {st}, total={j.get('total')}, error={j.get('error')}")
+          if leads:
+              sus = sum(1 for l in leads if l.get("suspect"))
+              tests = sum(1 for l in leads if "TEST" in (l.get("display_name") or ""))
+              dates = sorted(l.get("received_at", "") for l in leads)
+              print(f"  {len(leads)} stored · {sus} marked suspect (honeypot) · {tests} named TEST · first {dates[0]} · last {dates[-1]}")
+              by = {}
+              for l in leads: by[l.get("landing_path") or "?"] = by.get(l.get("landing_path") or "?", 0) + 1
+              print(f"  by page: {by}")
+
+          if os.environ.get("SUBMIT_TEST") == "true":
+              print("\n## 4. Test submission")
+              form = urllib.parse.urlencode({"name": "PIPELINE TEST", "email": "pipeline-test@cruise24.me",
+                  "pax": "2", "where": "test", "when": "test", "notes": "Automated form check. Ignore.",
+                  "page": "/contact.html"}).encode()
+              st, body = get("/api/enquiry.php", {"Content-Type": "application/x-www-form-urlencoded",
+                  "Accept": "application/json"}, method="POST", data=form)
+              print(f"POST api/enquiry.php: HTTP {st} {body[:200]!r}")
+              st2, j2 = stored()
+              print(f"leads.php total after: {j2.get('total')} (before: {j.get('total')})")
+          PY
