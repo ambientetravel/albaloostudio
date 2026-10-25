@@ -194,6 +194,16 @@ def commons_photo(title: str, site: str) -> tuple[str, str]:
         got = None
     if not got:
         return "", ""
+    # images.find_image vets fail-OPEN (an unchecked photo still reaches a human
+    # reviewer there). Here the photo is the first thing the team sees, so a photo
+    # the model could not confirm is dropped: 25 Oct dry run, vet unavailable, put
+    # a Kabul school and an elderly-care home on Farsi cruise articles.
+    try:
+        verdict = images._vet(got, subject, str(title or ""), final=False)
+    except Exception:  # noqa: BLE001
+        verdict = None
+    if verdict is not True:
+        return "", ""
     note = (f"PHOTO IN THE APP IS A SUGGESTION — the draft has no photo of its own. "
             f"Wikimedia Commons: {got['title']} · {got['creator']} · {got['licence']} · {got['source_page']}")
     return got["download_url"], note
