@@ -17,6 +17,10 @@ on:
         description: "Also submit one TEST enquiry and confirm it is stored"
         type: boolean
         default: false
+      browser_test:
+        description: "Fill and send the form in a real browser on index.html and contact.html (2 TEST enquiries)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -92,4 +96,33 @@ jobs:
               print(f"POST api/enquiry.php: HTTP {st} {body[:200]!r}")
               st2, j2 = stored()
               print(f"leads.php total after: {j2.get('total')} (before: {j.get('total')})")
+          PY
+      - name: Real-browser form test
+        if: inputs.browser_test
+        run: |
+          pip install -q playwright==1.48.0 && python3 -m playwright install --with-deps chromium >/dev/null
+          python3 - <<'PY'
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:
+              b = p.chromium.launch()
+              for page_path in ("/index.html", "/contact.html#browser-test"):
+                  pg = b.new_page(viewport={"width": 390, "height": 844})   # phone size
+                  errors = []
+                  pg.on("pageerror", lambda e: errors.append(str(e)))
+                  pg.on("console", lambda m: m.type == "error" and errors.append(m.text))
+                  pg.goto("https://cruise24.me" + page_path, wait_until="networkidle")
+                  f = pg.locator("form[data-enquiry]").first
+                  f.locator("[name=name]").fill("PIPELINE TEST (browser)")
+                  f.locator("[name=email]").fill("pipeline-test@cruise24.me")
+                  f.locator("[name=notes]").fill("Automated browser check. Ignore.")
+                  f.locator("button[type=submit]").click()
+                  note = f.locator(".note")
+                  try:
+                      pg.wait_for_function("el => /Thank you|did not go through|Too many|check your/.test(el.textContent)",
+                                           arg=note.element_handle(), timeout=20000)
+                  except Exception:
+                      pass
+                  print(f"{page_path}: note = {note.text_content().strip()!r}")
+                  print(f"  JS errors: {errors or 'none'}")
+              b.close()
           PY
