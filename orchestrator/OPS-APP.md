@@ -104,19 +104,26 @@ Alireza) the moment a new draft lands.
 
 The paste-ready prompt is `OPS-APP-PROMPT.md`.
 
-## Fact-check of open issues (25 Oct 2026, against code on main)
+**Built 25 Oct 2026** (orchestration session): `tools/ops_sync.py` + `.github/workflows/ops-sync.yml`,
+hourly at :40. Read-only probe of `ArticleReview` → HTTP 200 with the existing `BASE44_ACCESS_TOKEN`
+(no new token needed). Seeded 34 rows (run 40207408284) after a dry run; a second dry run plans
+nothing. The board's Pipeline ID is the row key (`repo#pr`, or `domain/slug` stored in `repo` for a
+base44 draft). The ping is a Notion @mention on a "🔔 New drafts" row (the Monday summary's proven
+path): Actions has no Telegram bot and no working mail sender. Tests: 5 in selfcheck.py.
 
-| Claim (PARKED.md, 27 Aug) | Status now | Evidence |
+## Fact-check of open issues — re-verified LIVE 25 Oct 2026 (orchestration session)
+
+Checked against Actions runs, repo secrets, live URLs and today's feed, not the code alone.
+Supersedes the first draft of this table, which had three rows wrong (marked ✎).
+
+| Claim (PARKED.md, 27 Aug) | Status 25 Oct | Live evidence |
 |---|---|---|
-| `base44_entity` adapter missing | **Fixed** | `agent2_writer_listener.py:1378` `_push_base44_entity` |
-| Astro route bug `/hotels/…` vs `/journal/hotels-…` | **Fixed in Writer** | `agent2_writer_listener.py:1549-1564`; merge_watch documents the trap |
-| `WEBHOOK_SINGING_SECRET` typo | Code uses the correct name and warns about the typo'd secret | `agent2_writer_listener.py:2400-2405`. **To check:** delete the typo'd repo secret |
-| Agent 4 has no lead source | **Wired** for cruise24.me (`sites.yml:651`, signed GET, `LEADS_SIGNING_SECRET`), every 4 h | Closer last run OK, 0.3 days old. **To check:** how many leads it has processed so far |
-| Nowruz visa counts disagree (255/53 vs 245/58) | **Unresolved**. Reconcile on today's feed and quote one figure | — |
-| 22 article PRs unmerged (oldest 27 days) | **Open**, waiting on Alireza | `reports/health-latest.md` |
-| 11 social posts without image | Open; pre-7-Oct articles only | health report |
-| AI recall 0/8 properties | **Open**. No model names any property | health report, Oracle 22.9 days old |
-| Persian Gulf demand vs inventory (199 terms vs 18 sailings) | Sourcing problem, not software | PARKED.md. Refresh on today's inventory |
-
-The orchestration session should re-verify each row live (Actions runs, repo
-secrets, live URLs) and correct this table rather than trust it.
+| `base44_entity` adapter missing | **Fixed** | Code `agent2_writer_listener.py:1378` → `_push_base44_entity` (:2038); live: the writer has created 6 cruisebaz drafts in base44 (11 + 18 Oct), all on the Content Review board |
+| Astro route bug `/hotels/…` vs `/journal/hotels-…` | **Fixed** | `boutimar.com/journal/hotels-yazd-joybar-boutique-hotel-review/` → 200; the brief's old `/hotels/…-review/` → 404 (nothing links there); writer note at `agent2_writer_listener.py:1564` |
+| `WEBHOOK_SINGING_SECRET` typo | **Still there** — no code reads it | Repo secrets (25 Oct, 11 names) still list `WEBHOOK_SINGING_SECRET`; code reads only `WEBHOOK_SIGNING_SECRET` and warns about the typo. **Alireza:** delete it in GitHub → albaloostudio → Settings → Secrets (irreversible, so not done for you) |
+| ✎ Agent 4 has no lead source | **Wired, but has never had a lead** | cruise24.me signed pull, every 4 h. 75 runs since 31 Aug: 69 "no leads waiting", 5 before the pull was set up, 1 on 31 Aug qualified 4 (before cruise24.me was wired). Not one `agent4-closed` artifact exists, i.e. **0 real leads processed**. One red run (11 Oct, cruise24.me timeout) fixed by retry in f36c62a |
+| ✎ Nowruz visa counts disagree (255/53 vs 245/58) | **Resolved — quote one figure** | Today's feed (6,238 departures), Nowruz 1406 window 15 Mar–10 Apr 2027 (the window in cruise24.ir's builder), classified by `c24data.visa_for` (mirror of `api/v1/cruises.php`): **468 departures, 192 need a national visa** (US/UK/Canada etc.: 86 alone + 106 with Schengen) = 41%; Schengen-only 266; visa-free 3; unresolved 7. The old pairs were Nowruz 1405 on an older, smaller feed |
+| 22 article PRs unmerged | **Worse: 34 drafts waiting** | 28 open PRs (boutimar 5, boutimarfarsi 8, cruise24-ir 6, exploreorient 9; oldest 28 days) + 6 cruisebaz base44 drafts. All 34 are now in the ops app's Review queue |
+| ✎ 11 social posts without image | **3, not 11** | The 11 came from a no-model TEST broadcast (19 Oct) counted as a cycle — health fixed in 8d181ad. Real run 25 Oct: 3 of 3 Instagram posts have no image (they promote pages published before articles carried photos). Fix = take the live page's photo |
+| AI recall 0/8 properties | **Open — not stale** | Oracle (`ai-visibility.yml`) runs monthly on the 1st; last 1 Oct, next 1 Nov |
+| Persian Gulf demand vs inventory (199 terms vs 18 sailings) | **Sharper than stated** | Inventory today: Gulf = 8 itineraries / **48 departures (0.77%)**; Mediterranean = **4,137 departures**. Demand (keywordchi export, Aug 2026 — static until a new export): **206 of 769** usable terms name the Persian Gulf, Dubai or a Gulf port; **34** name the Mediterranean. The old "199" was the size of the destination-generic cluster, not a Gulf count |
