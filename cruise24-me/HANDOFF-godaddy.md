@@ -581,3 +581,16 @@ To remove the key later: in cPanel, Deauthorize or Delete it, and delete the Git
 **Still open:** CruiseHost has not been asked whether scheduled retrieval under the contract is
 fine (`cruisehost_sync.py` docstring). The schedule was set up on 7 Oct at Alireza's request,
 spread to about 40 requests a day.
+
+## Checked by the "24-hour project strategy" session (25 Oct)
+
+Their report, not re-checked here:
+- **Enquiry form works end to end.** `.github/workflows/cruise24-form-check.yml` (main 99139e5) confirms:
+  `enquiry.php` answers 405 to a GET and 200 (stored) to a POST; a phone-size browser submit on
+  index.html and contact.html shows the thank-you note.
+- **No real enquiries yet.** leads.php had held 0 leads until then. They added 3 TEST leads (name
+  "PIPELINE TEST…", email pipeline-test@cruise24.me); Agent 4 will draft replies to them, so ignore those.
+- **The cause is traffic.** Search Console, 90 days: 596 impressions and 10 clicks, all for the brand
+  name. Of 1,715 sitemap URLs, 269 have ever appeared in results.
+- **The live site is behind the repo.** index.html and contact.html live differ from the repo. This is
+  expected: no nightly update has been uploaded since 7 Oct, because `CRUISE24_SSH_KEY` is not set yet.
