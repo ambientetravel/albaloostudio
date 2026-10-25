@@ -111,6 +111,38 @@ nothing. The board's Pipeline ID is the row key (`repo#pr`, or `domain/slug` sto
 base44 draft). The ping is a Notion @mention on a "🔔 New drafts" row (the Monday summary's proven
 path): Actions has no Telegram bot and no working mail sender. Tests: 5 in selfcheck.py.
 
+## Phase 2: the Leads tab (built 25 Oct 2026, session "24-hour project strategy")
+
+`tools/ops_leads.py` runs as the last step of `agent4-sales-closer.yml`, on the
+records that run just wrote. leads.php hands each lead out only once, so this is
+the only moment to push it. One `Lead` row per record:
+- `summary` starts "Reply to: <address>", then intent · party · window ·
+  budget, what is missing, the campaign, and the redacted message
+- `qualification` band: **hot** = a qualified booking/price/availability
+  enquiry that is escalated or worth ≥ €5,000; **warm** = any other qualified
+  lead; **cold** = spam or unqualified
+- `draft_reply`, empty when the compliance gate blocked it
+- `escalated` + `escalation_reason`
+
+Rows are keyed `source = channel:lead_id`, so re-runs never duplicate. Staff
+fields (status, assigned_to, notes, reply_released) are set once (new / "" /
+"" / no) and then belong to the app. **Lead state is not pulled back into
+git**: a CRM status next to a customer's email does not belong in a
+repository. This replaces build-order item 2's "status → repo JSON".
+
+New leads ping Alireza on the same Notion 🔔 row.
+`.github/workflows/ops-leads-backfill.yml` pushes a past run's kept artifact
+(7 days).
+
+First push: run 40238408454 sent Agent 4 run 40224394726's three TEST leads
+(cruise24.me, all cold). Tests: 3 in selfcheck.py, plus the 5 from phase 1,
+all passing when run in isolation. The full selfcheck stops at line 2696 on
+main because it needs `../boutimar-ir`, which isn't in this repo.
+
+**Gap:** the `Lead` entity has no contact or name field, so the reply address
+lives in `summary`. Add `contact` and `display_name` fields in base44, and
+ops_leads.py should fill them.
+
 ## Fact-check of open issues — re-verified LIVE 25 Oct 2026 (orchestration session)
 
 Checked against Actions runs, repo secrets, live URLs and today's feed, not the code alone.
