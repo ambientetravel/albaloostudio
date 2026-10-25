@@ -183,6 +183,22 @@ def pr_photo(pid: str) -> str:
     return ""
 
 
+def credited_photo(body: str) -> str:
+    """The article's OWN photo: its credit line names the Commons file
+    ("… via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:X.jpg)", or the
+    Farsi credit with the page in brackets). Same file, Commons' public URL. "" if none."""
+    from urllib.parse import unquote
+    m = re.search(r"commons\.wikimedia\.org/wiki/(File:[^\s)\"'<>\]]+)", str(body or ""))
+    if not m:
+        return ""
+    try:
+        import images
+        got = images.by_file(unquote(m.group(1)), width=1200)
+    except Exception:  # noqa: BLE001
+        got = None
+    return (got or {}).get("download_url", "")
+
+
 def commons_photo(title: str, site: str) -> tuple[str, str]:
     """Fallback for a draft with no photo of its own: a freely licensed Wikimedia Commons
     photo matching the title, with its real creator and licence. (url, note) or ("", "")."""
@@ -209,11 +225,15 @@ def commons_photo(title: str, site: str) -> tuple[str, str]:
     return got["download_url"], note
 
 
-def resolve_photo(row: dict, found: str = "") -> tuple[str, str]:
-    """(image_url, note). Order: a public URL the draft names → the draft's own photo
-    file → a credited Commons suggestion. Never an unlicensed or uncredited image."""
+def resolve_photo(row: dict, found: str = "", body: str = "") -> tuple[str, str]:
+    """(image_url, note). Order: a public URL the draft names → the Commons file its
+    photo credit names (the article's own photo) → the draft's own photo file → a
+    credited, model-vetted Commons suggestion. Never an unlicensed or uncredited image."""
     if found:
         return found, ""
+    own = credited_photo(body)
+    if own:
+        return own, ""
     own = pr_photo(row["pid"]) if "#" in row["pid"] else ""
     if own:
         return own, ""
@@ -284,7 +304,7 @@ def to_app(row: dict, now: datetime, *, with_body: bool) -> dict:
     if with_body:
         rec["body_markdown"], rec["verdict_notes"], img = article_text(row)
         if IMAGES_ON:
-            img, note = resolve_photo(row, img)
+            img, note = resolve_photo(row, img, rec["body_markdown"])
             if img:
                 rec["image_url"] = img
             if note:
@@ -438,7 +458,8 @@ def backfill_images(apply: bool, db: str) -> list[str]:
         r = rows.get(_key(have))
         if not r:
             continue
-        img, note = resolve_photo(r, article_text(r)[2])
+        body_, _, found_ = article_text(r)
+        img, note = resolve_photo(r, found_, body_)
         kind = "none  " if not img else ("commons" if note else "own   ")
         log.append(f"{kind}     {_key(have)}  {img[:90]}")
         if img:
