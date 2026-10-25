@@ -83,20 +83,21 @@ payment details never enter base44 (ARCHITECTURE.md §5, Agent 4).
 4. `Rate` and `Quote`. These need real supplier rate sheets. **Never seed invented rates.**
 5. `Partner` portal.
 
-## Prompt for the base44 AI builder (phase 1)
+## Phase 1 is the Review queue (changed 25 Oct 2026)
 
-> Create an internal app "Albaloo Ops". Users log in. Add fields to User: `role`
-> (owner, manager, sales, content, partner, viewer) and `properties` (list of
-> text). Create entities: Property (domain, platform, language, owner_session),
-> AgentRun (agent, result, age_days, run_url, synced_at), HealthItem (level:
-> critical|needs_you|warn|fine, text, property, synced_at), Metric (name, value,
-> previous, synced_at), ArticlePR (repo, number, title, url, age_days, property,
-> gate_verdict). Every entity except Metric has a `property` field. A user may only
-> read rows whose property is in their `properties`, unless role is owner or
-> manager. Build a "Pipeline" page: a "Needs you" list at the top, then one card
-> per AgentRun coloured by result, then a metrics row, then a table of ArticlePRs
-> sorted by age. These records are written by an external sync. Users can't edit
-> them. No sample data.
+Alireza misses article drafts because nothing reaches his phone. Notion "Content
+Review" (`tools/notion_review_sync.py`, hourly, working: run 40198837793) is
+already the decision path: Approved → squash-merge, Needs edits → feedback on the
+PR and a revision, Rejected → PR closed.
+
+The app's Review screen must use **that same path**, not a second one.
+`ops-sync` copies open article PRs into `ArticleReview`. When a row's
+`decision` is set in base44, `ops-sync` writes that decision onto the Notion row,
+and the existing review-sync acts on it. One brain: GitHub decides, Notion and
+base44 are two windows on it. `ops-sync` also sends a ping (Telegram or email to
+Alireza) the moment a new draft lands.
+
+The paste-ready prompt is `OPS-APP-PROMPT.md`.
 
 ## Fact-check of open issues (25 Oct 2026, against code on main)
 
