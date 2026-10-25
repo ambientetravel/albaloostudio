@@ -1,7 +1,7 @@
 {
  "_about": "Variety Cruises sailings read from varietycruises.com cruise pages (the line's own booking data). priceFrom = cheapest cabin category with cabins left, EUR per person, port charges excluded; soldOut when none are left.",
  "source": "Variety Cruises",
- "synced": "2026-10-18",
+ "synced": "2026-10-25",
  "sailings": [
   {
    "id": "VAR-antiquity-to-byzantium-canal-crossing",
@@ -80,14 +80,6 @@
     "Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-10-23",
-     "code": "ATB261023",
-     "ship": "Galileo",
-     "nights": 7,
-     "priceFrom": 2900,
-     "soldOut": false
-    },
     {
      "date": "2026-10-30",
      "code": "ATB261030",
@@ -1165,8 +1157,7 @@
    "summary": "Cyclades: Dazzling white villages, golden beaches and clear azure water are just the start of what these islands have to offer. Ancient Greek geographers gave this unique cluster of islands the name Cyclades because they saw that they formed a circle ('kyklos\" in Greek) of sorts around the sacred island of Delos. According to myth, the islands were the debris that remained after a battle between giants. In reality, they resulted from colossal geological events like earthquakes and volcanic eruptions.",
    "region": "Greek Islands",
    "ships": [
-    "Galileo",
-    "Panorama"
+    "Galileo"
    ],
    "nights": 7,
    "route": [
@@ -1233,14 +1224,6 @@
     "Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-10-23",
-     "code": "CJPAN261023",
-     "ship": "Panorama",
-     "nights": 7,
-     "priceFrom": 2590,
-     "soldOut": false
-    },
     {
      "date": "2027-04-16",
      "code": "CJ270416",
@@ -1595,14 +1578,6 @@
     "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
    ],
    "departures": [
-    {
-     "date": "2026-10-21",
-     "code": "SEY261021D3",
-     "ship": "Pegasus",
-     "nights": 3,
-     "priceFrom": null,
-     "soldOut": true
-    },
     {
      "date": "2026-11-11",
      "code": "SEY261111D3",
