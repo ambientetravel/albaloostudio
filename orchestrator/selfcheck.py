@@ -4465,6 +4465,53 @@ ok("Instagram handles: none shared across clusters; Explore Orient never in Bout
    and all(c.get("cluster") in ("persian", "ambiente", "albaloo", "personal") for _, c in _igsites)
    and _cl.get("exploreorient.com") == "ambiente" and _cl.get("boutimar.ir") == "persian")
 
+# ── ops-sync phase 1: the Review queue in the Albaloo Ops app (25 Oct) ──
+import ops_sync as _ops
+from datetime import datetime as _odt, timezone as _otz
+_now = _odt(2026, 10, 25, tzinfo=_otz.utc)
+def _br(pid, status="To review", gate="PASS", site="exploreorient.com"):
+    return {"page_id": "pg-" + pid, "title": "T " + pid, "site": site, "status": status, "pid": pid, "gate": gate,
+            "language": "English", "written": "2026-10-18", "read": "", "live": "", "words": "", "feedback": ""}
+_rec_pr = _ops.to_app(_br("exploreorient#28"), _now, with_body=False)
+_rec_b44 = _ops.to_app(_br("cruisebaz.com/nile-river-cruise-egypt", site="cruisebaz.com"), _now, with_body=False)
+ok("ops-sync: an app row's key is the Notion Pipeline ID, for a PR and for a base44 draft (no collisions)",
+   _ops._key(_rec_pr) == "exploreorient#28" and _ops._key(_rec_b44) == "cruisebaz.com/nile-river-cruise-egypt"
+   and _rec_pr["pr_url"] == "https://github.com/ambientetravel/exploreorient/pull/28" and _rec_pr["age_days"] == 7)
+_p0 = _ops.plan([_br("a#1"), _br("b#2", status="Published")], [], _now)
+ok("ops-sync: first sync creates every open draft and is a seed (no ping for the backlog)",
+   [r["pid"] for r in _p0["create"]] == ["a#1"] and _p0["seed"])
+def _app(pid, **kw):
+    r = _ops.to_app(_br(pid), _now, with_body=False); r["id"] = "id-" + pid; r.update(kw); return r
+_board = [_br("a#1"), _br("b#2", gate="BLOCK"), _br("c#3"), _br("d#4", status="Approved"), _br("e#5")]
+_appr = [_app("a#1", decision="publish"), _app("b#2", decision="publish", house_rules_verdict="BLOCK"),
+         _app("c#3", decision="needs_edits", feedback=""), _app("d#4", decision="reject", feedback="no"),
+         _app("x#9")]
+_p1 = _ops.plan(_board, _appr, _now)
+ok("ops-sync: an app decision goes to Notion only while the row is still 'To review'; publish on BLOCK and "
+   "needs_edits without feedback are refused; a decision already overtaken in Notion is not re-applied",
+   [x[0]["pid"] for x in _p1["decide"]] == ["a#1"]
+   and {pid for pid, _ in _p1["refused"]} == {"b#2", "c#3"}
+   and any(h["id"] == "id-d#4" and f["status"] == "approved" for h, f in _p1["update"])
+   and [r["pid"] for r in _p1["create"]] == ["e#5"] and not _p1["seed"])
+_pb = _ops.ping_blocks([_br("e#5")], "https://albaloo-ops-core.base44.app")
+ok("ops-sync: the new-draft ping @mentions Alireza (Notion push) and links the draft",
+   _pb[0]["callout"]["rich_text"][0]["mention"]["user"]["id"] == _ops.OWNER
+   and "1 new draft to review" in _pb[0]["callout"]["rich_text"][1]["text"]["content"]
+   and _pb[1]["bulleted_list_item"]["rich_text"][1]["text"]["link"]["url"].startswith("https://www.notion.so/"))
+_calls_ops = []
+_saved_ops = (_ops.nrs.notion, _ops.nrs.b44)
+_ops.nrs.notion = lambda m, path, b=None: (_calls_ops.append(("notion", m, path, b)), (200, {}))[1]
+_ops.nrs.b44 = lambda m, path, b=None: (_calls_ops.append(("b44", m, path, b)), (200, {}))[1]
+_lg = []
+_ops.apply_decision(_br("c#3"), _app("c#3", decision="needs_edits", feedback="Shorten the intro."), "needs_edits", True, _lg)
+_ops.nrs.notion, _ops.nrs.b44 = _saved_ops
+_np2 = [c for c in _calls_ops if c[0] == "notion"][0][3]["properties"]
+_bp = [c for c in _calls_ops if c[0] == "b44"][0][3]
+ok("ops-sync: applying 'needs edits' writes Status + the feedback text to Notion and clears the app decision",
+   _np2["Status"]["select"]["name"] == "Needs edits"
+   and _np2["Feedback"]["rich_text"][0]["text"]["content"] == "Shorten the intro."
+   and _bp["decision"] is None and _bp["status"] == "needs_edits")
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz
