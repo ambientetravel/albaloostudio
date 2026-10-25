@@ -5,8 +5,13 @@ name: Ops sync — Review queue (Albaloo Ops app)
 # a decision pressed in the app → Status (+ Feedback) on the Notion row, where the
 # hourly review sync acts on it; a new draft → a Notion @mention ping to Alireza.
 # GitHub stays the source of truth; base44 never calls GitHub. tools/ops_sync.py
+# Seeded 25 Oct 2026: 34 drafts (run 40207408284); dry run before and after.
 
 on:
+  schedule:
+    # Hourly, 25 min after the Notion review sync (:15) — an app decision reaches
+    # Notion within the hour and is acted on at the next review sync.
+    - cron: "40 * * * *"
   workflow_dispatch:
     inputs:
       mode:
