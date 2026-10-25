@@ -31,7 +31,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45      # a photo backfill vets ~34 Commons candidates with the model; a normal sync is ~40 s
     defaults:
       run:
         working-directory: orchestrator
