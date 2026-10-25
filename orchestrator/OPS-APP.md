@@ -159,3 +159,20 @@ Supersedes the first draft of this table, which had three rows wrong (marked ✎
 | ✎ 11 social posts without image | **3, not 11** | The 11 came from a no-model TEST broadcast (19 Oct) counted as a cycle — health fixed in 8d181ad. Real run 25 Oct: 3 of 3 Instagram posts have no image (they promote pages published before articles carried photos). Fix = take the live page's photo |
 | AI recall 0/8 properties | **Open — not stale** | Oracle (`ai-visibility.yml`) runs monthly on the 1st; last 1 Oct, next 1 Nov |
 | Persian Gulf demand vs inventory (199 terms vs 18 sailings) | **Sharper than stated** | Inventory today: Gulf = 8 itineraries / **48 departures (0.77%)**; Mediterranean = **4,137 departures**. Demand (keywordchi export, Aug 2026 — static until a new export): **206 of 769** usable terms name the Persian Gulf, Dubai or a Gulf port; **34** name the Mediterranean. The old "199" was the size of the destination-generic cluster, not a Gulf count |
+
+## Phase 3: the Today tab (built 25 Oct 2026, session "24-hour project strategy")
+
+`tools/ops_today.py`, an hourly step of `ops-sync.yml`, mirrors
+`reports/health-latest.json` into the app:
+- `AgentRun`: upsert by agent
+- `HealthItem`: replaced each sync, markdown stripped
+- `Metric`: upsert by name; `previous` is the value it replaced, or the
+  report's `prev_*` figure
+
+First write: run 40240969278 sent 11 agents, 3 health lines and 8 metrics,
+22 calls with 0 errors. Tests: 3 in selfcheck.py.
+
+Phase 2 follow-up (commit 1947abe): `Lead.contact` and `Lead.display_name` are
+filled. Agent 4's record now keeps the name the customer typed. Verified live
+by run 40240621198: form TEST enquiry → Agent 4 (spam, so cold) → Lead row
+created, 0 errors.
