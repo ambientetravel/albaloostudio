@@ -131,7 +131,7 @@ def age_days(written: str, now: datetime) -> int:
 
 
 # ── article text + verdict notes (only for rows the app does not have yet) ───
-IMG_KEYS = ("image", "hero_image", "hero", "cover", "og_image", "thumbnail")
+IMG_KEYS = ("image_source_url", "image", "hero_image", "hero", "cover", "og_image", "thumbnail")
 
 
 def find_image(*sources) -> str:
