@@ -176,3 +176,25 @@ Phase 2 follow-up (commit 1947abe): `Lead.contact` and `Lead.display_name` are
 filled. Agent 4's record now keeps the name the customer typed. Verified live
 by run 40240621198: form TEST enquiry → Agent 4 (spam, so cold) → Lead row
 created, 0 errors.
+
+## Phase 4: the Social tab (built 25 Oct 2026, session "24-hour project strategy")
+
+`tools/ops_social.py`, an hourly step of `ops-sync.yml`, reads the latest
+successful `agent3-broadcast` artifact. It shows every held post as a card:
+site, channel, copy with hashtags, the article photo, and the link. A team
+Approve or Reject sets the card's status.
+
+**Nothing is published from here.** An approved post is put up by hand, or it
+is the trigger to switch that one channel's autopost on. A selfcheck asserts
+that the module contains no posting call.
+
+First write: run 40242067295 created 6 boutimar.com posts (3 LinkedIn and 3
+Instagram), with 0 errors. None has a photo: they are pre-7-Oct articles, as
+the health report already said.
+
+Article photos: `ops_sync.find_image()` plus the `images_dry_run` and
+`images_apply` modes. Run 40241842373 found **0 of 34** open drafts with a
+public photo URL: drafts hold repo-relative paths. The fix is for Agent 2 to
+write `image_source_url`; this was asked of the orchestration session.
+`OPS_ARTICLE_IMAGES` stays off until the app has `image_url` (see
+`OPS-APP-VISUAL-PROMPT.md`).
