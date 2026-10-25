@@ -70,6 +70,15 @@ The registry is `.claude/session-routing.json`. Before handing off:
 Hand off the finished work — commit sha, what changed, what is deliberately not
 done — not a request for the other session to go and do the task.
 
+## base44 access — read `.claude/BASE44-ACCESS.md` before touching a base44 site
+
+base44 sites (ambientetravel.com, cruisebaz.com) are edited by a **Remote Control
+session on Alireza's Mac**, driving the base44 editor in his Chrome through
+Claude in Chrome. The base44 MCP connector fails in cloud sessions
+(`CLIENT_HTTP_NOT_IMPLEMENTED`). Don't retry it. Hand the base44 step to the
+owning Mac session with a finished spec instead. The file also lists the
+confirmed base44 traps.
+
 ## Hard rules that override everything
 
 - **«خلیج فارس» / Persian Gulf. Never "Arabian Gulf".** Every page, card, email,
