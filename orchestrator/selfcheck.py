@@ -4687,6 +4687,14 @@ import inspect as _insp
 ok("ops-social: never publishes — no scheduler, Zernio or posting call exists in the module",
    not any(w in _insp.getsource(_os4) for w in ("SCHEDULER", "schedule(", "publish_now", "zernio")))
 
+# ── each Instagram account's own job reaches the Broadcaster prompt (26 Oct) ──
+_ig_by = {st.domain: c for st in config.load_sites(include_hold=True) for c in st.channels if c.get("name") == "instagram"}
+ok("Instagram angles: @boutixcruises informs, @cruise24.ir sells, @cruise24.me carries no Iran trace — and the angle reaches the prompt",
+   "rates" in _ig_by["cruise24.ir"]["angle"] and "Gentle sales" in _ig_by["boutimar.ir"]["angle"]
+   and "NO Iran trace" in _ig_by["cruise24.me"]["angle"] and _ig_by["cruise24.me"]["cluster"] == "ambiente"
+   and "THIS ACCOUNT'S JOB: Sales" in _a3ig.channel_brief("instagram", _ig_by["cruise24.ir"]["angle"])
+   and "THIS ACCOUNT'S JOB" not in _a3ig.channel_brief("instagram"))
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz

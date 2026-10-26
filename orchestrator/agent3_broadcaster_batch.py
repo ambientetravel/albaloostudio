@@ -242,7 +242,8 @@ def broadcast_one(payload: dict[str, Any], out_dir: Path, *, no_llm: bool,
 
         names = [c["name"] for c in channel_cfgs]
         drafts, gen_meta = (_stub_copy(event, names) if no_llm
-                            else _call_claude(event, names, profile)[:2])
+                            else _call_claude(event, names, profile,
+                                              {c["name"]: c["angle"] for c in channel_cfgs if c.get("angle")})[:2])
 
         priced = event.content_summary.offer.has_offer
         ctx = {
