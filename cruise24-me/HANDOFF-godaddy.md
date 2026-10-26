@@ -594,3 +594,18 @@ Their report, not re-checked here:
   name. Of 1,715 sitemap URLs, 269 have ever appeared in results.
 - **The live site is behind the repo.** index.html and contact.html live differ from the repo. This is
   expected: no nightly update has been uploaded since 7 Oct, because `CRUISE24_SSH_KEY` is not set yet.
+
+## Partner embed (handed over by the Albaloo Ops session, 26 Oct; main 89d384b)
+
+- **Files:** `embed/enquiry.html` is a brand-neutral iframe form for agency sites (`?p=<partner>&lang=en|fa&accent=<hex>`),
+  noindex. `api/enquiry.php` now stores `partner_id`.
+- **Checked here on main:**
+  - the embed is in the bundle and in `deploy_update.py`'s auto-ship scope;
+  - the pre-launch check passes;
+  - `.htaccess` sets no X-Frame-Options or frame-ancestors, so agencies can frame it;
+  - the only brand word in the file is the iframe URL inside the HTML comment, which visitors do not see.
+- **Keep:** `embed/` stays out of the sitemap and the nav. Never add a frame-blocking header for that path.
+- **Deploy:**
+  - `enquiry.php` is PHP, so it is a manual upload (`deploy_update.py` never ships PHP).
+  - `embed/enquiry.html` ships with the nightly update once `CRUISE24_SSH_KEY` is set, or by hand.
+  - After deploy, run `cruise24-form-check.yml` with submit_test and browser_test.
