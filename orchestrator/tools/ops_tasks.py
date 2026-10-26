@@ -69,7 +69,7 @@ def run(apply: bool) -> list[str]:
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     code, d = nrs.b44("GET", _ent("/v2/list?limit=1000"))
     if code != 200:
-        return [f"Task entity not reachable (HTTP {code}) — paste OPS-APP-ISSUES-PROMPT.md into base44 first"]
+        return [f"Task entity not reachable (HTTP {code}) — paste OPS-APP-OVERVIEW-PROMPT.md into base44 first"]
     calls = plan(load(), nrs._b44_items(d), now)
     errors = 0
     for method, rid, body in calls:

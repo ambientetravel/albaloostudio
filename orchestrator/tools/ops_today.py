@@ -37,12 +37,16 @@ REPORT = ROOT / "reports" / "health-latest.json"
 LEVELS = ("critical", "needs_you", "warn", "fine")
 # report key → (label shown in the app, report key holding the previous figure)
 METRICS = {
+    "candidates": ("Gap candidates found (last cycle)", None),
+    "ledger_skipped": ("Already briefed, skipped", None),
     "open_prs": ("Article PRs waiting", None),
     "articles": ("Articles drafted (last cycle)", "prev_articles"),
     "briefs": ("Briefs (last cycle)", None),
     "cost_usd": ("Model spend, USD (last cycle)", "prev_cost_usd"),
     "posts": ("Social posts composed", None),
     "posts_held": ("Social posts held", None),
+    "posts_no_media": ("Social posts without a photo", None),
+    "writer_failed": ("Writer failures", None),
     "dlq": ("Dead-lettered", None),
     "sites_scanned": ("Sites scanned", None),
 }

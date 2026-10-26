@@ -4588,6 +4588,19 @@ ok("ops-tasks: new tasks open, GitHub refreshes the wording but never the team's
    and _tc[2] == ("PUT", "2", {"status": "archived", "synced_at": "now"})
    and len(_otk.load()) >= 10)
 
+import ops_sites as _osi
+_sr = _osi.build([{"domain": "a.com", "can_publish": "yes"}, {"domain": "b.ir", "can_publish": "no"}],
+                 [{"site": "a.com", "status": "To review", "written": "2026-10-20"},
+                  {"site": "a.com", "status": "Published", "written": "2026-10-01"}],
+                 [{"property": "a.com", "qualification": "hot"}, {"property": "a.com", "qualification": "cold"}],
+                 {"a.com": {"declared": 100, "declared_and_surfaced": 16, "coverage": 0.16}}, "now")
+ok("ops-sites: per-site drafts waiting, published, last draft, leads, hot leads and Google coverage — and no "
+   "coverage numbers invented for a site the weekly report didn't measure",
+   _sr[0]["drafts_waiting"] == 1 and _sr[0]["published_total"] == 1 and _sr[0]["last_draft_at"] == "2026-10-20"
+   and _sr[0]["leads_total"] == 2 and _sr[0]["leads_hot"] == 1 and _sr[0]["coverage_pct"] == 16.0
+   and "coverage_pct" not in _sr[1] and _sr[1]["leads_total"] == 0
+   and {r["domain"]: r["can_publish"] for r in _osi.site_rows()}.get("cruiseshop.ir") == "no")
+
 # ── ops-sync phase 2: Agent 4 leads → the Leads tab (25 Oct) ──
 import ops_leads as _ol
 import tempfile as _otf, json as _oj

@@ -111,3 +111,31 @@ jobs:
           set -o pipefail
           if [ "$MODE" = "apply" ]; then A="--apply"; else A=""; fi
           python3 tools/ops_tasks.py $A | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Find the latest weekly index-coverage report
+        id: cov
+        if: always() && (inputs.mode || 'apply') != 'probe'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN=$(gh run list --workflow index-coverage.yml --status success --event schedule --limit 1 \
+                --json databaseId --jq '.[0].databaseId' --repo "${{ github.repository }}" || true)
+          [ -n "$RUN" ] && [ "$RUN" != "null" ] && echo "run_id=$RUN" >> "$GITHUB_OUTPUT" || echo "no weekly coverage run found"
+      - uses: actions/download-artifact@v5
+        if: always() && steps.cov.outputs.run_id != ''
+        continue-on-error: true
+        with:
+          name: index-coverage
+          path: orchestrator/coverage_in
+          run-id: ${{ steps.cov.outputs.run_id }}
+          github-token: ${{ github.token }}
+      - name: Sites tab (sites.yml + review board + leads + weekly Google coverage)
+        if: always() && (inputs.mode || 'apply') != 'probe'
+        env:
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
+          MODE: ${{ inputs.mode || 'apply' }}
+        run: |
+          set -o pipefail
+          if [ "$MODE" = "apply" ]; then A="--apply"; else A=""; fi
+          python3 tools/ops_sites.py --coverage coverage_in $A | tee -a "$GITHUB_STEP_SUMMARY"
