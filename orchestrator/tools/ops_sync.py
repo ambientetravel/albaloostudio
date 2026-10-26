@@ -445,6 +445,10 @@ def run(apply: bool, db: str) -> list[str]:
             log.append(f"  ! {r['pid']}: {exc}")
     for pid, why in p["refused"]:
         log.append(f"refused     {pid}  {why}")
+    try:
+        log.extend(relay_photo_requests(apply))
+    except Exception as exc:  # noqa: BLE001 — a photo relay problem never blocks the review sync
+        log.append(f"  ! photo requests: {exc}")
     new = [r for r in p["create"] if r["status"] == "To review"]
     if new and not p["seed"]:
         log.append(f"ping        {len(new)} new draft(s) → Notion @mention")
@@ -461,13 +465,68 @@ def run(apply: bool, db: str) -> list[str]:
     return log
 
 
+def photo_comment(have: dict) -> str:
+    """The PR comment that records a team photo change. Commons links get their real
+    creator and licence from Commons itself; any other photo needs the team's credit,
+    licence and rights confirmation, or the request is refused (never an uncredited photo)."""
+    who = have.get("photo_requested_by") or "a team member"
+    if have.get("photo_status") == "removed":
+        return f"📷 **Photo removed** in Albaloo Ops by {who}. Publish this article without a lead photo."
+    url = str(have.get("image_url") or "")
+    credit, lic = str(have.get("photo_credit") or ""), str(have.get("photo_licence") or "")
+    m = re.search(r"commons\.wikimedia\.org/wiki/(File:[^\s?#]+)|upload\.wikimedia\.org/.+/([^/]+\.(?:jpe?g|png))", url, re.I)
+    if m:
+        from urllib.parse import unquote
+        try:
+            import images
+            got = images.by_file(unquote(m.group(1) or ("File:" + m.group(2))))
+        except Exception:  # noqa: BLE001
+            got = None
+        if got:
+            credit, lic = got["creator"], got["licence"]
+            url = got["source_page"] or url
+    if not credit or not lic or (not m and have.get("photo_rights_confirmed") != "yes"):
+        raise ValueError("needs a credit, a licence and the rights confirmation (non-Commons photo)")
+    return (f"📷 **Photo change requested** in Albaloo Ops by {who}.\n\n"
+            f"- New photo: {url}\n- Credit: {credit}\n- Licence: {lic}\n\n"
+            f"Swap the article's lead photo for this one and update its credit line before publishing.")
+
+
+def relay_photo_requests(apply: bool) -> list[str]:
+    """Team photo changes (photo_status pending/removed) → one comment on the draft's PR,
+    then photo_status → requested. Applying the swap inside the article file is a
+    separate step (per-site adapters); the request is never lost meanwhile."""
+    log = []
+    for have in app_rows():
+        if have.get("photo_status") not in ("pending", "removed"):
+            continue
+        repo, num, _ = pr_link(_key(have))
+        try:
+            body = photo_comment(have)
+        except ValueError as exc:
+            log.append(f"photo       {_key(have)}  refused: {exc}")
+            if apply:
+                nrs.b44("PUT", _ent(f"/{have['id']}"), {"photo_status": "needs_credit"})
+            continue
+        log.append(f"photo       {_key(have)}  {have.get('photo_status')} → requested")
+        if apply:
+            if repo:
+                c, d = nrs.gh("POST", f"/repos/{repo}/issues/{num}/comments", {"body": body})
+                if c not in (200, 201):
+                    log.append(f"  ! GitHub {c}: {str(d)[:160]}")
+                    continue
+            nrs.b44("PUT", _ent(f"/{have['id']}"), {"photo_status": "requested"})
+    return log
+
+
 def backfill_images(apply: bool, db: str) -> list[str]:
     """One-off: give rows already in the app the photo their draft carries."""
     rows = {r["pid"]: r for r in board(db)}
     log, found = [], 0
     for have in app_rows():
-        if have.get("image_url") or have.get("status") not in ("to_review", "needs_edits", "approved"):
-            continue
+        if have.get("image_url") or have.get("photo_status") or \
+                have.get("status") not in ("to_review", "needs_edits", "approved"):
+            continue                      # a photo the team set or removed is theirs
         r = rows.get(_key(have))
         if not r:
             continue

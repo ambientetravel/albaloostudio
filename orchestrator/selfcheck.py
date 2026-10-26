@@ -4533,6 +4533,28 @@ ok("ops-sync photos: a URL the draft names wins, then the draft's own photo file
        == ("https://upload.wikimedia.org/own.jpg", ""))
 _ops.pr_photo, _ops.commons_photo, _ops.credited_photo = _saved_ph
 
+import images as _imgs
+_saved_bf = _imgs.by_file
+_imgs.by_file = lambda title, width=1600: {"creator": "Ali R.", "licence": "CC BY-SA 4.0",
+                                           "source_page": "https://commons.wikimedia.org/wiki/" + title}
+_pc_commons = _ops.photo_comment({"photo_status": "pending", "photo_requested_by": "Sara",
+                                  "image_url": "https://commons.wikimedia.org/wiki/File:Hormuz.jpg"})
+try:
+    _ops.photo_comment({"photo_status": "pending", "image_url": "https://example.com/x.jpg",
+                        "photo_credit": "Me", "photo_licence": "own"})
+    _pc_refused = False
+except ValueError:
+    _pc_refused = True
+_pc_ok = _ops.photo_comment({"photo_status": "pending", "image_url": "https://example.com/x.jpg",
+                             "photo_credit": "Ambiente Tours", "photo_licence": "own photo",
+                             "photo_rights_confirmed": "yes"})
+_imgs.by_file = _saved_bf
+ok("ops-sync team photos: a Commons link gets its real credit and licence from Commons; any other photo needs "
+   "credit + licence + rights confirmation or is refused; a removal is recorded",
+   "Ali R." in _pc_commons and "CC BY-SA 4.0" in _pc_commons and "Sara" in _pc_commons
+   and _pc_refused and "Ambiente Tours" in _pc_ok
+   and "Photo removed" in _ops.photo_comment({"photo_status": "removed"}))
+
 # ── ops-sync phase 2: Agent 4 leads → the Leads tab (25 Oct) ──
 import ops_leads as _ol
 import tempfile as _otf, json as _oj
