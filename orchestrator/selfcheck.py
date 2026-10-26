@@ -4579,6 +4579,15 @@ ok("photo swap: the caption is Farsi on .ir sites and English elsewhere for a te
    _ps.credit_text({"credit": "Sara", "licence": "own photo"}, True) == "عکس: Sara — own photo"
    and _ps.credit_text({"credit": "Sara", "licence": "own photo"}, False) == "Photo: Sara, own photo")
 
+import ops_tasks as _otk
+_tk = [{"key": "a", "title": "A", "owner": "alireza", "priority": "high"}, {"key": "b", "title": "B2"}]
+_tc = _otk.plan(_tk, [{"id": "1", "key": "b", "title": "B", "status": "done"}, {"id": "2", "key": "z", "title": "Z", "status": "open"}], "now")
+ok("ops-tasks: new tasks open, GitHub refreshes the wording but never the team's status, removed tasks are archived",
+   ("POST", None) == _tc[0][:2] and _tc[0][2]["status"] == "open"
+   and _tc[1][1] == "1" and _tc[1][2]["title"] == "B2" and "status" not in _tc[1][2]
+   and _tc[2] == ("PUT", "2", {"status": "archived", "synced_at": "now"})
+   and len(_otk.load()) >= 10)
+
 # ── ops-sync phase 2: Agent 4 leads → the Leads tab (25 Oct) ──
 import ops_leads as _ol
 import tempfile as _otf, json as _oj
