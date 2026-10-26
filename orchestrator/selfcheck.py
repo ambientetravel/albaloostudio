@@ -4555,6 +4555,30 @@ ok("ops-sync team photos: a Commons link gets its real credit and licence from C
    and _pc_refused and "Ambiente Tours" in _pc_ok
    and "Photo removed" in _ops.photo_comment({"photo_status": "removed"}))
 
+import photo_swap as _ps
+_md = '---\ntitle: "Hormuz"\nimage: "/img/journal/hormuz.jpg"\n---\n![Old](/img/journal/hormuz.jpg)\n*Photo: Old Man, CC BY 4.0, via [Wikimedia Commons](x)*\n\nBody text.\n'
+_md2 = _ps.edit_markdown(_md, "image", "/img/journal/hormuz.jpg", "/img/journal/hormuz.png", "Photo: Sara, own photo", True, "Hormuz cliffs")
+_md3 = _ps.edit_markdown(_md, "image", "/img/journal/hormuz.jpg", "", "", True, "")
+ok("photo swap (astro): the front-matter field, the inline photo and the credit line all change together; a "
+   "removal drops all three and keeps the text",
+   'image: "/img/journal/hormuz.png"' in _md2 and "![Hormuz cliffs](/img/journal/hormuz.png)\n*Photo: Sara, own photo*" in _md2
+   and "Old Man" not in _md2 and _md2.count("![") == 1 and "Body text." in _md2
+   and "image:" not in _md3 and "![" not in _md3 and "Photo:" not in _md3 and "Body text." in _md3)
+_it = _ps.edit_json_item({"slug": "s", "image": "img/daryanameh/s.jpg", "body": [{"p": "متن"}, {"p": "عکس: الف — CC BY"}]},
+                         "img/daryanameh/s.png", "عکس: ب — عکس خود ما")
+_it0 = _ps.edit_json_item({"slug": "s", "image": "img/x.jpg", "body": [{"p": "متن"}, {"p": "عکس: الف"}]}, "", "")
+ok("photo swap (boutimar.ir JSON): image path and the Farsi credit block are replaced, never duplicated; removal clears both",
+   _it["image"] == "img/daryanameh/s.png" and _it["body"] == [{"p": "متن"}, {"p": "عکس: ب — عکس خود ما"}]
+   and _it0["image"] == "" and _it0["body"] == [{"p": "متن"}])
+_mf = _ps.edit_manifest({"title": "t", "hero_image": {"src": "hero.jpg"}}, "hero.png",
+                        {"credit": "Sara", "licence": "own photo", "url": "https://x/y.png"}, "alt")
+ok("photo swap (cruise24.ir bundle): manifest.hero_image carries the new src, credit, licence and source; removal drops it",
+   _mf["hero_image"] == {"src": "hero.png", "credit": "Sara", "licence": "own photo", "source_page": "https://x/y.png", "alt": "alt"}
+   and "hero_image" not in _ps.edit_manifest({"hero_image": {}}, "", {}, ""))
+ok("photo swap: the caption is Farsi on .ir sites and English elsewhere for a team photo",
+   _ps.credit_text({"credit": "Sara", "licence": "own photo"}, True) == "عکس: Sara — own photo"
+   and _ps.credit_text({"credit": "Sara", "licence": "own photo"}, False) == "Photo: Sara, own photo")
+
 # ── ops-sync phase 2: Agent 4 leads → the Leads tab (25 Oct) ──
 import ops_leads as _ol
 import tempfile as _otf, json as _oj

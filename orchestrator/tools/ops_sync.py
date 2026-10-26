@@ -465,16 +465,17 @@ def run(apply: bool, db: str) -> list[str]:
     return log
 
 
-def photo_comment(have: dict) -> str:
-    """The PR comment that records a team photo change. Commons links get their real
-    creator and licence from Commons itself; any other photo needs the team's credit,
-    licence and rights confirmation, or the request is refused (never an uncredited photo)."""
+def photo_request(have: dict) -> dict:
+    """The team's photo change, resolved: Commons links carry their real creator and
+    licence from Commons; any other photo needs the team's credit, licence and rights
+    confirmation, else ValueError (never an uncredited photo)."""
     who = have.get("photo_requested_by") or "a team member"
     if have.get("photo_status") == "removed":
-        return f"📷 **Photo removed** in Albaloo Ops by {who}. Publish this article without a lead photo."
+        return {"removed": True, "by": who}
     url = str(have.get("image_url") or "")
     credit, lic = str(have.get("photo_credit") or ""), str(have.get("photo_licence") or "")
     m = re.search(r"commons\.wikimedia\.org/wiki/(File:[^\s?#]+)|upload\.wikimedia\.org/.+/([^/]+\.(?:jpe?g|png))", url, re.I)
+    got = None
     if m:
         from urllib.parse import unquote
         try:
@@ -484,38 +485,52 @@ def photo_comment(have: dict) -> str:
             got = None
         if got:
             credit, lic = got["creator"], got["licence"]
-            url = got["source_page"] or url
-    if not credit or not lic or (not m and have.get("photo_rights_confirmed") != "yes"):
+    if not credit or not lic or (not got and have.get("photo_rights_confirmed") != "yes"):
         raise ValueError("needs a credit, a licence and the rights confirmation (non-Commons photo)")
-    return (f"📷 **Photo change requested** in Albaloo Ops by {who}.\n\n"
-            f"- New photo: {url}\n- Credit: {credit}\n- Licence: {lic}\n\n"
-            f"Swap the article's lead photo for this one and update its credit line before publishing.")
+    return {"removed": False, "by": who, "url": (got or {}).get("source_page") or url,
+            "download_url": (got or {}).get("download_url") or url, "credit": credit, "licence": lic,
+            "commons": got, "title": (got or {}).get("title", "")}
+
+
+def photo_comment(have: dict) -> str:
+    req = photo_request(have)
+    if req["removed"]:
+        return f"📷 **Photo removed** in Albaloo Ops by {req['by']}. Publish this article without a lead photo."
+    return (f"📷 **Photo change requested** in Albaloo Ops by {req['by']}.\n\n"
+            f"- New photo: {req['url']}\n- Credit: {req['credit']}\n- Licence: {req['licence']}")
 
 
 def relay_photo_requests(apply: bool) -> list[str]:
-    """Team photo changes (photo_status pending/removed) → one comment on the draft's PR,
-    then photo_status → requested. Applying the swap inside the article file is a
-    separate step (per-site adapters); the request is never lost meanwhile."""
+    """Team photo changes (photo_status pending/removed): record the request on the draft,
+    then swap the photo inside the article itself (tools/photo_swap.py, one adapter per
+    site). Swapped → photo_status applied; a swap that cannot run → requested, with the
+    reason on the draft, for a person to finish. Refused for credit → needs_credit."""
+    import photo_swap
     log = []
     for have in app_rows():
         if have.get("photo_status") not in ("pending", "removed"):
             continue
-        repo, num, _ = pr_link(_key(have))
+        pid = _key(have)
+        repo, num, _ = pr_link(pid)
         try:
-            body = photo_comment(have)
+            req, body = photo_request(have), photo_comment(have)
         except ValueError as exc:
-            log.append(f"photo       {_key(have)}  refused: {exc}")
+            log.append(f"photo       {pid}  refused: {exc}")
             if apply:
                 nrs.b44("PUT", _ent(f"/{have['id']}"), {"photo_status": "needs_credit"})
             continue
-        log.append(f"photo       {_key(have)}  {have.get('photo_status')} → requested")
+        try:
+            done = photo_swap.swap(pid, req, apply)
+            status, note = "applied", f"\n\n✅ Applied to the draft: {done}"
+        except Exception as exc:  # noqa: BLE001 — recorded on the draft; a person finishes it
+            status, note = "requested", f"\n\n⚠️ Not applied automatically: {exc}. Please swap it by hand."
+        log.append(f"photo       {pid}  {have.get('photo_status')} → {status}  {note.strip()[:140]}")
         if apply:
             if repo:
-                c, d = nrs.gh("POST", f"/repos/{repo}/issues/{num}/comments", {"body": body})
+                c, d = nrs.gh("POST", f"/repos/{repo}/issues/{num}/comments", {"body": body + note})
                 if c not in (200, 201):
                     log.append(f"  ! GitHub {c}: {str(d)[:160]}")
-                    continue
-            nrs.b44("PUT", _ent(f"/{have['id']}"), {"photo_status": "requested"})
+            nrs.b44("PUT", _ent(f"/{have['id']}"), {"photo_status": status})
     return log
 
 
