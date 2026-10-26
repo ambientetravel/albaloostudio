@@ -86,7 +86,7 @@ def to_row(rec: dict, host: str, locale: str, now: datetime) -> dict:
     esc = bool(rec.get("escalate"))
     return {
         "property": host,
-        "partner_id": "",
+        "partner_id": str(rec.get("partner_id") or ""),
         "source": f"{rec.get('channel') or 'unknown'}:{rec['lead_id']}",
         "contact": str(rec.get("from_ref") or ""),
         # the name the customer typed; never made up — the address stands in when there is none

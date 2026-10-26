@@ -4626,6 +4626,9 @@ ok("ops-leads: a row is keyed channel:lead_id, carries who to reply to, starts a
    and _lr["status"] == "new" and _lr["reply_released"] == "no" and _lr["draft_reply"] == ""
    and _lr["property"] == "cruise24.me")
 _lr2 = _ol.to_row({**_lrec("L3"), "display_name": "Sara K."}, "cruise24.me", "en", _now)
+ok("ops-leads: a lead from a partner's embed carries that agency's partner_id, so only that agency sees it",
+   _ol.to_row({**_lrec("P1"), "partner_id": "safar-tour"}, "cruise24.me", "en", _now)["partner_id"] == "safar-tour"
+   and _ol.to_row(_lrec("P2"), "cruise24.me", "en", _now)["partner_id"] == "")
 ok("ops-leads: contact is the reply address and display_name is the name the customer typed (address when none)",
    _lr2["contact"] == "a@b.example" and _lr2["display_name"] == "Sara K." and _lr["display_name"] == "a@b.example")
 _ld = _OP(_otf.mkdtemp())

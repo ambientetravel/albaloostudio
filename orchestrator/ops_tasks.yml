@@ -106,12 +106,16 @@ tasks:
     link: ""
 
   - key: partner-portal
-    title: Partner portal (agency login, embed code, only their own leads)
-    detail: Next base44 prompt after photo editing and Issues.
-    owner: strategy-session
+    title: Paste the partner portal prompt into base44, then upload the embed
+    detail: >-
+      GitHub side is built: the brand-neutral embed (cruise24-me/embed/enquiry.html) and
+      api/enquiry.php storing partner_id, so each agency's leads reach the app tagged.
+      Two steps left. Upload cruise24-me/api/enquiry.php and cruise24-me/embed/enquiry.html to cruise24.me
+      public_html in cPanel, then paste orchestrator/OPS-APP-PARTNER-PROMPT.md into base44.
+    owner: alireza
     priority: medium
     property: ""
-    link: ""
+    link: https://github.com/ambientetravel/albaloostudio/blob/main/orchestrator/OPS-APP-PARTNER-PROMPT.md
 
   - key: social-autopost
     title: "Decide: publish approved social posts automatically?"

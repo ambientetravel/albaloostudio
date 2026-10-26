@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Cruise enquiry</title>
+<!--
+  Brand-neutral partner embed (CLAUDE.md: no company name, no brand, no outbound links).
+  Runs inside partner agency sites in an <iframe>:
+
+    <iframe src="https://cruise24.me/embed/enquiry.html?p=AGENCY-ID&lang=en&accent=0b6e99"
+            style="width:100%;border:0;min-height:640px" loading="lazy" title="Cruise enquiry"></iframe>
+
+  p       the agency's partner id (lowercase letters, digits, dashes) — the lead is theirs
+  lang    en | fa  (fa = Farsi, right to left)
+  accent  6-digit hex colour for the button, without '#'
+
+  Posts to ../api/enquiry.php exactly like the site's own form; a "thank you" is shown
+  only when the server confirms it stored the request. Sends its height to the parent
+  page (postMessage "c24-embed-height") so the host can resize the frame.
+-->
+<style>
+  :root { --accent: #0b6e99; --ink: #14212b; --muted: #5d6b75; --line: #d8dee3; --bg: #ffffff; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Vazirmatn", Tahoma, sans-serif; }
+  form { max-width: 560px; margin: 0 auto; padding: 20px 16px; display: grid; gap: 14px; }
+  h1 { font-size: 1.35rem; margin: 0; }
+  p.lede { margin: 0; color: var(--muted); font-size: .95rem; }
+  label { display: grid; gap: 6px; font-size: .9rem; font-weight: 600; }
+  input, select, textarea { font: inherit; padding: 11px 12px; border: 1px solid var(--line);
+    border-radius: 10px; width: 100%; background: #fff; color: var(--ink); }
+  textarea { min-height: 96px; resize: vertical; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  button { font: inherit; font-weight: 700; padding: 13px; border: 0; border-radius: 10px;
+    background: var(--accent); color: #fff; cursor: pointer; }
+  button[disabled] { opacity: .6; cursor: default; }
+  .note { font-size: .9rem; color: var(--muted); min-height: 1.4em; }
+  .note.ok { color: #1d7a3a; font-weight: 600; }
+  .note.err { color: #b3261e; font-weight: 600; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  [dir="rtl"] form { text-align: right; }
+  @media (max-width: 420px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<form id="f" novalidate>
+  <h1 data-t="title">Plan a cruise</h1>
+  <p class="lede" data-t="lede">Tell us roughly when and where. A planner replies within one working day. Nothing to pay now.</p>
+  <label><span data-t="name">Name</span><input name="name" autocomplete="name" required></label>
+  <label><span data-t="email">Email</span><input type="email" name="email" autocomplete="email" required></label>
+  <div class="row">
+    <label><span data-t="pax">Travellers</span>
+      <select name="pax"><option>2</option><option>1</option><option>3</option><option>4</option><option>5+</option></select></label>
+    <label><span data-t="where">Where</span>
+      <select name="where">
+        <option value="Not sure yet" data-t="o_any">Not sure yet</option>
+        <option value="Mediterranean" data-t="o_med">Mediterranean</option>
+        <option value="Greek islands" data-t="o_gr">Greek islands</option>
+        <option value="Red Sea / Persian Gulf" data-t="o_gulf">Red Sea / Persian Gulf</option>
+        <option value="River (Europe)" data-t="o_river">River (Europe)</option>
+        <option value="Northern Europe" data-t="o_north">Northern Europe</option>
+        <option value="Somewhere else" data-t="o_else">Somewhere else</option>
+      </select></label>
+  </div>
+  <label><span data-t="when">Roughly when</span><input name="when" data-tp="when_ph" placeholder="e.g. Nowruz 2027, or any week in October"></label>
+  <label><span data-t="notes">Anything we should know</span><textarea name="notes"></textarea></label>
+  <label class="hp" aria-hidden="true">Leave empty <input name="c24_nb" tabindex="-1" autocomplete="off"></label>
+  <button type="submit" data-t="send">Send request</button>
+  <p class="note" role="status" aria-live="polite"></p>
+</form>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var partner = (q.get('p') || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40);
+  var fa = q.get('lang') === 'fa';
+  var accent = (q.get('accent') || '').replace(/[^0-9a-fA-F]/g, '');
+  if (accent.length === 6) document.documentElement.style.setProperty('--accent', '#' + accent);
+  var T = {
+    title: 'برنامه‌ریزی سفر دریایی', lede: 'بگویید تقریباً کی و کجا. کارشناس ما ظرف یک روز کاری پاسخ می‌دهد. اکنون هیچ پرداختی لازم نیست.',
+    name: 'نام', email: 'ایمیل', pax: 'تعداد مسافر', where: 'کجا', when: 'تقریباً چه زمانی', notes: 'نکته‌ای که باید بدانیم',
+    when_ph: 'مثلاً نوروز ۱۴۰۶ یا هر هفته‌ای در مهر', send: 'ارسال درخواست',
+    o_any: 'هنوز مطمئن نیستم', o_med: 'مدیترانه', o_gr: 'جزایر یونان', o_gulf: 'دریای سرخ / خلیج فارس',
+    o_river: 'رودخانه (اروپا)', o_north: 'شمال اروپا', o_else: 'جای دیگر',
+    ok: 'ممنون. درخواست شما رسید و کارشناس ما ظرف یک روز کاری پاسخ می‌دهد.',
+    bad: 'لطفاً نام و ایمیل را بررسی کنید و دوباره بفرستید.', rate: 'درخواست‌های زیادی از این اتصال رسیده. چند دقیقه بعد دوباره بفرستید.',
+    fail: 'درخواست ارسال نشد. لطفاً چند لحظه بعد دوباره امتحان کنید.', sending: 'در حال ارسال…'
+  };
+  var E = { ok: 'Thank you. Your request has reached us, and a planner will reply within one working day.',
+    bad: 'Please check your name and email address, then send it again.',
+    rate: 'Too many requests from this connection. Please wait a few minutes and send it again.',
+    fail: 'Your request did not go through. Please try again in a moment.', sending: 'Sending…' };
+  var L = fa ? T : E;
+  if (fa) {
+    document.documentElement.lang = 'fa'; document.documentElement.dir = 'rtl';
+    document.querySelectorAll('[data-t]').forEach(function (el) { if (T[el.dataset.t]) el.textContent = T[el.dataset.t]; });
+    document.querySelectorAll('[data-tp]').forEach(function (el) { el.placeholder = T[el.dataset.tp]; });
+    document.title = T.title;
+  }
+  var form = document.getElementById('f'), note = form.querySelector('.note'), btn = form.querySelector('button');
+  var label = btn.textContent;
+  function height() { try { parent.postMessage({ type: 'c24-embed-height', height: document.body.scrollHeight }, '*'); } catch (e) {} }
+  window.addEventListener('load', height); window.addEventListener('resize', height);
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    var data = new FormData(form);
+    data.append('page', '/embed/enquiry.html');
+    data.append('partner', partner);
+    btn.disabled = true; btn.textContent = L.sending; note.className = 'note'; note.textContent = '';
+    fetch('../api/enquiry.php', { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { s: r.status, b: j }; }); })
+      .then(function (res) {
+        if (res.b && res.b.ok) { form.reset(); note.className = 'note ok'; note.textContent = L.ok; btn.textContent = label; btn.disabled = false; height(); return; }
+        throw { m: res.s === 429 ? L.rate : res.s === 400 ? L.bad : L.fail };
+      })
+      .catch(function (err) { note.className = 'note err'; note.textContent = (err && err.m) || L.fail; btn.disabled = false; btn.textContent = label; height(); });
+  });
+})();
+</script>
+</body>
+</html>

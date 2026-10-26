@@ -53,6 +53,9 @@ $when  = field($in, 'when', 200);
 $notes = field($in, 'notes', 4000);
 $page  = field($in, 'page', 200);
 $ref   = preg_replace('/[^A-Za-z0-9-]/', '', field($in, 'sailing', 64)) ?? '';
+// Partner agency id from the brand-neutral embed (embed/enquiry.html?p=<id>): a short
+// lowercase code, nothing else. It decides which agency sees the lead in Albaloo Ops.
+$partner = preg_replace('/[^a-z0-9-]/', '', strtolower(field($in, 'partner', 40))) ?? '';
 
 $errors = [];
 if ($name === '') $errors[] = 'name';
@@ -91,6 +94,7 @@ if ($rl && flock($rl, LOCK_EX)) {
 }
 
 $lines = [];
+if ($partner !== '') $lines[] = 'Partner agency: ' . $partner;
 if ($ref !== '')   $lines[] = 'Sailing ref: ' . $ref;
 if ($pax !== '')   $lines[] = 'Travellers: ' . $pax;
 if ($where !== '') $lines[] = 'Where: ' . $where;
@@ -110,6 +114,7 @@ $lead = [
     'where'        => $where,
     'when'         => $when,
     'sailing_ref'  => $ref,
+    'partner_id'   => $partner,
     'received_at'  => gmdate('Y-m-d\TH:i:s\Z'),
 ];
 if ($suspect) $lead['suspect'] = 'honeypot';

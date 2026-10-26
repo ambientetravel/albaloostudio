@@ -172,6 +172,8 @@ def close_one(raw: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Outcome:
             "channel": lead.channel,
             "from_ref": lead.from_ref,
             "display_name": lead.display_name or "",
+            # the partner agency whose embed sent it (cruise24.me/embed/enquiry.html?p=…)
+            "partner_id": str((lead.model_extra or {}).get("partner_id") or ""),
             "message_redacted": clean,
             "redactions": redactions,
             "attributed_campaign": oc.attributed_campaign,
