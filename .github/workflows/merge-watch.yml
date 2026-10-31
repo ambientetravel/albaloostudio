@@ -127,6 +127,9 @@ jobs:
           # content repositories whose pull requests are being read. The default
           # GITHUB_TOKEN can only see this repository.
           ASTRO_GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+          # renders JavaScript pages (cruisebaz.com, ambientetravel.com) so their
+          # live text can be checked and handed to the Broadcaster; off without it
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
         run: |
           set -euo pipefail
           [ -d written/events ] || exit 0

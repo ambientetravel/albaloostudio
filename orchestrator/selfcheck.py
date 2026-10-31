@@ -4695,6 +4695,35 @@ ok("Instagram angles: @boutixcruises informs, @cruise24.ir sells, @cruise24.me c
    and "THIS ACCOUNT'S JOB: Sales" in _a3ig.channel_brief("instagram", _ig_by["cruise24.ir"]["angle"])
    and "THIS ACCOUNT'S JOB" not in _a3ig.channel_brief("instagram"))
 
+# ── Firecrawl renders JavaScript pages for merge-watch and Agent 8 (1 Nov) ──
+import firecrawl_client as _fc
+import requests as _rq_fc
+from tools import merge_watch as _mw_fc
+class _FR:
+    def __init__(self, code, data): self.status_code, self._d, self.content = code, data, b"x"
+    def json(self): return self._d
+_saved_fc = (_rq_fc.post, os.environ.get("FIRECRAWL_API_KEY"), os.environ.get("FIRECRAWL_MAX_PAGES"))
+_posts = []
+_rq_fc.post = lambda url, **kw: (_posts.append(kw["json"]["url"]),
+    _FR(200, {"success": True, "data": {"html": "<main><h1>AROYA without Schengen</h1><p>body</p></main>"}}))[1]
+class _Sess:
+    def get(self, url, **kw):
+        r = _FR(200, None); r.text = "<html><body><div id=root></div></body></html>"; r.content = r.text.encode(); return r
+os.environ.pop("FIRECRAWL_API_KEY", None)
+_off = _mw_fc.page_is_live("https://cruisebaz.com/aroya/x", "AROYA without Schengen", _Sess())
+os.environ["FIRECRAWL_API_KEY"] = "fc-test"; os.environ["FIRECRAWL_MAX_PAGES"] = "1"; _fc._used = 0
+_on = _mw_fc.page_is_live("https://cruisebaz.com/aroya/x", "AROYA without Schengen", _Sess())
+_capped = _fc.rendered_html("https://cruisebaz.com/aroya/y")
+ok("Firecrawl: a JavaScript page is live once rendered (title found); without the key it says why; the per-run page cap holds",
+   not _off["live"] and "FIRECRAWL_API_KEY" in _off["reason"]
+   and _on["live"] and _on.get("rendered") and "AROYA without Schengen" in _on["html"]
+   and _capped is None and _posts == ["https://cruisebaz.com/aroya/x"])
+_rq_fc.post = _saved_fc[0]
+for _k, _v in (("FIRECRAWL_API_KEY", _saved_fc[1]), ("FIRECRAWL_MAX_PAGES", _saved_fc[2])):
+    if _v is None: os.environ.pop(_k, None)
+    else: os.environ[_k] = _v
+_fc._used = 0
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz

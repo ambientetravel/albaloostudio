@@ -77,6 +77,8 @@ jobs:
       - name: Scout the competition
         env:
           PIPELINE_ENVIRONMENT: production
+          # renders JavaScript-built competitor pages; feature is off without it
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
         run: |
           set -euo pipefail
           ARGS="--out competitors --sample ${{ inputs.sample || '10' }}"
