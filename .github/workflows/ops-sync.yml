@@ -17,11 +17,12 @@ on:
       mode:
         description: "probe = read-only GET of ArticleReview; dry_run = report only; apply = write"
         type: choice
-        options: [probe, dry_run, apply]
+        options: [probe, dry_run, apply, images_dry_run, images_apply]
         default: dry_run
 
 permissions:
   contents: read
+  actions: read      # to download Agent 3's latest posts artifact
 
 concurrency:
   group: ops-sync
@@ -30,7 +31,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45      # a photo backfill vets ~34 Commons candidates with the model; a normal sync is ~40 s
     defaults:
       run:
         working-directory: orchestrator
@@ -49,11 +50,92 @@ jobs:
           NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
           # reads the draft text from the article PRs on the four site repos
           GITHUB_TOKEN: ${{ secrets.ASTRO_GITHUB_TOKEN }}
+          # on since 25 Oct 2026: the app's ArticleReview has image_url (visual redesign)
+          OPS_ARTICLE_IMAGES: ${{ vars.OPS_ARTICLE_IMAGES || '1' }}
+          # the Commons fallback vets each candidate photo with the model (images.suitable)
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Claude first: on 25 Oct Gemini answered 503 "high demand" and took 1–4 min per vet
+          PROSE_PROVIDER: anthropic
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           MODE: ${{ inputs.mode || 'apply' }}
         run: |
           set -o pipefail   # `| tee` must not turn a crash green
           case "$MODE" in
             probe)   python3 tools/ops_sync.py --probe | tee -a "$GITHUB_STEP_SUMMARY" ;;
             dry_run) python3 tools/ops_sync.py | tee -a "$GITHUB_STEP_SUMMARY" ;;
+            images_dry_run) python3 tools/ops_sync.py --backfill-images | tee -a "$GITHUB_STEP_SUMMARY" ;;
+            images_apply)   python3 tools/ops_sync.py --backfill-images --apply | tee -a "$GITHUB_STEP_SUMMARY" ;;
             *)       python3 tools/ops_sync.py --apply | tee -a "$GITHUB_STEP_SUMMARY" ;;
           esac
+      - name: Today tab (agents, health lines, metrics from reports/health-latest.json)
+        if: always() && (inputs.mode || 'apply') != 'probe'
+        env:
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
+          MODE: ${{ inputs.mode || 'apply' }}
+        run: |
+          set -o pipefail
+          if [ "$MODE" = "apply" ]; then A="--apply"; else A=""; fi
+          python3 tools/ops_today.py $A | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Find Agent 3's latest posts
+        id: a3
+        if: always() && (inputs.mode || 'apply') != 'probe'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN=$(gh run list --workflow agent3-broadcaster.yml --status success --limit 1 \
+                --json databaseId --jq '.[0].databaseId' --repo "${{ github.repository }}" || true)
+          [ -n "$RUN" ] && [ "$RUN" != "null" ] && echo "run_id=$RUN" >> "$GITHUB_OUTPUT" || echo "no Agent 3 run found"
+      - uses: actions/download-artifact@v5
+        if: always() && steps.a3.outputs.run_id != ''
+        continue-on-error: true
+        with:
+          name: agent3-broadcast
+          path: orchestrator/social_in
+          run-id: ${{ steps.a3.outputs.run_id }}
+          github-token: ${{ github.token }}
+      - name: Social tab (Agent 3's held posts; nothing is published from here)
+        if: always() && (inputs.mode || 'apply') != 'probe'
+        env:
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
+          MODE: ${{ inputs.mode || 'apply' }}
+        run: |
+          set -o pipefail
+          if [ "$MODE" = "apply" ]; then A="--apply"; else A=""; fi
+          python3 tools/ops_social.py --posts social_in $A | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Issues tab (orchestrator/ops_tasks.yml; the team owns each task's status)
+        if: always() && (inputs.mode || 'apply') != 'probe'
+        env:
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
+          MODE: ${{ inputs.mode || 'apply' }}
+        run: |
+          set -o pipefail
+          if [ "$MODE" = "apply" ]; then A="--apply"; else A=""; fi
+          python3 tools/ops_tasks.py $A | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Find the latest weekly index-coverage report
+        id: cov
+        if: always() && (inputs.mode || 'apply') != 'probe'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN=$(gh run list --workflow index-coverage.yml --status success --event schedule --limit 1 \
+                --json databaseId --jq '.[0].databaseId' --repo "${{ github.repository }}" || true)
+          [ -n "$RUN" ] && [ "$RUN" != "null" ] && echo "run_id=$RUN" >> "$GITHUB_OUTPUT" || echo "no weekly coverage run found"
+      - uses: actions/download-artifact@v5
+        if: always() && steps.cov.outputs.run_id != ''
+        continue-on-error: true
+        with:
+          name: index-coverage
+          path: orchestrator/coverage_in
+          run-id: ${{ steps.cov.outputs.run_id }}
+          github-token: ${{ github.token }}
+      - name: Sites tab (sites.yml + review board + leads + weekly Google coverage)
+        if: always() && (inputs.mode || 'apply') != 'probe'
+        env:
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
+          MODE: ${{ inputs.mode || 'apply' }}
+        run: |
+          set -o pipefail
+          if [ "$MODE" = "apply" ]; then A="--apply"; else A=""; fi
+          python3 tools/ops_sites.py --coverage coverage_in $A | tee -a "$GITHUB_STEP_SUMMARY"

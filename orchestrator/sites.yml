@@ -256,6 +256,7 @@ sites:
         requires_media: true
         handle: "@boutixcruises"
         cluster: persian          # instagram-agent cluster; clusters never share handles, tags or collabs
+        angle: "General information and beauty, Farsi, for Iranians in Iran and the B2B agencies that sell with us: introduce ships and cruise lines, cruise news, scenery. Gentle sales only; rates, packages and promotions belong to @cruise24.ir."
 
     # From the Iranian Cruise Competitor Map (23 Jul 2026). These five are the
     # ones that analysis flags as head-to-head, not the biggest names:
@@ -482,6 +483,14 @@ sites:
 
     # 20 Aug: this site has TWO Search Console properties and the older one
     # reports bigger numbers. It is not the better one.
+      - name: instagram
+        audience: d2c
+        autopost: false
+        account_ref: null          # Zernio/Postiz account id — filled when the account is connected
+        requires_media: true
+        handle: "@travelambiente"
+        cluster: ambiente          # instagram-agent cluster; clusters never share handles, tags or collabs
+        angle: "Ambiente Travel's tours, MICE and DMC products from ambientetravel.com; signature HQ products with fixed departure dates come first and are promoted well in advance."
     notes:
       - >-
         sc-domain:ambientetravel.com was verified 2026-08-09 and holds 11 days
@@ -557,6 +566,7 @@ sites:
         requires_media: true
         handle: "@cruisebaz"
         cluster: persian          # instagram-agent cluster; clusters never share handles, tags or collabs
+        angle: "The Persian diaspora outside Iran: every cruise line, group departures and gatherings of Iranians abroad. Bilingual: Farsi first, then an English version of the caption."
 
   - domain: cruise24.ir
     property_uri: "sc-domain:cruise24.ir"
@@ -631,8 +641,9 @@ sites:
         autopost: false
         account_ref: null          # Zernio account id — filled when the account is connected
         requires_media: true
-        handle: "cruise24.ir"          # handle as written in the 19 Oct sheet — confirm the exact @
+        handle: "@cruise24.ir"          # Alireza 26 Oct: the handle is the website address
         cluster: persian          # instagram-agent cluster; clusters never share handles, tags or collabs
+        angle: "Sales, Farsi, for Iranians in Iran: rates, itineraries, packages, promotions and news. Lead with the real fare from the live feed (with its date) when the article has one."
     notes:
       - "sitemap.xml and robots.txt both live (200) as of 2026-09-25 — were 404 on 2026-08-09."
       - "Zero JSON-LD blocks."
@@ -687,6 +698,14 @@ sites:
         audience: b2b
         autopost: false
         account_ref: null
+      - name: instagram
+        audience: d2c
+        autopost: false
+        account_ref: null          # Zernio/Postiz account id — filled when the account is connected
+        requires_media: true
+        handle: "@cruise24.me"
+        cluster: ambiente          # instagram-agent cluster; clusters never share handles, tags or collabs
+        angle: "English, for a world audience: luxury cruise lines and high-quality tours; the AmbiMare branch of Ambiente Travel. NO Iran trace (sanctions): never mention Iran, Iranian passports, rials/tomans or any Persian-cluster brand."
     notes:
       - "LinkedIn company page: https://www.linkedin.com/company/cruise24/ (edited 28 Sep)."
       - "Enquiries: api/enquiry.php stores them and copies each to res@cruise24.me."
@@ -803,3 +822,11 @@ sites:
         audience: b2b
         autopost: false
         account_ref: null          # not connected to the scheduler yet
+      - name: instagram
+        audience: d2c
+        autopost: false
+        account_ref: null          # Zernio/Postiz account id — filled when the account is connected
+        requires_media: true
+        handle: "@dmciran.ir"
+        cluster: persian          # instagram-agent cluster; clusters never share handles, tags or collabs
+        angle: "English, for travellers worldwide interested in Iran as a destination. The website is being rebuilt (Nov 2026): no links to dmciran.ir until it is live; follow current government travel advice honestly."

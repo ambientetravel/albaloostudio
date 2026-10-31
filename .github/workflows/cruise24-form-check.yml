@@ -18,7 +18,7 @@ on:
         type: boolean
         default: false
       browser_test:
-        description: "Fill and send the form in a real browser on index.html and contact.html (2 TEST enquiries)"
+        description: "Fill and send the form in a real browser on index.html, contact.html and the partner embed (3 TEST enquiries)"
         type: boolean
         default: false
 
@@ -50,7 +50,7 @@ jobs:
           def local(p): return sha(open("cruise24-me/" + p, "rb").read())
 
           print("## 1. Pages and form script")
-          for p in ("index.html", "contact.html", "assets/site.js"):
+          for p in ("index.html", "contact.html", "assets/site.js", "embed/enquiry.html"):
               st, body = get("/" + p)
               same = "same as repo" if st == 200 and sha(body) == local(p) else "DIFFERENT from repo"
               extra = ""
@@ -60,6 +60,15 @@ jobs:
               if p.endswith(".js"):
                   extra = f" | posts to form action: {b'data-enquiry' in body}"
               print(f"{p}: HTTP {st}, {len(body)} bytes, {same}{extra}")
+
+          # the partner embed lives inside agencies' sites, so the server must not forbid framing
+          try:
+              with urllib.request.urlopen(urllib.request.Request(BASE + "/embed/enquiry.html", headers=UA), timeout=30) as r:
+                  xfo, csp = r.headers.get("X-Frame-Options"), r.headers.get("Content-Security-Policy") or ""
+                  ok = not xfo and "frame-ancestors" not in csp
+                  print(f"embed framing: X-Frame-Options={xfo!r}, frame-ancestors in CSP={'frame-ancestors' in csp} → {'can be embedded' if ok else 'BLOCKED from embedding'}")
+          except urllib.error.HTTPError as e:
+              print(f"embed framing: HTTP {e.code} (404 = embed NOT DEPLOYED)")
 
           print("\n## 2. Enquiry endpoint")
           st, body = get("/api/enquiry.php")
@@ -90,12 +99,14 @@ jobs:
               print("\n## 4. Test submission")
               form = urllib.parse.urlencode({"name": "PIPELINE TEST", "email": "pipeline-test@cruise24.me",
                   "pax": "2", "where": "test", "when": "test", "notes": "Automated form check. Ignore.",
-                  "page": "/contact.html"}).encode()
+                  "page": "/embed/enquiry.html", "partner": "pipeline-test"}).encode()
               st, body = get("/api/enquiry.php", {"Content-Type": "application/x-www-form-urlencoded",
                   "Accept": "application/json"}, method="POST", data=form)
               print(f"POST api/enquiry.php: HTTP {st} {body[:200]!r}")
               st2, j2 = stored()
               print(f"leads.php total after: {j2.get('total')} (before: {j.get('total')})")
+              mine = [l for l in j2.get("leads", []) if l.get("partner_id") == "pipeline-test"]
+              print(f"stored with partner_id=pipeline-test: {len(mine)} (0 = enquiry.php on the server is the old one)")
           PY
       - name: Real-browser form test
         if: inputs.browser_test
@@ -105,7 +116,8 @@ jobs:
           from playwright.sync_api import sync_playwright
           with sync_playwright() as p:
               b = p.chromium.launch()
-              for page_path in ("/index.html", "/contact.html#browser-test"):
+              for page_path in ("/index.html", "/contact.html#browser-test",
+                                "/embed/enquiry.html?p=pipeline-test&lang=fa"):
                   pg = b.new_page(viewport={"width": 390, "height": 844})   # phone size
                   errors = []
                   pg.on("pageerror", lambda e: errors.append(str(e)))
@@ -118,7 +130,7 @@ jobs:
                   f.locator("button[type=submit]").click()
                   note = f.locator(".note")
                   try:
-                      pg.wait_for_function("el => /Thank you|did not go through|Too many|check your/.test(el.textContent)",
+                      pg.wait_for_function("el => /Thank you|did not go through|Too many|check your|ممنون|ارسال نشد|بررسی کنید/.test(el.textContent)",
                                            arg=note.element_handle(), timeout=20000)
                   except Exception:
                       pass

@@ -67,6 +67,8 @@ The registry is `.claude/session-routing.json`. Before handing off:
   before the first handoff to it.
 - Properties in `unrouted` have no owner. Ask, do not guess.
 
+**Game sessions are off limits for work.** Persia at War, PAW1, Karvansara and any other game session are a personal project. Never send them orchestration, site, deploy or browser tasks, even when one is the only live Mac session (`never_route` in the registry). If no work Mac session is live, give Alireza the steps instead.
+
 Hand off the finished work — commit sha, what changed, what is deliberately not
 done — not a request for the other session to go and do the task.
 

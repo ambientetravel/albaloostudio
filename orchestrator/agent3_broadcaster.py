@@ -440,7 +440,16 @@ def published_text_of(event: PublishingEvent) -> str:
     return str((pt or {}).get("published_text") or "").strip()
 
 
-def _user_prompt(event: PublishingEvent, channels: list[str]) -> str:
+def channel_brief(ch: str, angle: str | None = None) -> str:
+    """The channel's writing rules, plus the account's own job when sites.yml gives
+    one (26 Oct: @boutixcruises informs and shows the sea, @cruise24.ir sells with
+    rates — same article, two different posts)."""
+    base = CHANNEL_BRIEFS.get(ch, "Short promotional post.")
+    return base + (f" THIS ACCOUNT'S JOB: {angle}" if angle else "")
+
+
+def _user_prompt(event: PublishingEvent, channels: list[str],
+                 angles: dict[str, str] | None = None) -> str:
     cs = event.content_summary
     return json.dumps(
         {
@@ -467,7 +476,7 @@ def _user_prompt(event: PublishingEvent, channels: list[str]) -> str:
                 {
                     "channel": ch,
                     "audience": "b2b" if ch in B2B_CHANNELS else "d2c",
-                    "brief": CHANNEL_BRIEFS.get(ch, "Short promotional post."),
+                    "brief": channel_brief(ch, (angles or {}).get(ch)),
                 }
                 for ch in channels
             ],
@@ -478,7 +487,8 @@ def _user_prompt(event: PublishingEvent, channels: list[str]) -> str:
     )
 
 
-def _call_claude(event: PublishingEvent, channels: list[str], profile: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def _call_claude(event: PublishingEvent, channels: list[str], profile: str,
+                 angles: dict[str, str] | None = None) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """
     One batched call covering every channel.
 
@@ -488,7 +498,7 @@ def _call_claude(event: PublishingEvent, channels: list[str], profile: str) -> t
     replaces the prefill trick entirely.
     """
     system = _system_prompt(event, profile)
-    prompt = _user_prompt(event, channels)
+    prompt = _user_prompt(event, channels, angles)
     # Gemini's JSON mode fixes validity, not shape, so the envelope goes in the
     # prompt. Agent 1 got a bare array where it expected an object by leaving
     # this to the provider.
@@ -663,7 +673,8 @@ def run_broadcast_job(event: PublishingEvent, raw_payload: dict[str, Any]) -> No
             return
 
         names = [c["name"] for c in channel_cfgs]
-        drafts, gen_meta = _call_claude(event, names, profile)
+        angles = {c["name"]: c["angle"] for c in channel_cfgs if c.get("angle")}
+        drafts, gen_meta = _call_claude(event, names, profile, angles)
 
         # The compliance gate on the OUTPUT. Copy that carries an invented rate
         # or "Arabian Gulf" never reaches a scheduler, let alone a feed.

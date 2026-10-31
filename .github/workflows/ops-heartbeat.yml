@@ -1,0 +1,47 @@
+name: Ops heartbeat — keeps the Albaloo Ops app fresh
+
+# GitHub drops scheduled runs when it is busy: ops-sync's "hourly" cron fired
+# twice between 16:00 and 23:00 UTC on 25 Oct 2026. This is the backup timer.
+# One long job dispatches ops-sync every 15 minutes and Agent 4 (lead pull) every
+# hour, then starts its own successor just before GitHub's 6-hour job limit.
+# The cron below only restarts the chain if it ever breaks.
+#
+# Public repo: standard runners cost nothing. A sleeping job uses no API quota.
+# To stop it: disable this workflow in the Actions tab.
+
+on:
+  schedule:
+    - cron: "7 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write       # to dispatch ops-sync, Agent 4 and its own successor
+
+concurrency:
+  group: ops-heartbeat
+  cancel-in-progress: false
+
+jobs:
+  beat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - name: Dispatch every 15 minutes for ~5h45m
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          for i in $(seq 1 23); do
+            gh workflow run ops-sync.yml --repo "$REPO" --ref main -f mode=apply \
+              && echo "$(date -u +%H:%M) ops-sync dispatched" || echo "$(date -u +%H:%M) ops-sync dispatch failed"
+            if [ $((i % 4)) -eq 1 ]; then
+              gh workflow run agent4-sales-closer.yml --repo "$REPO" --ref main \
+                && echo "$(date -u +%H:%M) agent 4 dispatched" || echo "$(date -u +%H:%M) agent 4 dispatch failed"
+            fi
+            sleep 900
+          done
+      - name: Start the next heartbeat
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ops-heartbeat.yml --repo "${{ github.repository }}" --ref main

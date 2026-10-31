@@ -4512,6 +4512,189 @@ ok("ops-sync: applying 'needs edits' writes Status + the feedback text to Notion
    and _np2["Feedback"]["rich_text"][0]["text"]["content"] == "Shorten the intro."
    and _bp["decision"] is None and _bp["status"] == "needs_edits")
 
+ok("ops-sync: an article's photo is a real http(s) URL from its front matter, record or body — never a local path or a guess",
+   _ops.find_image('---\nimage: "https://u/a.jpg"\n---\n') == "https://u/a.jpg"
+   and _ops.find_image({"hero_image": {"url": "https://x/h.png"}}) == "https://x/h.png"
+   and _ops.find_image("", "t ![a](https://c/d.webp)") == "https://c/d.webp"
+   and _ops.find_image("image: img/local.jpg", {"image": "/rel.jpg"}) == "")
+
+_saved_ph = (_ops.pr_photo, _ops.commons_photo, _ops.credited_photo)
+_ops.credited_photo = lambda body: "https://upload.wikimedia.org/own.jpg" if "File:Own.jpg" in body else ""
+_ops.pr_photo = lambda pid: "https://raw.githubusercontent.com/ambientetravel/boutimar/abc/img/x.jpg" if pid == "boutimar#1" else ""
+_ops.commons_photo = lambda title, site: ("https://upload.wikimedia.org/c.jpg", "PHOTO IN THE APP IS A SUGGESTION — Commons: c · A · CC BY-SA 4.0") if title == "Hormuz" else ("", "")
+ok("ops-sync photos: a URL the draft names wins, then the draft's own photo file, then a credited Commons "
+   "suggestion marked as such — and nothing when none exists",
+   _ops.resolve_photo({"pid": "boutimar#1", "title": "Hormuz"}, "https://u/a.jpg") == ("https://u/a.jpg", "")
+   and _ops.resolve_photo({"pid": "boutimar#1", "title": "Hormuz"})[0].startswith("https://raw.githubusercontent.com/")
+   and _ops.resolve_photo({"pid": "boutimar#2", "title": "Hormuz"})[1].startswith("PHOTO IN THE APP IS A SUGGESTION")
+   and _ops.resolve_photo({"pid": "boutimar#2", "title": "Nowhere"}) == ("", "")
+   and _ops.resolve_photo({"pid": "boutimar#2", "title": "Hormuz"}, "",
+                          "Photo: A, CC BY 4.0, via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Own.jpg)")
+       == ("https://upload.wikimedia.org/own.jpg", ""))
+_ops.pr_photo, _ops.commons_photo, _ops.credited_photo = _saved_ph
+
+import images as _imgs
+_saved_bf = _imgs.by_file
+_imgs.by_file = lambda title, width=1600: {"creator": "Ali R.", "licence": "CC BY-SA 4.0",
+                                           "source_page": "https://commons.wikimedia.org/wiki/" + title}
+_pc_commons = _ops.photo_comment({"photo_status": "pending", "photo_requested_by": "Sara",
+                                  "image_url": "https://commons.wikimedia.org/wiki/File:Hormuz.jpg"})
+try:
+    _ops.photo_comment({"photo_status": "pending", "image_url": "https://example.com/x.jpg",
+                        "photo_credit": "Me", "photo_licence": "own"})
+    _pc_refused = False
+except ValueError:
+    _pc_refused = True
+_pc_ok = _ops.photo_comment({"photo_status": "pending", "image_url": "https://example.com/x.jpg",
+                             "photo_credit": "Ambiente Tours", "photo_licence": "own photo",
+                             "photo_rights_confirmed": "yes"})
+_imgs.by_file = _saved_bf
+ok("ops-sync team photos: a Commons link gets its real credit and licence from Commons; any other photo needs "
+   "credit + licence + rights confirmation or is refused; a removal is recorded",
+   "Ali R." in _pc_commons and "CC BY-SA 4.0" in _pc_commons and "Sara" in _pc_commons
+   and _pc_refused and "Ambiente Tours" in _pc_ok
+   and "Photo removed" in _ops.photo_comment({"photo_status": "removed"}))
+
+import photo_swap as _ps
+_md = '---\ntitle: "Hormuz"\nimage: "/img/journal/hormuz.jpg"\n---\n![Old](/img/journal/hormuz.jpg)\n*Photo: Old Man, CC BY 4.0, via [Wikimedia Commons](x)*\n\nBody text.\n'
+_md2 = _ps.edit_markdown(_md, "image", "/img/journal/hormuz.jpg", "/img/journal/hormuz.png", "Photo: Sara, own photo", True, "Hormuz cliffs")
+_md3 = _ps.edit_markdown(_md, "image", "/img/journal/hormuz.jpg", "", "", True, "")
+ok("photo swap (astro): the front-matter field, the inline photo and the credit line all change together; a "
+   "removal drops all three and keeps the text",
+   'image: "/img/journal/hormuz.png"' in _md2 and "![Hormuz cliffs](/img/journal/hormuz.png)\n*Photo: Sara, own photo*" in _md2
+   and "Old Man" not in _md2 and _md2.count("![") == 1 and "Body text." in _md2
+   and "image:" not in _md3 and "![" not in _md3 and "Photo:" not in _md3 and "Body text." in _md3)
+_it = _ps.edit_json_item({"slug": "s", "image": "img/daryanameh/s.jpg", "body": [{"p": "متن"}, {"p": "عکس: الف — CC BY"}]},
+                         "img/daryanameh/s.png", "عکس: ب — عکس خود ما")
+_it0 = _ps.edit_json_item({"slug": "s", "image": "img/x.jpg", "body": [{"p": "متن"}, {"p": "عکس: الف"}]}, "", "")
+ok("photo swap (boutimar.ir JSON): image path and the Farsi credit block are replaced, never duplicated; removal clears both",
+   _it["image"] == "img/daryanameh/s.png" and _it["body"] == [{"p": "متن"}, {"p": "عکس: ب — عکس خود ما"}]
+   and _it0["image"] == "" and _it0["body"] == [{"p": "متن"}])
+_mf = _ps.edit_manifest({"title": "t", "hero_image": {"src": "hero.jpg"}}, "hero.png",
+                        {"credit": "Sara", "licence": "own photo", "url": "https://x/y.png"}, "alt")
+ok("photo swap (cruise24.ir bundle): manifest.hero_image carries the new src, credit, licence and source; removal drops it",
+   _mf["hero_image"] == {"src": "hero.png", "credit": "Sara", "licence": "own photo", "source_page": "https://x/y.png", "alt": "alt"}
+   and "hero_image" not in _ps.edit_manifest({"hero_image": {}}, "", {}, ""))
+ok("photo swap: the caption is Farsi on .ir sites and English elsewhere for a team photo",
+   _ps.credit_text({"credit": "Sara", "licence": "own photo"}, True) == "عکس: Sara — own photo"
+   and _ps.credit_text({"credit": "Sara", "licence": "own photo"}, False) == "Photo: Sara, own photo")
+
+import ops_tasks as _otk
+_tk = [{"key": "a", "title": "A", "owner": "alireza", "priority": "high"}, {"key": "b", "title": "B2"}]
+_tc = _otk.plan(_tk, [{"id": "1", "key": "b", "title": "B", "status": "done"}, {"id": "2", "key": "z", "title": "Z", "status": "open"}], "now")
+ok("ops-tasks: new tasks open, GitHub refreshes the wording but never the team's status, removed tasks are archived",
+   ("POST", None) == _tc[0][:2] and _tc[0][2]["status"] == "open"
+   and _tc[1][1] == "1" and _tc[1][2]["title"] == "B2" and "status" not in _tc[1][2]
+   and _tc[2] == ("PUT", "2", {"status": "archived", "synced_at": "now"})
+   and len(_otk.load()) >= 10)
+
+import ops_sites as _osi
+_sr = _osi.build([{"domain": "a.com", "can_publish": "yes"}, {"domain": "b.ir", "can_publish": "no"}],
+                 [{"site": "a.com", "status": "To review", "written": "2026-10-20"},
+                  {"site": "a.com", "status": "Published", "written": "2026-10-01"}],
+                 [{"property": "a.com", "qualification": "hot"}, {"property": "a.com", "qualification": "cold"}],
+                 {"a.com": {"declared": 100, "declared_and_surfaced": 16, "coverage": 0.16}}, "now")
+ok("ops-sites: per-site drafts waiting, published, last draft, leads, hot leads and Google coverage — and no "
+   "coverage numbers invented for a site the weekly report didn't measure",
+   _sr[0]["drafts_waiting"] == 1 and _sr[0]["published_total"] == 1 and _sr[0]["last_draft_at"] == "2026-10-20"
+   and _sr[0]["leads_total"] == 2 and _sr[0]["leads_hot"] == 1 and _sr[0]["coverage_pct"] == 16.0
+   and "coverage_pct" not in _sr[1] and _sr[1]["leads_total"] == 0
+   and {r["domain"]: r["can_publish"] for r in _osi.site_rows()}.get("cruiseshop.ir") == "no")
+
+# ── ops-sync phase 2: Agent 4 leads → the Leads tab (25 Oct) ──
+import ops_leads as _ol
+import tempfile as _otf, json as _oj
+from pathlib import Path as _OP
+def _lrec(lid, **q):
+    base = {"intent": "booking_enquiry", "qualified": True, "party_size": 2, "travel_window": "Easter 2027",
+            "budget_band": "5k_15k", "estimated_value_eur": 0, "missing_information": ["dates"],
+            "suggested_reply": "Thanks — here are two sailings.", "reply_language": "en", "escalation_reason": ""}
+    base.update(q)
+    return {"lead_id": lid, "channel": "site_form", "from_ref": "a@b.example", "received_at": "2026-10-25T18:00:00Z",
+            "message_redacted": "Two of us, Greek islands.", "qualification": base, "suggested_reply": base["suggested_reply"],
+            "reply_blocked": False, "escalate": False, "escalation_reasons": [], "attributed_campaign": ""}
+ok("ops-leads: band is hot for a qualified buying enquiry worth >= EUR 5,000 or escalated, warm otherwise, cold for spam/unqualified",
+   _ol.band(_lrec("x", estimated_value_eur=6000)["qualification"], False) == "hot"
+   and _ol.band(_lrec("x")["qualification"], True) == "hot"
+   and _ol.band(_lrec("x")["qualification"], False) == "warm"
+   and _ol.band(_lrec("x", intent="spam")["qualification"], False) == "cold"
+   and _ol.band(_lrec("x", qualified=False)["qualification"], False) == "cold")
+_lr = _ol.to_row({**_lrec("L1"), "reply_blocked": True}, "cruise24.me", "en", _now)
+ok("ops-leads: a row is keyed channel:lead_id, carries who to reply to, starts as new / not released, "
+   "and a blocked reply never reaches the app",
+   _lr["source"] == "site_form:L1" and _lr["summary"].startswith("Reply to: a@b.example")
+   and _lr["status"] == "new" and _lr["reply_released"] == "no" and _lr["draft_reply"] == ""
+   and _lr["property"] == "cruise24.me")
+_lr2 = _ol.to_row({**_lrec("L3"), "display_name": "Sara K."}, "cruise24.me", "en", _now)
+ok("ops-leads: a lead from a partner's embed carries that agency's partner_id, so only that agency sees it",
+   _ol.to_row({**_lrec("P1"), "partner_id": "safar-tour"}, "cruise24.me", "en", _now)["partner_id"] == "safar-tour"
+   and _ol.to_row(_lrec("P2"), "cruise24.me", "en", _now)["partner_id"] == "")
+ok("ops-leads: contact is the reply address and display_name is the name the customer typed (address when none)",
+   _lr2["contact"] == "a@b.example" and _lr2["display_name"] == "Sara K." and _lr["display_name"] == "a@b.example")
+_ld = _OP(_otf.mkdtemp())
+for _sub, _id in (("cruise24.me/replies", "L1"), ("cruise24.me/escalations", "L2")):
+    (_ld / _sub).mkdir(parents=True, exist_ok=True)
+    (_ld / _sub / f"{_id}.json").write_text(_oj.dumps(_lrec(_id)), encoding="utf-8")
+(_ld / "cruise24.me" / "manifest.json").write_text("{}", encoding="utf-8")
+_lcalls = []
+_saved_ol = (_ol.nrs.b44, _ol.nrs.notion)
+_ol.nrs.b44 = lambda m, path, b=None: (_lcalls.append((m, path, b)),
+                                       (200, {"items": [{"source": "site_form:L1"}]}) if m == "GET" else (201, {}))[1]
+_ol.nrs.notion = lambda *a, **k: (200, {})
+_llog = _ol.run(_ld, True, {"cruise24.me": "en"})
+_ol.nrs.b44, _ol.nrs.notion = _saved_ol
+ok("ops-leads: reads replies/ and escalations/ (not the manifest), skips a lead the app already has, creates the rest",
+   [c[2]["source"] for c in _lcalls if c[0] == "POST"] == ["site_form:L2"]
+   and any("exists      site_form:L1" in x for x in _llog))
+
+# ── ops-sync phase 3: the Today tab from the health report (25 Oct) ──
+import ops_today as _ot
+_rep = {"agents": [{"agent": "Scout", "result": "success", "age_days": 0.5, "url": "u1"},
+                   {"agent": "Closer", "result": "failure", "age_days": 0.1, "url": "u2"}],
+        "critical": [], "needs_you": ["**22 PRs** waiting: [x#1](https://github.com/x/1) title"],
+        "warn": ["3 posts without an image"], "fine": [],
+        "numbers": {"open_prs": 22, "articles": 8, "prev_articles": 10, "cost_usd": 0.9, "ai_recall": "0/8"}}
+_r, _i, _m = _ot.rows_from(_rep, "now")
+ok("ops-today: health lines become plain text (no markdown links or bold), each with its level",
+   [x["level"] for x in _i] == ["needs_you", "warn"] and _i[0]["text"] == "22 PRs waiting: x#1 title")
+ok("ops-today: numeric metrics only, with the report's own previous figure when it has one",
+   {x["name"]: x.get("previous") for x in _m} == {"Article PRs waiting": None, "Articles drafted (last cycle)": 10.0,
+                                                   "Model spend, USD (last cycle)": None})
+_calls = _ot.plan(_r, _i, _m, [{"id": "a1", "agent": "Scout"}], [{"id": "h1"}, {"id": "h2"}],
+                  [{"id": "m1", "name": "Article PRs waiting", "value": 20}])
+ok("ops-today: agents and metrics upsert, health lines are replaced, and a metric's previous is the value it replaced",
+   ("PUT", "AgentRun", "a1") == _calls[0][:3] and _calls[1][:2] == ("POST", "AgentRun")
+   and [c[2] for c in _calls if c[0] == "DELETE"] == ["h1", "h2"]
+   and [c for c in _calls if c[1] == "Metric" and c[2] == "m1"][0][3]["previous"] == 20)
+
+# ── ops-sync phase 4: the Social tab from Agent 3's held posts (25 Oct) ──
+import ops_social as _os4
+_post = {"channel": "instagram", "published_at": None,
+         "copy": {"body": "Hormuz in a day", "hashtags": ["hormuz", "#iran"], "cta_url": "https://www.boutimar.com/x?utm_source=ig"},
+         "assets": [{"type": "image", "url": "https://img/x.jpg", "credit": "Photo: A"}]}
+_sr = _os4.to_row(_post, "now")
+ok("ops-social: a card carries site, channel, copy with hashtags, the article photo and link, and starts held",
+   _sr["property"] == "boutimar.com" and _sr["copy"] == "Hormuz in a day\n\n#hormuz #iran"
+   and _sr["image_url"] == "https://img/x.jpg" and _sr["status"] == "held")
+_sp = _os4.plan([_post, _post, {**_post, "channel": "linkedin"}],
+                [{"id": "s1", **_os4.to_row({**_post, "channel": "linkedin"}, "t")},
+                 {"id": "s2", "channel": "x", "copy": "c", "status": "held", "decision": "approve"},
+                 {"id": "s3", "channel": "x", "copy": "d", "status": "rejected", "decision": "reject"}], "now")
+ok("ops-social: no duplicate cards; an app decision sets approved/rejected once; nothing else is touched",
+   [r["channel"] for r in _sp["create"]] == ["instagram"]
+   and [(h["id"], f["status"]) for h, f in _sp["update"]] == [("s2", "approved")])
+import inspect as _insp
+ok("ops-social: never publishes — no scheduler, Zernio or posting call exists in the module",
+   not any(w in _insp.getsource(_os4) for w in ("SCHEDULER", "schedule(", "publish_now", "zernio")))
+
+# ── each Instagram account's own job reaches the Broadcaster prompt (26 Oct) ──
+_ig_by = {st.domain: c for st in config.load_sites(include_hold=True) for c in st.channels if c.get("name") == "instagram"}
+ok("Instagram angles: @boutixcruises informs, @cruise24.ir sells, @cruise24.me carries no Iran trace — and the angle reaches the prompt",
+   "rates" in _ig_by["cruise24.ir"]["angle"] and "Gentle sales" in _ig_by["boutimar.ir"]["angle"]
+   and "NO Iran trace" in _ig_by["cruise24.me"]["angle"] and _ig_by["cruise24.me"]["cluster"] == "ambiente"
+   and "THIS ACCOUNT'S JOB: Sales" in _a3ig.channel_brief("instagram", _ig_by["cruise24.ir"]["angle"])
+   and "THIS ACCOUNT'S JOB" not in _a3ig.channel_brief("instagram"))
+
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
 from datetime import datetime as _dt, timezone as _tz

@@ -111,6 +111,38 @@ nothing. The board's Pipeline ID is the row key (`repo#pr`, or `domain/slug` sto
 base44 draft). The ping is a Notion @mention on a "🔔 New drafts" row (the Monday summary's proven
 path): Actions has no Telegram bot and no working mail sender. Tests: 5 in selfcheck.py.
 
+## Phase 2: the Leads tab (built 25 Oct 2026, session "24-hour project strategy")
+
+`tools/ops_leads.py` runs as the last step of `agent4-sales-closer.yml`, on the
+records that run just wrote. leads.php hands each lead out only once, so this is
+the only moment to push it. One `Lead` row per record:
+- `summary` starts "Reply to: <address>", then intent · party · window ·
+  budget, what is missing, the campaign, and the redacted message
+- `qualification` band: **hot** = a qualified booking/price/availability
+  enquiry that is escalated or worth ≥ €5,000; **warm** = any other qualified
+  lead; **cold** = spam or unqualified
+- `draft_reply`, empty when the compliance gate blocked it
+- `escalated` + `escalation_reason`
+
+Rows are keyed `source = channel:lead_id`, so re-runs never duplicate. Staff
+fields (status, assigned_to, notes, reply_released) are set once (new / "" /
+"" / no) and then belong to the app. **Lead state is not pulled back into
+git**: a CRM status next to a customer's email does not belong in a
+repository. This replaces build-order item 2's "status → repo JSON".
+
+New leads ping Alireza on the same Notion 🔔 row.
+`.github/workflows/ops-leads-backfill.yml` pushes a past run's kept artifact
+(7 days).
+
+First push: run 40238408454 sent Agent 4 run 40224394726's three TEST leads
+(cruise24.me, all cold). Tests: 3 in selfcheck.py, plus the 5 from phase 1,
+all passing when run in isolation. The full selfcheck stops at line 2696 on
+main because it needs `../boutimar-ir`, which isn't in this repo.
+
+**Gap:** the `Lead` entity has no contact or name field, so the reply address
+lives in `summary`. Add `contact` and `display_name` fields in base44, and
+ops_leads.py should fill them.
+
 ## Fact-check of open issues — re-verified LIVE 25 Oct 2026 (orchestration session)
 
 Checked against Actions runs, repo secrets, live URLs and today's feed, not the code alone.
@@ -127,3 +159,42 @@ Supersedes the first draft of this table, which had three rows wrong (marked ✎
 | ✎ 11 social posts without image | **3, not 11** | The 11 came from a no-model TEST broadcast (19 Oct) counted as a cycle — health fixed in 8d181ad. Real run 25 Oct: 3 of 3 Instagram posts have no image (they promote pages published before articles carried photos). Fix = take the live page's photo |
 | AI recall 0/8 properties | **Open — not stale** | Oracle (`ai-visibility.yml`) runs monthly on the 1st; last 1 Oct, next 1 Nov |
 | Persian Gulf demand vs inventory (199 terms vs 18 sailings) | **Sharper than stated** | Inventory today: Gulf = 8 itineraries / **48 departures (0.77%)**; Mediterranean = **4,137 departures**. Demand (keywordchi export, Aug 2026 — static until a new export): **206 of 769** usable terms name the Persian Gulf, Dubai or a Gulf port; **34** name the Mediterranean. The old "199" was the size of the destination-generic cluster, not a Gulf count |
+
+## Phase 3: the Today tab (built 25 Oct 2026, session "24-hour project strategy")
+
+`tools/ops_today.py`, an hourly step of `ops-sync.yml`, mirrors
+`reports/health-latest.json` into the app:
+- `AgentRun`: upsert by agent
+- `HealthItem`: replaced each sync, markdown stripped
+- `Metric`: upsert by name; `previous` is the value it replaced, or the
+  report's `prev_*` figure
+
+First write: run 40240969278 sent 11 agents, 3 health lines and 8 metrics,
+22 calls with 0 errors. Tests: 3 in selfcheck.py.
+
+Phase 2 follow-up (commit 1947abe): `Lead.contact` and `Lead.display_name` are
+filled. Agent 4's record now keeps the name the customer typed. Verified live
+by run 40240621198: form TEST enquiry → Agent 4 (spam, so cold) → Lead row
+created, 0 errors.
+
+## Phase 4: the Social tab (built 25 Oct 2026, session "24-hour project strategy")
+
+`tools/ops_social.py`, an hourly step of `ops-sync.yml`, reads the latest
+successful `agent3-broadcast` artifact. It shows every held post as a card:
+site, channel, copy with hashtags, the article photo, and the link. A team
+Approve or Reject sets the card's status.
+
+**Nothing is published from here.** An approved post is put up by hand, or it
+is the trigger to switch that one channel's autopost on. A selfcheck asserts
+that the module contains no posting call.
+
+First write: run 40242067295 created 6 boutimar.com posts (3 LinkedIn and 3
+Instagram), with 0 errors. None has a photo: they are pre-7-Oct articles, as
+the health report already said.
+
+Article photos: `ops_sync.find_image()` plus the `images_dry_run` and
+`images_apply` modes. Run 40241842373 found **0 of 34** open drafts with a
+public photo URL: drafts hold repo-relative paths. The fix is for Agent 2 to
+write `image_source_url`; this was asked of the orchestration session.
+`OPS_ARTICLE_IMAGES` stays off until the app has `image_url` (see
+`OPS-APP-VISUAL-PROMPT.md`).

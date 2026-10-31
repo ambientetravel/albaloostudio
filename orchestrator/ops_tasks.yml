@@ -1,0 +1,128 @@
+# Open items shown in the Albaloo Ops app (Issues tab). tools/ops_tasks.py mirrors
+# this file into the app's Task entity every 15 minutes (ops-sync).
+#
+# GitHub owns WHAT the task is (title, detail, owner, priority, link). The app owns
+# its STATUS: once a task is in the app, the team's open / in_progress / done is never
+# overwritten. Removing a task here archives it in the app.
+#
+# owner: alireza | team | orchestration | strategy-session | cruise24-me-session
+# priority: high | medium | low
+
+tasks:
+  - key: test-publish
+    title: Press Publish on one article to test the whole path
+    detail: >-
+      No one has pressed Publish, Needs edits or Reject in the app yet. Pick one short
+      article you are happy with and press Publish. Within about 15 minutes it should show
+      as Approved on the Notion board, and the PR should be merged.
+    owner: alireza
+    priority: high
+    property: ""
+    link: https://albaloo-ops-core.base44.app
+
+  - key: quote-branding
+    title: Fix "AMBTC HQ" on the quote PDF
+    detail: >-
+      base44 branded the quote PDF "AMBTC HQ", a name that appears nowhere else. Set the
+      correct company name and logo before any quote reaches a customer.
+    owner: alireza
+    priority: high
+    property: ""
+    link: https://albaloo-ops-core.base44.app
+
+  - key: invite-team
+    title: Invite the team and set each person's role and sites
+    detail: In the app, Team tab. Roles are owner, manager, sales, content, partner and viewer. Sites are the domains each person works on.
+    owner: alireza
+    priority: high
+    property: ""
+    link: https://albaloo-ops-core.base44.app
+
+  - key: rate-sheets
+    title: Send the first supplier rate sheets
+    detail: >-
+      The Quotes tab can only price from verified rates, and none exist yet. Never invented ones.
+    owner: alireza
+    priority: medium
+    property: ""
+    link: ""
+
+  - key: delete-typo-secret
+    title: Delete the misspelled WEBHOOK_SINGING_SECRET repo secret
+    detail: Nothing reads it. GitHub, albaloostudio, Settings, Secrets and variables, Actions.
+    owner: alireza
+    priority: low
+    property: ""
+    link: https://github.com/ambientetravel/albaloostudio/settings/secrets/actions
+
+  - key: cruise24me-traffic
+    title: "cruise24.me has no traffic: 10 clicks in 90 days, all brand"
+    detail: >-
+      The form works end to end. The problem is traffic: only 269 of 1,715 pages were ever
+      shown by Google. Route guides and Gulf-resident visa pages are handed to the
+      Cruise24.me session (cruise24-me/HANDOFF-traffic.md). Partner links and any ad
+      budget are Alireza's call.
+    owner: cruise24-me-session
+    priority: high
+    property: cruise24.me
+    link: https://github.com/ambientetravel/albaloostudio/blob/main/cruise24-me/HANDOFF-traffic.md
+
+  - key: gulf-inventory
+    title: "Persian Gulf demand vs inventory: 206 search terms, 48 departures"
+    detail: >-
+      206 of 769 Farsi search terms name the Persian Gulf, Dubai or a Gulf port, against 48
+      departures (0.77%). The Mediterranean has 34 terms and 4,137 departures. This is a
+      sourcing question, not a page-building one.
+    owner: alireza
+    priority: high
+    property: cruise24.ir
+    link: ""
+
+  - key: nowruz-visa
+    title: "Nowruz 1406: 192 of 468 departures need a US, UK or Canada visa"
+    detail: Check the client's visa before quoting any Nowruz sailing (15 Mar to 10 Apr 2027).
+    owner: team
+    priority: medium
+    property: cruise24.ir
+    link: ""
+
+  - key: ai-visibility
+    title: "AI assistants name 0 of 8 sites"
+    detail: Monthly Oracle check. Clear question-and-answer pages (the visa pages, the route guides) are the fix. Next check 1 Nov.
+    owner: orchestration
+    priority: medium
+    property: ""
+    link: ""
+
+  - key: agent2-photo-source
+    title: Agent 2 to write image_source_url on new drafts
+    detail: >-
+      18 of 34 drafts show no photo in the app, mostly Farsi and cruisebaz drafts. Agent 2
+      knows each photo's public source when it drafts, and should save it, so every new
+      draft arrives with its real photo.
+    owner: orchestration
+    priority: medium
+    property: ""
+    link: ""
+
+  - key: partner-portal
+    title: Paste the partner portal prompt into base44, then upload the embed
+    detail: >-
+      GitHub side is built: the brand-neutral embed (cruise24-me/embed/enquiry.html) and
+      api/enquiry.php storing partner_id, so each agency's leads reach the app tagged.
+      Two steps left. Upload cruise24-me/api/enquiry.php and cruise24-me/embed/enquiry.html to cruise24.me
+      public_html in cPanel, then paste orchestrator/OPS-APP-PARTNER-PROMPT.md into base44.
+    owner: alireza
+    priority: medium
+    property: ""
+    link: https://github.com/ambientetravel/albaloostudio/blob/main/orchestrator/OPS-APP-PARTNER-PROMPT.md
+
+  - key: social-autopost
+    title: "Decide: publish approved social posts automatically?"
+    detail: >-
+      Today an approved post is posted by hand. Turning autopost on for one channel is a
+      public post under the company name, so it's your decision.
+    owner: alireza
+    priority: low
+    property: ""
+    link: ""

@@ -1,0 +1,53 @@
+name: Ops leads backfill — push a past Agent 4 run into the Leads tab
+
+# agent4-sales-closer.yml pushes its own leads at the end of every run
+# (tools/ops_leads.py). This is for runs from before that step existed, or one
+# whose push failed: give it the run id, and it pushes that run's kept
+# agent4-closed artifact (kept 7 days). Re-running is safe: leads already in
+# the app are skipped (key: source = channel:lead_id).
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Agent 4 run id whose agent4-closed artifact to push"
+        required: true
+        type: string
+      apply:
+        description: "Write to the app (unchecked = dry run)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v5
+        with:
+          name: agent4-closed
+          path: orchestrator/closed
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push
+        env:
+          BASE44_ACCESS_TOKEN: ${{ secrets.BASE44_ACCESS_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_REVIEW_DB: ${{ vars.NOTION_REVIEW_DB }}
+        run: |
+          set -o pipefail
+          python3 tools/ops_leads.py --closed closed ${{ inputs.apply && '--apply' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"

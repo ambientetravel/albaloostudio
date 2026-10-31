@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -48,6 +49,8 @@ ENTITY = "ArticleReview"
 OWNER = "1e746a95-158f-4f48-91e6-728fa01dacd7"       # Alireza (Notion user)
 PING_TITLE = "🔔 New drafts"
 BODY_CAP = 60000
+# ArticleReview.image_url exists only once the app has that field; until then it is never sent.
+IMAGES_ON = bool(os.environ.get("OPS_ARTICLE_IMAGES"))
 
 STATUS_TO_APP = {"To review": "to_review", "Approved": "approved", "Needs edits": "needs_edits",
                  "Rejected": "rejected", "Published": "published"}
@@ -128,8 +131,130 @@ def age_days(written: str, now: datetime) -> int:
 
 
 # ── article text + verdict notes (only for rows the app does not have yet) ───
-def article_text(row: dict) -> tuple[str, str]:
-    """(body_markdown, verdict_notes). Never raises — a missing body is shown as such."""
+IMG_KEYS = ("image_source_url", "image", "hero_image", "hero", "cover", "og_image", "thumbnail")
+
+
+def find_image(*sources) -> str:
+    """The article's own photo as a public http(s) URL, or "" — never a guess.
+    Sources: front-matter text, a JSON/base44 record (dict), or the body markdown."""
+    for s in sources:
+        if isinstance(s, dict):
+            for k in IMG_KEYS:
+                v = s.get(k)
+                v = v.get("url") or v.get("public_url") if isinstance(v, dict) else v
+                if isinstance(v, str) and v.startswith(("http://", "https://")):
+                    return v
+        elif isinstance(s, str) and s:
+            m = re.search(r"^\s*(?:%s)\s*:\s*[\"']?(https?://[^\s\"']+)" % "|".join(IMG_KEYS), s, re.M) \
+                or re.search(r"!\[[^\]]*\]\((https?://[^)\s]+)", s)
+            if m:
+                return m.group(1)
+    return ""
+
+
+IMG_EXT = (".jpg", ".jpeg", ".png", ".webp")
+
+
+def _public(url: str) -> bool:
+    """True when anyone's browser can load the URL (no token): the app shows it as-is."""
+    import subprocess
+    out = subprocess.run(["curl", "-sS", "-o", "/dev/null", "-I", "-L", "--max-time", "20",
+                          "-w", "%{http_code}", url], capture_output=True, text=True).stdout
+    return out.strip() == "200"
+
+
+def pr_photo(pid: str) -> str:
+    """The draft's OWN photo file, from its PR, as a raw URL pinned to the head commit
+    (so it keeps working after the branch is deleted). "" when the PR has no image file
+    or its repo is not publicly readable."""
+    repo, num, _ = pr_link(pid)
+    if not repo:
+        return ""
+    _, p = nrs.pr_state(pid)
+    sha = (p.get("head") or {}).get("sha")
+    code, files = nrs.gh("GET", f"/repos/{repo}/pulls/{num}/files?per_page=100")
+    if not sha or code != 200 or not isinstance(files, list):
+        return ""
+    # cruise24.ir bundles name their photo in manifest.json → hero_image.source_page
+    for f in files:
+        name = str(f.get("filename") or "")
+        if name.endswith("manifest.json") and f.get("status") != "removed":
+            c, meta = nrs.gh("GET", f"/repos/{repo}/contents/{name}?ref={sha}")
+            try:
+                import base64
+                hero = json.loads(base64.b64decode((meta or {}).get("content") or "")).get("hero_image") or {}
+            except (ValueError, TypeError, AttributeError):
+                hero = {}
+            own = credited_photo(str(hero.get("source_page") or ""))
+            if own:
+                return own
+    for f in files:
+        name = str(f.get("filename") or "")
+        if name.lower().endswith(IMG_EXT) and f.get("status") != "removed":
+            url = f"https://raw.githubusercontent.com/{repo}/{sha}/{name}"
+            return url if _public(url) else ""
+    return ""
+
+
+def credited_photo(body: str) -> str:
+    """The article's OWN photo: its credit line names the Commons file
+    ("… via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:X.jpg)", or the
+    Farsi credit with the page in brackets). Same file, Commons' public URL. "" if none."""
+    from urllib.parse import unquote
+    m = re.search(r"commons\.wikimedia\.org/wiki/(File:[^\s)\"'<>\]]+)", str(body or ""))
+    if not m:
+        return ""
+    try:
+        import images
+        got = images.by_file(unquote(m.group(1)), width=1200)
+    except Exception:  # noqa: BLE001
+        got = None
+    return (got or {}).get("download_url", "")
+
+
+def commons_photo(title: str, site: str) -> tuple[str, str]:
+    """Fallback for a draft with no photo of its own: a freely licensed Wikimedia Commons
+    photo matching the title, with its real creator and licence. (url, note) or ("", "")."""
+    try:
+        import images
+        subject = re.split(r"\s*[:|–—]\s*", str(title or ""), maxsplit=1)[0]   # the place, not the angle
+        got = images.find_image(subject, width=1200, context=str(title or ""))
+    except Exception:  # noqa: BLE001 — a failed search only means no suggestion
+        got = None
+    if not got:
+        return "", ""
+    # images.find_image vets fail-OPEN (an unchecked photo still reaches a human
+    # reviewer there). Here the photo is the first thing the team sees, so a photo
+    # the model could not confirm is dropped: 25 Oct dry run, vet unavailable, put
+    # a Kabul school and an elderly-care home on Farsi cruise articles.
+    try:
+        verdict = images._vet(got, subject, str(title or ""), final=False)
+    except Exception:  # noqa: BLE001
+        verdict = None
+    if verdict is not True:
+        return "", ""
+    note = (f"PHOTO IN THE APP IS A SUGGESTION — the draft has no photo of its own. "
+            f"Wikimedia Commons: {got['title']} · {got['creator']} · {got['licence']} · {got['source_page']}")
+    return got["download_url"], note
+
+
+def resolve_photo(row: dict, found: str = "", body: str = "") -> tuple[str, str]:
+    """(image_url, note). Order: a public URL the draft names → the Commons file its
+    photo credit names (the article's own photo) → the draft's own photo file → a
+    credited, model-vetted Commons suggestion. Never an unlicensed or uncredited image."""
+    if found:
+        return found, ""
+    own = credited_photo(body)
+    if own:
+        return own, ""
+    own = pr_photo(row["pid"]) if "#" in row["pid"] else ""
+    if own:
+        return own, ""
+    return commons_photo(row.get("title") or "", row.get("site") or "")
+
+
+def article_text(row: dict) -> tuple[str, str, str]:
+    """(body_markdown, verdict_notes, image_url). Never raises — a missing body is shown as such."""
     try:
         if "#" in row["pid"]:
             import pr_review
@@ -137,7 +262,7 @@ def article_text(row: dict) -> tuple[str, str]:
             repo, num, _ = pr_link(row["pid"])
             _, p = nrs.pr_state(row["pid"])
             target = rd.plan_target(repo, num, p["head"], p["base"]["ref"])
-            body = ""
+            body, image = "", ""
             if target:
                 text, _ = rd._file(repo, target["path"], p["head"]["ref"])
                 if target["kind"] == "json":
@@ -148,22 +273,25 @@ def article_text(row: dict) -> tuple[str, str]:
                     item = new[0] if new else {}
                     body = "\n\n".join(str(item.get(k) or "") for k in ("title", "summary", "body", "content")
                                        if item.get(k)) or json.dumps(item, ensure_ascii=False, indent=1)
+                    image = find_image(item, body)
                 else:
-                    body = rd._split_fm(text)[1]
+                    fm, body = rd._split_fm(text)
+                    image = find_image(fm, body)
             review = pr_review.review_pr(repo, num, pr_review.REPOS.get(repo, "boutimar_v1"))
         else:
             found = nrs.base44_record(row["pid"])
             rec = found[1] if found else {}
             body = str(rec.get("body_markdown") or "")
+            image = find_image(rec, body)
             domain = next(d for d in nrs.BASE44_SITES if row["pid"].startswith(d + "/"))
             _, review = nrs.base44_gate(rec, nrs.BASE44_SITES[domain][1])
         notes = [f"BLOCK {b.get('rule')}: «{str(b.get('excerpt'))[:160]}» → {b.get('fix') or b.get('message') or ''}"
                  for b in review.get("blocks") or []] + \
                 [f"WARN {w.get('rule')}: «{str(w.get('excerpt'))[:160]}» → {w.get('fix') or w.get('message') or ''}"
                  for w in review.get("warns") or []]
-        return body[:BODY_CAP], "\n".join(notes)[:8000]
+        return body[:BODY_CAP], "\n".join(notes)[:8000], image
     except Exception as exc:  # noqa: BLE001
-        return f"(article text could not be loaded: {type(exc).__name__})", ""
+        return f"(article text could not be loaded: {type(exc).__name__})", "", ""
 
 
 def to_app(row: dict, now: datetime, *, with_body: bool) -> dict:
@@ -187,7 +315,13 @@ def to_app(row: dict, now: datetime, *, with_body: bool) -> dict:
     if row["words"]:
         rec["word_count"] = int(float(row["words"]))
     if with_body:
-        rec["body_markdown"], rec["verdict_notes"] = article_text(row)
+        rec["body_markdown"], rec["verdict_notes"], img = article_text(row)
+        if IMAGES_ON:
+            img, note = resolve_photo(row, img, rec["body_markdown"])
+            if img:
+                rec["image_url"] = img
+            if note:
+                rec["verdict_notes"] = (note + "\n" + rec["verdict_notes"]).strip()
         if not rec.get("word_count"):
             rec["word_count"] = len(rec["body_markdown"].split())
     return rec
@@ -311,6 +445,10 @@ def run(apply: bool, db: str) -> list[str]:
             log.append(f"  ! {r['pid']}: {exc}")
     for pid, why in p["refused"]:
         log.append(f"refused     {pid}  {why}")
+    try:
+        log.extend(relay_photo_requests(apply))
+    except Exception as exc:  # noqa: BLE001 — a photo relay problem never blocks the review sync
+        log.append(f"  ! photo requests: {exc}")
     new = [r for r in p["create"] if r["status"] == "To review"]
     if new and not p["seed"]:
         log.append(f"ping        {len(new)} new draft(s) → Notion @mention")
@@ -327,10 +465,108 @@ def run(apply: bool, db: str) -> list[str]:
     return log
 
 
+def photo_request(have: dict) -> dict:
+    """The team's photo change, resolved: Commons links carry their real creator and
+    licence from Commons; any other photo needs the team's credit, licence and rights
+    confirmation, else ValueError (never an uncredited photo)."""
+    who = have.get("photo_requested_by") or "a team member"
+    if have.get("photo_status") == "removed":
+        return {"removed": True, "by": who}
+    url = str(have.get("image_url") or "")
+    credit, lic = str(have.get("photo_credit") or ""), str(have.get("photo_licence") or "")
+    m = re.search(r"commons\.wikimedia\.org/wiki/(File:[^\s?#]+)|upload\.wikimedia\.org/.+/([^/]+\.(?:jpe?g|png))", url, re.I)
+    got = None
+    if m:
+        from urllib.parse import unquote
+        try:
+            import images
+            got = images.by_file(unquote(m.group(1) or ("File:" + m.group(2))))
+        except Exception:  # noqa: BLE001
+            got = None
+        if got:
+            credit, lic = got["creator"], got["licence"]
+    if not credit or not lic or (not got and have.get("photo_rights_confirmed") != "yes"):
+        raise ValueError("needs a credit, a licence and the rights confirmation (non-Commons photo)")
+    return {"removed": False, "by": who, "url": (got or {}).get("source_page") or url,
+            "download_url": (got or {}).get("download_url") or url, "credit": credit, "licence": lic,
+            "commons": got, "title": (got or {}).get("title", "")}
+
+
+def photo_comment(have: dict) -> str:
+    req = photo_request(have)
+    if req["removed"]:
+        return f"📷 **Photo removed** in Albaloo Ops by {req['by']}. Publish this article without a lead photo."
+    return (f"📷 **Photo change requested** in Albaloo Ops by {req['by']}.\n\n"
+            f"- New photo: {req['url']}\n- Credit: {req['credit']}\n- Licence: {req['licence']}")
+
+
+def relay_photo_requests(apply: bool) -> list[str]:
+    """Team photo changes (photo_status pending/removed): record the request on the draft,
+    then swap the photo inside the article itself (tools/photo_swap.py, one adapter per
+    site). Swapped → photo_status applied; a swap that cannot run → requested, with the
+    reason on the draft, for a person to finish. Refused for credit → needs_credit."""
+    import photo_swap
+    log = []
+    for have in app_rows():
+        if have.get("photo_status") not in ("pending", "removed"):
+            continue
+        pid = _key(have)
+        repo, num, _ = pr_link(pid)
+        try:
+            req, body = photo_request(have), photo_comment(have)
+        except ValueError as exc:
+            log.append(f"photo       {pid}  refused: {exc}")
+            if apply:
+                nrs.b44("PUT", _ent(f"/{have['id']}"), {"photo_status": "needs_credit"})
+            continue
+        try:
+            done = photo_swap.swap(pid, req, apply)
+            status, note = "applied", f"\n\n✅ Applied to the draft: {done}"
+        except Exception as exc:  # noqa: BLE001 — recorded on the draft; a person finishes it
+            status, note = "requested", f"\n\n⚠️ Not applied automatically: {exc}. Please swap it by hand."
+        log.append(f"photo       {pid}  {have.get('photo_status')} → {status}  {note.strip()[:140]}")
+        if apply:
+            if repo:
+                c, d = nrs.gh("POST", f"/repos/{repo}/issues/{num}/comments", {"body": body + note})
+                if c not in (200, 201):
+                    log.append(f"  ! GitHub {c}: {str(d)[:160]}")
+            nrs.b44("PUT", _ent(f"/{have['id']}"), {"photo_status": status})
+    return log
+
+
+def backfill_images(apply: bool, db: str) -> list[str]:
+    """One-off: give rows already in the app the photo their draft carries."""
+    rows = {r["pid"]: r for r in board(db)}
+    log, found = [], 0
+    for have in app_rows():
+        if have.get("image_url") or have.get("photo_status") or \
+                have.get("status") not in ("to_review", "needs_edits", "approved"):
+            continue                      # a photo the team set or removed is theirs
+        r = rows.get(_key(have))
+        if not r:
+            continue
+        body_, _, found_ = article_text(r)
+        img, note = resolve_photo(r, found_, body_)
+        kind = "none  " if not img else ("commons" if note else "own   ")
+        log.append(f"{kind}     {_key(have)}  {img[:90]}")
+        if img:
+            found += 1
+            if apply:
+                body = {"image_url": img}
+                if note:
+                    body["verdict_notes"] = (note + "\n" + str(have.get("verdict_notes") or "")).strip()[:8000]
+                code, d = nrs.b44("PUT", _ent(f"/{have['id']}"), body)
+                if code != 200:
+                    log.append(f"  ! base44 {code}: {str(d)[:160]}")
+    log.append(f"summary: {found} photo(s) found" + ("" if apply else "  (dry run — nothing written)"))
+    return log
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--probe", action="store_true", help="read-only GET of the ArticleReview entity")
+    ap.add_argument("--backfill-images", action="store_true", help="one-off: photos for rows already in the app")
     a = ap.parse_args(argv)
     if not os.environ.get("BASE44_ACCESS_TOKEN"):
         print("not configured: BASE44_ACCESS_TOKEN — nothing synced")
@@ -350,7 +586,11 @@ def main(argv: list[str] | None = None) -> int:
     if not os.environ.get("NOTION_TOKEN") or not os.environ.get("GITHUB_TOKEN"):
         print("not configured: NOTION_TOKEN / GITHUB_TOKEN — nothing synced")
         return 0
-    print("\n".join(run(a.apply, os.environ.get("NOTION_REVIEW_DB") or nrs.DEFAULT_DB)))
+    db = os.environ.get("NOTION_REVIEW_DB") or nrs.DEFAULT_DB
+    if a.backfill_images:
+        print("\n".join(backfill_images(a.apply, db)))
+        return 0
+    print("\n".join(run(a.apply, db)))
     return 0
 
 
