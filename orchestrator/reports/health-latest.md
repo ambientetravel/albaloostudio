@@ -1,6 +1,6 @@
-# Orchestration health — 2026-11-01T00:57 UTC
+# Orchestration health — 2026-11-01T04:37 UTC
 
-**0 broke · 1 need you · 1 to watch.**
+**0 broke · 1 need you · 3 to watch.**
 
 ## 🔴 Broke
 
@@ -12,6 +12,8 @@
 
 ## 👀 To watch
 
+- 1 brief(s) built **without the model** on boutimar.com — not worth publishing; the writer skips them. Cause: Claude call failed: model returned no briefs
+- **cruisebaz.com** 'کروز آلاسکا برای ایرانیان' failed: all prose providers failed; last: Gemini was unavailable on all 3 attempts: 503 UNAVAILABLE. {'error': {'code': 503, 'me
 - 3 Instagram post(s) without an image — from articles drafted before photos were attached to social posts (7 Oct); new articles carry their photo and credit
 
 ## Numbers — last cycle
@@ -19,31 +21,31 @@
 | Metric | This cycle | Previous |
 |---|---:|---:|
 | Sites scanned | 10 | |
-| Gap candidates → briefs | 104 → **8** | |
-| Skipped by ledger (already briefed) | 50 | |
-| Dead-lettered / degraded | 0 / 0 | |
-| Articles drafted (as PRs) | **8** | 10 |
+| Gap candidates → briefs | 108 → **7** | |
+| Skipped by ledger (already briefed) | 38 | |
+| Dead-lettered / degraded | 0 / 1 | |
+| Articles drafted (as PRs) | **5** | 8 |
 | Briefs deferred by cap | 0 | |
-| Model spend | $0.939 | $1.019 |
+| Model spend | $0.743 | $0.939 |
 | Social: campaigns / posts held / no-media | 5 / 3 / 3 | |
-| Article PRs open | 28 | |
+| Article PRs open | 33 | |
 | AI recall (Oracle, monthly) | 0/8 properties named by ≥1 of 2 models | |
 
 ## Agents
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 6.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40161226655) |
-| Writer | ✓ success | 6.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40162274268) |
-| Broadcaster | ✓ success | 6.8d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40162862350) |
-| Closer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41257645522) |
-| Auditor+Analyst | ✓ success | 5.6d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40310243936) |
-| Cartographer | ✓ success | 5.6d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40314804868) |
-| Watcher | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41256380800) |
-| Oracle | ✓ success | 30.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426) |
-| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41256077815) |
-| PR gate | ✓ success | 0.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41242265565) |
-| Dashboard | ✓ success | 5.5d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40322415258) |
+| Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41272374818) |
+| Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41272843781) |
+| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41273798548) |
+| Closer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41270025764) |
+| Auditor+Analyst | ✓ success | 5.7d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40310243936) |
+| Cartographer | ✓ success | 5.7d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40314804868) |
+| Watcher | ✓ success | 0.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41256380800) |
+| Oracle | ✓ success | 30.6d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426) |
+| Merge-watch | ✓ success | 0.2d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41256077815) |
+| PR gate | ✓ success | 0.3d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41242265565) |
+| Dashboard | ✓ success | 5.7d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40322415258) |
 
 ## ✓ Fine
 
