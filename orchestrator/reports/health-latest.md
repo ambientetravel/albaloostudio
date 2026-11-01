@@ -1,4 +1,4 @@
-# Orchestration health — 2026-11-01T13:20 UTC
+# Orchestration health — 2026-11-01T14:12 UTC
 
 **0 broke · 1 need you · 3 to watch.**
 
@@ -38,14 +38,14 @@
 | Scout | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41272374818) |
 | Writer | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41272843781) |
 | Broadcaster | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41273798548) |
-| Closer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41309977026) |
+| Closer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41314873604) |
 | Auditor+Analyst | ✓ success | 6.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40310243936) |
 | Cartographer | ✓ success | 6.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40314804868) |
-| Watcher | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41306832003) |
-| Oracle | ✓ success | 30.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426) |
-| Merge-watch | ✓ success | 0.5d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41256077815) |
-| PR gate | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41308406933) |
-| Dashboard | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40322415258) |
+| Watcher | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41306832003) |
+| Oracle | ✓ success | 31.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/36880976426) |
+| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41314216901) |
+| PR gate | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41308406933) |
+| Dashboard | ✓ success | 6.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/40322415258) |
 
 ## ✓ Fine
 
