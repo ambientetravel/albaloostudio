@@ -4543,6 +4543,36 @@ ok("ops-sync: an app decision goes to Notion only while the row is still 'To rev
    and any(h["id"] == "id-d#4" and f["status"] == "approved" for h, f in _p1["update"])
    and [r["pid"] for r in _p1["create"]] == ["e#5"] and not _p1["seed"])
 _pb = _ops.ping_blocks([_br("e#5")], "https://albaloo-ops-core.base44.app")
+# ── triage score + data-as-of (1 Nov) ──
+from datetime import datetime as _dt, timezone as _tz
+_now = _dt(2026, 11, 1, tzinfo=_tz.utc)
+def _row(site, gate, written, status="To review"):
+    return {"pid": "x#1", "site": site, "gate": gate, "written": written, "status": status, "title": "t",
+            "language": "English", "read": "", "live": "", "words": "", "feedback": ""}
+_s_clean_old, _w1 = _ops.priority(_row("boutimar.com", "PASS", "2026-09-28"), _now)
+_s_warn_new, _w2 = _ops.priority(_row("exploreorient.com", "WARN", "2026-10-30"), _now)
+_s_block, _w3 = _ops.priority(_row("cruise24.ir", "BLOCK", "2026-10-01"), _now)
+ok("triage: a clean, old draft on a flagship site outranks a fresh warning on another site; reasons are plain words",
+   _s_clean_old > _s_warn_new and "flagship" in _w1 and "waiting 34 d" in _w1 and "other site" in _w2)
+ok("triage: a BLOCK draft scores below a PASS of the same age and says to fix it first",
+   _s_block < _ops.priority(_row("cruise24.ir", "PASS", "2026-10-01"), _now)[0] and "BLOCK" in _w3)
+ok("triage: the score never exceeds 100, and only drafts waiting for review carry one",
+   _ops.priority(_row("boutimar.com", "PASS", "2020-01-01"), _now)[0] <= 100
+   and "priority_score" in _ops.to_app(_row("boutimar.com", "PASS", "2026-10-01"), _now, with_body=False)
+   and "priority_score" not in _ops.to_app(_row("boutimar.com", "PASS", "2026-10-01", "Approved"), _now, with_body=False))
+import tools.ops_today as _ot
+_r, _i, _m = _ot.rows_from({"generated": "2026-10-31T13:32", "agents": [{"agent": "Scout", "result": "success", "age_days": 6.9}],
+                            "warn": ["x"], "numbers": {"open_prs": 28}}, "2026-11-01T04:00:00+00:00")
+ok("today tab: every agent, health line and metric carries when the REPORT was made, apart from when the sync ran",
+   _r[0]["data_as_of"] == _i[0]["data_as_of"] == _m[0]["data_as_of"] == "2026-10-31T13:32"
+   and _r[0]["synced_at"] == "2026-11-01T04:00:00+00:00")
+import tools.ops_sites as _os
+_b = _os.build([{"domain": "cruise24.ir"}], [], [], {"cruise24.ir": {"declared": 56, "declared_and_surfaced": 47, "coverage": 0.84}},
+               "2026-11-01T04:00:00+00:00", "2026-10-26")
+_b2 = _os.build([{"domain": "cruise24.ir"}], [], [], {"cruise24.ir": {"declared": 56, "declared_and_surfaced": 47, "coverage": 0.84}},
+                "2026-11-01T04:00:00+00:00")
+ok("sites tab: coverage carries the day Google was asked and its age (6 d), and stays unlabelled rather than guessed when unknown",
+   _b[0]["coverage_as_of"] == "2026-10-26" and _b[0]["coverage_age_days"] == 6 and "coverage_as_of" not in _b2[0])
 ok("ops-sync: the new-draft ping @mentions Alireza (Notion push) and links the draft",
    _pb[0]["callout"]["rich_text"][0]["mention"]["user"]["id"] == _ops.OWNER
    and "1 new draft to review" in _pb[0]["callout"]["rich_text"][1]["text"]["content"]

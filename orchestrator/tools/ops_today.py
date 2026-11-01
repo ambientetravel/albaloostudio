@@ -64,17 +64,23 @@ def plain(md: str, cap: int = 600) -> str:
 
 
 def rows_from(report: dict, now: str) -> tuple[list[dict], list[dict], list[dict]]:
+    # `synced_at` is when this job ran; `data_as_of` is when the health report itself
+    # was generated. They differ whenever health.yml is late or failed (GitHub's 07:00
+    # cron has landed at 13:00-14:00), and a tab that shows only the first looks fresh
+    # while the numbers are a day old.
+    as_of = str(report.get("generated") or "")
     runs = [{"agent": a["agent"], "result": a.get("result") or "skipped",
-             "age_days": float(a.get("age_days") or 0), "run_url": a.get("url") or "", "synced_at": now}
+             "age_days": float(a.get("age_days") or 0), "run_url": a.get("url") or "", "synced_at": now,
+             "data_as_of": as_of}
             for a in report.get("agents") or []]
-    items = [{"level": lvl, "text": plain(str(t)), "property": "", "synced_at": now}
+    items = [{"level": lvl, "text": plain(str(t)), "property": "", "synced_at": now, "data_as_of": as_of}
              for lvl in LEVELS for t in report.get(lvl) or []]
     nums = report.get("numbers") or {}
     metrics = []
     for key, (label, prev_key) in METRICS.items():
         v = nums.get(key)
         if isinstance(v, (int, float)):
-            m = {"name": label, "value": round(float(v), 3), "synced_at": now}
+            m = {"name": label, "value": round(float(v), 3), "synced_at": now, "data_as_of": as_of}
             if prev_key and isinstance(nums.get(prev_key), (int, float)):
                 m["previous"] = round(float(nums[prev_key]), 3)
             metrics.append(m)

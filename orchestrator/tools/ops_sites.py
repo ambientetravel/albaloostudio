@@ -75,7 +75,16 @@ def coverage(folder: Path | None) -> dict[str, dict]:
     return {r["domain"]: r for r in rows if isinstance(r, dict) and r.get("domain") and not r.get("error")}
 
 
-def build(sites: list[dict], board: list[dict], leads: list[dict], cov: dict[str, dict], now: str) -> list[dict]:
+def coverage_date(folder: Path | None) -> str:
+    """The date in the newest index-coverage-YYYY-MM-DD.json: the day Google was asked."""
+    if not folder or not folder.exists():
+        return ""
+    files = sorted(folder.glob("**/index-coverage-*.json"))
+    return files[-1].stem.rsplit("index-coverage-", 1)[-1] if files else ""
+
+
+def build(sites: list[dict], board: list[dict], leads: list[dict], cov: dict[str, dict], now: str,
+          cov_date: str = "") -> list[dict]:
     out = []
     for s in sites:
         d = s["domain"]
@@ -94,6 +103,15 @@ def build(sites: list[dict], board: list[dict], leads: list[dict], cov: dict[str
             row["pages_in_sitemap"] = c["declared"]
             row["pages_shown_by_google"] = c.get("declared_and_surfaced") or 0
             row["coverage_pct"] = round(100 * float(c.get("coverage") or 0), 1)
+            if cov_date:
+                # The weekly run is skipped, cancelled or late more often than it fails; without
+                # a date the Sites tab shows last week's coverage as if it were this week's.
+                row["coverage_as_of"] = cov_date
+                try:
+                    row["coverage_age_days"] = max(0, (datetime.fromisoformat(now) -
+                                                        datetime.fromisoformat(cov_date).replace(tzinfo=timezone.utc)).days)
+                except ValueError:
+                    pass
         out.append(row)
     return out
 
@@ -107,7 +125,7 @@ def run(apply: bool, cov_dir: Path | None) -> list[str]:
     board = ops_sync.board(os.environ.get("NOTION_REVIEW_DB") or nrs.DEFAULT_DB) if os.environ.get("NOTION_TOKEN") else []
     lc, ldata = nrs.b44("GET", f"/{ops_sync.OPS_APP}/entities/Lead/v2/list?limit=1000")
     leads = nrs._b44_items(ldata) if lc == 200 else []
-    rows = build(site_rows(), board, leads, coverage(cov_dir), now)
+    rows = build(site_rows(), board, leads, coverage(cov_dir), now, coverage_date(cov_dir))
     errors = 0
     for r in rows:
         h = have.get(r["domain"])
