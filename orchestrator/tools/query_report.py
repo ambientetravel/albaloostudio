@@ -73,6 +73,31 @@ def collect(service, site: config.Site) -> list[dict[str, Any]]:
     return out
 
 
+def collect_pages(service, site: config.Site) -> dict[str, list[dict[str, Any]]]:
+    """Which PAGE Google shows for each query. Position 77 on a head term reads
+    very differently when it is the home page (a linking/canonical problem: the
+    dedicated page exists and is not the one chosen) than when it is the
+    dedicated page itself (authority — backlinks and time). cruise24.ir asked
+    exactly this on 1 Nov and the query-only table could not say."""
+    end = (a1.utc_now() - timedelta(days=site.data_lag_days)).date()
+    start = end - timedelta(days=site.lookback_days)
+    rows = a1._search_analytics(service, site.property_uri,
+                                start.isoformat(), end.isoformat(), ["query", "page"])
+    out: dict[str, list[dict[str, Any]]] = {}
+    for r in rows:
+        keys = r.get("keys") or []
+        if len(keys) < 2:
+            continue
+        pos = float(r.get("position", 0) or 0)
+        out.setdefault(keys[0], []).append({
+            "page": keys[1].replace(f"https://{site.domain}", "") or "/",
+            "impressions": int(r.get("impressions", 0) or 0),
+            "clicks": int(r.get("clicks", 0) or 0), "position": round(pos, 1)})
+    for v in out.values():
+        v.sort(key=lambda x: -x["impressions"])
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--domain", required=True)
@@ -80,6 +105,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--watch", default="",
                     help="comma-separated terms to check for presence")
     ap.add_argument("--format", choices=["md", "json"], default="md")
+    ap.add_argument("--pages", action="store_true",
+                    help="also show WHICH page ranks for each top/watched query")
     args = ap.parse_args(argv)
 
     site = config.load_sites(only=[args.domain], include_hold=True)[0]
@@ -94,9 +121,11 @@ def main(argv: list[str] | None = None) -> int:
         hits = [r for r in rows if w in r["query"]]
         found[w] = hits
 
+    pages = collect_pages(service, site) if args.pages else {}
+
     if args.format == "json":
         print(json.dumps({"domain": site.domain, "queries": rows,
-                          "watch": {k: v for k, v in found.items()}},
+                          "watch": {k: v for k, v in found.items()}, "pages": pages},
                          ensure_ascii=False, indent=2))
         return 0
 
@@ -150,6 +179,26 @@ def main(argv: list[str] | None = None) -> int:
                 for h in sorted(found[w], key=lambda x: -x["impressions"])[:10]:
                     print(f"| {h['query']} | {h['impressions']:,} | {h['position']} |")
                 print()
+    if args.pages:
+        shown = [w for w in watch if found.get(w)] or []
+        qs = []
+        for w in shown:
+            qs += [h["query"] for h in sorted(found[w], key=lambda x: -x["impressions"])[:5]]
+        if not qs:
+            qs = [r["query"] for r in rows[:args.top]]
+        seen = set()
+        print("\n## Which page Google shows for each query\n")
+        print("The home page at position 70+ for a head term means the dedicated page "
+              "is not being chosen (canonical / internal links); the dedicated page at 70+ means authority.\n")
+        print("| Query | Page | Impressions | Clicks | Position |")
+        print("|---|---|---:|---:|---:|")
+        for q in qs:
+            if q in seen:
+                continue
+            seen.add(q)
+            for pg in (pages.get(q) or [])[:3]:
+                print(f"| {q} | `{pg['page']}` | {pg['impressions']:,} | {pg['clicks']} | {pg['position']} |")
+        print()
     return 0
 
 

@@ -26,6 +26,11 @@ on:
         required: false
         default: "30"
         type: string
+      pages:
+        description: "Also show which page ranks for each query"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -54,4 +59,4 @@ jobs:
           python3 tools/query_report.py \
             --domain "${{ inputs.domain }}" \
             --top "${{ inputs.top || '30' }}" \
-            --watch "${{ inputs.watch }}" | tee -a "$GITHUB_STEP_SUMMARY"
+            --watch "${{ inputs.watch }}" ${{ inputs.pages && '--pages' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
