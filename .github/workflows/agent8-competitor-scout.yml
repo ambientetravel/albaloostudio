@@ -20,6 +20,9 @@
 # A site with no list is skipped rather than guessed at.
 
 name: Agent 8 — Competitor Scout
+# A key probe is not a scout: titled "(dry run)" so the health report's _counts()
+# skips it and "Watcher" keeps pointing at the last real crawl.
+run-name: ${{ inputs.firecrawl_probe != '' && 'Firecrawl key probe (dry run)' || 'Agent 8 — Competitor Scout' }}
 
 on:
   schedule:

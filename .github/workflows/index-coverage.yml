@@ -89,6 +89,11 @@ jobs:
         # Real-visitor LCP / INP / CLS where Google has them, plus the Lighthouse
         # score and biggest savings. Needs PAGESPEED_API_KEY (Google now refuses
         # keyless calls); without it each page reports the 429 as a note.
+        # Its own clock: on 26 Oct this step ran past the job's 40 minutes and
+        # the whole run read "cancelled" although coverage had finished and
+        # uploaded. A step timeout is a step failure, which continue-on-error
+        # absorbs; the run stays green and the coverage report stays trusted.
+        timeout-minutes: 12
         continue-on-error: true
         env:
           PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}

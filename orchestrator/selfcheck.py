@@ -4360,15 +4360,33 @@ def _closed(sc):
 ok("reviser: every object in its output schemas is closed, and a JSON article comes back parsed",
    len(_schemas) == 2 and all(_closed(x) for x in _schemas) and _oj["item"] == {"slug": "a", "title": "T2"})
 
-# Health: a weekly agent pushed off the first page of runs by the hourly sync is not "never ran" (10 Oct)
+# Health: a weekly agent buried under hourly runs is not "never ran". One page of 100 missed it on
+# 10 Oct; eight pages missed it on 31 Oct (957 runs in 6 days). Now each workflow is asked directly.
 _saved_hj = _hr._json
-_pages = {1: [{"name": "Content Review sync (Notion ⇄ GitHub)", "conclusion": "success", "display_title": "x"}] * 100,
-          2: [{"name": "Agent 8 — Competitor Scout", "conclusion": "success", "display_title": "y"}]}
-_hr._json = lambda url, tok: {"workflow_runs": _pages.get(int(url.rsplit("page=", 1)[1]), [])}
+_hr_calls = []
+def _hr_fake(url, tok):
+    _hr_calls.append(url)
+    if "/actions/workflows?" in url:
+        return {"workflows": [{"name": "Content Review sync (Notion ⇄ GitHub)", "id": 1},
+                              {"name": "Agent 8 — Competitor Scout", "id": 8},
+                              {"name": "Agent 1 — SEO Scout", "id": 2}]}
+    if "/workflows/8/runs" in url:   # the Sunday fallback cancelled itself, then last week's real run
+        return {"workflow_runs": [{"name": "Agent 8 — Competitor Scout", "conclusion": "cancelled", "display_title": "y", "id": 2},
+                                  {"name": "Agent 8 — Competitor Scout", "conclusion": "success", "display_title": "y", "id": 1}]}
+    if "/workflows/2/runs" in url:
+        return {"workflow_runs": [{"name": "Agent 1 — SEO Scout", "conclusion": "success", "display_title": "(dry run)", "id": 3}]}
+    if "/actions/runs?" in url:      # the repo-wide list: 900 sync runs, the agents nowhere in reach
+        return {"workflow_runs": [{"name": "Content Review sync (Notion ⇄ GitHub)", "conclusion": "success", "display_title": "x"}] * 100}
+    return {"workflow_runs": []}
+_hr._json = _hr_fake
 _lr = _hr.latest_runs("t")
 _hr._json = _saved_hj
-ok("health: agents on later pages of the run list are found, not reported as 'never ran'",
-   "Agent 8 — Competitor Scout" in _lr)
+ok("health: a weekly agent is found through its own workflow's run list, past any number of hourly runs; "
+   "a cancelled fallback is skipped for the real run; the repo-wide list is never paged",
+   _lr.get("Agent 8 — Competitor Scout", {}).get("id") == 1
+   and "Agent 1 — SEO Scout" not in _lr          # only a dry run: correctly "never ran"
+   and not any("/actions/runs?" in u for u in _hr_calls)
+   and not any("/workflows/1/runs" in u for u in _hr_calls))   # the sync is not an agent: not asked
 
 # ── Closer: one dropped connection to a lead source is retried, not a red run (11 Oct) ──
 import agent4_sales_closer_batch as _a4b

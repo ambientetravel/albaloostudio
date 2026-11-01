@@ -93,19 +93,29 @@ def _json(url: str, token: str):
     return json.loads(body.decode("utf-8"))
 
 
-def latest_runs(token: str, max_pages: int = 8) -> dict[str, dict]:
-    """Newest run per workflow display name. Pages back until every agent is found:
-    the hourly review sync alone fills 100 runs in ~4 days, so one page made the
-    weekly agents read "never ran" (10 Oct — they had run on 4–5 Oct)."""
-    out: dict[str, dict] = {}
-    for page in range(1, max_pages + 1):
-        d = _json(f"{API}/repos/{REPO}/actions/runs?per_page=100&page={page}", token)
-        batch = d.get("workflow_runs", [])
-        for r in batch:
-            if _counts(r):
-                out.setdefault(r["name"], r)  # list is newest-first
-        if len(batch) < 100 or all(name in out for name in AGENTS):
+def latest_runs(token: str, per_workflow: int = 10) -> dict[str, dict]:
+    """Newest counting run per workflow display name, asked of each workflow's
+    OWN run list. Paging the repo-wide list stopped working twice: one page of
+    100 (10 Oct) and then 8 pages of 100 (31 Oct — ops-sync, review-sync, the
+    Closer, the heartbeat and the PR gate had pushed the 25 Oct Sunday cycle to
+    run ~957, so Scout, Writer and Broadcaster read "never ran" while the 26 Oct
+    Monday agents, 100 runs younger, were found). A per-workflow request is
+    exact whatever the run rate: 11 calls, 10 runs each."""
+    wanted = set(AGENTS)
+    ids: dict[str, int] = {}
+    for page in range(1, 4):
+        d = _json(f"{API}/repos/{REPO}/actions/workflows?per_page=100&page={page}", token)
+        batch = d.get("workflows", [])
+        ids.update({w["name"]: w["id"] for w in batch if w.get("name") in wanted})
+        if len(batch) < 100 or wanted <= set(ids):
             break
+    out: dict[str, dict] = {}
+    for name, wid in ids.items():
+        d = _json(f"{API}/repos/{REPO}/actions/workflows/{wid}/runs?per_page={per_workflow}", token)
+        for r in d.get("workflow_runs", []):  # newest-first
+            if _counts(r):
+                out[name] = r
+                break
     return out
 
 
