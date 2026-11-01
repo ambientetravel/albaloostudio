@@ -4573,6 +4573,27 @@ _b2 = _os.build([{"domain": "cruise24.ir"}], [], [], {"cruise24.ir": {"declared"
                 "2026-11-01T04:00:00+00:00")
 ok("sites tab: coverage carries the day Google was asked and its age (6 d), and stays unlabelled rather than guessed when unknown",
    _b[0]["coverage_as_of"] == "2026-10-26" and _b[0]["coverage_age_days"] == 6 and "coverage_as_of" not in _b2[0])
+import tools.ops_notify as _on
+_rt = _on.load_routing()
+_ev = _on.draft_events([_row("cruise24.ir", "PASS", "2026-10-01"), _row("exploreorient.com", "WARN", "2026-10-30"),
+                        _row("nowhere.test", "PASS", "2026-10-30"), _row("boutimar.com", "PASS", "2026-10-01", "Approved")],
+                       _rt, "2026-11-01T04:00:00+00:00")
+ok("notify: a new draft goes to its property's content field; an unowned property goes to the owner, never nowhere; "
+   "a draft not waiting for review is not announced",
+   [e["field"] for e in _ev] == ["persian_content", "english_content", "owner"])
+_hv = _on.health_events({"critical": ["**Scout has no successful run on record** — x"], "needs_you": ["28 PRs waiting"]}, _rt, "2026-11-01T04:00:00+00:00")
+ok("notify: a broken core agent is for the technical field, plain text, and its key is stable so the hourly sync cannot repeat it",
+   _hv[0]["field"] == "technical" and "**" not in _hv[0]["title"] and _hv[1]["field"] == "owner"
+   and _hv[0]["key"] == _on.health_events({"critical": ["**Scout has no successful run on record** — x"]}, _rt, "2026-11-02T09:00:00+00:00")[0]["key"])
+ok("notify: a health report older than 26 h raises one 'late' notice, keyed by the report's day; a fresh one raises none",
+   len(_on.stale_events({"generated": "2026-10-31T13:32"}, _rt, "2026-11-01T20:00:00+00:00")) == 1
+   and not _on.stale_events({"generated": "2026-11-01T03:00"}, _rt, "2026-11-01T20:00:00+00:00"))
+_saved_b44 = _on.nrs.b44
+_on.nrs.b44 = lambda m, p, b=None: (404, {})
+_pub = _on.publish(_ev, True)
+_on.nrs.b44 = _saved_b44
+ok("notify: if the app has no Notification entity yet, the sync says so and carries on (no exception)",
+   len(_pub) == 1 and "OPS-APP-NOTIFY-PROMPT.md" in _pub[0])
 ok("ops-sync: the new-draft ping @mentions Alireza (Notion push) and links the draft",
    _pb[0]["callout"]["rich_text"][0]["mention"]["user"]["id"] == _ops.OWNER
    and "1 new draft to review" in _pb[0]["callout"]["rich_text"][1]["text"]["content"]

@@ -488,6 +488,13 @@ def run(apply: bool, db: str) -> list[str]:
     except Exception as exc:  # noqa: BLE001 — a photo relay problem never blocks the review sync
         log.append(f"  ! photo requests: {exc}")
     new = [r for r in p["create"] if r["status"] == "To review"]
+    if not p["seed"]:
+        try:
+            import ops_notify
+            log.extend(ops_notify.publish(
+                ops_notify.draft_events(p["create"], ops_notify.load_routing(), now.isoformat(timespec="seconds")), apply))
+        except Exception as exc:  # noqa: BLE001 — never let notifications break the review sync
+            log.append(f"  ! notifications skipped: {exc}")
     if new and not p["seed"]:
         log.append(f"ping        {len(new)} new draft(s) → Notion @mention")
         if apply:

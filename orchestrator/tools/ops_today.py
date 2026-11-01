@@ -118,6 +118,13 @@ def run(apply: bool, report_path: Path = REPORT) -> list[str]:
     report = json.loads(report_path.read_text(encoding="utf-8"))
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     runs, items, metrics = rows_from(report, now)
+    try:
+        import ops_notify
+        routing = ops_notify.load_routing()
+        log_notify = ops_notify.publish(ops_notify.health_events(report, routing, now)
+                                        + ops_notify.stale_events(report, routing, now), apply)
+    except Exception as exc:  # noqa: BLE001
+        log_notify = [f"  ! notifications skipped: {exc}"]
     calls = plan(runs, items, metrics, _list("AgentRun"), _list("HealthItem"), _list("Metric"))
     log = [f"report generated {report.get('generated')}: {len(runs)} agents, {len(items)} health lines, "
            f"{len(metrics)} metrics"]
@@ -132,6 +139,7 @@ def run(apply: bool, report_path: Path = REPORT) -> list[str]:
     tally = {}
     for method, ent, _, _ in calls:
         tally[f"{method} {ent}"] = tally.get(f"{method} {ent}", 0) + 1
+    log.extend(log_notify)
     log.append("calls: " + ", ".join(f"{k} ×{v}" for k, v in sorted(tally.items())))
     log.append(f"summary: {len(calls)} call(s), {errors} error(s)" + ("" if apply else "  (dry run — nothing written)"))
     return log
