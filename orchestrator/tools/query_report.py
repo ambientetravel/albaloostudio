@@ -113,7 +113,7 @@ def main(argv: list[str] | None = None) -> int:
     service = a1.build_gsc_client()
     rows = collect(service, site)
 
-    watch = [w.strip() for w in args.watch.split(",") if w.strip()]
+    watch = [w.strip() for w in args.watch.split(",") if w.strip()] or list(site.watch_terms)
     found = {}
     for w in watch:
         # Substring, not equality: "تور کشتی کروز" should match the long-tail

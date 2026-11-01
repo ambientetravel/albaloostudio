@@ -569,6 +569,17 @@ sites:
         angle: "The Persian diaspora outside Iran: every cruise line, group departures and gatherings of Iranians abroad. Bilingual: Farsi first, then an English version of the caption."
 
   - domain: cruise24.ir
+    # Monday query watch (tools/query_report.py --pages, cron in query-report.yml).
+    # Set 1 Nov with the cruise24 session: the snippet recount shows in CTR, the
+    # AROYA title in position, and the Nowruz consolidation (0fe5948) when
+    # cruise-mediterranean and msc drop out of the page table for the last term
+    # while cruise-nowruz-1406 climbs from 41.6.
+    watch_terms:
+      - کشتی کروز خلیج فارس
+      - کشتی کروز دبی
+      - تور کشتی کروز آرویا
+      - کشتی کروز aroya
+      - تور کشتی کروز اروپا نوروز ۱۴۰۶
     property_uri: "sc-domain:cruise24.ir"
     gsc_account: "alimozzarella@gmail.com"
     brand: Cruise24

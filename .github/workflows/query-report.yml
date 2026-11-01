@@ -10,6 +10,10 @@
 name: Query report — positions and absences
 
 on:
+  schedule:
+    # Monday 07:00 UTC, after index-coverage (06:30): every site that declares
+    # watch_terms in sites.yml, with the page Google shows for each term.
+    - cron: "0 7 * * 1"
   workflow_dispatch:
     inputs:
       domain:
@@ -56,6 +60,13 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -euo pipefail
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            # the Monday watch: sites with watch_terms, terms from sites.yml
+            for d in $(python3 -c "import config; print(' '.join(s.domain for s in config.load_sites(include_hold=True) if s.watch_terms))"); do
+              python3 tools/query_report.py --domain "$d" --top 20 --pages | tee -a "$GITHUB_STEP_SUMMARY"
+            done
+            exit 0
+          fi
           python3 tools/query_report.py \
             --domain "${{ inputs.domain }}" \
             --top "${{ inputs.top || '30' }}" \
