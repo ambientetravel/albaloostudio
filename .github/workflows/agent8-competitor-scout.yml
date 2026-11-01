@@ -42,6 +42,10 @@ on:
         required: false
         default: false
         type: boolean
+      firecrawl_probe:
+        description: "Only test the Firecrawl key: render this one URL (1 credit) and skip the scout"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -53,7 +57,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  firecrawl-probe:
+    if: inputs.firecrawl_probe != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - name: Render one page through Firecrawl
+        env:
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          PROBE_URL: ${{ inputs.firecrawl_probe }}
+        run: python3 firecrawl_client.py "$PROBE_URL"
+
   scout:
+    if: inputs.firecrawl_probe == ''
     runs-on: ubuntu-latest
     # Generous on purpose: one request at a time with a 1.5s delay, across
     # several competitors, is slow by design and must not be killed mid-crawl.

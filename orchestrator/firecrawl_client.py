@@ -57,3 +57,16 @@ def rendered_html(url: str, *, main_only: bool = True, timeout: int = 90) -> str
         return None
     html = ((d.get("data") or {}).get("html") or "").strip()
     return html or None
+
+
+if __name__ == "__main__":
+    # Key check: `python3 firecrawl_client.py URL` renders one page (one credit)
+    # and prints only the outcome and the size, never the page or the key.
+    import sys
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    if not enabled():
+        print("FIRECRAWL_API_KEY is not set — nothing to test")
+        sys.exit(2)
+    out = rendered_html(sys.argv[1], main_only=False)
+    print(f"rendered {len(out)} chars" if out else "render FAILED — see the warning above")
+    sys.exit(0 if out else 1)
