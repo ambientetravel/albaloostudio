@@ -221,6 +221,34 @@ jobs:
           print("\n*Architecture credit: Albaloo Studio*")
           PY
 
+      # This repository is PUBLIC, and a public repo's artifacts can be downloaded
+      # by any signed-in GitHub account. redact() strips cards, CVVs, passports and
+      # IBANs for the model's benefit and deliberately keeps e-mails and phones so
+      # the Ops app can answer the lead — the Ops push above already happened, so
+      # the copy that leaves the runner carries neither. The backfill tool reads
+      # this artifact and will see masked contacts; that is the point.
+      - name: Mask e-mails and phone numbers before the artifact leaves the runner
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import glob, json, re
+          EMAIL = re.compile(r"([\w.+-]+)@([\w-]+(?:\.[\w-]+)+)")
+          # nine or more digits: a phone, not a date (2027-02-12 has eight) or a 6-digit ref
+          PHONE = re.compile(r"(?<![\w/-])\+?(?:\d[\s().-]*){8,}\d(?![\w/-])")
+          def mask(s):
+              s = EMAIL.sub(lambda m: m.group(1)[:2] + "…@" + m.group(2), s)
+              return PHONE.sub(lambda m: re.sub(r"\d(?=(?:\D*\d){4})", "•", m.group()), s)
+          def walk(x):
+              if isinstance(x, str): return mask(x)
+              if isinstance(x, list): return [walk(v) for v in x]
+              if isinstance(x, dict): return {k: walk(v) for k, v in x.items()}
+              return x
+          n = 0
+          for path in glob.glob("closed/**/*.json", recursive=True):
+              d = json.load(open(path)); json.dump(walk(d), open(path, "w"), ensure_ascii=False, indent=1); n += 1
+          print(f"masked {n} file(s)")
+          PY
+
       # Retention is short on purpose. These records hold redacted customer
       # messages — real people's words, even with the card numbers stripped.
       # 90 days is right for a build artifact and wrong for correspondence.

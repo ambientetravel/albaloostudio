@@ -177,6 +177,12 @@ def build(token: str, bridge_token: str) -> dict:
         r = runs.get(wf)
         if not r:
             agents.append({"agent": label, "result": "never ran", "age_days": None, "url": ""})
+            if wf in CORE:
+                # 31 Oct: Scout, Writer and Broadcaster all read "never ran" under a
+                # headline of "0 broke — every core agent's last run succeeded".
+                # A core agent with no counting run is the loudest thing on the page.
+                critical.append(f"**{label} has no successful run on record** — the weekly cycle "
+                                f"is not proven to have happened. Check the workflow's run list.")
             continue
         age = _age_days(r["created_at"])
         row = {"agent": label, "result": r["conclusion"] or r["status"],

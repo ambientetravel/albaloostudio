@@ -27,6 +27,13 @@ on:
 permissions:
   contents: read
 
+# It fires on an hourly cron AND on every Writer run: two syncs an hour apart
+# could race on the same Notion rows and the same merge. Queue, never cancel —
+# a cancelled sync could leave a row Published with the PR unmerged.
+concurrency:
+  group: review-sync
+  cancel-in-progress: false
+
 jobs:
   sync:
     runs-on: ubuntu-latest

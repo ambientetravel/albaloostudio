@@ -3774,6 +3774,24 @@ _log, _c = _nrs_run({"boutimar#30": {"page_id": "p1", "status": "Approved", "fee
                     {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "BLOCK"}])
 ok("Approved but BLOCKed by the house rules is NOT merged, and goes back to Needs edits",
    not any(m == "PUT" for m, p, b in _c) and any("HOLD" in l for l in _log))
+_log, _c = _nrs_run({"boutimar#30": {"page_id": "p1", "status": "Approved", "feedback": ""}},
+                    {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "UNKNOWN"}])
+ok("Approved but the gate could not read the diff (UNKNOWN) is held: no merge, no comment, row left Approved for the next run",
+   not any(m == "PUT" for m, p, b in _c) and not any(m == "POST" for m, p, b in _c)
+   and not any(m == "NPATCH" for m, p, b in _c) and any("could not read" in l for l in _log))
+_saved_rp, _saved_gh = _nrs.pr_review.review_pr, _nrs.gh
+def _boom(*a, **k): raise RuntimeError("GitHub 502")
+_nrs.pr_review.review_pr = _boom
+_nrs.gh = lambda m, path, body=None: (200, [{"number": 30, "head": {"ref": "agent2/x", "sha": "s"}, "html_url": "u",
+                                             "title": "Agent 2 draft: T", "created_at": "2026-10-01T00:00:00Z"}]
+                                       if path.endswith("pulls?state=open&per_page=50") else (200, []))
+try:
+    _lp = _nrs.open_article_prs()
+finally:
+    _nrs.pr_review.review_pr, _nrs.gh = _saved_rp, _saved_gh
+ok("a diff the gate cannot read is UNKNOWN, not WARN (WARN would have merged on Approved)",
+   _lp and all(x["gate"] == "UNKNOWN" for x in _lp))
+
 _fb = {"boutimar#30": {"page_id": "p1", "status": "Needs edits", "feedback": "Cut the second section."}}
 _log, _c = _nrs_run(_fb, {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "PASS"}])
 _posted = [b for m, p, b in _c if m == "POST" and p.endswith("/issues/30/comments")]
@@ -4387,6 +4405,19 @@ ok("health: a weekly agent is found through its own workflow's run list, past an
    and "Agent 1 — SEO Scout" not in _lr          # only a dry run: correctly "never ran"
    and not any("/actions/runs?" in u for u in _hr_calls)
    and not any("/workflows/1/runs" in u for u in _hr_calls))   # the sync is not an agent: not asked
+
+# Health: a CORE agent with no counting run is "broke", never a quiet table row under "0 broke" (31 Oct)
+_saved_hb = (_hr.latest_runs, _hr.latest_artifact, _hr.open_prs)
+_hr.latest_runs = lambda tok: {}
+_hr.latest_artifact = lambda *a, **k: None
+_hr.open_prs = lambda tok: ([], [])
+try:
+    _rep = _hr.build("t", "")
+    _md = _hr.render(_rep)
+finally:
+    _hr.latest_runs, _hr.latest_artifact, _hr.open_prs = _saved_hb
+ok("health: Scout/Writer/Broadcaster with no run on record are listed under Broke, and the headline does not say every core agent succeeded",
+   sum("no successful run" in c for c in _rep["critical"]) == 3 and "Every core agent's last run succeeded" not in _md)
 
 # ── Closer: one dropped connection to a lead source is retried, not a red run (11 Oct) ──
 import agent4_sales_closer_batch as _a4b
