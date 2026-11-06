@@ -274,8 +274,10 @@ def sailing_rows(ss) -> str:
     for s in sorted(ss, key=lambda s: (next_dep(s) or "9999", s["title"])):
         a, b = ends(s)
         more = len(s["departures"]) - 1
+        dates = [d["date"] for d in s["departures"] if not d.get("soldOut")] or [d["date"] for d in s["departures"]]
         rows.append(
-            f'<tr><td>{esc(fmt_date(next_dep(s)))}' + (f' <span class="fine">+{more} more</span>' if more > 0 else "") + "</td>"
+            f'<tr data-dates="{" ".join(dates)}"><td><span class="next-date">{esc(fmt_date(next_dep(s)))}</span>'
+            + (f' <span class="fine more-dates">+{more} more</span>' if more > 0 else "") + "</td>"
             f'<td><a href="{esc(s["url"])}">{esc(s["title"])}</a></td>'
             f'<td>{s["nights"]}</td><td>{esc(s["line"])} · {esc(" / ".join(s["ships"]))}</td>'
             f'<td>{esc(visa_short(s))}</td></tr>')

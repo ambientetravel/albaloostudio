@@ -122,6 +122,31 @@ def pr_link(pid: str) -> tuple[str, int, str]:
     return full, int(num), f"https://github.com/{full}/pull/{num}"
 
 
+# ── triage: which waiting draft to open first ────────────────────────────────
+# 33 drafts and no order (1 Nov). The score uses only what the board already
+# knows — no demand figure is invented: how clean the house-rules check is (a
+# PASS is a two-minute read), how much the property matters (the three sites
+# Alireza named on 1 Nov), and how long it has waited. Search demand for the
+# target keyword is NOT in the row today; when the Writer starts carrying it,
+# it belongs here as a fourth term.
+FLAGSHIP = {"boutimar.com", "ambientetravel.com", "cruise24.ir"}
+GATE_POINTS = {"PASS": 40, "WARN": 15}          # BLOCK cannot be published: 0, "fix first"
+AGE_CAP = 25                                    # ~33 days at 0.75/day
+
+
+def priority(row: dict, now: datetime) -> tuple[int, str]:
+    """(0-100, plain-words reason). Only meaningful for a draft waiting for review."""
+    gate = (row.get("gate") or "WARN").upper()
+    days = age_days(row.get("written", ""), now)
+    site = row.get("site") or SITE_REPO.get(pr_link(row.get("pid", ""))[0].split("/")[-1], "")
+    flagship = site in FLAGSHIP
+    score = GATE_POINTS.get(gate, 0) + (25 if flagship else 10) + min(AGE_CAP, round(days * 0.75))
+    why = [{"PASS": "clean house-rules check", "WARN": "house-rules warning, read the flagged lines",
+            "BLOCK": "house rules BLOCK, fix before anything else"}.get(gate, gate),
+           "flagship site" if flagship else "other site", f"waiting {days} d"]
+    return min(100, score), " · ".join(why)
+
+
 def age_days(written: str, now: datetime) -> int:
     try:
         d = datetime.fromisoformat(written[:10]).replace(tzinfo=timezone.utc)
@@ -312,6 +337,8 @@ def to_app(row: dict, now: datetime, *, with_body: bool) -> dict:
         "live_url": row["live"],
         "synced_at": now.isoformat(timespec="seconds"),
     }
+    if row["status"] == "To review":
+        rec["priority_score"], rec["priority_reason"] = priority(row, now)
     if row["words"]:
         rec["word_count"] = int(float(row["words"]))
     if with_body:
@@ -337,6 +364,10 @@ def _key(rec: dict) -> str:
 
 # ── the three moves ──────────────────────────────────────────────────────────
 OPEN = {"To review", "Needs edits", "Approved"}
+# Self-limiting: if the app's schema does not keep priority_score (base44 drops
+# fields it does not know), the first write notices and stops sending it, instead
+# of re-sending 33 rows every hour for ever.
+PRIORITY_ON = [True]
 
 
 def plan(board_rows: list[dict], app: list[dict], now: datetime) -> dict:
@@ -363,6 +394,8 @@ def plan(board_rows: list[dict], app: list[dict], now: datetime) -> dict:
         fields = {"status": want, "age_days": age_days(r["written"], now), "live_url": r["live"],
                   "house_rules_verdict": r["gate"] or have.get("house_rules_verdict") or "WARN",
                   "title": r["title"]}
+        if r["status"] == "To review" and PRIORITY_ON[0]:
+            fields["priority_score"], fields["priority_reason"] = priority(r, now)
         if any(have.get(k) != v for k, v in fields.items()):
             update.append((have, fields))
     seed = not app
@@ -438,6 +471,11 @@ def run(apply: bool, db: str) -> list[str]:
             code, d = nrs.b44("PUT", _ent(f"/{have['id']}"), {**fields, "synced_at": now.isoformat(timespec='seconds')})
             if code != 200:
                 log.append(f"  ! base44 {code}: {str(d)[:160]}")
+            elif "priority_score" in fields and PRIORITY_ON[0] and isinstance(d, dict) and "priority_score" not in d:
+                PRIORITY_ON[0] = False
+                log.append("  ! the app did not keep priority_score — add priority_score (number) and "
+                           "priority_reason (text) to ArticleReview in base44 (OPS-APP-TRIAGE-PROMPT.md); "
+                           "not sending them again this run")
     for r, have, dec in p["decide"]:
         try:
             apply_decision(r, have, dec, apply, log)
@@ -450,6 +488,13 @@ def run(apply: bool, db: str) -> list[str]:
     except Exception as exc:  # noqa: BLE001 — a photo relay problem never blocks the review sync
         log.append(f"  ! photo requests: {exc}")
     new = [r for r in p["create"] if r["status"] == "To review"]
+    if not p["seed"]:
+        try:
+            import ops_notify
+            log.extend(ops_notify.publish(
+                ops_notify.draft_events(p["create"], ops_notify.load_routing(), now.isoformat(timespec="seconds")), apply))
+        except Exception as exc:  # noqa: BLE001 — never let notifications break the review sync
+            log.append(f"  ! notifications skipped: {exc}")
     if new and not p["seed"]:
         log.append(f"ping        {len(new)} new draft(s) → Notion @mention")
         if apply:

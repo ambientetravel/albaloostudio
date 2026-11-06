@@ -1,7 +1,7 @@
 {
  "schema_version": "offer.v1",
  "site": "cruise24.me",
- "generated_at": "2026-10-31T09:43:33Z",
+ "generated_at": "2026-11-06T10:58:12Z",
  "offerings": [
   {
    "slug": "explora-journeys",
@@ -45,8 +45,8 @@
     "polar",
     "africa-arabia",
     "adriatic",
-    "tahiti",
     "greece",
+    "tahiti",
     "turkiye",
     "seychelles"
    ],
@@ -94,8 +94,8 @@
     "italy",
     "greece",
     "turkiye",
-    "tahiti",
     "asia-pacific",
+    "tahiti",
     "adriatic",
     "africa-arabia"
    ],
@@ -135,8 +135,8 @@
     "italy",
     "western-med",
     "greece",
-    "adriatic",
     "atlantic",
+    "adriatic",
     "turkiye",
     "africa-arabia",
     "northern-europe"
@@ -177,8 +177,8 @@
    "regions": [
     "western-med",
     "italy",
-    "greece",
     "atlantic",
+    "greece",
     "adriatic",
     "turkiye"
    ],
@@ -198,8 +198,8 @@
     "western-med",
     "italy",
     "atlantic",
-    "greece",
     "turkiye",
+    "greece",
     "adriatic"
    ],
    "countries": [
@@ -322,16 +322,6 @@
    ]
   },
   {
-   "slug": "atlantic",
-   "title": "Atlantic islands and crossings",
-   "type": "destination",
-   "summary": "Cruises in Atlantic islands and crossings, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
-   "url": "https://cruise24.me/journeys.html#atlantic.any",
-   "regions": [
-    "atlantic"
-   ]
-  },
-  {
    "slug": "adriatic",
    "title": "Croatia and the Adriatic",
    "type": "destination",
@@ -339,6 +329,16 @@
    "url": "https://cruise24.me/journeys.html#adriatic.any",
    "regions": [
     "adriatic"
+   ]
+  },
+  {
+   "slug": "atlantic",
+   "title": "Atlantic islands and crossings",
+   "type": "destination",
+   "summary": "Cruises in Atlantic islands and crossings, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#atlantic.any",
+   "regions": [
+    "atlantic"
    ]
   },
   {
@@ -352,16 +352,6 @@
    ]
   },
   {
-   "slug": "asia-pacific",
-   "title": "Asia and the Pacific",
-   "type": "destination",
-   "summary": "Cruises in Asia and the Pacific, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
-   "url": "https://cruise24.me/journeys.html#asia-pacific.any",
-   "regions": [
-    "asia-pacific"
-   ]
-  },
-  {
    "slug": "turkiye",
    "title": "Türkiye",
    "type": "destination",
@@ -369,6 +359,16 @@
    "url": "https://cruise24.me/journeys.html#turkiye.any",
    "regions": [
     "turkiye"
+   ]
+  },
+  {
+   "slug": "asia-pacific",
+   "title": "Asia and the Pacific",
+   "type": "destination",
+   "summary": "Cruises in Asia and the Pacific, from the lines Cruise24 books, with the fare confirmed with the line before you commit.",
+   "url": "https://cruise24.me/journeys.html#asia-pacific.any",
+   "regions": [
+    "asia-pacific"
    ]
   },
   {

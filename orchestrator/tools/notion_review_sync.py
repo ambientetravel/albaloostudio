@@ -148,8 +148,10 @@ def open_article_prs() -> list[dict]:
             try:
                 review = pr_review.review_pr(repo, p["number"], pr_review.REPOS.get(repo, "boutimar_v1"))
                 verdict = review["verdict"]
-            except Exception:  # noqa: BLE001 — an unreadable diff is a WARN for a human, not a crash
-                review, verdict = {}, "WARN"
+            except Exception:  # noqa: BLE001 — an unreadable diff must not crash the sync…
+                # …and must not merge either: WARN here let an Approved PR merge on a GitHub 5xx
+                # with its lines unread. UNKNOWN is held like BLOCK until the diff can be read.
+                review, verdict = {}, "UNKNOWN"
             out.append({"pid": f"{repo.split('/')[1]}#{p['number']}", "repo": repo, "num": p["number"],
                         "site": site, "url": p["html_url"], "gate": verdict, "review": review,
                         "sha": p["head"]["sha"],
@@ -637,6 +639,11 @@ def sync(apply: bool, db: str) -> list[str]:
         st = row["status"]
         if st == "Approved":
             gate = live_prs.get(pid, {}).get("gate", "WARN")
+            if gate == "UNKNOWN":
+                # The gate could not read the diff this hour. Not a verdict on the text:
+                # leave the row Approved and try again next run, merge nothing.
+                log.append(f"HOLD        {pid}  approved but the gate could not read the diff — retry next run")
+                continue
             if gate == "BLOCK":
                 log.append(f"HOLD        {pid}  approved but house rules say BLOCK — not merged")
                 if apply:

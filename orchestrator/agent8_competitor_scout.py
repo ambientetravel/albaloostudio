@@ -66,7 +66,10 @@ from urllib.robotparser import RobotFileParser
 import requests
 
 import config
+import firecrawl_client
 from agent5_site_auditor import fetch
+
+RENDER_BELOW_WORDS = 150   # fewer words than this = probably a JavaScript shell; render it
 from config import ARCHITECTURE_CREDIT, Site, rfc3339, utc_now
 
 log = logging.getLogger("agent8.competitor_scout")
@@ -302,7 +305,18 @@ def scout_competitor(session: requests.Session, base_url: str,
             time.sleep(pace)
             if resp is None or resp.status_code >= 400:
                 continue
-            words, title, heads, types = _text_stats(resp.text)
+            page_html = resp.text
+            words, title, heads, types = _text_stats(page_html)
+            rendered = False
+            if words < RENDER_BELOW_WORDS:
+                # A JavaScript-built page reads as a near-empty shell; render it
+                # (Firecrawl, off without FIRECRAWL_API_KEY, capped per run).
+                html2 = firecrawl_client.rendered_html(u)
+                if html2:
+                    w2, t2, h2, ty2 = _text_stats(html2)
+                    if w2 > words:
+                        page_html, rendered = html2, True
+                        words, title, heads, types = w2, t2 or title, h2, ty2 or types
             words_seen.append(words)
             for t in types:
                 rep.schema_types[t] = rep.schema_types.get(t, 0) + 1
@@ -313,7 +327,7 @@ def scout_competitor(session: requests.Session, base_url: str,
                 rep.languages[lang] = rep.languages.get(lang, 0) + 1
             rep.samples.append({
                 "url": u, "title": title, "words": words,
-                "headings": heads, "language": lang,
+                "headings": heads, "language": lang, "rendered": rendered,
             })
 
         rep.pages_sampled = len(rep.samples)

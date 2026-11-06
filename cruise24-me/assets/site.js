@@ -122,3 +122,50 @@
     });
   });
 })();
+
+/* Departures are shown from today. The pages are built once a day and uploaded when they
+   are, so the browser drops every date before the visitor's today: a fares row, a card or a
+   guide row that has only past dates is hidden, the "next departure" moves to the next date
+   still ahead, and past months leave the month menus. The build applies the same rule. */
+window.C24Today = (function () {
+  var d = new Date();
+  return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+})();
+(function () {
+  var today = window.C24Today, month = today.slice(0, 7);
+  var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var day = function (iso) { var p = iso.split('-'); return (+p[2]) + ' ' + MON[+p[1] - 1] + ' ' + p[0]; };
+  var ahead = function (list) { return (list || '').split(' ').filter(function (x) { return x && x >= today; }); };
+
+  // Sailing pages: fares rows. If none is left, say so instead of an empty table.
+  document.querySelectorAll('table.fares').forEach(function (t) {
+    var rows = t.querySelectorAll('tbody tr[data-date]'), left = 0;
+    rows.forEach(function (r) { if (r.dataset.date < today) r.hidden = true; else left++; });
+    if (rows.length && !left) {
+      var wrap = t.closest('.fares-wrap'), note = wrap && wrap.parentNode.querySelector('.fares-past');
+      if (wrap) wrap.hidden = true;
+      if (note) note.hidden = false;
+    }
+  });
+  // Listing cards written into the HTML.
+  document.querySelectorAll('.jcard2[data-dates]').forEach(function (c) {
+    if (!c.dataset.dates) return;                       // dates on request: nothing to drop
+    var d = ahead(c.dataset.dates);
+    if (!d.length) { c.hidden = true; return; }
+    c.dataset.date = d[0];
+    var em = c.querySelector('.jc-when');
+    if (em) em.textContent = 'Next departure ' + day(d[0]) + (d.length > 1 ? ' · ' + d.length + ' dates' : '');
+  });
+  // Guide tables.
+  document.querySelectorAll('tr[data-dates]').forEach(function (r) {
+    var d = ahead(r.dataset.dates);
+    if (!d.length) { r.hidden = true; return; }
+    var nd = r.querySelector('.next-date'), more = r.querySelector('.more-dates');
+    if (nd) nd.textContent = day(d[0]);
+    if (more) { if (d.length > 1) more.textContent = '+' + (d.length - 1) + ' more'; else more.remove(); }
+  });
+  // Month menus (journeys filter, home search): no month that is already over.
+  document.querySelectorAll('select option').forEach(function (o) {
+    if (/^\d{4}-\d{2}$/.test(o.value) && o.value < month) o.remove();
+  });
+})();

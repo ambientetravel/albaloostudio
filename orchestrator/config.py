@@ -420,6 +420,11 @@ class Site:
     # compete with is a judgement about the business, and a crawler guessing at
     # it would confidently study the wrong sites.
     competitors: list[str] = field(default_factory=list)
+    # Queries the owner wants reported every Monday with the page Google shows
+    # for them (tools/query_report.py --pages). Terms, not pages: a term that
+    # moves from one URL to another is itself the finding (1 Nov: the Nowruz
+    # term was split over three cruise24.ir pages).
+    watch_terms: list[str] = field(default_factory=list)
     # Starter topics for a site with no Search Console footprint yet. The scout
     # writes briefs from GSC gaps — demand it can measure — so a new, low-traffic
     # site (cruise24.ir has 57 query-rows to boutimar.com's 3,690) produces
@@ -529,6 +534,7 @@ def load_sites(
                 status=str(merged.get("status", "active")).lower(),
                 audit_sample_pages=int(merged.get("audit_sample_pages", 10)),
                 competitors=[str(u).rstrip("/") for u in (merged.get("competitors") or [])],
+                watch_terms=[str(k).strip() for k in (merged.get("watch_terms") or []) if str(k).strip()],
                 seed_keywords=[str(k).strip() for k in (merged.get("seed_keywords") or []) if str(k).strip()],
                 offer_feed=str(merged.get("offer_feed", "") or "").strip(),
                 lead_source=str(merged.get("lead_source", "") or "").strip(),

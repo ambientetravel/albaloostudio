@@ -432,6 +432,14 @@ GUIDE_LINKS: dict[str, list[tuple[str, str]]] = {}   # sailing id -> [(guide url
 STATIC_CARDS = 36   # written into the HTML for crawlers and no-JS; journeys.js renders the rest from the index
 
 
+def dates_of(s) -> list[str]:
+    """The dates a visitor can still book, oldest first: open departures, or all of them when
+    every one is sold out (as `dep` does). site.js / journeys.js drop the ones before the
+    visitor's today, so a page built yesterday never shows yesterday's departure."""
+    open_deps = [d["date"] for d in s["departures"] if not d.get("soldOut")]
+    return open_deps or [d["date"] for d in s["departures"]]
+
+
 def index_record(s) -> dict:
     """Compact per-sailing record for the listing and the contact prefill (the full inventory
     is ~3 MB; this is what a phone actually downloads)."""
@@ -439,7 +447,7 @@ def index_record(s) -> dict:
     dep = open_deps[0]["date"] if open_deps else (s["departures"][0]["date"] if s["departures"] else None)
     ports = list(dict.fromkeys(p for p in (pretty_port(x) for x in s["route"]) if p != "At sea"))
     return {"id": s["id"], "u": s["url"], "t": s["title"], "l": s["line"], "k": s["lineKey"], "s": s["ships"], "n": s["nights"],
-            "d": dep, "dc": len(s["departures"]), "p": s["priceFrom"], "a": s["areas"], "m": s["months"],
+            "d": dep, "dc": len(s["departures"]), "ds": dates_of(s), "p": s["priceFrom"], "a": s["areas"], "m": s["months"],
             "f": [COUNTRY[c] for c in s["focus"]], "i": s.get("image"), "r": ports[:9] + (["…"] if len(ports) > 9 else [])}
 
 
@@ -451,13 +459,13 @@ def card(s) -> str:
     chips = "".join(f'<span class="chip">{esc(COUNTRY[c])}</span>' for c in s["focus"])
     ship = " or ".join(s["ships"])
     return (f'<a class="jcard2" href="{esc(s["url"])}" data-areas="{" ".join(s["areas"])}" data-months="{" ".join(s["months"]) or "request"}" '
-            f'data-line="{s["lineKey"]}" data-nights="{s["nights"]}" data-price="{s["priceFrom"] or 999999}" data-date="{dep or "9999"}" data-focus="{1 if s["focus"] else 0}">'
+            f'data-line="{s["lineKey"]}" data-nights="{s["nights"]}" data-price="{s["priceFrom"] or 999999}" data-date="{dep or "9999"}" data-dates="{" ".join(dates_of(s))}" data-focus="{1 if s["focus"] else 0}">'
             + (f'<img src="{esc(s["image"])}" alt="" loading="lazy">' if s.get("image") else '<div class="noimg"></div>') +
             f'<div class="jc-body"><small>{esc(s["line"])} · {esc(ship)}</small>'
             f'<h3>{esc(s["title"])}</h3>'
             f'<p class="jc-route">{esc(" · ".join(dict.fromkeys(p for p in (pretty_port(x) for x in s["route"]) if p != "At sea")))}</p>'
             f'<div class="jc-chips">{chips}</div>'
-            f'<div class="jc-foot"><span>{s["nights"]} nights<br><em>{esc(when)}{more}</em></span>'
+            f'<div class="jc-foot"><span>{s["nights"]} nights<br><em class="jc-when">{esc(when)}{more}</em></span>'
             + (f'<span class="jc-price">from <b>{euro(s["priceFrom"])}</b><em>per person</em></span>' if s["priceFrom"] else '<span class="jc-price"><b style="font-size:1rem">Fare on request</b></span>')
             + '</div></div></a>')
 
@@ -529,8 +537,9 @@ def detail(s, head, nav, foot) -> str:
         def fare(d):
             return "Sold out" if d.get("soldOut") else (euro(d["priceFrom"]) if d.get("priceFrom") else "On request")
         fares = ('<div class="fares-wrap"><table class="fares"><thead><tr><th>Departure</th>' + ("<th>Ship</th>" if multi else "") + '<th>From, per person</th></tr></thead><tbody>' +
-                 "".join(f'<tr{" class=sold" if d.get("soldOut") else ""}><td>{date.fromisoformat(d["date"]).strftime("%a %-d %b %Y")}</td>' + (f'<td>{esc(d.get("ship") or "")}</td>' if multi else "") + f'<td>{fare(d)}</td></tr>' for d in s["departures"]) +
-                 "</tbody></table></div>")
+                 "".join(f'<tr data-date="{d["date"]}"{" class=sold" if d.get("soldOut") else ""}><td>{date.fromisoformat(d["date"]).strftime("%a %-d %b %Y")}</td>' + (f'<td>{esc(d.get("ship") or "")}</td>' if multi else "") + f'<td>{fare(d)}</td></tr>' for d in s["departures"]) +
+                 "</tbody></table></div>"
+                 '<p class="fine fares-past" hidden>Every departure listed here has sailed. Ask us for the next dates.</p>')
     else:
         fares = (f'<p class="bigfare">from <b>{euro(s["priceFrom"])}</b> per person</p>' if s["priceFrom"] else "") + '<p class="fine">No departure dates in the source. Dates and the live fare come with your quote.</p>'
     shipnote = ""

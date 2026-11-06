@@ -64,17 +64,23 @@ def plain(md: str, cap: int = 600) -> str:
 
 
 def rows_from(report: dict, now: str) -> tuple[list[dict], list[dict], list[dict]]:
+    # `synced_at` is when this job ran; `data_as_of` is when the health report itself
+    # was generated. They differ whenever health.yml is late or failed (GitHub's 07:00
+    # cron has landed at 13:00-14:00), and a tab that shows only the first looks fresh
+    # while the numbers are a day old.
+    as_of = str(report.get("generated") or "")
     runs = [{"agent": a["agent"], "result": a.get("result") or "skipped",
-             "age_days": float(a.get("age_days") or 0), "run_url": a.get("url") or "", "synced_at": now}
+             "age_days": float(a.get("age_days") or 0), "run_url": a.get("url") or "", "synced_at": now,
+             "data_as_of": as_of}
             for a in report.get("agents") or []]
-    items = [{"level": lvl, "text": plain(str(t)), "property": "", "synced_at": now}
+    items = [{"level": lvl, "text": plain(str(t)), "property": "", "synced_at": now, "data_as_of": as_of}
              for lvl in LEVELS for t in report.get(lvl) or []]
     nums = report.get("numbers") or {}
     metrics = []
     for key, (label, prev_key) in METRICS.items():
         v = nums.get(key)
         if isinstance(v, (int, float)):
-            m = {"name": label, "value": round(float(v), 3), "synced_at": now}
+            m = {"name": label, "value": round(float(v), 3), "synced_at": now, "data_as_of": as_of}
             if prev_key and isinstance(nums.get(prev_key), (int, float)):
                 m["previous"] = round(float(nums[prev_key]), 3)
             metrics.append(m)
@@ -112,6 +118,13 @@ def run(apply: bool, report_path: Path = REPORT) -> list[str]:
     report = json.loads(report_path.read_text(encoding="utf-8"))
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     runs, items, metrics = rows_from(report, now)
+    try:
+        import ops_notify
+        routing = ops_notify.load_routing()
+        log_notify = ops_notify.publish(ops_notify.health_events(report, routing, now)
+                                        + ops_notify.stale_events(report, routing, now), apply)
+    except Exception as exc:  # noqa: BLE001
+        log_notify = [f"  ! notifications skipped: {exc}"]
     calls = plan(runs, items, metrics, _list("AgentRun"), _list("HealthItem"), _list("Metric"))
     log = [f"report generated {report.get('generated')}: {len(runs)} agents, {len(items)} health lines, "
            f"{len(metrics)} metrics"]
@@ -126,6 +139,7 @@ def run(apply: bool, report_path: Path = REPORT) -> list[str]:
     tally = {}
     for method, ent, _, _ in calls:
         tally[f"{method} {ent}"] = tally.get(f"{method} {ent}", 0) + 1
+    log.extend(log_notify)
     log.append("calls: " + ", ".join(f"{k} ×{v}" for k, v in sorted(tally.items())))
     log.append(f"summary: {len(calls)} call(s), {errors} error(s)" + ("" if apply else "  (dry run — nothing written)"))
     return log

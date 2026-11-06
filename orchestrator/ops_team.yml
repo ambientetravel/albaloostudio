@@ -1,0 +1,33 @@
+# Who hears about what — by FIELD, never by person.
+#
+# The pipeline writes one Notification row per event, tagged with a field. The
+# Albaloo Ops app (TeamMember entity, filled in by Alireza) says which people
+# cover which fields and how they want to hear: bell only, or bell + e-mail.
+# No names or addresses live in this repository, and nothing here sends e-mail.
+#
+# A property belongs to exactly one content field. Change a row here and the
+# next sync routes by it.
+fields:
+  persian_content:
+    label: Persian content
+    properties: [boutimar.ir, cruise24.ir, cruisebaz.com, dmciran.ir]
+  english_content:
+    label: English / Ambiente content
+    properties: [boutimar.com, exploreorient.com, ambientetravel.com, cruise24.me]
+  sales:
+    label: Sales and leads
+  social:
+    label: Social and Instagram
+  technical:
+    label: Site and pipeline health
+  owner:
+    label: Owner (everything that needs a decision)
+
+# event kind -> which field hears it. "by_property" = the property's content field.
+routes:
+  new_draft: by_property        # an article is waiting for review
+  hot_lead: sales
+  social_held: social
+  health_critical: technical    # a core agent broke or never ran
+  health_needs_you: owner
+  data_stale: technical         # a tab's source is late (see data_as_of)

@@ -1,7 +1,7 @@
 {
  "_about": "Variety Cruises sailings read from varietycruises.com cruise pages (the line's own booking data). priceFrom = cheapest cabin category with cabins left, EUR per person, port charges excluded; soldOut when none are left.",
  "source": "Variety Cruises",
- "synced": "2026-10-25",
+ "synced": "2026-11-01",
  "sailings": [
   {
    "id": "VAR-antiquity-to-byzantium-canal-crossing",
@@ -80,14 +80,6 @@
     "Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-10-30",
-     "code": "ATB261030",
-     "ship": "Galileo",
-     "nights": 7,
-     "priceFrom": 1700,
-     "soldOut": false
-    },
     {
      "date": "2026-11-06",
      "code": "ATB261106",
@@ -626,14 +618,6 @@
     },
     {
      "date": "2027-09-03",
-     "code": null,
-     "ship": "Callisto",
-     "nights": 7,
-     "priceFrom": null,
-     "soldOut": false
-    },
-    {
-     "date": "2027-09-17",
      "code": null,
      "ship": "Callisto",
      "nights": 7,

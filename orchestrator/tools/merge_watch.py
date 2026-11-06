@@ -59,6 +59,7 @@ from urllib.parse import urlparse
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config  # noqa: E402
+import firecrawl_client
 
 log = logging.getLogger("tools.merge_watch")
 
@@ -140,8 +141,18 @@ def page_is_live(url: str, title: str, session: requests.Session) -> dict[str, A
     # " — دریانامه | بوتیمار" suffix do not decide the match.
     words = [w for w in re.split(r"\s+", (title or "").strip()) if w][:_TITLE_MATCH_WORDS]
     if words and not all(w in text for w in words):
+        # A JavaScript app (cruisebaz.com and ambientetravel.com run on base44)
+        # serves the same empty shell for every route, so the title is only in
+        # the RENDERED page. Without this the Broadcaster never got the approved
+        # text of a base44 article. Off without FIRECRAWL_API_KEY.
+        rendered = firecrawl_client.rendered_html(url)
+        if rendered and all(w in rendered for w in words):
+            return {"live": True, "reason": None, "bytes": len(rendered), "html": rendered,
+                    "rendered": True}
         return {"live": False,
-                "reason": "200, but the page does not contain this article's title"}
+                "reason": "200, but the page does not contain this article's title"
+                          + ("" if firecrawl_client.enabled() else
+                             " (a JavaScript page cannot be checked without FIRECRAWL_API_KEY)")}
     return {"live": True, "reason": None, "bytes": len(r.content), "html": text}
 
 

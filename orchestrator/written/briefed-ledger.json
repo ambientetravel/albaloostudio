@@ -1,7 +1,7 @@
 {
  "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
  "cooldown_days": 45,
- "updated_at": "2026-10-25T04:32:30+00:00",
+ "updated_at": "2026-11-01T04:22:13+00:00",
  "entries": [
   {
    "domain": "cruise24.me",
@@ -876,12 +876,28 @@
    "target_url_path": "/blog/mediterranean-cruise-daily-itinerary/"
   },
   {
+   "domain": "cruise24.ir",
+   "query": "برنامه‌ریزی کروز نوروز ۱۴۰۶",
+   "first_briefed": "2026-11-01T04:22:13+00:00",
+   "last_briefed": "2026-11-01T04:22:13+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/blog/nowruz-cruise-planning-guide/"
+  },
+  {
    "domain": "boutimar.ir",
    "query": "بهترین زمان سفر دریایی به فیوردهای نروژ",
    "first_briefed": "2026-09-27T10:03:16+00:00",
    "last_briefed": "2026-09-27T10:03:16+00:00",
    "times_briefed": 1,
    "target_url_path": "/behtarin-zaman-safar-dariyayi-fjordhaye-norway"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "بهترین زمان کروز خلیج فارس و امارات",
+   "first_briefed": "2026-11-01T04:18:32+00:00",
+   "last_briefed": "2026-11-01T04:18:32+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/best-time-for-persian-gulf-cruise"
   },
   {
    "domain": "boutimar.ir",
@@ -906,6 +922,14 @@
    "last_briefed": "2026-10-18T04:27:50+00:00",
    "times_briefed": 1,
    "target_url_path": "/blog/msc-cruises-vs-explora-journeys/"
+  },
+  {
+   "domain": "cruise24.ir",
+   "query": "تفاوت کروز ام اس سی و سلستیال",
+   "first_briefed": "2026-11-01T04:22:13+00:00",
+   "last_briefed": "2026-11-01T04:22:13+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/blog/msc-vs-celestyal-cruise-comparison/"
   },
   {
    "domain": "cruisebaz.com",
@@ -962,6 +986,14 @@
    "last_briefed": "2026-09-26T22:26:14+00:00",
    "times_briefed": 1,
    "target_url_path": "/blog/rahnamaye-baste-bandi-chamedan-safar-daryaei/"
+  },
+  {
+   "domain": "cruise24.ir",
+   "query": "راهنمای بندر کروز دبی هاربر",
+   "first_briefed": "2026-11-01T04:22:13+00:00",
+   "last_briefed": "2026-11-01T04:22:13+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/blog/dubai-harbour-cruise-port-guide/"
   },
   {
    "domain": "cruise24.ir",
@@ -1045,6 +1077,14 @@
   },
   {
    "domain": "cruisebaz.com",
+   "query": "کروز آلاسکا برای ایرانیان",
+   "first_briefed": "2026-11-01T04:20:05+00:00",
+   "last_briefed": "2026-11-01T04:20:05+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/alaska-cruise-for-iranians"
+  },
+  {
+   "domain": "cruisebaz.com",
    "query": "کروز رودخانه دانوب از بوداپست تا وین",
    "first_briefed": "2026-10-18T04:26:06+00:00",
    "last_briefed": "2026-10-18T04:26:06+00:00",
@@ -1114,6 +1154,14 @@
    "last_briefed": "2026-09-26T22:26:14+00:00",
    "times_briefed": 1,
    "target_url_path": "/blog/keshti-kroz-chist-va-chegoone-kar-mikonad/"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "گشت ساحلی در کشتی کروز چیست",
+   "first_briefed": "2026-11-01T04:18:32+00:00",
+   "last_briefed": "2026-11-01T04:18:32+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/what-is-a-shore-excursion"
   }
  ]
 }

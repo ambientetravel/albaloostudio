@@ -3774,6 +3774,24 @@ _log, _c = _nrs_run({"boutimar#30": {"page_id": "p1", "status": "Approved", "fee
                     {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "BLOCK"}])
 ok("Approved but BLOCKed by the house rules is NOT merged, and goes back to Needs edits",
    not any(m == "PUT" for m, p, b in _c) and any("HOLD" in l for l in _log))
+_log, _c = _nrs_run({"boutimar#30": {"page_id": "p1", "status": "Approved", "feedback": ""}},
+                    {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "UNKNOWN"}])
+ok("Approved but the gate could not read the diff (UNKNOWN) is held: no merge, no comment, row left Approved for the next run",
+   not any(m == "PUT" for m, p, b in _c) and not any(m == "POST" for m, p, b in _c)
+   and not any(m == "NPATCH" for m, p, b in _c) and any("could not read" in l for l in _log))
+_saved_rp, _saved_gh = _nrs.pr_review.review_pr, _nrs.gh
+def _boom(*a, **k): raise RuntimeError("GitHub 502")
+_nrs.pr_review.review_pr = _boom
+_nrs.gh = lambda m, path, body=None: (200, [{"number": 30, "head": {"ref": "agent2/x", "sha": "s"}, "html_url": "u",
+                                             "title": "Agent 2 draft: T", "created_at": "2026-10-01T00:00:00Z"}]
+                                       if path.endswith("pulls?state=open&per_page=50") else (200, []))
+try:
+    _lp = _nrs.open_article_prs()
+finally:
+    _nrs.pr_review.review_pr, _nrs.gh = _saved_rp, _saved_gh
+ok("a diff the gate cannot read is UNKNOWN, not WARN (WARN would have merged on Approved)",
+   _lp and all(x["gate"] == "UNKNOWN" for x in _lp))
+
 _fb = {"boutimar#30": {"page_id": "p1", "status": "Needs edits", "feedback": "Cut the second section."}}
 _log, _c = _nrs_run(_fb, {"boutimar#30": _open}, [{"pid": "boutimar#30", "gate": "PASS"}])
 _posted = [b for m, p, b in _c if m == "POST" and p.endswith("/issues/30/comments")]
@@ -4360,15 +4378,46 @@ def _closed(sc):
 ok("reviser: every object in its output schemas is closed, and a JSON article comes back parsed",
    len(_schemas) == 2 and all(_closed(x) for x in _schemas) and _oj["item"] == {"slug": "a", "title": "T2"})
 
-# Health: a weekly agent pushed off the first page of runs by the hourly sync is not "never ran" (10 Oct)
+# Health: a weekly agent buried under hourly runs is not "never ran". One page of 100 missed it on
+# 10 Oct; eight pages missed it on 31 Oct (957 runs in 6 days). Now each workflow is asked directly.
 _saved_hj = _hr._json
-_pages = {1: [{"name": "Content Review sync (Notion ⇄ GitHub)", "conclusion": "success", "display_title": "x"}] * 100,
-          2: [{"name": "Agent 8 — Competitor Scout", "conclusion": "success", "display_title": "y"}]}
-_hr._json = lambda url, tok: {"workflow_runs": _pages.get(int(url.rsplit("page=", 1)[1]), [])}
+_hr_calls = []
+def _hr_fake(url, tok):
+    _hr_calls.append(url)
+    if "/actions/workflows?" in url:
+        return {"workflows": [{"name": "Content Review sync (Notion ⇄ GitHub)", "id": 1},
+                              {"name": "Agent 8 — Competitor Scout", "id": 8},
+                              {"name": "Agent 1 — SEO Scout", "id": 2}]}
+    if "/workflows/8/runs" in url:   # the Sunday fallback cancelled itself, then last week's real run
+        return {"workflow_runs": [{"name": "Agent 8 — Competitor Scout", "conclusion": "cancelled", "display_title": "y", "id": 2},
+                                  {"name": "Agent 8 — Competitor Scout", "conclusion": "success", "display_title": "y", "id": 1}]}
+    if "/workflows/2/runs" in url:
+        return {"workflow_runs": [{"name": "Agent 1 — SEO Scout", "conclusion": "success", "display_title": "(dry run)", "id": 3}]}
+    if "/actions/runs?" in url:      # the repo-wide list: 900 sync runs, the agents nowhere in reach
+        return {"workflow_runs": [{"name": "Content Review sync (Notion ⇄ GitHub)", "conclusion": "success", "display_title": "x"}] * 100}
+    return {"workflow_runs": []}
+_hr._json = _hr_fake
 _lr = _hr.latest_runs("t")
 _hr._json = _saved_hj
-ok("health: agents on later pages of the run list are found, not reported as 'never ran'",
-   "Agent 8 — Competitor Scout" in _lr)
+ok("health: a weekly agent is found through its own workflow's run list, past any number of hourly runs; "
+   "a cancelled fallback is skipped for the real run; the repo-wide list is never paged",
+   _lr.get("Agent 8 — Competitor Scout", {}).get("id") == 1
+   and "Agent 1 — SEO Scout" not in _lr          # only a dry run: correctly "never ran"
+   and not any("/actions/runs?" in u for u in _hr_calls)
+   and not any("/workflows/1/runs" in u for u in _hr_calls))   # the sync is not an agent: not asked
+
+# Health: a CORE agent with no counting run is "broke", never a quiet table row under "0 broke" (31 Oct)
+_saved_hb = (_hr.latest_runs, _hr.latest_artifact, _hr.open_prs)
+_hr.latest_runs = lambda tok: {}
+_hr.latest_artifact = lambda *a, **k: None
+_hr.open_prs = lambda tok: ([], [])
+try:
+    _rep = _hr.build("t", "")
+    _md = _hr.render(_rep)
+finally:
+    _hr.latest_runs, _hr.latest_artifact, _hr.open_prs = _saved_hb
+ok("health: Scout/Writer/Broadcaster with no run on record are listed under Broke, and the headline does not say every core agent succeeded",
+   sum("no successful run" in c for c in _rep["critical"]) == 3 and "Every core agent's last run succeeded" not in _md)
 
 # ── Closer: one dropped connection to a lead source is retried, not a red run (11 Oct) ──
 import agent4_sales_closer_batch as _a4b
@@ -4494,6 +4543,57 @@ ok("ops-sync: an app decision goes to Notion only while the row is still 'To rev
    and any(h["id"] == "id-d#4" and f["status"] == "approved" for h, f in _p1["update"])
    and [r["pid"] for r in _p1["create"]] == ["e#5"] and not _p1["seed"])
 _pb = _ops.ping_blocks([_br("e#5")], "https://albaloo-ops-core.base44.app")
+# ── triage score + data-as-of (1 Nov) ──
+from datetime import datetime as _dt, timezone as _tz
+_now = _dt(2026, 11, 1, tzinfo=_tz.utc)
+def _row(site, gate, written, status="To review"):
+    return {"pid": "x#1", "site": site, "gate": gate, "written": written, "status": status, "title": "t",
+            "language": "English", "read": "", "live": "", "words": "", "feedback": ""}
+_s_clean_old, _w1 = _ops.priority(_row("boutimar.com", "PASS", "2026-09-28"), _now)
+_s_warn_new, _w2 = _ops.priority(_row("exploreorient.com", "WARN", "2026-10-30"), _now)
+_s_block, _w3 = _ops.priority(_row("cruise24.ir", "BLOCK", "2026-10-01"), _now)
+ok("triage: a clean, old draft on a flagship site outranks a fresh warning on another site; reasons are plain words",
+   _s_clean_old > _s_warn_new and "flagship" in _w1 and "waiting 34 d" in _w1 and "other site" in _w2)
+ok("triage: a BLOCK draft scores below a PASS of the same age and says to fix it first",
+   _s_block < _ops.priority(_row("cruise24.ir", "PASS", "2026-10-01"), _now)[0] and "BLOCK" in _w3)
+ok("triage: the score never exceeds 100, and only drafts waiting for review carry one",
+   _ops.priority(_row("boutimar.com", "PASS", "2020-01-01"), _now)[0] <= 100
+   and "priority_score" in _ops.to_app(_row("boutimar.com", "PASS", "2026-10-01"), _now, with_body=False)
+   and "priority_score" not in _ops.to_app(_row("boutimar.com", "PASS", "2026-10-01", "Approved"), _now, with_body=False))
+import tools.ops_today as _ot
+_r, _i, _m = _ot.rows_from({"generated": "2026-10-31T13:32", "agents": [{"agent": "Scout", "result": "success", "age_days": 6.9}],
+                            "warn": ["x"], "numbers": {"open_prs": 28}}, "2026-11-01T04:00:00+00:00")
+ok("today tab: every agent, health line and metric carries when the REPORT was made, apart from when the sync ran",
+   _r[0]["data_as_of"] == _i[0]["data_as_of"] == _m[0]["data_as_of"] == "2026-10-31T13:32"
+   and _r[0]["synced_at"] == "2026-11-01T04:00:00+00:00")
+import tools.ops_sites as _os
+_b = _os.build([{"domain": "cruise24.ir"}], [], [], {"cruise24.ir": {"declared": 56, "declared_and_surfaced": 47, "coverage": 0.84}},
+               "2026-11-01T04:00:00+00:00", "2026-10-26")
+_b2 = _os.build([{"domain": "cruise24.ir"}], [], [], {"cruise24.ir": {"declared": 56, "declared_and_surfaced": 47, "coverage": 0.84}},
+                "2026-11-01T04:00:00+00:00")
+ok("sites tab: coverage carries the day Google was asked and its age (6 d), and stays unlabelled rather than guessed when unknown",
+   _b[0]["coverage_as_of"] == "2026-10-26" and _b[0]["coverage_age_days"] == 6 and "coverage_as_of" not in _b2[0])
+import tools.ops_notify as _on
+_rt = _on.load_routing()
+_ev = _on.draft_events([_row("cruise24.ir", "PASS", "2026-10-01"), _row("exploreorient.com", "WARN", "2026-10-30"),
+                        _row("nowhere.test", "PASS", "2026-10-30"), _row("boutimar.com", "PASS", "2026-10-01", "Approved")],
+                       _rt, "2026-11-01T04:00:00+00:00")
+ok("notify: a new draft goes to its property's content field; an unowned property goes to the owner, never nowhere; "
+   "a draft not waiting for review is not announced",
+   [e["field"] for e in _ev] == ["persian_content", "english_content", "owner"])
+_hv = _on.health_events({"critical": ["**Scout has no successful run on record** — x"], "needs_you": ["28 PRs waiting"]}, _rt, "2026-11-01T04:00:00+00:00")
+ok("notify: a broken core agent is for the technical field, plain text, and its key is stable so the hourly sync cannot repeat it",
+   _hv[0]["field"] == "technical" and "**" not in _hv[0]["title"] and _hv[1]["field"] == "owner"
+   and _hv[0]["key"] == _on.health_events({"critical": ["**Scout has no successful run on record** — x"]}, _rt, "2026-11-02T09:00:00+00:00")[0]["key"])
+ok("notify: a health report older than 26 h raises one 'late' notice, keyed by the report's day; a fresh one raises none",
+   len(_on.stale_events({"generated": "2026-10-31T13:32"}, _rt, "2026-11-01T20:00:00+00:00")) == 1
+   and not _on.stale_events({"generated": "2026-11-01T03:00"}, _rt, "2026-11-01T20:00:00+00:00"))
+_saved_b44 = _on.nrs.b44
+_on.nrs.b44 = lambda m, p, b=None: (404, {})
+_pub = _on.publish(_ev, True)
+_on.nrs.b44 = _saved_b44
+ok("notify: if the app has no Notification entity yet, the sync says so and carries on (no exception)",
+   len(_pub) == 1 and "OPS-APP-NOTIFY-PROMPT.md" in _pub[0])
 ok("ops-sync: the new-draft ping @mentions Alireza (Notion push) and links the draft",
    _pb[0]["callout"]["rich_text"][0]["mention"]["user"]["id"] == _ops.OWNER
    and "1 new draft to review" in _pb[0]["callout"]["rich_text"][1]["text"]["content"]
@@ -4694,6 +4794,35 @@ ok("Instagram angles: @boutixcruises informs, @cruise24.ir sells, @cruise24.me c
    and "NO Iran trace" in _ig_by["cruise24.me"]["angle"] and _ig_by["cruise24.me"]["cluster"] == "ambiente"
    and "THIS ACCOUNT'S JOB: Sales" in _a3ig.channel_brief("instagram", _ig_by["cruise24.ir"]["angle"])
    and "THIS ACCOUNT'S JOB" not in _a3ig.channel_brief("instagram"))
+
+# ── Firecrawl renders JavaScript pages for merge-watch and Agent 8 (1 Nov) ──
+import firecrawl_client as _fc
+import requests as _rq_fc
+from tools import merge_watch as _mw_fc
+class _FR:
+    def __init__(self, code, data): self.status_code, self._d, self.content = code, data, b"x"
+    def json(self): return self._d
+_saved_fc = (_rq_fc.post, os.environ.get("FIRECRAWL_API_KEY"), os.environ.get("FIRECRAWL_MAX_PAGES"))
+_posts = []
+_rq_fc.post = lambda url, **kw: (_posts.append(kw["json"]["url"]),
+    _FR(200, {"success": True, "data": {"html": "<main><h1>AROYA without Schengen</h1><p>body</p></main>"}}))[1]
+class _Sess:
+    def get(self, url, **kw):
+        r = _FR(200, None); r.text = "<html><body><div id=root></div></body></html>"; r.content = r.text.encode(); return r
+os.environ.pop("FIRECRAWL_API_KEY", None)
+_off = _mw_fc.page_is_live("https://cruisebaz.com/aroya/x", "AROYA without Schengen", _Sess())
+os.environ["FIRECRAWL_API_KEY"] = "fc-test"; os.environ["FIRECRAWL_MAX_PAGES"] = "1"; _fc._used = 0
+_on = _mw_fc.page_is_live("https://cruisebaz.com/aroya/x", "AROYA without Schengen", _Sess())
+_capped = _fc.rendered_html("https://cruisebaz.com/aroya/y")
+ok("Firecrawl: a JavaScript page is live once rendered (title found); without the key it says why; the per-run page cap holds",
+   not _off["live"] and "FIRECRAWL_API_KEY" in _off["reason"]
+   and _on["live"] and _on.get("rendered") and "AROYA without Schengen" in _on["html"]
+   and _capped is None and _posts == ["https://cruisebaz.com/aroya/x"])
+_rq_fc.post = _saved_fc[0]
+for _k, _v in (("FIRECRAWL_API_KEY", _saved_fc[1]), ("FIRECRAWL_MAX_PAGES", _saved_fc[2])):
+    if _v is None: os.environ.pop(_k, None)
+    else: os.environ[_k] = _v
+_fc._used = 0
 
 # ── Monday summary (10 Oct) ──
 import weekly_summary as _ws
