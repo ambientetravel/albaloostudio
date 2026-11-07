@@ -98,6 +98,62 @@ def collect_pages(service, site: config.Site) -> dict[str, list[dict[str, Any]]]
     return out
 
 
+def trend(service, site: config.Site, days: int = 480) -> list[dict[str, Any]]:
+    """Clicks, impressions and position per ISO week (Monday), as far back as Search
+    Console keeps data (16 months). "Performance dropped" is a claim about a curve;
+    this is the curve."""
+    from datetime import date as _date
+    end = (a1.utc_now() - timedelta(days=site.data_lag_days)).date()
+    start = end - timedelta(days=days)
+    rows = a1._search_analytics(service, site.property_uri, start.isoformat(), end.isoformat(), ["date"])
+    weeks: dict[str, dict[str, float]] = {}
+    for r in rows:
+        d = _date.fromisoformat(r["keys"][0])
+        wk = (d - timedelta(days=d.weekday())).isoformat()
+        w = weeks.setdefault(wk, {"clicks": 0, "impressions": 0, "pos_x_impr": 0.0, "days": 0})
+        imp = int(r.get("impressions", 0) or 0)
+        w["clicks"] += int(r.get("clicks", 0) or 0)
+        w["impressions"] += imp
+        w["pos_x_impr"] += float(r.get("position", 0) or 0) * imp
+        w["days"] += 1
+    return [{"week": k, "clicks": int(v["clicks"]), "impressions": int(v["impressions"]), "days": int(v["days"]),
+             "position": round(v["pos_x_impr"] / v["impressions"], 1) if v["impressions"] else None}
+            for k, v in sorted(weeks.items())]
+
+
+def page_windows(service, site: config.Site, pivot: str, days: int) -> list[dict[str, Any]]:
+    """Impressions and clicks per page in the `days` before `pivot` and the `days` after it
+    (or up to the data lag), to see which pages a drop came from."""
+    from datetime import date as _date
+    p = _date.fromisoformat(pivot)
+    end = min(p + timedelta(days=days), (a1.utc_now() - timedelta(days=site.data_lag_days)).date())
+    span = (end - p).days
+    before = a1._search_analytics(service, site.property_uri, (p - timedelta(days=span)).isoformat(),
+                                  (p - timedelta(days=1)).isoformat(), ["page"])
+    after = a1._search_analytics(service, site.property_uri, p.isoformat(), end.isoformat(), ["page"])
+    out: dict[str, dict[str, Any]] = {}
+    for tag, rows in (("before", before), ("after", after)):
+        for r in rows:
+            o = out.setdefault(r["keys"][0], {"page": r["keys"][0], "before_impr": 0, "before_clicks": 0,
+                                              "after_impr": 0, "after_clicks": 0})
+            o[f"{tag}_impr"] += int(r.get("impressions", 0) or 0)
+            o[f"{tag}_clicks"] += int(r.get("clicks", 0) or 0)
+    rows = sorted(out.values(), key=lambda o: -(o["before_impr"] + o["after_impr"]))
+    for o in rows:
+        o["span_days"] = span
+    return rows
+
+
+def sitemap_status(service, site: config.Site) -> list[dict[str, Any]]:
+    """What Search Console itself holds for the property's sitemaps: when it last read
+    them, errors, and how many URLs it took from each. Restricted users can read this."""
+    try:
+        resp = service.sitemaps().list(siteUrl=site.property_uri).execute()
+    except Exception as e:  # noqa: BLE001 — a permission answer is a finding, not a crash
+        return [{"error": str(e)[:200]}]
+    return resp.get("sitemap", [])
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--domain", required=True)
@@ -105,12 +161,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--watch", default="",
                     help="comma-separated terms to check for presence")
     ap.add_argument("--format", choices=["md", "json"], default="md")
+    ap.add_argument("--trend", action="store_true",
+                    help="weekly clicks, impressions and position over 16 months, plus sitemap status")
+    ap.add_argument("--compare", default="",
+                    help="YYYY-MM-DD: per-page impressions in equal windows before and after this date")
     ap.add_argument("--pages", action="store_true",
                     help="also show WHICH page ranks for each top/watched query")
     args = ap.parse_args(argv)
 
     site = config.load_sites(only=[args.domain], include_hold=True)[0]
     service = a1.build_gsc_client()
+    if args.trend or args.compare:
+        return report_trend(service, site, args)
     rows = collect(service, site)
 
     watch = [w.strip() for w in args.watch.split(",") if w.strip()] or list(site.watch_terms)
@@ -198,6 +260,44 @@ def main(argv: list[str] | None = None) -> int:
             seen.add(q)
             for pg in (pages.get(q) or [])[:3]:
                 print(f"| {q} | `{pg['page']}` | {pg['impressions']:,} | {pg['clicks']} | {pg['position']} |")
+        print()
+    return 0
+
+
+def report_trend(service, site: config.Site, args) -> int:
+    if args.trend:
+        weeks = trend(service, site)
+        print(f"# {site.domain} — clicks and impressions per week ({site.property_uri})\n")
+        print("| Week of | Clicks | Impressions | Avg position | Days with data |")
+        print("|---|---:|---:|---:|---:|")
+        for w in weeks:
+            print(f"| {w['week']} | {w['clicks']} | {w['impressions']:,} | {w['position'] if w['position'] is not None else '—'} | {w['days']} |")
+        print(f"\n{len(weeks)} weeks, {sum(w['clicks'] for w in weeks)} clicks, "
+              f"{sum(w['impressions'] for w in weeks):,} impressions in total.\n")
+        print("## Sitemaps as Search Console holds them\n")
+        sm = sitemap_status(service, site)
+        if not sm:
+            print("No sitemap submitted to Search Console for this property.\n")
+        for m in sm:
+            if "error" in m:
+                print(f"Could not read sitemaps: {m['error']}\n")
+                continue
+            parts = ", ".join(f"{c.get('type')}: {c.get('submitted')} submitted" + (f", {c['indexed']} indexed" if c.get("indexed") else "")
+                              for c in m.get("contents", []))
+            print(f"- `{m.get('path')}`: last submitted {str(m.get('lastSubmitted', '—'))[:10]}, last read by Google "
+                  f"{str(m.get('lastDownloaded', '—'))[:10]}, pending {m.get('isPending')}, errors {m.get('errors', 0)}, "
+                  f"warnings {m.get('warnings', 0)}; {parts or 'no contents reported'}")
+        print()
+    if args.compare:
+        rows = page_windows(service, site, args.compare, 60)
+        span = rows[0]["span_days"] if rows else 0
+        print(f"## Pages, {span} days before vs {span} days after {args.compare}\n")
+        print(f"Before: {sum(r['before_impr'] for r in rows):,} impressions, {sum(r['before_clicks'] for r in rows)} clicks. "
+              f"After: {sum(r['after_impr'] for r in rows):,} impressions, {sum(r['after_clicks'] for r in rows)} clicks.\n")
+        print("| Page | Impr. before | Clicks before | Impr. after | Clicks after |")
+        print("|---|---:|---:|---:|---:|")
+        for r in rows[:args.top]:
+            print(f"| {r['page']} | {r['before_impr']:,} | {r['before_clicks']} | {r['after_impr']:,} | {r['after_clicks']} |")
         print()
     return 0
 

@@ -183,6 +183,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--ssh", action="store_true", help="upload the changed files and confirm them live")
     ap.add_argument("--explain", type=int, default=0, metavar="N", help="print how N differing files differ from live")
+    ap.add_argument("--live-urls", default="", metavar="FILE",
+                    help="after --ssh, write the URLs of pages confirmed changed or removed (for IndexNow)")
     args = ap.parse_args()
     today = dt.date.today().isoformat()
 
@@ -254,6 +256,12 @@ def main() -> int:
         print(f"uploaded and read back: {len(ok)}/{len(changed)} files live, "
               f"{len(retire) - sum(1 for r in retire if after[r] is not None)}/{len(retire)} pages retired")
         save_manifest(known)
+        if args.live_urls:
+            # Only what was read back: a changed page now live, or a retired page now gone.
+            gone = [r for r in retire if after[r] is None]
+            urls = [SITE + ("" if r == "index.html" else r) for r in ok + gone if r.endswith(".html")]
+            Path(args.live_urls).write_text("".join(u + "\n" for u in urls), encoding="utf-8")
+            print(f"{len(urls)} page URLs for IndexNow -> {args.live_urls}")
         if bad:
             print("NOT live after upload: " + ", ".join(bad[:10]))
             return 1
