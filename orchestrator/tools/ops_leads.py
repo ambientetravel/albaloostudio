@@ -41,6 +41,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import notion_review_sync as nrs  # noqa: E402
+import ops_notify  # noqa: E402
 import ops_sync  # noqa: E402
 
 ENTITY = "Lead"
@@ -169,6 +170,9 @@ def run(closed: Path, apply: bool, locales: dict[str, str]) -> list[str]:
                                  {"children": ping_blocks(new)})
             if c != 200:
                 log.append(f"  ! Notion {c} ping: {str(resp)[:160]}")
+    # hot or escalated leads reach the sales field's bell. Never raises (publish() guards itself).
+    log.extend(ops_notify.publish(ops_notify.lead_events(new, ops_notify.load_routing(),
+                                                         now.isoformat(timespec="seconds")), apply))
     log.append(f"summary: {len(recs)} record(s), {len(new)} created"
                + ("" if apply else "  (dry run — nothing written)"))
     return log
@@ -187,8 +191,12 @@ def main(argv: list[str] | None = None) -> int:
         locales = {s.domain: s.locale for s in config.load_sites()}
     except Exception:  # noqa: BLE001 — a missing locale only defaults to "en"
         locales = {}
-    print("\n".join(run(Path(a.closed), a.apply, locales)))
-    return 0
+    lines = run(Path(a.closed), a.apply, locales)
+    print("\n".join(lines))
+    # A lead the app refused is not safely recorded: exit non-zero so the Closer workflow
+    # does not tell the source it may forget it. (Notification problems are not lead
+    # problems and are worded differently.)
+    return 1 if any(x.startswith("  ! base44") for x in lines) and a.apply else 0
 
 
 if __name__ == "__main__":

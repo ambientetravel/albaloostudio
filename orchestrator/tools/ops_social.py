@@ -39,6 +39,7 @@ from urllib.parse import urlparse
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import notion_review_sync as nrs  # noqa: E402
+import ops_notify  # noqa: E402
 import ops_sync  # noqa: E402
 
 ENTITY = "SocialPost"
@@ -123,6 +124,9 @@ def run(folder: Path, apply: bool) -> list[str]:
             c, resp = nrs.b44("PUT", _ent(f"/{h['id']}"), fields)
             if c != 200:
                 log.append(f"  ! base44 {c}: {str(resp)[:160]}")
+    # An app with no rows at all is a first sync: the backlog is not news (see ops_notify).
+    if have:
+        log.extend(ops_notify.publish(ops_notify.social_events(p["create"], ops_notify.load_routing(), now), apply))
     ready = sum(1 for h in have if h.get("decision") == "approve")
     log.append(f"summary: {len(p['create'])} created, {len(p['update'])} updated, {ready} approved and "
                f"waiting to be posted by hand (nothing is published from here)"

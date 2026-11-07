@@ -50,6 +50,7 @@ from agent4_sales_closer import (
     qualify,
     redact,
     site_of,
+    stable_lead_id,
 )
 from config import rfc3339, utc_now
 
@@ -134,7 +135,7 @@ def close_one(raw: dict[str, Any], out_dir: Path, *, no_llm: bool) -> Outcome:
     routing = campaign.lead_routing if campaign else LeadRouting()
     profile = profile_for(campaign, site_of(lead))
 
-    oc.lead_id = f"lead_{utc_now():%Y%m%dT%H%M%S}Z_{abs(hash(lead.from_ref)) % 10**6:06d}"
+    oc.lead_id = stable_lead_id(lead)
 
     try:
         rates = _fetch_rates(routing.price_source)
@@ -209,6 +210,21 @@ def _sleep(seconds: float) -> None:
     time.sleep(seconds)
 
 
+# What the last pull said about its cursor, so a finished run can acknowledge it.
+# {"url", "next", "seqs"}; "next" is None when the source hands leads out once and
+# moves its own cursor (the old leads.php), in which case there is nothing to ack.
+LAST_PULL: dict[str, Any] = {}
+
+
+def _lead_secret() -> str:
+    # LEADS_SIGNING_SECRET, when set, is used only for pulling leads: it lives in a
+    # site's api/config.php, so it should not be the key that signs every other hop.
+    secret = config.optional_env("LEADS_SIGNING_SECRET") or config.optional_env("WEBHOOK_SIGNING_SECRET")
+    # A value copied out of a web terminal can carry a line break where the line wrapped;
+    # a signing secret never contains whitespace, so none of it is meant.
+    return "".join(secret.split())
+
+
 def _fetch_leads(url: str) -> list[dict[str, Any]]:
     """
     Pull leads from an endpoint — the portal at res.boutimar.ir, a Make
@@ -221,12 +237,8 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
     """
     import requests
 
-    # LEADS_SIGNING_SECRET, when set, is used only for pulling leads: it lives in a
-    # site's api/config.php, so it should not be the key that signs every other hop.
-    secret = config.optional_env("LEADS_SIGNING_SECRET") or config.optional_env("WEBHOOK_SIGNING_SECRET")
-    # A value copied out of a web terminal can carry a line break where the line wrapped;
-    # a signing secret never contains whitespace, so none of it is meant.
-    secret = "".join(secret.split())
+    secret = _lead_secret()
+    LAST_PULL.clear()
     if secret:
         # Length and a short hash, never the value: compared with the same two numbers
         # printed on the server, they show which copy of the secret is the wrong one.
@@ -249,6 +261,11 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
             _sleep(wait)
         headers = (config.signed_headers(secret, body, "agent4-lead-pull")
                    if secret else {"User-Agent": config.USER_AGENT})
+        # "I will acknowledge what I recorded": the source then keeps its cursor where it
+        # is until the ack arrives, instead of moving it on the GET and losing every lead
+        # if this run dies before the Ops app has them. A source that does not know the
+        # header ignores it and behaves as before.
+        headers["X-Albaloo-Ack"] = "1"
         try:
             resp = requests.get(url, headers=headers, timeout=config.WEBHOOK_TIMEOUT_S)
         except (requests.ConnectionError, requests.Timeout):
@@ -262,6 +279,8 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
         # secret from a host that strips the X- headers; raise_for_status alone drops it.
         raise requests.HTTPError(f"{resp.status_code} from {url}: {config.redact(resp.text[:200])}", response=resp)
     data = resp.json()
+    if isinstance(data, dict) and isinstance(data.get("seqs"), list) and data.get("next") is not None:
+        LAST_PULL.update(url=url, next=int(data["next"]), seqs=[int(x) for x in data["seqs"]])
     # Accept a bare array or {"leads": [...]}, because both are what real
     # endpoints return and arguing about it helps nobody.
     if isinstance(data, dict):
@@ -269,6 +288,25 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
     if not isinstance(data, list):
         raise ValueError(f"expected a list of leads, got {type(data).__name__}")
     return data
+
+
+def ack_through(outcomes: list["Outcome"], pull: dict[str, Any], n_leads: int) -> int | None:
+    """
+    How far the source's cursor may move: past every lead up to, not including, the
+    first one that did not get recorded. A lead that cannot be read at all is
+    recorded as such in the manifest and never will be readable, so it does not hold
+    the cursor back; a lead that failed for any other reason (the model was down) does,
+    and is served again next run. None when the source keeps its own cursor.
+    """
+    seqs = pull.get("seqs")
+    if not pull or pull.get("next") is None or not isinstance(seqs, list) or len(seqs) != n_leads:
+        return None
+    for i, oc in enumerate(outcomes):
+        if oc.status == "failed" and not oc.error.startswith("not a valid inbound lead"):
+            return seqs[i] - 1
+    if len(outcomes) == n_leads:
+        return int(pull["next"])
+    return seqs[len(outcomes) - 1] if outcomes else None
 
 
 def _read_leads(path: Path) -> list[dict[str, Any]]:
@@ -293,7 +331,7 @@ def _read_leads(path: Path) -> list[dict[str, Any]]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--campaigns", help="directory of campaign.log.v1 files from Agent 3")
-    src = ap.add_mutually_exclusive_group(required=True)
+    src = ap.add_mutually_exclusive_group(required=False)  # checked below
     src.add_argument("--leads", help="JSONL or JSON array of inbound leads")
     src.add_argument("--leads-url", help="endpoint returning leads as JSON; the "
                                          "request is HMAC-signed like every "
@@ -308,6 +346,9 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s %(levelname)-7s %(name)s | %(message)s",
                         datefmt="%H:%M:%S")
+
+    if not (args.leads or args.leads_url):
+        ap.error("one of --leads or --leads-url is required")
 
     if args.leads:
         leads_path = Path(args.leads)
@@ -357,7 +398,9 @@ def main(argv: list[str] | None = None) -> int:
                  f"  redacted={oc.redactions}" if oc.redactions else "",
                  f"  campaign={oc.attributed_campaign}" if oc.attributed_campaign else "")
 
+    through = ack_through(outcomes, dict(LAST_PULL), len(leads)) if args.leads_url else None
     manifest = {
+        "ack": ({"url": args.leads_url, "through": through} if through is not None else {}),
         "architecture_credit": ARCHITECTURE_CREDIT,
         "owner": config.OWNER,
         "no_llm": args.no_llm,

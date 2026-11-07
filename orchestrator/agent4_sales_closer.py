@@ -158,6 +158,18 @@ class CampaignLog(_Loose):
     compliance: dict[str, Any] = Field(default_factory=dict)
 
 
+def stable_lead_id(lead: "InboundLead") -> str:
+    """
+    The same enquiry always gets the same id. The old id mixed the wall clock with
+    Python's hash(), which is salted per process, so a lead handed out twice became
+    two Lead rows. The id is content-addressed instead: who, when they sent it, what
+    they said. A re-delivered lead overwrites its own record and the Ops app skips it.
+    """
+    import hashlib
+    h = hashlib.sha256("\x1f".join((lead.from_ref, lead.received_at or "", lead.message)).encode("utf-8"))
+    return f"lead_{h.hexdigest()[:16]}"
+
+
 class InboundLead(BaseModel):
     """What a chat widget, WhatsApp bridge or inbox poller posts to us."""
 
@@ -587,7 +599,7 @@ async def inbound_lead(
     profile = profile_for(campaign, site_of(lead))
 
     rates = _fetch_rates(routing.price_source)
-    lead_id = f"lead_{utc_now():%Y%m%dT%H%M%S}Z_{abs(hash(lead.from_ref)) % 10**6:06d}"
+    lead_id = stable_lead_id(lead)
 
     try:
         result, meta = qualify(lead, clean_message, routing, rates, campaign, profile)

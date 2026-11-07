@@ -61,6 +61,41 @@ def draft_events(created: list[dict], routing: dict, now: str) -> list[dict]:
     return out
 
 
+def lead_events(new_rows: list[dict], routing: dict, now: str, cap: int = 20) -> list[dict]:
+    """A hot or escalated lead just reached the Leads tab. One event per lead, keyed by the
+    lead's own row key, so a lead handed out twice is announced once. No contact details
+    here: the notification says a lead is waiting, the Leads tab holds who."""
+    out = []
+    for r in new_rows:
+        if r.get("qualification") != "hot" and r.get("escalated") != "yes":
+            continue
+        facts = (r.get("summary", "").split("\n") + ["", ""])[1]
+        why = r.get("escalation_reason") or ""
+        out.append({"key": _key("hot_lead", r["source"]), "kind": "hot_lead",
+                    "field": field_for("hot_lead", r.get("property", ""), routing),
+                    "level": "action", "property": r.get("property", ""),
+                    "title": f"{'Hot' if r.get('qualification') == 'hot' else 'Escalated'} lead · {r.get('property', '')}: {facts[:80]}",
+                    "body": (f"Escalated: {why[:200]}. " if why else "") + "Open the Leads tab to reply.",
+                    "link": "https://albaloo-ops-core.base44.app", "created_at": now})
+    return out[:cap]
+
+
+def social_events(created: list[dict], routing: dict, now: str, cap: int = 10) -> list[dict]:
+    """Posts Agent 3 composed and held at the autopost gate, newly on the Social tab. Nothing is
+    published from here; this only says a human decision is waiting."""
+    out = []
+    for r in created:
+        if r.get("status") != "held":
+            continue
+        out.append({"key": _key("social_held", str(r.get("channel")), str(r.get("copy"))), "kind": "social_held",
+                    "field": field_for("social_held", r.get("property", ""), routing),
+                    "level": "action", "property": r.get("property", ""),
+                    "title": f"Post held for approval: {r.get('channel', '')} · {r.get('property', '')}",
+                    "body": str(r.get("copy", ""))[:300], "link": "https://albaloo-ops-core.base44.app",
+                    "created_at": now})
+    return out[:cap]
+
+
 def health_events(report: dict, routing: dict, now: str) -> list[dict]:
     out = []
     for level, kind, lvl in (("critical", "health_critical", "critical"),

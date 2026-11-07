@@ -180,6 +180,7 @@ jobs:
           exit $FAILED
 
       - name: Push leads to the Albaloo Ops app (Leads tab)
+        id: opspush
         # leads.php hands each lead out once, so the records this run just wrote
         # are pushed now. Only for leads pulled from a site, never for a test
         # leads file. tools/ops_leads.py; staff fields belong to the app after create.
@@ -192,6 +193,17 @@ jobs:
         run: |
           set -o pipefail
           python3 tools/ops_leads.py --closed closed --apply | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # The source holds its cursor until told the leads are safe. Only now - after the
+      # Ops app has every record - does it move on; a run that died earlier, or a push
+      # that failed, leaves the leads to be handed out again (their ids are stable, so
+      # the Leads tab never shows one twice).
+      - name: Acknowledge the leads the Ops app now holds
+        if: always() && steps.opspush.outcome == 'success' && steps.leads.outputs.skip != 'true' && steps.leads.outputs.path == ''
+        continue-on-error: true
+        env:
+          LEADS_SIGNING_SECRET: ${{ secrets.LEADS_SIGNING_SECRET }}
+        run: python3 lead_ack.py closed
 
       - name: Summarise
         if: always()

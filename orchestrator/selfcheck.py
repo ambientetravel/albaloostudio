@@ -4594,6 +4594,73 @@ _pub = _on.publish(_ev, True)
 _on.nrs.b44 = _saved_b44
 ok("notify: if the app has no Notification entity yet, the sync says so and carries on (no exception)",
    len(_pub) == 1 and "OPS-APP-NOTIFY-PROMPT.md" in _pub[0])
+
+# ── item 4 (7 Nov): hot_lead and social_held are wired ──
+_hl = [{"source": "site_form:L1", "property": "cruise24.me", "qualification": "hot", "escalated": "no",
+        "summary": "Reply to: a@b.example\nbooking enquiry · 2 travellers · Easter 2027", "escalation_reason": ""},
+       {"source": "site_form:L2", "property": "cruise24.me", "qualification": "warm", "escalated": "yes",
+        "summary": "Reply to: c@d.example\ncomplaint", "escalation_reason": "refund demand"},
+       {"source": "site_form:L3", "property": "cruise24.me", "qualification": "warm", "escalated": "no", "summary": "x\ny"}]
+_le = _on.lead_events(_hl, _rt, "2026-11-07T10:00:00+00:00")
+ok("notify: a hot or escalated lead goes to the sales field; a plain warm one is not announced; no e-mail address leaks into the notice",
+   [e["field"] for e in _le] == ["sales", "sales"] and "a@b.example" not in str(_le) and "c@d.example" not in str(_le)
+   and _le[0]["title"].startswith("Hot lead") and _le[1]["title"].startswith("Escalated lead"))
+ok("notify: a lead's notice key is its row key, so a lead handed out twice is announced once",
+   _le[0]["key"] == _on.lead_events(_hl, _rt, "2026-11-08T10:00:00+00:00")[0]["key"])
+_se = _on.social_events([{"status": "held", "channel": "instagram", "property": "boutimar.com", "copy": "A post"},
+                         {"status": "posted", "channel": "x", "property": "boutimar.com", "copy": "Old"}], _rt, "2026-11-07T10:00:00+00:00")
+ok("notify: a newly held post goes to the social field; a post already published is not announced",
+   len(_se) == 1 and _se[0]["field"] == "social" and _se[0]["kind"] == "social_held")
+
+# ── item 2 (7 Nov): leads are delivered at least once, with stable ids ──
+import agent4_sales_closer as _a4m
+_L = lambda **k: _a4m.InboundLead(**{"channel": "form", "from_ref": "a@b.example", "message": "Hi", "received_at": "2026-11-07T09:00:00Z", **k})
+ok("Closer: the lead id is the same on every run (and in every process), differs for a different message",
+   _a4m.stable_lead_id(_L()) == _a4m.stable_lead_id(_L())
+   and _a4m.stable_lead_id(_L()) != _a4m.stable_lead_id(_L(message="Hello"))
+   and _a4m.stable_lead_id(_L()) == __import__("subprocess").run(
+       [sys.executable, "-c", "import agent4_sales_closer as m;print(m.stable_lead_id(m.InboundLead(channel='form',from_ref='a@b.example',message='Hi',received_at='2026-11-07T09:00:00Z')))"],
+       capture_output=True, text=True, cwd=str(__import__("pathlib").Path(__file__).resolve().parent)).stdout.strip())
+_O = lambda st, err="": a4b.Outcome(lead_ref="x", status=st, error=err)
+_pull = {"url": "u", "next": 9, "seqs": [4, 5, 7]}
+ok("Closer ack: everything recorded -> the cursor moves to the source's `next`",
+   a4b.ack_through([_O("qualified")] * 3, _pull, 3) == 9)
+ok("Closer ack: a lead the model failed on holds the cursor just before it, and everything after it is served again",
+   a4b.ack_through([_O("qualified"), _O("failed", "Claude call failed"), _O("qualified")], _pull, 3) == 4)
+ok("Closer ack: an unreadable lead is recorded as such and does not hold the cursor back forever",
+   a4b.ack_through([_O("qualified"), _O("failed", "not a valid inbound lead: x"), _O("qualified")], _pull, 3) == 9)
+ok("Closer ack: --limit stops early -> ack only what was processed; a source that keeps its own cursor -> no ack at all",
+   a4b.ack_through([_O("qualified")], _pull, 3) == 4 and a4b.ack_through([_O("qualified")] * 3, {}, 3) is None)
+import lead_ack as _la
+_ackd = []
+_saved_post = _rq.post
+class _RP:
+    status_code, text = 200, ""
+_rq.post = lambda url, data=None, headers=None, timeout=None: (_ackd.append((url, data, headers)), _RP())[1]
+os.environ["LEADS_SIGNING_SECRET"] = "x" * 20
+_ackroot = __import__("pathlib").Path(__import__("tempfile").mkdtemp())
+(_ackroot / "cruise24.me").mkdir()
+(_ackroot / "cruise24.me" / "manifest.json").write_text(json.dumps({"ack": {"url": "https://x/api/leads.php", "through": 9}}))
+(_ackroot / "other").mkdir(); (_ackroot / "other" / "manifest.json").write_text(json.dumps({"ack": {}}))
+_nack = _la.ack_manifests(_ackroot)
+_rq.post = _saved_post
+ok("lead_ack: POSTs {ack: N} signed over that body to the source named in the manifest; a run with no ack is skipped",
+   _nack == 1 and _ackd[0][0] == "https://x/api/leads.php" and json.loads(_ackd[0][1]) == {"ack": 9}
+   and "X-Albaloo-Signature" in _ackd[0][2])
+_seq[:] = [_R(200, {"leads": [{"id": 1}], "seqs": [4], "next": 4})]
+_rq.get, _a4b._sleep = _fake_get, (lambda s: None)
+_hdr = {}
+def _spy_get(url, headers=None, timeout=None): _hdr.update(headers or {}); return _seq.pop(0)
+_rq.get = _spy_get
+_a4b._fetch_leads("https://x/api/leads.php")
+_rq.get, _a4b._sleep = _saved_a4
+ok("Closer pull: asks the source to defer its cursor (X-Albaloo-Ack) and remembers where the cursor should go",
+   _hdr.get("X-Albaloo-Ack") == "1" and _a4b.LAST_PULL.get("next") == 4 and _a4b.LAST_PULL.get("seqs") == [4])
+_wf4 = (__import__("pathlib").Path(__file__).resolve().parents[1] / ".github" / "workflows" / "agent4-sales-closer.yml").read_text(encoding="utf-8")
+ok("Closer workflow: the ack step runs only after the Ops push succeeded, and comes after it",
+   "steps.opspush.outcome == 'success'" in _wf4 and _wf4.index("id: opspush") < _wf4.index("lead_ack.py closed"))
+ok("ops-leads: a lead the app refused makes the push step fail (so the source is not told to forget it)",
+   "startswith(\"  ! base44\")" in __import__("inspect").getsource(__import__("ops_leads").main))
 ok("ops-sync: the new-draft ping @mentions Alireza (Notion push) and links the draft",
    _pb[0]["callout"]["rich_text"][0]["mention"]["user"]["id"] == _ops.OWNER
    and "1 new draft to review" in _pb[0]["callout"]["rich_text"][1]["text"]["content"]
