@@ -25,7 +25,8 @@ Sailing pages the build no longer makes (every departure sailed, or the line dro
 are MOVED on the server to ~/retired/<date>/, never deleted.
 
 --ssh needs CRUISE24_SSH_KEY_FILE (a private key authorised in cPanel → SSH Access) and
-reads CRUISE24_SSH_TARGET (default ekrd2r2976p9@92.205.251.216).
+reads CRUISE24_SSH_TARGET (default ekrd2r2976p9@92.205.251.216). It uploads only to a server whose
+ED25519 host key matches HOST_FINGERPRINT (override: CRUISE24_HOST_FINGERPRINT).
 """
 
 from __future__ import annotations
@@ -145,8 +146,36 @@ def live_hashes(rels: list[str]) -> dict[str, str | None]:
         return dict(zip(rels, ex.map(live_hash, rels)))
 
 
+# The server's own ED25519 host key, as Alireza's first login saw it on 7 Nov 2026. A fresh
+# runner has no known_hosts, so without this every run would trust whichever server answered.
+HOST_FINGERPRINT = "SHA256:/n5QGcIgdD/OCKdcBsNWGyTVWd0VspZIBanozvBwslM"
+_known_hosts: str | None = None
+
+
+def pinned_known_hosts(target: str) -> str:
+    """A known_hosts file holding the server's key, written only if its fingerprint is the pinned one."""
+    global _known_hosts
+    if _known_hosts:
+        return _known_hosts
+    host = target.rsplit("@", 1)[-1]
+    want = os.environ.get("CRUISE24_HOST_FINGERPRINT", HOST_FINGERPRINT)
+    scan = subprocess.run(["ssh-keyscan", "-T", "20", "-t", "ed25519", host], capture_output=True, text=True).stdout
+    lines = [l for l in scan.splitlines() if l and not l.startswith("#")]
+    if not lines:
+        raise SystemExit(f"--ssh: {host} offered no ed25519 host key")
+    path = os.path.join(os.environ.get("RUNNER_TEMP", "/tmp"), "cruise24_known_hosts")
+    with open(path, "w") as fh:
+        fh.write("\n".join(lines) + "\n")
+    got = subprocess.run(["ssh-keygen", "-lf", path], capture_output=True, text=True).stdout.split()
+    if want not in got:
+        raise SystemExit(f"--ssh: {host} host key is {got[1] if len(got) > 1 else '?'}, expected {want}; refusing to upload")
+    _known_hosts = path
+    return path
+
+
 def ssh(target: str, key: str, command: str, stdin: bytes | None = None) -> None:
-    subprocess.run(["ssh", "-i", key, "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=accept-new",
+    subprocess.run(["ssh", "-i", key, "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=yes",
+                    "-o", f"UserKnownHostsFile={pinned_known_hosts(target)}",
                     "-o", "ConnectTimeout=20", target, command], input=stdin, check=True)
 
 

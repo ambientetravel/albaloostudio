@@ -609,3 +609,14 @@ Their report, not re-checked here:
   - `enquiry.php` is PHP, so it is a manual upload (`deploy_update.py` never ships PHP).
   - `embed/enquiry.html` ships with the nightly update once `CRUISE24_SSH_KEY` is set, or by hand.
   - After deploy, run `cruise24-form-check.yml` with submit_test and browser_test.
+
+## Upload key live (7 Nov)
+
+- **The key:** `cruise24_deploy` (ed25519) was made on Alireza's Mac and imported and authorized in cPanel → SSH Access
+  (by Claude in Chrome). It is the only key on the account. The private key is in the GitHub secret `CRUISE24_SSH_KEY`.
+- **Login test from the Mac:** passwordless login worked. Server host key: `SHA256:/n5QGcIgdD/OCKdcBsNWGyTVWd0VspZIBanozvBwslM`.
+- **First automatic upload** (run 42364414691): 1,917/1,917 changed files (17.7 MB) uploaded and read back
+  from https://cruise24.me. 180 sailed-out pages were moved to `~/retired/<date>/`. Before this, the live site was
+  the 7 Oct build.
+- **Host-key pin:** `deploy_update.py` now uploads only to a server with that host key (on this branch, live with PR #9).
+- **To revoke:** in cPanel → SSH Access → Manage SSH Keys, Deauthorize `cruise24_deploy`, and delete the GitHub secret.
