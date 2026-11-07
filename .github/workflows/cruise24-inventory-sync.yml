@@ -107,8 +107,15 @@ jobs:
             key="$RUNNER_TEMP/cruise24_key"
             printf '%s\n' "$SSH_KEY" > "$key"
             chmod 600 "$key"
-            CRUISE24_SSH_KEY_FILE="$key" python3 deploy_update.py --ssh | tee "$RUNNER_TEMP/ship.txt"
+            CRUISE24_SSH_KEY_FILE="$key" python3 deploy_update.py --ssh --live-urls "$RUNNER_TEMP/live-urls.txt" | tee "$RUNNER_TEMP/ship.txt"
             rm -f "$key"
+            # Tell Bing (and Yandex, Seznam, Naver) about the pages that just changed, instead of
+            # waiting for a crawl. Only URLs read back live; Google does not use IndexNow.
+            if [ -s "$RUNNER_TEMP/live-urls.txt" ]; then
+              pip install -q pyyaml
+              (cd ../orchestrator && python3 tools/indexnow_ping.py $(sed 's/^/--url /' "$RUNNER_TEMP/live-urls.txt")) \
+                | tee -a "$RUNNER_TEMP/ship.txt" || echo "::warning title=IndexNow::The ping failed; the pages are live, only the notice to Bing is missing."
+            fi
           else
             python3 deploy_update.py | tee "$RUNNER_TEMP/ship.txt"
             if ls dist/update-*.zip >/dev/null 2>&1; then
