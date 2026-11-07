@@ -71,6 +71,19 @@
   addEventListener('hashchange', function () { readHash(); apply(); });
   readHash();
   more.hidden = true;
-  fetch(grid.dataset.index).then(function (r) { return r.json(); }).then(function (d) { all = d; apply(); })
+  // Departures from today (site.js): drop dates that have passed since the build, move the
+  // next departure on, and leave out a sailing whose every date is behind us.
+  function fresh(d) {
+    var today = window.C24Today || '', month = today.slice(0, 7);
+    return d.filter(function (r) {
+      if (!r.ds || !r.ds.length) return true;          // dates on request
+      var ds = r.ds.filter(function (x) { return x >= today; });
+      if (!ds.length) return false;
+      r.d = ds[0]; r.dc = ds.length;
+      r.m = r.m.filter(function (m) { return m >= month; });
+      return true;
+    });
+  }
+  fetch(grid.dataset.index).then(function (r) { return r.json(); }).then(function (d) { all = fresh(d); apply(); })
     .catch(function () { more.hidden = true; count.textContent = 'Showing the first sailings. Reload to see them all.'; });
 })();

@@ -36,6 +36,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import port_countries  # noqa: E402  (the wider port -> country rules)
+import build_guides  # noqa: E402  (route and visa guides, built from the same inventory)
 
 HERE = Path(__file__).resolve().parent
 SRC = HERE / "data" / "sources"
@@ -427,7 +428,16 @@ def page(head, nav, foot, *, slug, title, desc, body, base="", canonical=None):
             '<script src="assets/site.js"></script>\n<script src="assets/journeys.js"></script>\n</body>\n</html>\n')
 
 
+GUIDE_LINKS: dict[str, list[tuple[str, str]]] = {}   # sailing id -> [(guide url, label)], filled in main()
 STATIC_CARDS = 36   # written into the HTML for crawlers and no-JS; journeys.js renders the rest from the index
+
+
+def dates_of(s) -> list[str]:
+    """The dates a visitor can still book, oldest first: open departures, or all of them when
+    every one is sold out (as `dep` does). site.js / journeys.js drop the ones before the
+    visitor's today, so a page built yesterday never shows yesterday's departure."""
+    open_deps = [d["date"] for d in s["departures"] if not d.get("soldOut")]
+    return open_deps or [d["date"] for d in s["departures"]]
 
 
 def index_record(s) -> dict:
@@ -437,7 +447,7 @@ def index_record(s) -> dict:
     dep = open_deps[0]["date"] if open_deps else (s["departures"][0]["date"] if s["departures"] else None)
     ports = list(dict.fromkeys(p for p in (pretty_port(x) for x in s["route"]) if p != "At sea"))
     return {"id": s["id"], "u": s["url"], "t": s["title"], "l": s["line"], "k": s["lineKey"], "s": s["ships"], "n": s["nights"],
-            "d": dep, "dc": len(s["departures"]), "p": s["priceFrom"], "a": s["areas"], "m": s["months"],
+            "d": dep, "dc": len(s["departures"]), "ds": dates_of(s), "p": s["priceFrom"], "a": s["areas"], "m": s["months"],
             "f": [COUNTRY[c] for c in s["focus"]], "i": s.get("image"), "r": ports[:9] + (["…"] if len(ports) > 9 else [])}
 
 
@@ -449,13 +459,13 @@ def card(s) -> str:
     chips = "".join(f'<span class="chip">{esc(COUNTRY[c])}</span>' for c in s["focus"])
     ship = " or ".join(s["ships"])
     return (f'<a class="jcard2" href="{esc(s["url"])}" data-areas="{" ".join(s["areas"])}" data-months="{" ".join(s["months"]) or "request"}" '
-            f'data-line="{s["lineKey"]}" data-nights="{s["nights"]}" data-price="{s["priceFrom"] or 999999}" data-date="{dep or "9999"}" data-focus="{1 if s["focus"] else 0}">'
+            f'data-line="{s["lineKey"]}" data-nights="{s["nights"]}" data-price="{s["priceFrom"] or 999999}" data-date="{dep or "9999"}" data-dates="{" ".join(dates_of(s))}" data-focus="{1 if s["focus"] else 0}">'
             + (f'<img src="{esc(s["image"])}" alt="" loading="lazy">' if s.get("image") else '<div class="noimg"></div>') +
             f'<div class="jc-body"><small>{esc(s["line"])} · {esc(ship)}</small>'
             f'<h3>{esc(s["title"])}</h3>'
             f'<p class="jc-route">{esc(" · ".join(dict.fromkeys(p for p in (pretty_port(x) for x in s["route"]) if p != "At sea")))}</p>'
             f'<div class="jc-chips">{chips}</div>'
-            f'<div class="jc-foot"><span>{s["nights"]} nights<br><em>{esc(when)}{more}</em></span>'
+            f'<div class="jc-foot"><span>{s["nights"]} nights<br><em class="jc-when">{esc(when)}{more}</em></span>'
             + (f'<span class="jc-price">from <b>{euro(s["priceFrom"])}</b><em>per person</em></span>' if s["priceFrom"] else '<span class="jc-price"><b style="font-size:1rem">Fare on request</b></span>')
             + '</div></div></a>')
 
@@ -487,7 +497,7 @@ def listing(sailings, head, nav, foot) -> str:
     body = f'''<section class="page-hero" style="min-height:auto;padding-bottom:40px">
   <img src="{esc(m("Thumbnail-Vertical.jpg"))}" alt="" loading="eager">
   <div class="wrap"><span class="kicker">Journeys</span><h1>Sailings you can book</h1>
-  <p>{len(sailings)} sailings from {and_list(sorted({s["line"] for s in sailings}))}. {n_focus} of them call in Türkiye, Greece or Italy, and those come first. {fare_sources(sailings)} Every fare is confirmed with the line before you commit.</p></div>
+  <p>{len(sailings)} sailings from {and_list(sorted({s["line"] for s in sailings}))}. {n_focus} of them call in Türkiye, Greece or Italy, and those come first. {fare_sources(sailings)} Every fare is confirmed with the line before you commit. <a href="guides.html" style="border-bottom:1px solid var(--accent)">Route and visa guides</a>.</p></div>
 </section>
 <section class="section light" style="padding-top:28px">
   <div class="wrap">
@@ -527,8 +537,9 @@ def detail(s, head, nav, foot) -> str:
         def fare(d):
             return "Sold out" if d.get("soldOut") else (euro(d["priceFrom"]) if d.get("priceFrom") else "On request")
         fares = ('<div class="fares-wrap"><table class="fares"><thead><tr><th>Departure</th>' + ("<th>Ship</th>" if multi else "") + '<th>From, per person</th></tr></thead><tbody>' +
-                 "".join(f'<tr{" class=sold" if d.get("soldOut") else ""}><td>{date.fromisoformat(d["date"]).strftime("%a %-d %b %Y")}</td>' + (f'<td>{esc(d.get("ship") or "")}</td>' if multi else "") + f'<td>{fare(d)}</td></tr>' for d in s["departures"]) +
-                 "</tbody></table></div>")
+                 "".join(f'<tr data-date="{d["date"]}"{" class=sold" if d.get("soldOut") else ""}><td>{date.fromisoformat(d["date"]).strftime("%a %-d %b %Y")}</td>' + (f'<td>{esc(d.get("ship") or "")}</td>' if multi else "") + f'<td>{fare(d)}</td></tr>' for d in s["departures"]) +
+                 "</tbody></table></div>"
+                 '<p class="fine fares-past" hidden>Every departure listed here has sailed. Ask us for the next dates.</p>')
     else:
         fares = (f'<p class="bigfare">from <b>{euro(s["priceFrom"])}</b> per person</p>' if s["priceFrom"] else "") + '<p class="fine">No departure dates in the source. Dates and the live fare come with your quote.</p>'
     shipnote = ""
@@ -569,6 +580,7 @@ def detail(s, head, nav, foot) -> str:
     <p class="fine">{esc(s["priceBasis"])}. Source: {esc(s["source"])}{", as of " + date.fromisoformat(s["asOf"]).strftime("%-d %B %Y") if s["asOf"] else ""}. The line adds its service charge where it applies; we confirm the live fare and cabin before you commit.</p>
     <a class="btn solid full" href="contact.html#{esc(s["id"])}">Ask about this sailing</a>
     <a class="btn full" href="journeys.html">All sailings</a>
+    {"".join(f'<p class="fine" style="margin-top:14px">Route guide: <a href="{esc(u)}" style="border-bottom:1px solid var(--accent)">{esc(t)}</a></p>' for u, t in GUIDE_LINKS.get(s["id"], []))}
   </aside>
 </div></section>
 '''
@@ -685,6 +697,11 @@ def main() -> int:
            "index.html": home_search(sailings),
            "destinations.html": recount("destinations.html", sailings),
            "ports.html": ports_page(sailings, head, nav, foot)}
+    guide_files, links, guide_stats = build_guides.build(
+        sailings, lambda **kw: page(head, nav, foot, **kw))
+    GUIDE_LINKS.clear()
+    GUIDE_LINKS.update(links)
+    out.update(guide_files)
     # ships.html and itineraries.html are redirects now (to lines.html#ships, destinations.html#itineraries)
     static = ["", "journeys.html", "destinations.html", "ports.html", "lines.html", "mice.html", "about.html",
               "journal.html", "contact.html", "conditions.html", "imprint.html", "privacy.html"]
@@ -693,6 +710,7 @@ def main() -> int:
     # daily rebuild, stamping every URL with today would tell search engines all 1,700 changed.
     built = {"", "journeys.html", "destinations.html", "ports.html"}
     entries = [(f"https://cruise24.me/{p}", TODAY if p in built else None) for p in static] + \
+              [(f"https://cruise24.me/{g}", TODAY) for g in sorted(guide_files)] + \
               [(f"https://cruise24.me/{s['url']}", s.get("asOf")) for s in sailings]
     out["sitemap.xml"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
                           + "".join(f"  <url><loc>{u}</loc>" + (f"<lastmod>{m}</lastmod>" if m else "") + "</url>\n" for u, m in entries)
@@ -704,19 +722,21 @@ def main() -> int:
             raise SystemExit("«Arabian Gulf» in generated output — refused")
         if k != "data/data-checks.json" and re.search(r"boutimar|\.ir\b", text, re.I):
             raise SystemExit(f"{k}: mentions boutimar/.ir — cruise24.me must not; refused")
-    stale = [p for p in (HERE / "journeys").glob("*.html") if f"journeys/{p.name}" not in out] if (HERE / "journeys").exists() else []
+    stale = [p for d in ("journeys", "guides") if (HERE / d).exists()
+             for p in (HERE / d).glob("*.html") if f"{d}/{p.name}" not in out]
     if check:
         diff = [k for k, v in out.items() if not (HERE / k).exists() or (HERE / k).read_text(encoding="utf-8") != v]
         print(f"{len(out)} files, {len(diff)} differ, {len(stale)} stale", diff[:5])
         return 1 if diff or stale else 0
     (HERE / "journeys").mkdir(exist_ok=True)
+    (HERE / "guides").mkdir(exist_ok=True)
     for p in stale:
         p.unlink()
     for k, v in out.items():
         (HERE / k).write_text(v, encoding="utf-8")
     c = Counter(s["line"] for s in sailings)
     print(f"{len(sailings)} sailings ({dict(c)}), {sum(1 for s in sailings if s['focus'])} in Türkiye/Greece/Italy; "
-          f"wrote journeys.html + {len(sailings)} pages; removed {len(stale)} stale")
+          f"wrote journeys.html + {len(sailings)} pages + {len(guide_files)} guide pages; removed {len(stale)} stale")
     return 0
 
 
