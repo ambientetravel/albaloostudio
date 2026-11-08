@@ -1,7 +1,7 @@
 {
  "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
  "cooldown_days": 45,
- "updated_at": "2026-11-01T04:22:13+00:00",
+ "updated_at": "2026-11-08T04:21:56+00:00",
  "entries": [
   {
    "domain": "cruise24.me",
@@ -74,6 +74,14 @@
    "last_briefed": "2026-09-17T10:14:10+00:00",
    "times_briefed": 1,
    "target_url_path": "/iran-dmc-services-tour-operators"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "Iran internet and SIM card",
+   "first_briefed": "2026-11-08T04:17:10+00:00",
+   "last_briefed": "2026-11-08T04:17:10+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/journal/iran-sim-card-internet-guide/"
   },
   {
    "domain": "boutimar.com",
@@ -194,6 +202,14 @@
    "last_briefed": "2026-10-04T10:37:52+00:00",
    "times_briefed": 1,
    "target_url_path": "/guides/variety-cruises-greek-islands"
+  },
+  {
+   "domain": "boutimar.com",
+   "query": "Yazd to Kerman desert route",
+   "first_briefed": "2026-11-08T04:17:10+00:00",
+   "last_briefed": "2026-11-08T04:17:10+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/journal/yazd-to-kerman-desert-route/"
   },
   {
    "domain": "boutimar.com",
@@ -1053,6 +1069,14 @@
   },
   {
    "domain": "cruise24.ir",
+   "query": "مسیرهای کروز از استانبول",
+   "first_briefed": "2026-11-08T04:21:56+00:00",
+   "last_briefed": "2026-11-08T04:21:56+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/blog/cruise-routes-from-istanbul/"
+  },
+  {
+   "domain": "cruise24.ir",
    "query": "هزینه‌های پنهان کشتی کروز چیست",
    "first_briefed": "2026-10-11T04:23:00+00:00",
    "last_briefed": "2026-10-11T04:23:00+00:00",
@@ -1076,12 +1100,12 @@
    "target_url_path": "/aroya/moarefi"
   },
   {
-   "domain": "cruisebaz.com",
-   "query": "کروز آلاسکا برای ایرانیان",
-   "first_briefed": "2026-11-01T04:20:05+00:00",
-   "last_briefed": "2026-11-01T04:20:05+00:00",
+   "domain": "boutimar.ir",
+   "query": "کروز ایتالیا یا یونان کدام بهتر است",
+   "first_briefed": "2026-11-08T04:18:53+00:00",
+   "last_briefed": "2026-11-08T04:18:53+00:00",
    "times_briefed": 1,
-   "target_url_path": "/alaska-cruise-for-iranians"
+   "target_url_path": "/italy-vs-greece-cruise-comparison"
   },
   {
    "domain": "cruisebaz.com",
@@ -1116,6 +1140,22 @@
    "target_url_path": "/seine-river-cruise-paris-guide"
   },
   {
+   "domain": "cruisebaz.com",
+   "query": "کروز رودخانه‌ای بلژیک و هلند",
+   "first_briefed": "2026-11-08T04:20:06+00:00",
+   "last_briefed": "2026-11-08T04:20:06+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/belgium-netherlands-river-cruise-guide"
+  },
+  {
+   "domain": "cruisebaz.com",
+   "query": "کروز رودخانه‌ای راین یا دانوب",
+   "first_briefed": "2026-11-08T04:20:06+00:00",
+   "last_briefed": "2026-11-08T04:20:06+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/rhine-vs-danube-river-cruise-comparison"
+  },
+  {
    "domain": "boutimar.ir",
    "query": "کروز زمستانی جزایر قناری و مادیرا",
    "first_briefed": "2026-09-27T10:03:16+00:00",
@@ -1132,12 +1172,28 @@
    "target_url_path": "/kroz-luks-chist-tafavot-ba-kroz-moamoli"
   },
   {
+   "domain": "cruise24.ir",
+   "query": "کروز مدیترانه غربی یا شرقی",
+   "first_briefed": "2026-11-08T04:21:56+00:00",
+   "last_briefed": "2026-11-08T04:21:56+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/blog/western-vs-eastern-mediterranean-cruise-comparison/"
+  },
+  {
    "domain": "boutimar.ir",
    "query": "کروز پایتخت‌های بالتیک از استکهلم تا تالین",
    "first_briefed": "2026-09-27T10:03:16+00:00",
    "last_briefed": "2026-09-27T10:03:16+00:00",
    "times_briefed": 1,
    "target_url_path": "/kroz-payetakhthaye-baltik-estokholm-ta-talin"
+  },
+  {
+   "domain": "boutimar.ir",
+   "query": "کروز کرواسی و سواحل دالماسی",
+   "first_briefed": "2026-11-08T04:18:53+00:00",
+   "last_briefed": "2026-11-08T04:18:53+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/croatia-dalmatian-coast-cruise-guide"
   },
   {
    "domain": "boutimar.ir",
