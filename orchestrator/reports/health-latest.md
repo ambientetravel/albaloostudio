@@ -1,4 +1,4 @@
-# Orchestration health — 2026-11-08T04:33 UTC
+# Orchestration health — 2026-11-08T04:34 UTC
 
 **0 broke · 1 need you · 1 to watch.**
 
@@ -35,7 +35,7 @@
 |---|---|---:|---|
 | Scout | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/42446064249) |
 | Writer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/42446540515) |
-| Broadcaster | · in_progress | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/42447247075) |
+| Broadcaster | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/42447247075) |
 | Closer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/42444062455) |
 | Auditor+Analyst | ✓ success | 5.6d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41450843878) |
 | Cartographer | ✓ success | 5.6d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41455606953) |
