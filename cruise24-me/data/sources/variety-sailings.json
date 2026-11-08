@@ -1,7 +1,7 @@
 {
  "_about": "Variety Cruises sailings read from varietycruises.com cruise pages (the line's own booking data). priceFrom = cheapest cabin category with cabins left, EUR per person, port charges excluded; soldOut when none are left.",
  "source": "Variety Cruises",
- "synced": "2026-11-01",
+ "synced": "2026-11-08",
  "sailings": [
   {
    "id": "VAR-antiquity-to-byzantium-canal-crossing",
@@ -80,14 +80,6 @@
     "Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-11-06",
-     "code": "ATB261106",
-     "ship": "Galileo",
-     "nights": 7,
-     "priceFrom": 2250,
-     "soldOut": false
-    },
     {
      "date": "2026-11-13",
      "code": "ATB261113",
@@ -1990,14 +1982,6 @@
    ],
    "departures": [
     {
-     "date": "2026-11-07",
-     "code": "SEY261107D5",
-     "ship": "Pegasus",
-     "nights": 4,
-     "priceFrom": null,
-     "soldOut": true
-    },
-    {
      "date": "2026-12-05",
      "code": "SEY261205D5",
      "ship": "Pegasus",
@@ -2441,14 +2425,6 @@
    ],
    "departures": [
     {
-     "date": "2026-11-07",
-     "code": "SEY261107D7",
-     "ship": "Pegasus",
-     "nights": 7,
-     "priceFrom": null,
-     "soldOut": true
-    },
-    {
      "date": "2026-12-05",
      "code": "SEY261205D7",
      "ship": "Pegasus",
@@ -2806,6 +2782,82 @@
      "ship": "Pegasus",
      "nights": 7,
      "priceFrom": 2350,
+     "soldOut": false
+    }
+   ]
+  },
+  {
+   "id": "VAR-sicilian-sunsets-and-amalfi-delights",
+   "slug": "sicilian-sunsets-and-amalfi-delights",
+   "url": "https://www.varietycruises.com/cruises/sicilian-sunsets-and-amalfi-delights",
+   "title": "Sicilian Sunsets & Amalfi Delights",
+   "summary": "Embark on a captivating journey starting from the charming capital of Malta, Valletta, and let it lead you on an enthralling exploration of Sicily and Southern Italy. Begin with a visit to Agrigento, home to the UNESCO-listed Temple Valley. Explore the medieval city of Erice, nestled near Trapani, where narrow cobblestone streets and timeless charm await. In Palermo, uncover the intriguing origins of the Mafia and savor the flavors of Sicilian cuisine. Continue to the Aeolian Island of Lipari, where azure waters meet rugged cliffs, before reaching Sorrento. Here, amidst fragrant lemon groves adorning the hillsides, taste the renowned limoncello, capturing the essence of Sorrento's citrus bounty. Highlights include: Valletta – Agrigento - Trapani – Palermo – Lipari – Sorrento – Naples",
+   "region": "Greek Islands",
+   "ships": [
+    "Variety Voyager"
+   ],
+   "nights": 7,
+   "route": [
+    "Valletta, Malta",
+    "Port Empedocle, Sicily",
+    "Trapani",
+    "Palermo",
+    "Lipari",
+    "Sorrento",
+    "Naples"
+   ],
+   "itinerary": [
+    [
+     "Valletta, Malta",
+     ""
+    ],
+    [
+     "Port Empedocle, Sicily",
+     ""
+    ],
+    [
+     "Trapani",
+     ""
+    ],
+    [
+     "Palermo",
+     ""
+    ],
+    [
+     "Lipari",
+     ""
+    ],
+    [
+     "Sorrento",
+     ""
+    ],
+    [
+     "Naples",
+     ""
+    ]
+   ],
+   "included": [
+    "Accommodation in sea-view double or twin cabins with private SH/WC & air conditioning.",
+    "Half-board: Buffet breakfast and 1 meal daily, including a Welcome Cocktail, a Captain’s Italian Night dinner, fun BBQ (weather permitting).",
+    "Regular (filter) coffee, tea and drinking water free all day.",
+    "Use of fishing and snorkelling equipment (Masks, Fins and Snorkels), and Beach Towels.",
+    "Kayaks and Stand-Up Paddle Boards (subject to availability).",
+    "English-Speaking Chief Experience Officer."
+   ],
+   "notIncluded": [
+    "Beverages (except those mentioned above).",
+    "Shore excursions on the islands or other land arrangements.",
+    "Crew tips.",
+    "Passenger personal expenses.",
+    "Wi-Fi (available at charge)."
+   ],
+   "departures": [
+    {
+     "date": "2027-07-03",
+     "code": "MTN270703",
+     "ship": "Variety Voyager",
+     "nights": 7,
+     "priceFrom": 2850,
      "soldOut": false
     }
    ]
@@ -3295,14 +3347,6 @@
     "Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-11-06",
-     "code": "TAH7D261106",
-     "ship": "Panorama II",
-     "nights": 7,
-     "priceFrom": 2990,
-     "soldOut": false
-    },
     {
      "date": "2026-12-04",
      "code": "TAH7D261204",
