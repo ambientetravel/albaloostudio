@@ -35,6 +35,16 @@ on:
         required: false
         default: false
         type: boolean
+      trend:
+        description: "Weekly clicks/impressions over 16 months, plus Search Console's sitemap status"
+        required: false
+        default: false
+        type: boolean
+      compare:
+        description: "YYYY-MM-DD: per-page impressions before vs after this date (e.g. a go-live)"
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: read
@@ -65,6 +75,11 @@ jobs:
             for d in $(python3 -c "import config; print(' '.join(s.domain for s in config.load_sites(include_hold=True) if s.watch_terms))"); do
               python3 tools/query_report.py --domain "$d" --top 20 --pages | tee -a "$GITHUB_STEP_SUMMARY"
             done
+            exit 0
+          fi
+          if [ "${{ inputs.trend }}" = "true" ] || [ -n "${{ inputs.compare }}" ]; then
+            python3 tools/query_report.py --domain "${{ inputs.domain }}" --top "${{ inputs.top || '30' }}" \
+              ${{ inputs.trend && '--trend' || '' }} ${{ inputs.compare && format('--compare {0}', inputs.compare) || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           python3 tools/query_report.py \

@@ -23,6 +23,8 @@ not serve those as files, so they cannot be read back, and they change by hand, 
 
 Sailing pages the build no longer makes (every departure sailed, or the line dropped it)
 are MOVED on the server to ~/retired/<date>/, never deleted.
+A file on the server that this script never wrote (e.g. cPanel's own 404.shtml) is copied to
+~/retired/<date>/replaced/ before an upload replaces it.
 
 --ssh needs CRUISE24_SSH_KEY_FILE (a private key authorised in cPanel → SSH Access) and
 reads CRUISE24_SSH_TARGET (default ekrd2r2976p9@92.205.251.216). It uploads only to a server whose
@@ -70,7 +72,7 @@ GODADDY_TAG = re.compile(rb"<script>\s*'undefined'\s*===\s*typeof _trfq.*?(?=</h
 
 
 def norm(rel: str, b: bytes) -> bytes:
-    if rel.endswith(".html"):
+    if rel.endswith((".html", ".shtml")):
         b = GODADDY_TAG.sub(b"", b)
         return b.rstrip()
     return b
@@ -183,6 +185,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--ssh", action="store_true", help="upload the changed files and confirm them live")
     ap.add_argument("--explain", type=int, default=0, metavar="N", help="print how N differing files differ from live")
+    ap.add_argument("--live-urls", default="", metavar="FILE",
+                    help="after --ssh, write the URLs of pages confirmed changed or removed (for IndexNow)")
     args = ap.parse_args()
     today = dt.date.today().isoformat()
 
@@ -206,6 +210,9 @@ def main() -> int:
         if seen[r] == local[r]:
             known[r] = local[r]                      # already live (a manual upload, or first run)
     changed = [r for r in candidates if seen[r] != local[r]]
+    # On the server but never written by this script (cPanel's own 404.shtml, a hand upload):
+    # copied to ~/retired/<date>/replaced/ before the upload overwrites it.
+    foreign = [r for r in changed if seen[r] is not None and r not in known]
     retire = [r for r in gone if seen[r] is not None]
     for r in gone:
         if seen[r] is None:
@@ -233,6 +240,11 @@ def main() -> int:
         target = os.environ.get("CRUISE24_SSH_TARGET", "ekrd2r2976p9@92.205.251.216")
         if not key:
             print("--ssh: CRUISE24_SSH_KEY_FILE is not set"); return 1
+        if foreign:
+            dest = f"retired/{today}/replaced"
+            ssh(target, key, f"mkdir -p {dest} && cd {DOCROOT} && tar cf - -- "
+                + " ".join(shlex.quote(r) for r in foreign) + f" | tar xf - -C ../{dest}")
+            print(f"kept a copy of {len(foreign)} server files before replacing them: ~/{dest}/")
         if changed:
             buf = io.BytesIO()
             with tarfile.open(fileobj=buf, mode="w:gz") as t:
@@ -254,6 +266,12 @@ def main() -> int:
         print(f"uploaded and read back: {len(ok)}/{len(changed)} files live, "
               f"{len(retire) - sum(1 for r in retire if after[r] is not None)}/{len(retire)} pages retired")
         save_manifest(known)
+        if args.live_urls:
+            # Only what was read back: a changed page now live, or a retired page now gone.
+            gone = [r for r in retire if after[r] is None]
+            urls = [SITE + ("" if r == "index.html" else r) for r in ok + gone if r.endswith(".html")]
+            Path(args.live_urls).write_text("".join(u + "\n" for u in urls), encoding="utf-8")
+            print(f"{len(urls)} page URLs for IndexNow -> {args.live_urls}")
         if bad:
             print("NOT live after upload: " + ", ".join(bad[:10]))
             return 1
