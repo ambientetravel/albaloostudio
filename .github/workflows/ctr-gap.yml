@@ -2,6 +2,9 @@
 name: CTR gap — shown but not clicked
 
 on:
+  schedule:
+    # 1st of each month, 07:30 UTC: the monthly look at which pages are shown but not clicked.
+    - cron: "30 7 1 * *"
   workflow_dispatch:
     inputs:
       domain:
@@ -36,4 +39,4 @@ jobs:
       - name: Report
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-        run: python3 tools/ctr_gap.py --domain "${{ inputs.domain }}" --min-imp "${{ inputs.min_imp }}" | tee -a "$GITHUB_STEP_SUMMARY"
+        run: python3 tools/ctr_gap.py --domain "${{ inputs.domain || '' }}" --min-imp "${{ inputs.min_imp || '150' }}" | tee -a "$GITHUB_STEP_SUMMARY"
