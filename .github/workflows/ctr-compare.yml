@@ -1,0 +1,40 @@
+# Dispatch-only, read-only. 28 days before vs after a title change for one page.
+name: CTR compare — before and after a title change
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        required: true
+        type: string
+      page:
+        description: "Full page URL"
+        required: true
+        type: string
+      applied:
+        description: "Date the change went live, YYYY-MM-DD"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: orchestrator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Compare
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: python3 tools/ctr_compare.py --domain "${{ inputs.domain }}" --page "${{ inputs.page }}" --applied "${{ inputs.applied }}" | tee -a "$GITHUB_STEP_SUMMARY"
