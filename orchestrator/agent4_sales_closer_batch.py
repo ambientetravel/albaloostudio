@@ -273,12 +273,28 @@ def _fetch_leads(url: str) -> list[dict[str, Any]]:
                 raise
             continue
         if resp.status_code < 500 or attempt == len(LEAD_FETCH_RETRY_WAITS):
+            if resp.status_code < 400:
+                # 14 Nov 18:13 UTC: cruise24.me answered a signed pull with 200 and a body that
+                # was not JSON ("Expecting value: line 1 column 1"), then answered normally an
+                # hour later. A shared host doing that is an outage of one request, like a 5xx:
+                # retry it, and say what came back if it keeps happening. Safe to repeat: with
+                # X-Albaloo-Ack the source keeps its cursor until the ack arrives.
+                try:
+                    data = resp.json()
+                except ValueError:
+                    log.warning("lead source %s sent HTTP %d with a non-JSON body (%s, %d bytes): %r",
+                                url, resp.status_code, resp.headers.get("Content-Type", "?"),
+                                len(resp.content), config.redact(resp.text[:120]))
+                    if attempt == len(LEAD_FETCH_RETRY_WAITS):
+                        raise requests.HTTPError(
+                            f"{resp.status_code} from {url}: body is not JSON "
+                            f"({len(resp.content)} bytes): {config.redact(resp.text[:200])}", response=resp)
+                    continue
             break
     if resp.status_code >= 400:
         # The source's own reason ("unsigned", "stale", "signature") is what tells a wrong
         # secret from a host that strips the X- headers; raise_for_status alone drops it.
         raise requests.HTTPError(f"{resp.status_code} from {url}: {config.redact(resp.text[:200])}", response=resp)
-    data = resp.json()
     if isinstance(data, dict) and isinstance(data.get("seqs"), list) and data.get("next") is not None:
         LAST_PULL.update(url=url, next=int(data["next"]), seqs=[int(x) for x in data["seqs"]])
     # Accept a bare array or {"leads": [...]}, because both are what real
