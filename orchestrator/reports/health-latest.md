@@ -1,4 +1,4 @@
-# Orchestration health — 2026-11-15T13:55 UTC
+# Orchestration health — 2026-11-15T14:39 UTC
 
 **0 broke · 1 need you · 1 to watch.**
 
@@ -36,14 +36,14 @@
 | Scout | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43675954141) |
 | Writer | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43676575336) |
 | Broadcaster | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43677357077) |
-| Closer | ✗ failure | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43719250789) |
+| Closer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43724627188) |
 | Auditor+Analyst | ✗ failure | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/42627433934) |
 | Cartographer | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/42632343465) |
-| Watcher | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43718220094) |
+| Watcher | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43718220094) |
 | Oracle | ✓ success | 14.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41317366000) |
-| Merge-watch | ✓ success | 1.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43602294493) |
+| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43724765533) |
 | PR gate | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43719997103) |
-| Dashboard | ✓ success | 5.9d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/42644735860) |
+| Dashboard | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/42644735860) |
 
 ## ✓ Fine
 
