@@ -1,7 +1,7 @@
 {
  "_comment": "Every (domain, keyword) Agent 1 has already emitted a brief for. Agent 1 reads this at the start of a run and skips any keyword briefed within the cooldown window, so it moves to NEW gaps instead of re-proposing the same ten every week. Seeded 31 Aug 2026 from run history — 53 briefs collapsed to the distinct keywords below.",
  "cooldown_days": 45,
- "updated_at": "2026-11-08T04:21:56+00:00",
+ "updated_at": "2026-11-15T04:23:20+00:00",
  "entries": [
   {
    "domain": "cruise24.me",
@@ -124,6 +124,14 @@
    "target_url_path": "/guides/morocco-kasbah-route"
   },
   {
+   "domain": "boutimar.com",
+   "query": "Nowruz celebrations in Iran",
+   "first_briefed": "2026-11-15T04:17:34+00:00",
+   "last_briefed": "2026-11-15T04:17:34+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/journal/guides-nowruz-celebrations-iran/"
+  },
+  {
    "domain": "exploreorient.com",
    "query": "Oman frankincense trail Dhofar travel guide",
    "first_briefed": "2026-09-26T22:24:53+00:00",
@@ -175,9 +183,9 @@
    "domain": "boutimar.com",
    "query": "Stargazing in the Iranian desert",
    "first_briefed": "2026-09-27T10:01:08+00:00",
-   "last_briefed": "2026-09-27T10:01:08+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/guides/stargazing-iranian-desert"
+   "last_briefed": "2026-11-15T04:17:34+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/journal/guides-desert-stargazing-iran/"
   },
   {
    "domain": "boutimar.com",
@@ -836,6 +844,14 @@
    "target_url_path": "/uae-stag-party-guide/"
   },
   {
+   "domain": "boutimar.com",
+   "query": "visiting Imam Reza shrine Mashhad",
+   "first_briefed": "2026-11-15T04:17:34+00:00",
+   "last_briefed": "2026-11-15T04:17:34+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/journal/guides-imam-reza-shrine-mashhad/"
+  },
+  {
    "domain": "exploreorient.com",
    "query": "visiting hegra alula travel guide",
    "first_briefed": "2026-10-06T09:28:03+00:00",
@@ -903,9 +919,9 @@
    "domain": "boutimar.ir",
    "query": "بهترین زمان سفر دریایی به فیوردهای نروژ",
    "first_briefed": "2026-09-27T10:03:16+00:00",
-   "last_briefed": "2026-09-27T10:03:16+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/behtarin-zaman-safar-dariyayi-fjordhaye-norway"
+   "last_briefed": "2026-11-15T04:19:49+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/best-time-norway-fjord-cruise"
   },
   {
    "domain": "boutimar.ir",
@@ -983,25 +999,25 @@
    "domain": "cruise24.ir",
    "query": "دریازدگی در سفر دریایی و راه‌های پیشگیری",
    "first_briefed": "2026-09-27T10:04:56+00:00",
-   "last_briefed": "2026-09-27T10:04:56+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/blog/daryazadagi-dar-safar-daryayi-rahkarha/"
+   "last_briefed": "2026-11-15T04:23:20+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/blog/seasickness-prevention-cruise-guide/"
   },
   {
    "domain": "cruise24.ir",
    "query": "راهنمای انتخاب کابین کشتی کروز",
    "first_briefed": "2026-09-26T22:26:14+00:00",
-   "last_briefed": "2026-09-26T22:26:14+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/blog/rahnamaye-entekhabe-kabin-keshti-kroz/"
+   "last_briefed": "2026-11-15T04:23:20+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/blog/cruise-cabin-selection-guide/"
   },
   {
    "domain": "cruise24.ir",
    "query": "راهنمای بستن چمدان برای سفر دریایی",
    "first_briefed": "2026-09-26T22:26:14+00:00",
-   "last_briefed": "2026-09-26T22:26:14+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/blog/rahnamaye-baste-bandi-chamedan-safar-daryaei/"
+   "last_briefed": "2026-11-15T04:23:20+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/blog/cruise-packing-guide/"
   },
   {
    "domain": "cruise24.ir",
@@ -1015,9 +1031,9 @@
    "domain": "cruise24.ir",
    "query": "راهنمای بندر گالاتاپورت استانبول برای مسافران کروز",
    "first_briefed": "2026-09-27T10:04:56+00:00",
-   "last_briefed": "2026-09-27T10:04:56+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/blog/rahnamaye-bandar-galataport-istanbul/"
+   "last_briefed": "2026-11-15T04:23:20+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/blog/galataport-istanbul-cruise-guide/"
   },
   {
    "domain": "boutimar.ir",
@@ -1031,17 +1047,17 @@
    "domain": "boutimar.ir",
    "query": "سفر دریایی به ژاپن و کره با کشتی کروز",
    "first_briefed": "2026-09-27T10:03:16+00:00",
-   "last_briefed": "2026-09-27T10:03:16+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/safar-dariyayi-japan-korea-ba-keshti-kroz"
+   "last_briefed": "2026-11-15T04:19:49+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/japan-korea-cruise-guide"
   },
   {
    "domain": "cruise24.ir",
    "query": "سفر کشتی کروز برای خانواده",
    "first_briefed": "2026-09-26T22:26:14+00:00",
-   "last_briefed": "2026-09-26T22:26:14+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/blog/safar-keshti-kroz-baraye-khanevade/"
+   "last_briefed": "2026-11-15T04:23:20+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/blog/family-cruise-guide/"
   },
   {
    "domain": "boutimar.ir",
@@ -1108,6 +1124,14 @@
    "target_url_path": "/italy-vs-greece-cruise-comparison"
   },
   {
+   "domain": "boutimar.ir",
+   "query": "کروز بدون ویزا برای ایرانیان",
+   "first_briefed": "2026-11-15T04:19:49+00:00",
+   "last_briefed": "2026-11-15T04:19:49+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/visa-free-cruises-for-iranians"
+  },
+  {
    "domain": "cruisebaz.com",
    "query": "کروز رودخانه دانوب از بوداپست تا وین",
    "first_briefed": "2026-10-18T04:26:06+00:00",
@@ -1133,11 +1157,27 @@
   },
   {
    "domain": "cruisebaz.com",
+   "query": "کروز رودخانه رون فرانسه",
+   "first_briefed": "2026-11-15T04:21:30+00:00",
+   "last_briefed": "2026-11-15T04:21:30+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/rhone-river-cruise-guide"
+  },
+  {
+   "domain": "cruisebaz.com",
    "query": "کروز رودخانه سن پاریس",
    "first_briefed": "2026-10-25T04:28:03+00:00",
    "last_briefed": "2026-10-25T04:28:03+00:00",
    "times_briefed": 1,
    "target_url_path": "/seine-river-cruise-paris-guide"
+  },
+  {
+   "domain": "cruisebaz.com",
+   "query": "کروز رودخانه ماین آلمان",
+   "first_briefed": "2026-11-15T04:21:30+00:00",
+   "last_briefed": "2026-11-15T04:21:30+00:00",
+   "times_briefed": 1,
+   "target_url_path": "/main-river-cruise-guide-germany"
   },
   {
    "domain": "cruisebaz.com",
@@ -1159,9 +1199,9 @@
    "domain": "boutimar.ir",
    "query": "کروز زمستانی جزایر قناری و مادیرا",
    "first_briefed": "2026-09-27T10:03:16+00:00",
-   "last_briefed": "2026-09-27T10:03:16+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/kroz-zemestani-jazayer-qanari-va-madira"
+   "last_briefed": "2026-11-15T04:19:49+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/winter-cruise-canary-islands-madeira"
   },
   {
    "domain": "boutimar.ir",
@@ -1172,20 +1212,12 @@
    "target_url_path": "/kroz-luks-chist-tafavot-ba-kroz-moamoli"
   },
   {
-   "domain": "cruise24.ir",
-   "query": "کروز مدیترانه غربی یا شرقی",
-   "first_briefed": "2026-11-08T04:21:56+00:00",
-   "last_briefed": "2026-11-08T04:21:56+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/blog/western-vs-eastern-mediterranean-cruise-comparison/"
-  },
-  {
    "domain": "boutimar.ir",
    "query": "کروز پایتخت‌های بالتیک از استکهلم تا تالین",
    "first_briefed": "2026-09-27T10:03:16+00:00",
-   "last_briefed": "2026-09-27T10:03:16+00:00",
-   "times_briefed": 1,
-   "target_url_path": "/kroz-payetakhthaye-baltik-estokholm-ta-talin"
+   "last_briefed": "2026-11-15T04:19:49+00:00",
+   "times_briefed": 2,
+   "target_url_path": "/baltic-capitals-cruise-stockholm-tallinn"
   },
   {
    "domain": "boutimar.ir",
