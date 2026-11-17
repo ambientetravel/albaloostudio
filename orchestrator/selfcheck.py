@@ -110,6 +110,39 @@ ok("a seed the sitemap already covers is dropped",
    bool(_eo) and not any(
        c["query"] == "Silk Road travel guide" for c in _a1seed.seed_candidates(
            _eo, {"https://exploreorient.com/silk-road-travel-guide/"}, existing=[])))
+# Owner ideas (ideas/*.json): the owner's input path. Added 17 Nov after a partner email
+# (cruise + guided walks in Europe) had no way into the pipeline except a code edit.
+import tempfile as _tf, pathlib as _pl
+from datetime import date as _date
+_idir = _pl.Path(_tf.mkdtemp())
+(_idir / "a.json").write_text(json.dumps({"id": "t1", "status": "new", "created": "2026-11-17", "title": "Walks",
+    "notes": ["Partner X combines cruises with guided walks"], "source": {"kind": "email", "from": "Partner X"},
+    "domains": {"cruise24.me": {"query": "walking cruises europe", "angle": "who it suits"}}}), encoding="utf-8")
+(_idir / "old.json").write_text(json.dumps({"id": "t2", "status": "new", "created": "2026-08-01",
+    "domains": {"cruise24.me": {"query": "stale idea"}}}), encoding="utf-8")
+(_idir / "done.json").write_text(json.dumps({"id": "t3", "status": "briefed", "created": "2026-11-17",
+    "domains": {"cruise24.me": {"query": "done idea"}}}), encoding="utf-8")
+_c24me = next((s for s in config.load_sites(include_hold=True) if s.domain == "cruise24.me"), None)
+_ic = _a1seed.idea_candidates(_c24me, set(), [], today=_date(2026, 11, 17), ideas_dir=_idir) if _c24me else []
+ok("an owner idea becomes a candidate for the sites it names; stale and non-new ideas are ignored",
+   [c["query"] for c in _ic] == ["walking cruises europe"] and _ic[0].get("owner_idea"), [c["query"] for c in _ic])
+ok("an owner idea outranks real GSC demand",
+   sorted([{"query": "g", "local_score": 52.0}] + _ic, key=lambda c: c["local_score"], reverse=True)[0]["query"] == "walking cruises europe")
+ok("an idea for another site does not touch this one",
+   not _a1seed.idea_candidates(next(s for s in config.load_sites(include_hold=True) if s.domain == "cruise24.ir"),
+                               set(), [], today=_date(2026, 11, 17), ideas_dir=_idir))
+ok("an idea the site already has a page for is dropped, never written as a twin",
+   not _a1seed.idea_candidates(_c24me, {"https://cruise24.me/guides/walking-cruises-europe/"}, [],
+                               today=_date(2026, 11, 17), ideas_dir=_idir))
+_an = {"gap_type": "missing_page", "primary_keyword": "walking cruises europe", "search_intent": "informational",
+       "priority_score": 70, "priority_inputs": {}, "rationale": "r", "working_title": "Walking cruises in Europe",
+       "content_type": "guide", "target_url_path": "/guides/walking-cruises-europe/", "word_count_min": 800,
+       "word_count_max": 1200, "outline": [{"heading": "a"}], "secondary_keywords": [], "must_include": ["x"],
+       "must_avoid": [], "meta_title": "t", "meta_description": "d", "schema_org": ["Article"]}
+_bp = _a1seed.build_brief_payload(_c24me, _an, _ic[0], {"date_range": {"start": "a", "end": "b"}}, "run1", "", True) if _ic else {}
+ok("the owner's notes reach the brief as attributed facts, with a ban on selling the source's product as ours",
+   bool(_bp) and any(m.startswith("Fact from Partner X") for m in _bp["brief"]["must_include"])
+   and any("as our own" in m for m in _bp["brief"]["must_avoid"]) and _bp["brief"]["owner_idea"]["id"] == "t1")
 ok("a missing delivery endpoint is optional, not fatal — the artifact is the handoff",
    'optional_env("AGENT2_WEBHOOK_URL")' in _scout_src
    and 'require_env("AGENT2_WEBHOOK_URL")' not in _scout_src,

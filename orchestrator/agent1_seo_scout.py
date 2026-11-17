@@ -28,7 +28,8 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from datetime import timedelta
+from datetime import date, timedelta
+from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlparse
 
@@ -824,6 +825,74 @@ def seed_candidates(site: Site, sitemap_urls: set[str],
             "covered_by_sitemap": False,
             "local_score": round(1.0 / (i + 1), 3),
             "seed": True,
+        })
+    return out
+
+
+IDEAS_DIR = Path(__file__).resolve().parent / "ideas"
+IDEA_MAX_AGE_DAYS = 45
+
+
+def idea_candidates(site: Site, sitemap_urls: set[str],
+                    existing: list[dict[str, Any]], today: date | None = None,
+                    ideas_dir: Path | None = None) -> list[dict[str, Any]]:
+    """
+    Owner ideas (ideas/*.json, see ideas/README.md) for this site, as missing_page
+    candidates that rank above measured gaps and seeds: the owner has just learned
+    something the data cannot know. The same coverage test as a seed drops an idea the
+    site already has a page for, so an idea can never be written as a twin.
+    """
+    base = ideas_dir or IDEAS_DIR
+    if not base.is_dir():
+        return []
+    today = today or utc_now().date()
+    have = {str(c["query"]).lower() for c in existing}
+    sitemap_tokens = [_slug_tokens(u) for u in sitemap_urls]
+    out: list[dict[str, Any]] = []
+    for f in sorted(base.glob("*.json")):
+        if f.name.startswith("_"):
+            continue
+        try:
+            idea = json.loads(f.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            log.warning("idea %s unreadable: %s", f.name, exc)
+            continue
+        if idea.get("status") != "new":
+            continue
+        try:
+            age = (today - date.fromisoformat(str(idea.get("created", ""))[:10])).days
+        except ValueError:
+            log.warning("idea %s has no valid created date; ignored", f.name)
+            continue
+        if age > IDEA_MAX_AGE_DAYS:
+            continue
+        entry = (idea.get("domains") or {}).get(site.domain)
+        if not entry or not str(entry.get("query", "")).strip():
+            continue
+        q = str(entry["query"]).strip()
+        if q.lower() in have:
+            continue
+        qt = {t for t in _SLUG_SPLIT.split(q.lower()) if len(t) > 2}
+        if any(qt and len(qt & toks) >= max(1, len(qt) // 2) for toks in sitemap_tokens):
+            log.info("%s — idea %s dropped: the site already has a page for %r",
+                     site.domain, idea.get("id", f.name), q)
+            continue
+        out.append({
+            "query": q, "gap_type": "missing_page",
+            "impressions": 0, "clicks": 0, "ctr": 0.0,
+            "position": site.max_position, "best_position": site.max_position,
+            "trend": "owner_idea", "current_url": None, "competing_urls": [],
+            "top_country": None, "device_split": {},
+            "covered_by_sitemap": False,
+            "local_score": 1000.0,
+            "seed": True, "owner_idea": True,
+            "idea": {
+                "id": idea.get("id", f.stem), "title": idea.get("title", ""),
+                "notes": [str(n) for n in idea.get("notes", []) if str(n).strip()],
+                "source": idea.get("source", {}),
+                "angle": str(entry.get("angle", "")),
+                "images": [str(i) for i in idea.get("images", [])],
+            },
         })
     return out
 
@@ -1665,6 +1734,22 @@ def build_brief_payload(
                  "must_avoid", len(relocated))
     must_avoid = list(dict.fromkeys(
         list(analysis.get("must_avoid", [])) + relocated + _HARD_AVOID))
+    idea = candidate.get("idea")
+    if idea:
+        # The owner's own notes are the only facts about this subject. The writer is told
+        # to attribute them to the source, not copy its wording, and not to sell the
+        # source's product as ours; anything beyond the notes is the model's to avoid.
+        src = idea.get("source") or {}
+        who = src.get("from") or src.get("kind") or "the owner's source"
+        must_include = ([f"Fact from {who} (attribute it, do not copy the wording): {n}"
+                         for n in idea.get("notes", [])]
+                        + ([f"Angle the owner wants: {idea['angle']}"] if idea.get("angle") else [])
+                        + must_include)
+        must_avoid = list(dict.fromkeys(must_avoid + [
+            f"Presenting {who}'s product or programme as our own",
+            "Any price, date, itinerary or inclusion that is not in the owner's notes",
+            "Copying the source's wording",
+        ]))
 
     return {
         "schema_version": config.SCHEMA_VERSION,
@@ -1738,6 +1823,9 @@ def build_brief_payload(
             "outline": analysis["outline"],
             "must_include": must_include,
             "must_avoid": must_avoid,
+            **({"owner_idea": {"id": idea.get("id"), "title": idea.get("title"),
+                               "source": idea.get("source"), "images": idea.get("images", [])}}
+               if idea else {}),
             "internal_links": [],
             "external_sources": [],
             "schema_org": analysis.get("schema_org", ["Article"]),
@@ -1929,6 +2017,13 @@ def process_site(
         candidates = find_gaps(site, gsc, sitemap_urls)
         # Break the no-traffic deadlock: a site with no GSC footprint gets its
         # curated starter topics as candidates so it can produce content at all.
+        owner_ideas = idea_candidates(site, sitemap_urls, candidates)
+        if owner_ideas:
+            candidates = sorted(candidates + owner_ideas,
+                                key=lambda c: c["local_score"], reverse=True)
+            log.info("%s — %d owner idea(s) added: %s", site.domain, len(owner_ideas),
+                     ", ".join(c["query"] for c in owner_ideas))
+        stat["owner_ideas"] = len(owner_ideas)
         seeds = seed_candidates(site, sitemap_urls, candidates)
         if seeds:
             candidates = sorted(candidates + seeds,
