@@ -1,6 +1,6 @@
 {
  "_about": "CruiseHost CPX, aid 204622, synced directly by sync/cruisehost_sync.py",
- "snapshotDate": "2026-11-17",
+ "snapshotDate": "2026-11-18",
  "sailings": [
   {
    "cruisehostId": "EXP-65f63c92",
@@ -29,7 +29,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-65f63c92",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -59,7 +59,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-b968ef14",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -80,16 +80,16 @@
    "departures": [
     {
      "date": "2027-01-29",
-     "priceFrom": 1740,
+     "priceFrom": 1860,
      "cruisehostId": "M2359164270202"
     }
    ],
-   "priceFrom": 1740,
+   "priceFrom": 1860,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-3d088e75",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -119,7 +119,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-7c99a16d",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -149,7 +149,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-9bfd4085",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -236,7 +236,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-7ec4f35d",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -293,7 +293,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-f5893388",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -356,7 +356,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-47cf76bb",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -388,7 +388,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-b3427ed5",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -452,7 +452,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-196af7a9",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -670,20 +670,15 @@
     "Ocean Cay MSC Marine Reserve",
     "Miami"
    ],
-   "departures": [
-    {
-     "date": "2026-11-17",
-     "priceFrom": 3995,
-     "cruisehostId": "M1301668261125"
-    }
-   ],
+   "departures": [],
    "priceFrom": 3995,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M1.jpg",
    "itineraryId": "EXP-1fbc3ba8",
    "syncedAt": "2026-11-12",
-   "shipImage": "media/cruisehost/M1.jpg"
+   "shipImage": "media/cruisehost/M1.jpg",
+   "hidden": true
   },
   {
    "cruisehostId": "EXP-86684d35",
@@ -8946,17 +8941,17 @@
    ],
    "departures": [
     {
-     "date": "2027-11-02",
-     "priceFrom": 9300,
-     "cruisehostId": "TD333589271111"
+     "date": "2027-10-15",
+     "priceFrom": 11650,
+     "cruisehostId": "TD333586271024"
     }
    ],
-   "priceFrom": 9300,
+   "priceFrom": 11650,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-d2530004",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -9982,16 +9977,16 @@
    "departures": [
     {
      "date": "2027-10-24",
-     "priceFrom": 9050,
+     "priceFrom": 11400,
      "cruisehostId": "TD331661271102"
     }
    ],
-   "priceFrom": 9050,
+   "priceFrom": 11400,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-77408fdf",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -10028,7 +10023,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U6.jpg",
    "itineraryId": "SSE-d18a488b",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U6.jpg"
   },
   {
@@ -10216,7 +10211,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U6.jpg",
    "itineraryId": "SSE-eb6b970e",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U6.jpg"
   },
   {
@@ -11221,7 +11216,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TP.jpg",
    "itineraryId": "SSE-f51ec28c",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TP.jpg"
   },
   {
@@ -11527,7 +11522,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-6469c859",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -12423,16 +12418,16 @@
    "departures": [
     {
      "date": "2027-11-13",
-     "priceFrom": 10350,
+     "priceFrom": 11330,
      "cruisehostId": "U8333590271123"
     }
    ],
-   "priceFrom": 10350,
+   "priceFrom": 11330,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U8.jpg",
    "itineraryId": "SSE-0179e113",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U8.jpg"
   },
   {
@@ -12904,16 +12899,16 @@
    "departures": [
     {
      "date": "2027-10-15",
-     "priceFrom": 10350,
+     "priceFrom": 11330,
      "cruisehostId": "U8370661271025"
     }
    ],
-   "priceFrom": 10350,
+   "priceFrom": 11330,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U8.jpg",
    "itineraryId": "SSE-b7e2fd7b",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U8.jpg"
   },
   {
@@ -13206,7 +13201,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TP.jpg",
    "itineraryId": "SSE-11b495ca",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TP.jpg"
   },
   {
@@ -13505,7 +13500,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TP.jpg",
    "itineraryId": "SSE-b022414d",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TP.jpg"
   },
   {
@@ -13648,22 +13643,22 @@
    ],
    "departures": [
     {
-     "date": "2027-07-12",
-     "priceFrom": 8365,
-     "cruisehostId": "M1356504270726"
+     "date": "2027-06-14",
+     "priceFrom": 11400,
+     "cruisehostId": "M1356500270628"
     },
     {
-     "date": "2027-10-04",
-     "priceFrom": 8960,
-     "cruisehostId": "M1356518271018"
+     "date": "2027-09-06",
+     "priceFrom": 11040,
+     "cruisehostId": "M1356514270920"
     }
    ],
-   "priceFrom": 8365,
+   "priceFrom": 11040,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M1.jpg",
    "itineraryId": "EXP-c9925756",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M1.jpg"
   },
   {
@@ -13780,7 +13775,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TP.jpg",
    "itineraryId": "SSE-c6716336",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TP.jpg"
   },
   {
@@ -14065,16 +14060,16 @@
    "departures": [
     {
      "date": "2027-08-20",
-     "priceFrom": 11050,
+     "priceFrom": 12600,
      "cruisehostId": "T1331908270901"
     }
    ],
-   "priceFrom": 11050,
+   "priceFrom": 12600,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-1883323c",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -14216,17 +14211,17 @@
    ],
    "departures": [
     {
-     "date": "2028-01-23",
-     "priceFrom": 8700,
-     "cruisehostId": "TP331690280206"
+     "date": "2027-11-07",
+     "priceFrom": 10850,
+     "cruisehostId": "TP331682271121"
     }
    ],
-   "priceFrom": 8700,
+   "priceFrom": 10850,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TP.jpg",
    "itineraryId": "SSE-3d66cbef",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TP.jpg"
   },
   {
@@ -14378,7 +14373,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TP.jpg",
    "itineraryId": "SSE-7455c88b",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TP.jpg"
   },
   {
@@ -14697,16 +14692,16 @@
    "departures": [
     {
      "date": "2027-01-11",
-     "priceFrom": 8925,
+     "priceFrom": 12300,
      "cruisehostId": "M1323248270129"
     }
    ],
-   "priceFrom": 8925,
+   "priceFrom": 12300,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M1.jpg",
    "itineraryId": "EXP-3629251c",
-   "syncedAt": "2026-11-05",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M1.jpg"
   },
   {
@@ -15051,22 +15046,17 @@
    ],
    "departures": [
     {
-     "date": "2027-06-21",
-     "priceFrom": 9310,
-     "cruisehostId": "M1356501270705"
-    },
-    {
-     "date": "2027-07-19",
-     "priceFrom": 8365,
-     "cruisehostId": "M1356505270802"
+     "date": "2027-09-13",
+     "priceFrom": 10760,
+     "cruisehostId": "M1356515270927"
     }
    ],
-   "priceFrom": 8365,
+   "priceFrom": 10760,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M1.jpg",
    "itineraryId": "EXP-f94d25fb",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M1.jpg"
   },
   {
@@ -15405,7 +15395,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-ce10c440",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -15534,16 +15524,16 @@
    "departures": [
     {
      "date": "2026-12-13",
-     "priceFrom": 7215,
+     "priceFrom": 11100,
      "cruisehostId": "M1323236261227"
     }
    ],
-   "priceFrom": 7215,
+   "priceFrom": 11100,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M1.jpg",
    "itineraryId": "EXP-546d0c5e",
-   "syncedAt": "2026-11-09",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M1.jpg"
   },
   {
@@ -15644,16 +15634,16 @@
    "departures": [
     {
      "date": "2027-09-13",
-     "priceFrom": 11650,
+     "priceFrom": 11900,
      "cruisehostId": "T1332048270925"
     }
    ],
-   "priceFrom": 11650,
+   "priceFrom": 11900,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-0f02d209",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -15886,7 +15876,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TA.jpg",
    "itineraryId": "SSE-72da9b54",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TA.jpg"
   },
   {
@@ -16004,7 +15994,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-2afd8a39",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -16042,7 +16032,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-69341651",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -16072,17 +16062,17 @@
    ],
    "departures": [
     {
-     "date": "2027-07-05",
-     "priceFrom": 9750,
-     "cruisehostId": "M2355915270719"
+     "date": "2027-06-14",
+     "priceFrom": 10460,
+     "cruisehostId": "M2356499270628"
     }
    ],
-   "priceFrom": 9750,
+   "priceFrom": 10460,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-c609206d",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -16120,7 +16110,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-00bd4f56",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -16149,16 +16139,16 @@
    "departures": [
     {
      "date": "2027-11-21",
-     "priceFrom": 10850,
+     "priceFrom": 11050,
      "cruisehostId": "U6333163271203"
     }
    ],
-   "priceFrom": 10850,
+   "priceFrom": 11050,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U6.jpg",
    "itineraryId": "SSE-60ff9703",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U6.jpg"
   },
   {
@@ -16263,21 +16253,16 @@
    "departures": [
     {
      "date": "2027-11-26",
-     "priceFrom": 9380,
+     "priceFrom": 10920,
      "cruisehostId": "M3355926271210"
-    },
-    {
-     "date": "2027-12-26",
-     "priceFrom": 9230,
-     "cruisehostId": "M3355929280109"
     }
    ],
-   "priceFrom": 9230,
+   "priceFrom": 10920,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-d1c444d9",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -16752,7 +16737,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-36512b91",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -16816,16 +16801,21 @@
    "departures": [
     {
      "date": "2027-06-21",
-     "priceFrom": 12250,
+     "priceFrom": 12500,
      "cruisehostId": "T1332042270703"
+    },
+    {
+     "date": "2027-09-01",
+     "priceFrom": 10850,
+     "cruisehostId": "T1332047270913"
     }
    ],
-   "priceFrom": 12250,
+   "priceFrom": 10850,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-a9ec357b",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -16941,7 +16931,7 @@
     },
     {
      "date": "2027-10-17",
-     "priceFrom": 10950,
+     "priceFrom": 13200,
      "cruisehostId": "TA332000271029"
     }
    ],
@@ -16950,7 +16940,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TA.jpg",
    "itineraryId": "SSE-7b0a4683",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TA.jpg"
   },
   {
@@ -16980,22 +16970,17 @@
    ],
    "departures": [
     {
-     "date": "2027-01-31",
-     "priceFrom": 14150,
-     "cruisehostId": "T1354544270214"
-    },
-    {
-     "date": "2027-02-28",
-     "priceFrom": 13900,
-     "cruisehostId": "T1354545270314"
+     "date": "2027-01-03",
+     "priceFrom": 10500,
+     "cruisehostId": "T1354543270117"
     }
    ],
-   "priceFrom": 13900,
+   "priceFrom": 10500,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-98b2ee31",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -17027,16 +17012,16 @@
    "departures": [
     {
      "date": "2028-01-15",
-     "priceFrom": 10500,
+     "priceFrom": 11050,
      "cruisehostId": "TA308401280129"
     }
    ],
-   "priceFrom": 10500,
+   "priceFrom": 11050,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TA.jpg",
    "itineraryId": "SSE-37906fc3",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TA.jpg"
   },
   {
@@ -17138,16 +17123,16 @@
    "departures": [
     {
      "date": "2027-04-01",
-     "priceFrom": 10450,
+     "priceFrom": 13500,
      "cruisehostId": "TA331853270413"
     }
    ],
-   "priceFrom": 10450,
+   "priceFrom": 13500,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TA.jpg",
    "itineraryId": "SSE-06835415",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TA.jpg"
   },
   {
@@ -17364,16 +17349,16 @@
    "departures": [
     {
      "date": "2027-06-08",
-     "priceFrom": 10460,
+     "priceFrom": 10725,
      "cruisehostId": "M1356498270621"
     }
    ],
-   "priceFrom": 10460,
+   "priceFrom": 10725,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M1.jpg",
    "itineraryId": "EXP-f167c034",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M1.jpg"
   },
   {
@@ -17442,20 +17427,15 @@
     "Cruising Day",
     "Miami"
    ],
-   "departures": [
-    {
-     "date": "2026-11-17",
-     "priceFrom": 39100,
-     "cruisehostId": "M1323227261205"
-    }
-   ],
+   "departures": [],
    "priceFrom": 39100,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M1.jpg",
    "itineraryId": "EXP-04b978bb",
    "syncedAt": "2026-11-12",
-   "shipImage": "media/cruisehost/M1.jpg"
+   "shipImage": "media/cruisehost/M1.jpg",
+   "hidden": true
   },
   {
    "cruisehostId": "SSE-54a5a4b3",
@@ -17565,16 +17545,16 @@
    "departures": [
     {
      "date": "2026-12-06",
-     "priceFrom": 14800,
+     "priceFrom": 13300,
      "cruisehostId": "M3323234261220"
     }
    ],
-   "priceFrom": 14800,
+   "priceFrom": 13300,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-862006a6",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -17640,11 +17620,6 @@
    ],
    "departures": [
     {
-     "date": "2027-11-07",
-     "priceFrom": 13900,
-     "cruisehostId": "T1331911271121"
-    },
-    {
      "date": "2027-12-05",
      "priceFrom": 12600,
      "cruisehostId": "T1331608271219"
@@ -17655,7 +17630,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-9788af7a",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -17697,7 +17672,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TP.jpg",
    "itineraryId": "SSE-3929cf53",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TP.jpg"
   },
   {
@@ -18044,16 +18019,16 @@
    "departures": [
     {
      "date": "2027-01-21",
-     "priceFrom": 9110,
+     "priceFrom": 10675,
      "cruisehostId": "M3323252270205"
     }
    ],
-   "priceFrom": 9110,
+   "priceFrom": 10675,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-b31415e5",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -18094,7 +18069,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-85223bcd",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -18166,11 +18141,6 @@
      "cruisehostId": "T1298583270131"
     },
     {
-     "date": "2027-02-14",
-     "priceFrom": 15050,
-     "cruisehostId": "T1298585270228"
-    },
-    {
      "date": "2027-11-21",
      "priceFrom": 12950,
      "cruisehostId": "T1331607271205"
@@ -18181,7 +18151,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-e9863eb2",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -18328,16 +18298,16 @@
    "departures": [
     {
      "date": "2027-03-07",
-     "priceFrom": 9240,
+     "priceFrom": 10960,
      "cruisehostId": "M3323265270321"
     }
    ],
-   "priceFrom": 9240,
+   "priceFrom": 10960,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-68e98cc7",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -18378,7 +18348,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-e0c1555b",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -18456,7 +18426,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-d43cad5d",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -18489,16 +18459,16 @@
    "departures": [
     {
      "date": "2027-03-14",
-     "priceFrom": 9360,
+     "priceFrom": 12480,
      "cruisehostId": "M3323266270329"
     }
    ],
-   "priceFrom": 9360,
+   "priceFrom": 12480,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-d80071dd",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -18700,7 +18670,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-9c6efc70",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -18854,7 +18824,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LM.jpg",
    "itineraryId": "SLC-a2064ec1",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LM.jpg"
   },
   {
@@ -18885,16 +18855,16 @@
    "departures": [
     {
      "date": "2026-12-22",
-     "priceFrom": 34250,
+     "priceFrom": 10850,
      "cruisehostId": "U8298478270105"
     }
    ],
-   "priceFrom": 34250,
+   "priceFrom": 10850,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U8.jpg",
    "itineraryId": "SSE-8c458998",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U8.jpg"
   },
   {
@@ -18959,27 +18929,17 @@
    ],
    "departures": [
     {
-     "date": "2027-06-16",
-     "priceFrom": 10700,
-     "cruisehostId": "U6331962270627"
-    },
-    {
-     "date": "2027-06-27",
-     "priceFrom": 10600,
-     "cruisehostId": "U6331963270708"
-    },
-    {
      "date": "2027-10-07",
-     "priceFrom": 10600,
+     "priceFrom": 11580,
      "cruisehostId": "U6331970271018"
     }
    ],
-   "priceFrom": 10600,
+   "priceFrom": 11580,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U6.jpg",
    "itineraryId": "SSE-42f82b39",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U6.jpg"
   },
   {
@@ -19260,16 +19220,16 @@
    "departures": [
     {
      "date": "2027-07-30",
-     "priceFrom": 12300,
+     "priceFrom": 11135,
      "cruisehostId": "M3355924270813"
     }
    ],
-   "priceFrom": 12300,
+   "priceFrom": 11135,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-c111cd94",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -19369,18 +19329,17 @@
    "departures": [
     {
      "date": "2027-10-25",
-     "priceFrom": 9400,
+     "priceFrom": 11750,
      "cruisehostId": "T1357501271107"
     }
    ],
-   "priceFrom": 9400,
+   "priceFrom": 11750,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-43396e9e",
-   "syncedAt": "2026-10-24",
-   "shipImage": "media/cruisehost/T1.jpg",
-   "hidden": true
+   "syncedAt": "2026-11-18",
+   "shipImage": "media/cruisehost/T1.jpg"
   },
   {
    "cruisehostId": "EXP-b199d933",
@@ -19411,16 +19370,16 @@
    "departures": [
     {
      "date": "2027-12-19",
-     "priceFrom": 10885,
+     "priceFrom": 11095,
      "cruisehostId": "M3355928280102"
     }
    ],
-   "priceFrom": 10885,
+   "priceFrom": 11095,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-b199d933",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -19491,16 +19450,16 @@
    "departures": [
     {
      "date": "2027-02-05",
-     "priceFrom": 8480,
+     "priceFrom": 10625,
      "cruisehostId": "M3323257270219"
     }
    ],
-   "priceFrom": 8480,
+   "priceFrom": 10625,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-1a589cb9",
-   "syncedAt": "2026-11-09",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -19574,16 +19533,16 @@
    "departures": [
     {
      "date": "2027-03-21",
-     "priceFrom": 12750,
+     "priceFrom": 12145,
      "cruisehostId": "M3323267270405"
     }
    ],
-   "priceFrom": 12750,
+   "priceFrom": 12145,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-0db6fa3a",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -19612,16 +19571,16 @@
    "departures": [
     {
      "date": "2027-02-27",
-     "priceFrom": 14000,
+     "priceFrom": 10500,
      "cruisehostId": "T2332053270310"
     }
    ],
-   "priceFrom": 14000,
+   "priceFrom": 10500,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T2.jpg",
    "itineraryId": "SSE-0244cbff",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T2.jpg"
   },
   {
@@ -19778,7 +19737,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-cae64b69",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -19814,7 +19773,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-c4ddb7fc",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -19845,16 +19804,16 @@
    "departures": [
     {
      "date": "2027-01-29",
-     "priceFrom": 10875,
+     "priceFrom": 11250,
      "cruisehostId": "M3323254270212"
     }
    ],
-   "priceFrom": 10875,
+   "priceFrom": 11250,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-84429744",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -19962,7 +19921,7 @@
    "departures": [
     {
      "date": "2027-07-25",
-     "priceFrom": 14350,
+     "priceFrom": 11750,
      "cruisehostId": "T2331546270804"
     },
     {
@@ -19971,12 +19930,12 @@
      "cruisehostId": "T2331548270824"
     }
    ],
-   "priceFrom": 12850,
+   "priceFrom": 11750,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T2.jpg",
    "itineraryId": "SSE-5268b39e",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T2.jpg"
   },
   {
@@ -20043,16 +20002,16 @@
    "departures": [
     {
      "date": "2027-05-03",
-     "priceFrom": 11935,
+     "priceFrom": 13390,
      "cruisehostId": "M3355933270521"
     }
    ],
-   "priceFrom": 11935,
+   "priceFrom": 13390,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-1ca20b89",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -20129,16 +20088,16 @@
    "departures": [
     {
      "date": "2027-05-24",
-     "priceFrom": 10350,
+     "priceFrom": 11150,
      "cruisehostId": "T1332040270607"
     }
    ],
-   "priceFrom": 10350,
+   "priceFrom": 11150,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-dcbf315e",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -20176,7 +20135,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-728da022",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -20211,16 +20170,16 @@
    "departures": [
     {
      "date": "2027-04-22",
-     "priceFrom": 9480,
+     "priceFrom": 11430,
      "cruisehostId": "M3323271270510"
     }
    ],
-   "priceFrom": 9480,
+   "priceFrom": 11430,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-7a24d480",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -20568,17 +20527,17 @@
    ],
    "departures": [
     {
-     "date": "2027-03-20",
-     "priceFrom": 19500,
-     "cruisehostId": "T0298569270403"
+     "date": "2027-04-03",
+     "priceFrom": 11150,
+     "cruisehostId": "T0298571270417"
     }
    ],
-   "priceFrom": 19500,
+   "priceFrom": 11150,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-a25a6270",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -20609,16 +20568,16 @@
    "departures": [
     {
      "date": "2027-04-26",
-     "priceFrom": 11650,
+     "priceFrom": 12250,
      "cruisehostId": "T1331907270510"
     }
    ],
-   "priceFrom": 11650,
+   "priceFrom": 12250,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-5a9beed1",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -20658,7 +20617,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-280be57f",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -20689,16 +20648,16 @@
    "departures": [
     {
      "date": "2027-09-20",
-     "priceFrom": 12240,
+     "priceFrom": 11720,
      "cruisehostId": "M2355920271004"
     }
    ],
-   "priceFrom": 12240,
+   "priceFrom": 11720,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-f5c0b011",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -20729,16 +20688,16 @@
    "departures": [
     {
      "date": "2027-09-06",
-     "priceFrom": 11640,
+     "priceFrom": 10560,
      "cruisehostId": "M2355919270920"
     }
    ],
-   "priceFrom": 11640,
+   "priceFrom": 10560,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-e4c17df8",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -20780,7 +20739,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-a05f4ee1",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -20807,16 +20766,16 @@
    "departures": [
     {
      "date": "2027-07-11",
-     "priceFrom": 12350,
+     "priceFrom": 13150,
      "cruisehostId": "T6342860270721"
     }
    ],
-   "priceFrom": 12350,
+   "priceFrom": 13150,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-15cb87fe",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -20848,16 +20807,16 @@
    "departures": [
     {
      "date": "2027-07-02",
-     "priceFrom": 12900,
+     "priceFrom": 11135,
      "cruisehostId": "M3355922270716"
     }
    ],
-   "priceFrom": 12900,
+   "priceFrom": 11135,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-cfdc1774",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -21023,7 +20982,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-81d7619c",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -21268,7 +21227,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T2.jpg",
    "itineraryId": "SSE-d9d77ff7",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T2.jpg"
   },
   {
@@ -21418,16 +21377,16 @@
    "departures": [
     {
      "date": "2027-02-14",
-     "priceFrom": 12500,
+     "priceFrom": 11750,
      "cruisehostId": "T0298523270304"
     }
    ],
-   "priceFrom": 12500,
+   "priceFrom": 11750,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-28600148",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -21545,16 +21504,16 @@
    "departures": [
     {
      "date": "2027-05-18",
-     "priceFrom": 12215,
+     "priceFrom": 11340,
      "cruisehostId": "M4355946270602"
     }
    ],
-   "priceFrom": 12215,
+   "priceFrom": 11340,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-6b6f615e",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -21585,16 +21544,16 @@
    "departures": [
     {
      "date": "2027-04-17",
-     "priceFrom": 12000,
+     "priceFrom": 11150,
      "cruisehostId": "T0298550270501"
     }
    ],
-   "priceFrom": 12000,
+   "priceFrom": 11150,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-f62296bf",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -21786,16 +21745,16 @@
    "departures": [
     {
      "date": "2027-08-13",
-     "priceFrom": 13325,
+     "priceFrom": 11440,
      "cruisehostId": "M4355950270827"
     }
    ],
-   "priceFrom": 13325,
+   "priceFrom": 11440,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-2aea59ac",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -21824,16 +21783,16 @@
    "departures": [
     {
      "date": "2027-07-16",
-     "priceFrom": 12300,
+     "priceFrom": 10575,
      "cruisehostId": "M4312433270728"
     }
    ],
-   "priceFrom": 12300,
+   "priceFrom": 10575,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-0e3e2dab",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -21949,16 +21908,16 @@
    "departures": [
     {
      "date": "2027-04-14",
-     "priceFrom": 12840,
+     "priceFrom": 11865,
      "cruisehostId": "M2355914270503"
     }
    ],
-   "priceFrom": 12840,
+   "priceFrom": 11865,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-52650f8e",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -22039,7 +21998,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-3aa37aa4",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -22077,7 +22036,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-b903011c",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -22155,7 +22114,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U7.jpg",
    "itineraryId": "SSE-c07f96d9",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U7.jpg"
   },
   {
@@ -22194,7 +22153,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-d1c7458c",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -22353,7 +22312,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-8fcc3427",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -22495,16 +22454,16 @@
    "departures": [
     {
      "date": "2027-05-10",
-     "priceFrom": 12300,
+     "priceFrom": 11275,
      "cruisehostId": "M4355952270525"
     }
    ],
-   "priceFrom": 12300,
+   "priceFrom": 11275,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-c2847903",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -22650,16 +22609,16 @@
    "departures": [
     {
      "date": "2027-05-24",
-     "priceFrom": 12365,
+     "priceFrom": 11720,
      "cruisehostId": "M2356497270607"
     }
    ],
-   "priceFrom": 12365,
+   "priceFrom": 11720,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M2.jpg",
    "itineraryId": "EXP-0b166e7d",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M2.jpg"
   },
   {
@@ -22724,16 +22683,16 @@
    "departures": [
     {
      "date": "2026-12-04",
-     "priceFrom": 12700,
+     "priceFrom": 13400,
      "cruisehostId": "T0298456261218"
     }
    ],
-   "priceFrom": 12700,
+   "priceFrom": 13400,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-80bc765e",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -22958,7 +22917,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LM.jpg",
    "itineraryId": "SLC-fecdc563",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LM.jpg"
   },
   {
@@ -23039,7 +22998,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-bffa3d4e",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -23074,7 +23033,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LM.jpg",
    "itineraryId": "SLC-95825083",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LM.jpg"
   },
   {
@@ -23108,16 +23067,16 @@
    "departures": [
     {
      "date": "2027-06-23",
-     "priceFrom": 12880,
+     "priceFrom": 11405,
      "cruisehostId": "M4355947270709"
     }
    ],
-   "priceFrom": 12880,
+   "priceFrom": 11405,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-f4bc87ae",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -23206,7 +23165,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U6.jpg",
    "itineraryId": "SSE-4a927927",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U6.jpg"
   },
   {
@@ -23245,7 +23204,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T2.jpg",
    "itineraryId": "SSE-88307d3e",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T2.jpg"
   },
   {
@@ -23281,7 +23240,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-c9f388f3",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -23317,7 +23276,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U6.jpg",
    "itineraryId": "SSE-ddf75a6a",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U6.jpg"
   },
   {
@@ -23511,7 +23470,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U8.jpg",
    "itineraryId": "SSE-e4aab7eb",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U8.jpg"
   },
   {
@@ -23585,7 +23544,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LM.jpg",
    "itineraryId": "SLC-799f06e2",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LM.jpg"
   },
   {
@@ -23623,7 +23582,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T2.jpg",
    "itineraryId": "SSE-3766ff36",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T2.jpg"
   },
   {
@@ -23780,16 +23739,16 @@
    "departures": [
     {
      "date": "2026-12-02",
-     "priceFrom": 15050,
+     "priceFrom": 13300,
      "cruisehostId": "T1311866261220"
     }
    ],
-   "priceFrom": 15050,
+   "priceFrom": 13300,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-3c357549",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -23821,16 +23780,16 @@
    "departures": [
     {
      "date": "2027-08-20",
-     "priceFrom": 14460,
+     "priceFrom": 12445,
      "cruisehostId": "M4355951270904"
     }
    ],
-   "priceFrom": 14460,
+   "priceFrom": 12445,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-ec49a5d5",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -23906,16 +23865,16 @@
    "departures": [
     {
      "date": "2027-05-25",
-     "priceFrom": 12975,
+     "priceFrom": 12480,
      "cruisehostId": "M4355953270610"
     }
    ],
-   "priceFrom": 12975,
+   "priceFrom": 12480,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-30203336",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -24035,7 +23994,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-f2c3f63a",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -24111,7 +24070,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-4a7b6392",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -24272,16 +24231,16 @@
    "departures": [
     {
      "date": "2027-04-05",
-     "priceFrom": 12400,
+     "priceFrom": 12260,
      "cruisehostId": "M3323269270422"
     }
    ],
-   "priceFrom": 12400,
+   "priceFrom": 12260,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-147ec1ed",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -24443,7 +24402,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-a5e5d6a4",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -24758,7 +24717,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LL.jpg",
    "itineraryId": "SLC-7cbd7ab7",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LL.jpg"
   },
   {
@@ -24785,16 +24744,16 @@
    "departures": [
     {
      "date": "2027-06-05",
-     "priceFrom": 13695,
+     "priceFrom": 13245,
      "cruisehostId": "LL311593270615"
     }
    ],
-   "priceFrom": 13695,
+   "priceFrom": 13245,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LL.jpg",
    "itineraryId": "SLC-15cbbdd3",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LL.jpg"
   },
   {
@@ -24913,7 +24872,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-ba1533f7",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -25021,16 +24980,16 @@
    "departures": [
     {
      "date": "2027-05-21",
-     "priceFrom": 13200,
+     "priceFrom": 12500,
      "cruisehostId": "TD343687270605"
     }
    ],
-   "priceFrom": 13200,
+   "priceFrom": 12500,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-dc24294e",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -25072,7 +25031,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-765fbdae",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -25145,16 +25104,16 @@
    "departures": [
     {
      "date": "2027-07-28",
-     "priceFrom": 14265,
+     "priceFrom": 12480,
      "cruisehostId": "M4355955270813"
     }
    ],
-   "priceFrom": 14265,
+   "priceFrom": 12480,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-6b4beff8",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -25242,7 +25201,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-8bab91f8",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -25512,16 +25471,16 @@
    "departures": [
     {
      "date": "2027-04-21",
-     "priceFrom": 14455,
+     "priceFrom": 10433,
      "cruisehostId": "LL311427270505"
     }
    ],
-   "priceFrom": 14455,
+   "priceFrom": 10433,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LL.jpg",
    "itineraryId": "SLC-d0b70def",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LL.jpg"
   },
   {
@@ -26693,7 +26652,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-3b92e369",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -26732,16 +26691,16 @@
    "departures": [
     {
      "date": "2027-04-12",
-     "priceFrom": 12670,
+     "priceFrom": 11460,
      "cruisehostId": "M3323270270503"
     }
    ],
-   "priceFrom": 12670,
+   "priceFrom": 11460,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-0cfab74d",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -26823,16 +26782,16 @@
    "departures": [
     {
      "date": "2027-02-05",
-     "priceFrom": 15130,
+     "priceFrom": 13510,
      "cruisehostId": "M1351304270301"
     }
    ],
-   "priceFrom": 15130,
+   "priceFrom": 13510,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M1.jpg",
    "itineraryId": "EXP-83fd33bb",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M1.jpg"
   },
   {
@@ -31715,7 +31674,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ES.jpg",
    "itineraryId": "CLP-ec0f1294",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ES.jpg"
   },
   {
@@ -31744,7 +31703,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ER.jpg",
    "itineraryId": "CLP-b38bf473",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ER.jpg"
   },
   {
@@ -31774,7 +31733,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ES.jpg",
    "itineraryId": "CLP-c223a160",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ES.jpg"
   },
   {
@@ -31805,7 +31764,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ER.jpg",
    "itineraryId": "CLP-db300ef3",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ER.jpg"
   },
   {
@@ -31867,7 +31826,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ES.jpg",
    "itineraryId": "CLP-488eef37",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ES.jpg"
   },
   {
@@ -31898,7 +31857,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ER.jpg",
    "itineraryId": "CLP-8f70c83e",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ER.jpg"
   },
   {
@@ -31935,7 +31894,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/EF.jpg",
    "itineraryId": "CLP-83c655d9",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/EF.jpg"
   },
   {
@@ -31967,7 +31926,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ER.jpg",
    "itineraryId": "CLP-0cc4aed4",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ER.jpg"
   },
   {
@@ -32040,7 +31999,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ES.jpg",
    "itineraryId": "CLP-a0781959",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ES.jpg"
   },
   {
@@ -32073,7 +32032,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ES.jpg",
    "itineraryId": "CLP-dd97f80e",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ES.jpg"
   },
   {
@@ -32168,16 +32127,6 @@
      "date": "2027-05-08",
      "priceFrom": 2750,
      "cruisehostId": "ES340573270515"
-    },
-    {
-     "date": "2027-09-08",
-     "priceFrom": 2750,
-     "cruisehostId": "ES340615270915"
-    },
-    {
-     "date": "2027-09-18",
-     "priceFrom": 2750,
-     "cruisehostId": "ES340620270925"
     }
    ],
    "priceFrom": 2750,
@@ -32185,7 +32134,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ES.jpg",
    "itineraryId": "CLP-43d66015",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ES.jpg"
   },
   {
@@ -32344,7 +32293,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/EF.jpg",
    "itineraryId": "CLP-e517f078",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/EF.jpg"
   },
   {
@@ -32377,7 +32326,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ES.jpg",
    "itineraryId": "CLP-51d2e95f",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ES.jpg"
   },
   {
@@ -41885,7 +41834,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T4.jpg",
    "itineraryId": "REG-44e54bf1",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T4.jpg"
   },
   {
@@ -42063,7 +42012,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TE.jpg",
    "itineraryId": "REG-4e47ff93",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TE.jpg"
   },
   {
@@ -42094,16 +42043,16 @@
    "departures": [
     {
      "date": "2027-09-09",
-     "priceFrom": 17039,
+     "priceFrom": 17279,
      "cruisehostId": "TR318875270923"
     }
    ],
-   "priceFrom": 17039,
+   "priceFrom": 17279,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TR.jpg",
    "itineraryId": "REG-dfa266ee",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TR.jpg"
   },
   {
@@ -42444,16 +42393,16 @@
    "departures": [
     {
      "date": "2027-09-20",
-     "priceFrom": 18049,
+     "priceFrom": 19159,
      "cruisehostId": "TE318882271010"
     }
    ],
-   "priceFrom": 18049,
+   "priceFrom": 19159,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TE.jpg",
    "itineraryId": "REG-94bf8d6c",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TE.jpg"
   },
   {
@@ -42491,16 +42440,16 @@
    "departures": [
     {
      "date": "2027-08-21",
-     "priceFrom": 17998,
+     "priceFrom": 18743,
      "cruisehostId": "KM321802270911"
     }
    ],
-   "priceFrom": 17998,
+   "priceFrom": 18743,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-bc3853b8",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -42720,16 +42669,16 @@
    "departures": [
     {
      "date": "2027-06-08",
-     "priceFrom": 19329,
+     "priceFrom": 18369,
      "cruisehostId": "TR318783270626"
     }
    ],
-   "priceFrom": 19329,
+   "priceFrom": 18369,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TR.jpg",
    "itineraryId": "REG-a70cf9f8",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TR.jpg"
   },
   {
@@ -42776,7 +42725,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-2de22c29",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -42814,16 +42763,16 @@
    "departures": [
     {
      "date": "2027-09-04",
-     "priceFrom": 19168,
+     "priceFrom": 18528,
      "cruisehostId": "KM321817270925"
     }
    ],
-   "priceFrom": 19168,
+   "priceFrom": 18528,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-9c3c0c3e",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -42862,16 +42811,16 @@
    "departures": [
     {
      "date": "2027-04-30",
-     "priceFrom": 18898,
+     "priceFrom": 18098,
      "cruisehostId": "KM321708270522"
     }
    ],
-   "priceFrom": 18898,
+   "priceFrom": 18098,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-45d8b813",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -42954,16 +42903,16 @@
    "departures": [
     {
      "date": "2027-10-09",
-     "priceFrom": 19808,
+     "priceFrom": 18423,
      "cruisehostId": "KM321847271030"
     }
    ],
-   "priceFrom": 19808,
+   "priceFrom": 18423,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-2a1bea85",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43001,16 +42950,16 @@
    "departures": [
     {
      "date": "2027-10-02",
-     "priceFrom": 18998,
+     "priceFrom": 17498,
      "cruisehostId": "KM321841271023"
     }
    ],
-   "priceFrom": 18998,
+   "priceFrom": 17498,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-70b1c4d4",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43056,16 +43005,16 @@
    "departures": [
     {
      "date": "2027-08-06",
-     "priceFrom": 20398,
+     "priceFrom": 19198,
      "cruisehostId": "KM321780270904"
     }
    ],
-   "priceFrom": 20398,
+   "priceFrom": 19198,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-2a56ee27",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43106,16 +43055,16 @@
    "departures": [
     {
      "date": "2027-06-13",
-     "priceFrom": 19913,
+     "priceFrom": 19168,
      "cruisehostId": "KM321741270707"
     }
    ],
-   "priceFrom": 19913,
+   "priceFrom": 19168,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-fda6f504",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43155,16 +43104,16 @@
    "departures": [
     {
      "date": "2027-05-29",
-     "priceFrom": 21198,
+     "priceFrom": 20198,
      "cruisehostId": "KM321729270621"
     }
    ],
-   "priceFrom": 21198,
+   "priceFrom": 20198,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-0928b670",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43243,16 +43192,16 @@
    "departures": [
     {
      "date": "2027-07-15",
-     "priceFrom": 21198,
+     "priceFrom": 20098,
      "cruisehostId": "KM321761270806"
     }
    ],
-   "priceFrom": 21198,
+   "priceFrom": 20098,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-ff2acc8d",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43291,16 +43240,16 @@
    "departures": [
     {
      "date": "2027-07-23",
-     "priceFrom": 22898,
+     "priceFrom": 21398,
      "cruisehostId": "KM321770270814"
     }
    ],
-   "priceFrom": 22898,
+   "priceFrom": 21398,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-b816d446",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43341,16 +43290,16 @@
    "departures": [
     {
      "date": "2027-06-05",
-     "priceFrom": 22788,
+     "priceFrom": 21938,
      "cruisehostId": "KM321733270629"
     }
    ],
-   "priceFrom": 22788,
+   "priceFrom": 21938,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-4c3a1091",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43424,16 +43373,16 @@
    "departures": [
     {
      "date": "2027-05-22",
-     "priceFrom": 23598,
+     "priceFrom": 22898,
      "cruisehostId": "KM359238270613"
     }
    ],
-   "priceFrom": 23598,
+   "priceFrom": 22898,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-ba1b9de1",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43471,16 +43420,16 @@
    "departures": [
     {
      "date": "2027-05-08",
-     "priceFrom": 22898,
+     "priceFrom": 22398,
      "cruisehostId": "KM321712270529"
     }
    ],
-   "priceFrom": 22898,
+   "priceFrom": 22398,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-6b95b91a",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43518,16 +43467,16 @@
    "departures": [
     {
      "date": "2027-05-15",
-     "priceFrom": 22298,
+     "priceFrom": 22098,
      "cruisehostId": "KM321718270605"
     }
    ],
-   "priceFrom": 22298,
+   "priceFrom": 22098,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-fe048704",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43572,16 +43521,16 @@
    "departures": [
     {
      "date": "2027-10-09",
-     "priceFrom": 23398,
+     "priceFrom": 22098,
      "cruisehostId": "KM321848271106"
     }
    ],
-   "priceFrom": 23398,
+   "priceFrom": 22098,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-8101a443",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43626,16 +43575,16 @@
    "departures": [
     {
      "date": "2027-09-25",
-     "priceFrom": 26198,
+     "priceFrom": 23853,
      "cruisehostId": "KM321835271023"
     }
    ],
-   "priceFrom": 26198,
+   "priceFrom": 23853,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-91fcfd02",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43682,16 +43631,16 @@
    "departures": [
     {
      "date": "2027-07-15",
-     "priceFrom": 26098,
+     "priceFrom": 24598,
      "cruisehostId": "KM321760270814"
     }
    ],
-   "priceFrom": 26098,
+   "priceFrom": 24598,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-aad2aab1",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43737,16 +43686,16 @@
    "departures": [
     {
      "date": "2027-04-30",
-     "priceFrom": 28298,
+     "priceFrom": 27498,
      "cruisehostId": "KM321709270529"
     }
    ],
-   "priceFrom": 28298,
+   "priceFrom": 27498,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-3b316acf",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43791,16 +43740,16 @@
    "departures": [
     {
      "date": "2027-05-08",
-     "priceFrom": 28798,
+     "priceFrom": 28098,
      "cruisehostId": "KM321711270605"
     }
    ],
-   "priceFrom": 28798,
+   "priceFrom": 28098,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-42f012eb",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43852,16 +43801,16 @@
    "departures": [
     {
      "date": "2027-09-25",
-     "priceFrom": 30198,
+     "priceFrom": 27498,
      "cruisehostId": "KM321833271030"
     }
    ],
-   "priceFrom": 30198,
+   "priceFrom": 27498,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-cbc97df7",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43914,16 +43863,16 @@
    "departures": [
     {
      "date": "2027-10-09",
-     "priceFrom": 30033,
+     "priceFrom": 28753,
      "cruisehostId": "KM321849271114"
     }
    ],
-   "priceFrom": 30033,
+   "priceFrom": 28753,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-1ac264d9",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -43977,16 +43926,16 @@
    "departures": [
     {
      "date": "2027-07-15",
-     "priceFrom": 33438,
+     "priceFrom": 29498,
      "cruisehostId": "KM321762270821"
     }
    ],
-   "priceFrom": 33438,
+   "priceFrom": 29498,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-8de1385a",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -44032,16 +43981,16 @@
    "departures": [
     {
      "date": "2027-05-15",
-     "priceFrom": 32588,
+     "priceFrom": 31733,
      "cruisehostId": "KM359236270613"
     }
    ],
-   "priceFrom": 32588,
+   "priceFrom": 31733,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-c4b6b4bb",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -44095,16 +44044,16 @@
    "departures": [
     {
      "date": "2027-05-15",
-     "priceFrom": 43588,
+     "priceFrom": 42423,
      "cruisehostId": "KM359237270621"
     }
    ],
-   "priceFrom": 43588,
+   "priceFrom": 42423,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-635d5dfa",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -44137,7 +44086,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TR.jpg",
    "itineraryId": "REG-c39247de",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TR.jpg"
   },
   {
@@ -44172,7 +44121,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LH.jpg",
    "itineraryId": "SLC-042ed44c",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LH.jpg"
   },
   {
@@ -44207,7 +44156,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L1.jpg",
    "itineraryId": "SLC-3173c794",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L1.jpg"
   },
   {
@@ -44241,7 +44190,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-b8389b08",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -44397,20 +44346,15 @@
     "Amsterdam",
     "Amsterdam"
    ],
-   "departures": [
-    {
-     "date": "2026-11-17",
-     "priceFrom": 2085,
-     "cruisehostId": "L1346323261124"
-    }
-   ],
+   "departures": [],
    "priceFrom": 2085,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L1.jpg",
    "itineraryId": "SLC-2bed7629",
    "syncedAt": "2026-11-12",
-   "shipImage": "media/cruisehost/L1.jpg"
+   "shipImage": "media/cruisehost/L1.jpg",
+   "hidden": true
   },
   {
    "cruisehostId": "SLC-5bff00e7",
@@ -45140,7 +45084,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L7.jpg",
    "itineraryId": "SLC-9c73f18b",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L7.jpg"
   },
   {
@@ -45521,7 +45465,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L8.jpg",
    "itineraryId": "SLC-2e5b65b2",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L8.jpg"
   },
   {
@@ -45973,14 +45917,14 @@
    ],
    "departures": [
     {
+     "date": "2027-07-12",
+     "priceFrom": 2398,
+     "cruisehostId": "L2324647270719"
+    },
+    {
      "date": "2027-07-26",
      "priceFrom": 2398,
      "cruisehostId": "L2324651270802"
-    },
-    {
-     "date": "2027-08-09",
-     "priceFrom": 2398,
-     "cruisehostId": "L2324655270816"
     }
    ],
    "priceFrom": 2398,
@@ -45988,7 +45932,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-c4961f07",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -46033,7 +45977,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-dfaad124",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -46321,24 +46265,14 @@
      "date": "2027-04-20",
      "priceFrom": 6655,
      "cruisehostId": "LN313245270427"
-    },
-    {
-     "date": "2027-09-28",
-     "priceFrom": 6360,
-     "cruisehostId": "LN345459271005"
-    },
-    {
-     "date": "2027-12-28",
-     "priceFrom": 6000,
-     "cruisehostId": "LN346979280104"
     }
    ],
-   "priceFrom": 6000,
+   "priceFrom": 6655,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LN.jpg",
    "itineraryId": "SLC-6585cadf",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LN.jpg"
   },
   {
@@ -46363,27 +46297,17 @@
    ],
    "departures": [
     {
-     "date": "2027-04-27",
-     "priceFrom": 6070,
-     "cruisehostId": "LN313249270504"
-    },
-    {
-     "date": "2027-09-21",
-     "priceFrom": 6360,
-     "cruisehostId": "LN345453270928"
-    },
-    {
-     "date": "2027-11-02",
-     "priceFrom": 6445,
-     "cruisehostId": "LN345484271109"
+     "date": "2027-11-16",
+     "priceFrom": 7385,
+     "cruisehostId": "LN345495271123"
     }
    ],
-   "priceFrom": 6070,
+   "priceFrom": 7385,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LN.jpg",
    "itineraryId": "SLC-f0c89091",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LN.jpg"
   },
   {
@@ -47708,47 +47632,17 @@
    ],
    "departures": [
     {
-     "date": "2027-04-13",
-     "priceFrom": 5920,
-     "cruisehostId": "LF350995270423"
-    },
-    {
-     "date": "2027-04-23",
-     "priceFrom": 5990,
-     "cruisehostId": "LF350999270503"
-    },
-    {
-     "date": "2027-05-10",
-     "priceFrom": 6080,
-     "cruisehostId": "LF351006270520"
-    },
-    {
-     "date": "2027-06-09",
-     "priceFrom": 6080,
-     "cruisehostId": "LF351016270619"
-    },
-    {
-     "date": "2028-04-23",
-     "priceFrom": 5995,
-     "cruisehostId": "LF367586280503"
-    },
-    {
-     "date": "2028-05-10",
-     "priceFrom": 6295,
-     "cruisehostId": "LF367601280520"
-    },
-    {
-     "date": "2028-05-20",
-     "priceFrom": 6295,
-     "cruisehostId": "LF367612280530"
+     "date": "2027-09-15",
+     "priceFrom": 6990,
+     "cruisehostId": "LF351045270925"
     }
    ],
-   "priceFrom": 5920,
+   "priceFrom": 6990,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LF.jpg",
    "itineraryId": "SLC-20a2a958",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LF.jpg"
   },
   {
@@ -48979,47 +48873,32 @@
    ],
    "departures": [
     {
-     "date": "2027-07-06",
-     "priceFrom": 6040,
-     "cruisehostId": "L8324901270716"
+     "date": "2027-04-13",
+     "priceFrom": 7095,
+     "cruisehostId": "L8324889270423"
     },
     {
-     "date": "2027-07-16",
-     "priceFrom": 6040,
-     "cruisehostId": "L8324903270726"
+     "date": "2027-08-02",
+     "priceFrom": 6740,
+     "cruisehostId": "L8324905270812"
     },
     {
-     "date": "2027-09-15",
-     "priceFrom": 6145,
-     "cruisehostId": "L8324911270925"
+     "date": "2027-09-25",
+     "priceFrom": 7095,
+     "cruisehostId": "L8324913271005"
     },
     {
-     "date": "2028-04-20",
-     "priceFrom": 6470,
-     "cruisehostId": "L8367584280430"
-    },
-    {
-     "date": "2028-04-30",
-     "priceFrom": 6470,
-     "cruisehostId": "L8367592280510"
-    },
-    {
-     "date": "2028-05-10",
-     "priceFrom": 6470,
-     "cruisehostId": "L8367600280520"
-    },
-    {
-     "date": "2028-05-20",
-     "priceFrom": 6470,
-     "cruisehostId": "L8367611280530"
+     "date": "2027-10-12",
+     "priceFrom": 7130,
+     "cruisehostId": "L8324916271022"
     }
    ],
-   "priceFrom": 6040,
+   "priceFrom": 6740,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L8.jpg",
    "itineraryId": "SLC-2ba85e6d",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L8.jpg"
   },
   {
@@ -49119,22 +48998,32 @@
    ],
    "departures": [
     {
-     "date": "2027-10-02",
-     "priceFrom": 6080,
-     "cruisehostId": "LN345463271012"
+     "date": "2027-04-10",
+     "priceFrom": 7155,
+     "cruisehostId": "LN313238270420"
     },
     {
-     "date": "2027-10-16",
-     "priceFrom": 6080,
-     "cruisehostId": "LN345472271026"
+     "date": "2027-04-24",
+     "priceFrom": 6820,
+     "cruisehostId": "LN313247270504"
+    },
+    {
+     "date": "2027-09-18",
+     "priceFrom": 7020,
+     "cruisehostId": "LN345451270928"
+    },
+    {
+     "date": "2027-10-30",
+     "priceFrom": 7105,
+     "cruisehostId": "LN345482271109"
     }
    ],
-   "priceFrom": 6080,
+   "priceFrom": 6820,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LN.jpg",
    "itineraryId": "SLC-a03bead5",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LN.jpg"
   },
   {
@@ -49161,17 +49050,37 @@
    ],
    "departures": [
     {
+     "date": "2027-04-06",
+     "priceFrom": 7310,
+     "cruisehostId": "LN313235270416"
+    },
+    {
+     "date": "2027-04-20",
+     "priceFrom": 7355,
+     "cruisehostId": "LN313246270430"
+    },
+    {
+     "date": "2027-09-28",
+     "priceFrom": 7020,
+     "cruisehostId": "LN345460271008"
+    },
+    {
      "date": "2027-10-12",
-     "priceFrom": 6080,
+     "priceFrom": 7020,
      "cruisehostId": "LN345469271022"
+    },
+    {
+     "date": "2027-12-28",
+     "priceFrom": 6660,
+     "cruisehostId": "LN346980280107"
     }
    ],
-   "priceFrom": 6080,
+   "priceFrom": 6660,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LN.jpg",
    "itineraryId": "SLC-4162e3ed",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LN.jpg"
   },
   {
@@ -49198,22 +49107,17 @@
    ],
    "departures": [
     {
-     "date": "2027-04-06",
-     "priceFrom": 6440,
-     "cruisehostId": "LG325144270416"
-    },
-    {
-     "date": "2027-10-19",
-     "priceFrom": 6230,
-     "cruisehostId": "LG325160271029"
+     "date": "2027-04-16",
+     "priceFrom": 6900,
+     "cruisehostId": "LG325145270426"
     }
    ],
-   "priceFrom": 6230,
+   "priceFrom": 6900,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LG.jpg",
    "itineraryId": "SLC-9335f79d",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LG.jpg"
   },
   {
@@ -49736,7 +49640,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L5.jpg",
    "itineraryId": "SLC-50bc85e2",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L5.jpg"
   },
   {
@@ -50246,37 +50150,52 @@
    ],
    "departures": [
     {
-     "date": "2027-07-10",
-     "priceFrom": 5955,
-     "cruisehostId": "L3324751270720"
+     "date": "2027-05-10",
+     "priceFrom": 6890,
+     "cruisehostId": "L3324719270520"
     },
     {
-     "date": "2027-08-19",
-     "priceFrom": 5975,
-     "cruisehostId": "L3324767270829"
+     "date": "2027-05-30",
+     "priceFrom": 6890,
+     "cruisehostId": "L3324727270609"
     },
     {
-     "date": "2027-10-12",
-     "priceFrom": 5950,
-     "cruisehostId": "L3324791271022"
+     "date": "2027-09-05",
+     "priceFrom": 7250,
+     "cruisehostId": "L3324775270915"
     },
     {
-     "date": "2027-11-12",
-     "priceFrom": 5940,
-     "cruisehostId": "L3347281271122"
+     "date": "2027-09-15",
+     "priceFrom": 6890,
+     "cruisehostId": "L3324779270925"
     },
     {
-     "date": "2028-04-13",
-     "priceFrom": 6450,
-     "cruisehostId": "L3367575280423"
+     "date": "2027-10-02",
+     "priceFrom": 6890,
+     "cruisehostId": "L3324787271012"
+    },
+    {
+     "date": "2028-04-30",
+     "priceFrom": 6810,
+     "cruisehostId": "L3367591280510"
+    },
+    {
+     "date": "2028-05-10",
+     "priceFrom": 6875,
+     "cruisehostId": "L3367599280520"
+    },
+    {
+     "date": "2028-05-20",
+     "priceFrom": 6875,
+     "cruisehostId": "L3367610280530"
     }
    ],
-   "priceFrom": 5940,
+   "priceFrom": 6810,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L3.jpg",
    "itineraryId": "SLC-6bf5cb57",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L3.jpg"
   },
   {
@@ -50534,17 +50453,17 @@
    ],
    "departures": [
     {
-     "date": "2027-04-20",
-     "priceFrom": 5210,
-     "cruisehostId": "L0324960270502"
+     "date": "2028-03-31",
+     "priceFrom": 7165,
+     "cruisehostId": "L0368031280412"
     }
    ],
-   "priceFrom": 5210,
+   "priceFrom": 7165,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L0.jpg",
    "itineraryId": "SLC-19e2232c",
-   "syncedAt": "2026-11-14",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L0.jpg"
   },
   {
@@ -50611,22 +50530,27 @@
    ],
    "departures": [
     {
-     "date": "2027-06-18",
-     "priceFrom": 6245,
-     "cruisehostId": "L6325257270702"
+     "date": "2027-05-21",
+     "priceFrom": 7057,
+     "cruisehostId": "L6325236270604"
     },
     {
-     "date": "2027-08-13",
-     "priceFrom": 5895,
-     "cruisehostId": "L6325280270827"
+     "date": "2027-09-10",
+     "priceFrom": 6867,
+     "cruisehostId": "L6325291270924"
+    },
+    {
+     "date": "2027-10-08",
+     "priceFrom": 7057,
+     "cruisehostId": "L6325304271022"
     }
    ],
-   "priceFrom": 5895,
+   "priceFrom": 6867,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L6.jpg",
    "itineraryId": "SLC-2e7be452",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L6.jpg"
   },
   {
@@ -50659,14 +50583,9 @@
    ],
    "departures": [
     {
-     "date": "2027-06-18",
-     "priceFrom": 6245,
-     "cruisehostId": "L7325258270702"
-    },
-    {
-     "date": "2027-08-13",
-     "priceFrom": 5895,
-     "cruisehostId": "L7325281270827"
+     "date": "2027-05-21",
+     "priceFrom": 7057,
+     "cruisehostId": "L7325237270604"
     },
     {
      "date": "2027-09-10",
@@ -50674,12 +50593,12 @@
      "cruisehostId": "L7325292270924"
     }
    ],
-   "priceFrom": 5895,
+   "priceFrom": 6651,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L7.jpg",
    "itineraryId": "SLC-ba228b5f",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L7.jpg"
   },
   {
@@ -50866,7 +50785,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L5.jpg",
    "itineraryId": "SLC-7d208098",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L5.jpg"
   },
   {
@@ -51236,7 +51155,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L7.jpg",
    "itineraryId": "SLC-8a475e45",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L7.jpg"
   },
   {
@@ -51265,22 +51184,17 @@
    ],
    "departures": [
     {
-     "date": "2027-05-02",
-     "priceFrom": 6445,
-     "cruisehostId": "LN313251270514"
-    },
-    {
-     "date": "2027-05-16",
-     "priceFrom": 6355,
-     "cruisehostId": "LN313260270528"
+     "date": "2027-12-26",
+     "priceFrom": 7295,
+     "cruisehostId": "LN346978280107"
     }
    ],
-   "priceFrom": 6355,
+   "priceFrom": 7295,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LN.jpg",
    "itineraryId": "SLC-3a2cc15f",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LN.jpg"
   },
   {
@@ -51310,17 +51224,17 @@
    ],
    "departures": [
     {
-     "date": "2027-05-08",
-     "priceFrom": 6145,
-     "cruisehostId": "LN313258270520"
+     "date": "2027-10-02",
+     "priceFrom": 6715,
+     "cruisehostId": "LN345464271014"
     }
    ],
-   "priceFrom": 6145,
+   "priceFrom": 6715,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LN.jpg",
    "itineraryId": "SLC-f54504a8",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LN.jpg"
   },
   {
@@ -51389,17 +51303,17 @@
    ],
    "departures": [
     {
-     "date": "2027-06-02",
-     "priceFrom": 6245,
-     "cruisehostId": "LI325245270616"
+     "date": "2027-03-24",
+     "priceFrom": 6690,
+     "cruisehostId": "LI325208270407"
     }
    ],
-   "priceFrom": 6245,
+   "priceFrom": 6690,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-71fa0835",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -51432,19 +51346,14 @@
    ],
    "departures": [
     {
-     "date": "2027-06-04",
-     "priceFrom": 6245,
-     "cruisehostId": "L6325246270618"
+     "date": "2027-03-26",
+     "priceFrom": 6965,
+     "cruisehostId": "L6355055270409"
     },
     {
-     "date": "2027-07-02",
-     "priceFrom": 6245,
-     "cruisehostId": "L6325261270716"
-    },
-    {
-     "date": "2027-08-27",
-     "priceFrom": 6245,
-     "cruisehostId": "L6325284270910"
+     "date": "2027-05-07",
+     "priceFrom": 7057,
+     "cruisehostId": "L6325226270521"
     },
     {
      "date": "2027-09-24",
@@ -51452,12 +51361,12 @@
      "cruisehostId": "L6325301271008"
     }
    ],
-   "priceFrom": 6245,
+   "priceFrom": 6651,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L6.jpg",
    "itineraryId": "SLC-c6aa9c1a",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L6.jpg"
   },
   {
@@ -51579,14 +51488,9 @@
    ],
    "departures": [
     {
-     "date": "2027-07-02",
-     "priceFrom": 6245,
-     "cruisehostId": "L7325262270716"
-    },
-    {
-     "date": "2027-08-27",
-     "priceFrom": 6245,
-     "cruisehostId": "L7325285270910"
+     "date": "2027-05-07",
+     "priceFrom": 7273,
+     "cruisehostId": "L7325227270521"
     },
     {
      "date": "2027-09-24",
@@ -51594,12 +51498,12 @@
      "cruisehostId": "L7353614271008"
     }
    ],
-   "priceFrom": 6245,
+   "priceFrom": 6651,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L7.jpg",
    "itineraryId": "SLC-3c5681a6",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L7.jpg"
   },
   {
@@ -51847,18 +51751,17 @@
    "departures": [
     {
      "date": "2027-06-07",
-     "priceFrom": 7505,
+     "priceFrom": 7055,
      "cruisehostId": "L2325248270619"
     }
    ],
-   "priceFrom": 7505,
+   "priceFrom": 7055,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-1171d56b",
-   "syncedAt": "2026-10-18",
-   "shipImage": "media/cruisehost/L2.jpg",
-   "hidden": true
+   "syncedAt": "2026-11-18",
+   "shipImage": "media/cruisehost/L2.jpg"
   },
   {
    "cruisehostId": "SLC-905067b5",
@@ -52076,17 +51979,17 @@
    ],
    "departures": [
     {
-     "date": "2027-10-11",
-     "priceFrom": 6247,
-     "cruisehostId": "L2324672271019"
+     "date": "2027-06-07",
+     "priceFrom": 7156,
+     "cruisehostId": "L2324634270615"
     }
    ],
-   "priceFrom": 6247,
+   "priceFrom": 7156,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-5587a81e",
-   "syncedAt": "2026-11-09",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -52616,32 +52519,17 @@
    ],
    "departures": [
     {
-     "date": "2027-05-10",
-     "priceFrom": 6510,
-     "cruisehostId": "L3324720270522"
-    },
-    {
-     "date": "2027-06-16",
-     "priceFrom": 6510,
-     "cruisehostId": "L3324737270628"
-    },
-    {
-     "date": "2027-08-19",
-     "priceFrom": 5960,
-     "cruisehostId": "L3324768270831"
-    },
-    {
-     "date": "2027-09-05",
-     "priceFrom": 6510,
-     "cruisehostId": "L3324776270917"
+     "date": "2027-07-10",
+     "priceFrom": 6660,
+     "cruisehostId": "L3324752270722"
     }
    ],
-   "priceFrom": 5960,
+   "priceFrom": 6660,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L3.jpg",
    "itineraryId": "SLC-6f3d221d",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L3.jpg"
   },
   {
@@ -52896,22 +52784,17 @@
    ],
    "departures": [
     {
-     "date": "2027-06-01",
-     "priceFrom": 6245,
-     "cruisehostId": "L0325243270615"
-    },
-    {
-     "date": "2027-08-10",
-     "priceFrom": 5895,
-     "cruisehostId": "L0325278270824"
+     "date": "2027-09-07",
+     "priceFrom": 7057,
+     "cruisehostId": "L0325289270921"
     }
    ],
-   "priceFrom": 5895,
+   "priceFrom": 7057,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L0.jpg",
    "itineraryId": "SLC-bc64d7b3",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L0.jpg"
   },
   {
@@ -52944,27 +52827,17 @@
    ],
    "departures": [
     {
-     "date": "2027-06-15",
-     "priceFrom": 6245,
-     "cruisehostId": "L0325252270629"
-    },
-    {
-     "date": "2027-08-24",
-     "priceFrom": 6245,
-     "cruisehostId": "L0325282270907"
-    },
-    {
      "date": "2027-09-21",
      "priceFrom": 6651,
      "cruisehostId": "L0325298271005"
     }
    ],
-   "priceFrom": 6245,
+   "priceFrom": 6651,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L0.jpg",
    "itineraryId": "SLC-5868f9a0",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L0.jpg"
   },
   {
@@ -53000,19 +52873,14 @@
      "date": "2027-06-01",
      "priceFrom": 6651,
      "cruisehostId": "L1325244270615"
-    },
-    {
-     "date": "2027-08-10",
-     "priceFrom": 5895,
-     "cruisehostId": "L1325279270824"
     }
    ],
-   "priceFrom": 5895,
+   "priceFrom": 6651,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L1.jpg",
    "itineraryId": "SLC-549187bf",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L1.jpg"
   },
   {
@@ -53088,22 +52956,17 @@
    ],
    "departures": [
     {
-     "date": "2027-06-15",
-     "priceFrom": 6245,
-     "cruisehostId": "L1325253270629"
-    },
-    {
-     "date": "2027-08-24",
-     "priceFrom": 6245,
-     "cruisehostId": "L1325283270907"
+     "date": "2027-03-23",
+     "priceFrom": 6965,
+     "cruisehostId": "L1325207270406"
     }
    ],
-   "priceFrom": 6245,
+   "priceFrom": 6965,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L1.jpg",
    "itineraryId": "SLC-50d3cb0f",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L1.jpg"
   },
   {
@@ -53414,17 +53277,17 @@
    ],
    "departures": [
     {
-     "date": "2026-11-24",
-     "priceFrom": 5988,
-     "cruisehostId": "L0296589261211"
+     "date": "2027-11-23",
+     "priceFrom": 7135,
+     "cruisehostId": "L0325001271210"
     }
    ],
-   "priceFrom": 5988,
+   "priceFrom": 7135,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L0.jpg",
    "itineraryId": "SLC-7d640e36",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L0.jpg"
   },
   {
@@ -53997,22 +53860,42 @@
    ],
    "departures": [
     {
-     "date": "2027-10-10",
-     "priceFrom": 6400,
-     "cruisehostId": "LF325307271022"
+     "date": "2027-04-11",
+     "priceFrom": 7105,
+     "cruisehostId": "LF325217270423"
     },
     {
-     "date": "2027-10-27",
-     "priceFrom": 6150,
-     "cruisehostId": "LF325313271108"
+     "date": "2027-05-18",
+     "priceFrom": 6955,
+     "cruisehostId": "LF325233270530"
+    },
+    {
+     "date": "2027-05-28",
+     "priceFrom": 6955,
+     "cruisehostId": "LF325240270609"
+    },
+    {
+     "date": "2027-06-17",
+     "priceFrom": 7100,
+     "cruisehostId": "LF325255270629"
+    },
+    {
+     "date": "2027-07-04",
+     "priceFrom": 6730,
+     "cruisehostId": "LF325264270716"
+    },
+    {
+     "date": "2027-09-03",
+     "priceFrom": 6700,
+     "cruisehostId": "LF325287270915"
     }
    ],
-   "priceFrom": 6150,
+   "priceFrom": 6700,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LF.jpg",
    "itineraryId": "SLC-d18331d9",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LF.jpg"
   },
   {
@@ -54097,27 +53980,17 @@
    ],
    "departures": [
     {
-     "date": "2027-07-20",
-     "priceFrom": 6115,
-     "cruisehostId": "LN345422270729"
-    },
-    {
-     "date": "2027-08-07",
-     "priceFrom": 5995,
-     "cruisehostId": "LN345431270816"
-    },
-    {
-     "date": "2027-08-25",
-     "priceFrom": 5995,
-     "cruisehostId": "LN345438270903"
+     "date": "2027-09-12",
+     "priceFrom": 6665,
+     "cruisehostId": "LN345446270921"
     }
    ],
-   "priceFrom": 5995,
+   "priceFrom": 6665,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LN.jpg",
    "itineraryId": "SLC-700fb326",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LN.jpg"
   },
   {
@@ -54631,17 +54504,17 @@
    ],
    "departures": [
     {
-     "date": "2027-06-09",
-     "priceFrom": 6260,
-     "cruisehostId": "L2324636270623"
+     "date": "2027-10-13",
+     "priceFrom": 7105,
+     "cruisehostId": "L2324675271027"
     }
    ],
-   "priceFrom": 6260,
+   "priceFrom": 7105,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-ce71bc58",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -55061,17 +54934,17 @@
    ],
    "departures": [
     {
-     "date": "2027-10-02",
-     "priceFrom": 6370,
-     "cruisehostId": "LI325140271013"
+     "date": "2028-05-13",
+     "priceFrom": 7180,
+     "cruisehostId": "LI367904280524"
     }
    ],
-   "priceFrom": 6370,
+   "priceFrom": 7180,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-9af8124c",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -55194,17 +55067,17 @@
    ],
    "departures": [
     {
-     "date": "2027-09-22",
-     "priceFrom": 6370,
-     "cruisehostId": "LH325104271003"
+     "date": "2028-05-17",
+     "priceFrom": 7180,
+     "cruisehostId": "LH367919280528"
     }
    ],
-   "priceFrom": 6370,
+   "priceFrom": 7180,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LH.jpg",
    "itineraryId": "SLC-b6e54690",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LH.jpg"
   },
   {
@@ -55406,17 +55279,17 @@
    ],
    "departures": [
     {
-     "date": "2027-06-30",
-     "priceFrom": 6415,
-     "cruisehostId": "L3324744270712"
+     "date": "2028-04-20",
+     "priceFrom": 7335,
+     "cruisehostId": "L3368069280502"
     }
    ],
-   "priceFrom": 6415,
+   "priceFrom": 7335,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L3.jpg",
    "itineraryId": "SLC-bd3011ec",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L3.jpg"
   },
   {
@@ -55450,22 +55323,27 @@
    ],
    "departures": [
     {
-     "date": "2027-08-09",
-     "priceFrom": 6415,
-     "cruisehostId": "LF324872270822"
+     "date": "2027-08-26",
+     "priceFrom": 6715,
+     "cruisehostId": "LF324875270908"
     },
     {
-     "date": "2027-10-12",
-     "priceFrom": 6415,
-     "cruisehostId": "LF324885271025"
+     "date": "2027-10-02",
+     "priceFrom": 6715,
+     "cruisehostId": "LF324882271015"
+    },
+    {
+     "date": "2028-04-13",
+     "priceFrom": 7330,
+     "cruisehostId": "LF368063280426"
     }
    ],
-   "priceFrom": 6415,
+   "priceFrom": 6715,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LF.jpg",
    "itineraryId": "SLC-eff7c656",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LF.jpg"
   },
   {
@@ -55671,6 +55549,16 @@
      "cruisehostId": "L3324738270629"
     },
     {
+     "date": "2027-07-20",
+     "priceFrom": 7215,
+     "cruisehostId": "L3324756270802"
+    },
+    {
+     "date": "2027-08-09",
+     "priceFrom": 6815,
+     "cruisehostId": "L3324764270822"
+    },
+    {
      "date": "2027-09-15",
      "priceFrom": 7365,
      "cruisehostId": "L3324780270928"
@@ -55681,27 +55569,17 @@
      "cruisehostId": "L3324788271015"
     },
     {
-     "date": "2027-11-12",
-     "priceFrom": 7860,
-     "cruisehostId": "L3353623271125"
-    },
-    {
-     "date": "2028-04-13",
-     "priceFrom": 8030,
-     "cruisehostId": "L3368060280426"
-    },
-    {
-     "date": "2028-04-30",
-     "priceFrom": 8030,
-     "cruisehostId": "L3368080280513"
+     "date": "2027-10-12",
+     "priceFrom": 7115,
+     "cruisehostId": "L3324792271025"
     }
    ],
-   "priceFrom": 7365,
+   "priceFrom": 6815,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L3.jpg",
    "itineraryId": "SLC-39507a86",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L3.jpg"
   },
   {
@@ -55730,22 +55608,17 @@
    ],
    "departures": [
     {
-     "date": "2027-06-17",
-     "priceFrom": 6650,
-     "cruisehostId": "LG351018270629"
-    },
-    {
-     "date": "2027-06-27",
-     "priceFrom": 6650,
-     "cruisehostId": "LG351021270709"
+     "date": "2027-07-31",
+     "priceFrom": 7340,
+     "cruisehostId": "LG351030270812"
     }
    ],
-   "priceFrom": 6650,
+   "priceFrom": 7340,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LG.jpg",
    "itineraryId": "SLC-cfd17f57",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LG.jpg"
   },
   {
@@ -55940,7 +55813,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L6.jpg",
    "itineraryId": "SLC-87d59200",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L6.jpg"
   },
   {
@@ -56009,17 +55882,17 @@
    ],
    "departures": [
     {
-     "date": "2028-04-04",
-     "priceFrom": 5915,
-     "cruisehostId": "L8368044280413"
+     "date": "2027-05-01",
+     "priceFrom": 6730,
+     "cruisehostId": "L8351002270510"
     }
    ],
-   "priceFrom": 5915,
+   "priceFrom": 6730,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L8.jpg",
    "itineraryId": "SLC-796c77bc",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L8.jpg"
   },
   {
@@ -56202,17 +56075,17 @@
    ],
    "departures": [
     {
-     "date": "2027-05-30",
-     "priceFrom": 7530,
-     "cruisehostId": "LF324862270612"
+     "date": "2027-07-06",
+     "priceFrom": 7230,
+     "cruisehostId": "LF324867270719"
     }
    ],
-   "priceFrom": 7530,
+   "priceFrom": 7230,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LF.jpg",
    "itineraryId": "SLC-e0fd8437",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LF.jpg"
   },
   {
@@ -56302,7 +56175,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L1.jpg",
    "itineraryId": "SLC-a40ed923",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L1.jpg"
   },
   {
@@ -56348,7 +56221,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L0.jpg",
    "itineraryId": "SLC-8cd92a55",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L0.jpg"
   },
   {
@@ -56384,22 +56257,22 @@
    ],
    "departures": [
     {
-     "date": "2027-10-02",
-     "priceFrom": 9800,
-     "cruisehostId": "L0324994271019"
+     "date": "2027-07-10",
+     "priceFrom": 6890,
+     "cruisehostId": "L0324983270727"
     },
     {
-     "date": "2028-04-11",
-     "priceFrom": 8640,
-     "cruisehostId": "L0368056280428"
+     "date": "2027-08-07",
+     "priceFrom": 6890,
+     "cruisehostId": "L0324988270824"
     }
    ],
-   "priceFrom": 8640,
+   "priceFrom": 6890,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L0.jpg",
    "itineraryId": "SLC-34784828",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L0.jpg"
   },
   {
@@ -56435,17 +56308,27 @@
    ],
    "departures": [
     {
-     "date": "2028-04-29",
-     "priceFrom": 9035,
-     "cruisehostId": "L7368078280516"
+     "date": "2027-06-15",
+     "priceFrom": 7330,
+     "cruisehostId": "L7324937270702"
+    },
+    {
+     "date": "2027-08-10",
+     "priceFrom": 6890,
+     "cruisehostId": "L7324942270827"
+    },
+    {
+     "date": "2027-09-07",
+     "priceFrom": 7330,
+     "cruisehostId": "L7324944270924"
     }
    ],
-   "priceFrom": 9035,
+   "priceFrom": 6890,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L7.jpg",
    "itineraryId": "SLC-c0c332fe",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L7.jpg"
   },
   {
@@ -56654,17 +56537,22 @@
    ],
    "departures": [
     {
-     "date": "2027-04-03",
-     "priceFrom": 8620,
-     "cruisehostId": "L3324703270416"
+     "date": "2027-06-30",
+     "priceFrom": 7270,
+     "cruisehostId": "L3324745270713"
+    },
+    {
+     "date": "2027-11-19",
+     "priceFrom": 6720,
+     "cruisehostId": "L3353625271202"
     }
    ],
-   "priceFrom": 8620,
+   "priceFrom": 6720,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L3.jpg",
    "itineraryId": "SLC-1ce3bf4b",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L3.jpg"
   },
   {
@@ -56709,7 +56597,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-d94648d4",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -56754,7 +56642,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-6a8e6033",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -56799,7 +56687,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-b50eb34e",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -56887,7 +56775,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L5.jpg",
    "itineraryId": "SLC-264db135",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L5.jpg"
   },
   {
@@ -56963,17 +56851,17 @@
    ],
    "departures": [
     {
-     "date": "2028-03-31",
-     "priceFrom": 9370,
-     "cruisehostId": "L3368034280415"
+     "date": "2027-08-16",
+     "priceFrom": 7215,
+     "cruisehostId": "L3324766270831"
     }
    ],
-   "priceFrom": 9370,
+   "priceFrom": 7215,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L3.jpg",
    "itineraryId": "SLC-42c2b51f",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L3.jpg"
   },
   {
@@ -57050,17 +56938,17 @@
    ],
    "departures": [
     {
-     "date": "2027-05-02",
-     "priceFrom": 7440,
-     "cruisehostId": "LI330904270516"
+     "date": "2027-07-18",
+     "priceFrom": 7040,
+     "cruisehostId": "LI330929270801"
     }
    ],
-   "priceFrom": 7440,
+   "priceFrom": 7040,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-d358e268",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -57151,7 +57039,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L5.jpg",
    "itineraryId": "SLC-ad6e2f30",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L5.jpg"
   },
   {
@@ -57321,7 +57209,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L6.jpg",
    "itineraryId": "SLC-6c5880fc",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L6.jpg"
   },
   {
@@ -57390,17 +57278,17 @@
    ],
    "departures": [
     {
-     "date": "2027-09-15",
-     "priceFrom": 8985,
-     "cruisehostId": "LG325158270928"
+     "date": "2027-05-30",
+     "priceFrom": 7130,
+     "cruisehostId": "LG325430270612"
     }
    ],
-   "priceFrom": 8985,
+   "priceFrom": 7130,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LG.jpg",
    "itineraryId": "SLC-725075eb",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LG.jpg"
   },
   {
@@ -57444,7 +57332,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L1.jpg",
    "itineraryId": "SLC-ebce87be",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L1.jpg"
   },
   {
@@ -57562,27 +57450,17 @@
    ],
    "departures": [
     {
-     "date": "2027-05-30",
-     "priceFrom": 9375,
-     "cruisehostId": "L8324896270612"
-    },
-    {
-     "date": "2027-07-06",
-     "priceFrom": 8375,
-     "cruisehostId": "L8324902270719"
-    },
-    {
-     "date": "2027-10-12",
-     "priceFrom": 8890,
-     "cruisehostId": "L8324917271025"
+     "date": "2027-09-15",
+     "priceFrom": 7200,
+     "cruisehostId": "L8324912270928"
     }
    ],
-   "priceFrom": 8375,
+   "priceFrom": 7200,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L8.jpg",
    "itineraryId": "SLC-c0804175",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L8.jpg"
   },
   {
@@ -57626,7 +57504,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L5.jpg",
    "itineraryId": "SLC-8ef229fb",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L5.jpg"
   },
   {
@@ -57672,7 +57550,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L0.jpg",
    "itineraryId": "SLC-defbf3db",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L0.jpg"
   },
   {
@@ -57716,7 +57594,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-f73f9243",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -57760,7 +57638,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L1.jpg",
    "itineraryId": "SLC-0ccf317e",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L1.jpg"
   },
   {
@@ -57837,17 +57715,17 @@
    ],
    "departures": [
     {
-     "date": "2027-05-20",
-     "priceFrom": 9440,
-     "cruisehostId": "L8330911270602"
+     "date": "2027-08-19",
+     "priceFrom": 7220,
+     "cruisehostId": "L8330937270901"
     }
    ],
-   "priceFrom": 9440,
+   "priceFrom": 7220,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L8.jpg",
    "itineraryId": "SLC-fc08dc69",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L8.jpg"
   },
   {
@@ -57929,17 +57807,17 @@
    ],
    "departures": [
     {
-     "date": "2027-10-22",
-     "priceFrom": 6580,
-     "cruisehostId": "L2324678271108"
+     "date": "2027-08-27",
+     "priceFrom": 7240,
+     "cruisehostId": "L2324661270913"
     }
    ],
-   "priceFrom": 6580,
+   "priceFrom": 7240,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-fd22cfd2",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -57975,17 +57853,22 @@
    ],
    "departures": [
     {
-     "date": "2027-06-04",
-     "priceFrom": 8800,
-     "cruisehostId": "L7324936270621"
+     "date": "2027-07-02",
+     "priceFrom": 7240,
+     "cruisehostId": "L7324938270719"
+    },
+    {
+     "date": "2027-08-27",
+     "priceFrom": 7160,
+     "cruisehostId": "L7324943270913"
     }
    ],
-   "priceFrom": 8800,
+   "priceFrom": 7160,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L7.jpg",
    "itineraryId": "SLC-0fc6bdc4",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L7.jpg"
   },
   {
@@ -58017,37 +57900,47 @@
    ],
    "departures": [
     {
-     "date": "2027-07-17",
-     "priceFrom": 6550,
-     "cruisehostId": "L3324753270730"
+     "date": "2027-05-07",
+     "priceFrom": 6700,
+     "cruisehostId": "L3324717270520"
     },
     {
-     "date": "2027-07-27",
-     "priceFrom": 6550,
-     "cruisehostId": "L3324757270809"
+     "date": "2027-05-27",
+     "priceFrom": 6700,
+     "cruisehostId": "L3324725270609"
     },
     {
-     "date": "2027-08-06",
-     "priceFrom": 6150,
-     "cruisehostId": "L3324761270819"
+     "date": "2027-06-13",
+     "priceFrom": 6700,
+     "cruisehostId": "L3324733270626"
     },
     {
-     "date": "2027-08-16",
-     "priceFrom": 6150,
-     "cruisehostId": "L3324765270829"
+     "date": "2027-07-07",
+     "priceFrom": 6850,
+     "cruisehostId": "L3324749270720"
     },
     {
-     "date": "2027-10-09",
-     "priceFrom": 6450,
-     "cruisehostId": "L3324789271022"
+     "date": "2027-09-02",
+     "priceFrom": 6700,
+     "cruisehostId": "L3324773270915"
+    },
+    {
+     "date": "2027-09-29",
+     "priceFrom": 6700,
+     "cruisehostId": "L3324785271012"
+    },
+    {
+     "date": "2027-11-09",
+     "priceFrom": 7195,
+     "cruisehostId": "L3353622271122"
     }
    ],
-   "priceFrom": 6150,
+   "priceFrom": 6700,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L3.jpg",
    "itineraryId": "SLC-2639a9cc",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L3.jpg"
   },
   {
@@ -58122,17 +58015,17 @@
    ],
    "departures": [
     {
-     "date": "2028-03-31",
-     "priceFrom": 8960,
-     "cruisehostId": "L0368032280414"
+     "date": "2027-04-20",
+     "priceFrom": 7280,
+     "cruisehostId": "L0324961270504"
     }
    ],
-   "priceFrom": 8960,
+   "priceFrom": 7280,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L0.jpg",
    "itineraryId": "SLC-dc2103e3",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L0.jpg"
   },
   {
@@ -58243,22 +58136,22 @@
    ],
    "departures": [
     {
-     "date": "2028-04-15",
-     "priceFrom": 8640,
-     "cruisehostId": "L6368065280502"
+     "date": "2027-05-04",
+     "priceFrom": 7330,
+     "cruisehostId": "L6325012270521"
     },
     {
-     "date": "2028-05-13",
-     "priceFrom": 9035,
-     "cruisehostId": "L6368096280530"
+     "date": "2027-09-21",
+     "priceFrom": 7330,
+     "cruisehostId": "L6325022271008"
     }
    ],
-   "priceFrom": 8640,
+   "priceFrom": 7330,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L6.jpg",
    "itineraryId": "SLC-d59ba488",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L6.jpg"
   },
   {
@@ -58309,7 +58202,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-f6c6de76",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -58446,7 +58339,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-b4c2c764",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -58706,17 +58599,27 @@
    ],
    "departures": [
     {
-     "date": "2027-12-09",
-     "priceFrom": 8385,
-     "cruisehostId": "LN345509271221"
+     "date": "2027-07-20",
+     "priceFrom": 7175,
+     "cruisehostId": "LN345423270801"
+    },
+    {
+     "date": "2027-08-07",
+     "priceFrom": 7055,
+     "cruisehostId": "LN345432270819"
+    },
+    {
+     "date": "2027-08-25",
+     "priceFrom": 7055,
+     "cruisehostId": "LN345439270906"
     }
    ],
-   "priceFrom": 8385,
+   "priceFrom": 7055,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LN.jpg",
    "itineraryId": "SLC-44e83a5a",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LN.jpg"
   },
   {
@@ -58794,22 +58697,22 @@
    ],
    "departures": [
     {
-     "date": "2027-11-27",
-     "priceFrom": 8385,
-     "cruisehostId": "LN345502271209"
+     "date": "2027-07-26",
+     "priceFrom": 7055,
+     "cruisehostId": "LN345425270807"
     },
     {
-     "date": "2027-12-15",
-     "priceFrom": 8385,
-     "cruisehostId": "LN346975271227"
+     "date": "2027-08-13",
+     "priceFrom": 7055,
+     "cruisehostId": "LN345433270825"
     }
    ],
-   "priceFrom": 8385,
+   "priceFrom": 7055,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LN.jpg",
    "itineraryId": "SLC-61a9e5d5",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LN.jpg"
   },
   {
@@ -62048,16 +61951,16 @@
    "departures": [
     {
      "date": "2027-07-16",
-     "priceFrom": 8595,
+     "priceFrom": 7188,
      "cruisehostId": "LM311445270726"
     }
    ],
-   "priceFrom": 8595,
+   "priceFrom": 7188,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LM.jpg",
    "itineraryId": "SLC-e8bbf6f5",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LM.jpg"
   },
   {
@@ -70946,14 +70849,19 @@
      "date": "2027-06-23",
      "priceFrom": 7250,
      "cruisehostId": "LI373272270709"
+    },
+    {
+     "date": "2027-08-18",
+     "priceFrom": 6750,
+     "cruisehostId": "LI373280270903"
     }
    ],
-   "priceFrom": 7250,
+   "priceFrom": 6750,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-d5caa427",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -70986,17 +70894,22 @@
    ],
    "departures": [
     {
+     "date": "2027-04-19",
+     "priceFrom": 6850,
+     "cruisehostId": "LH373265270505"
+    },
+    {
      "date": "2027-06-14",
      "priceFrom": 7250,
      "cruisehostId": "LH373270270630"
     }
    ],
-   "priceFrom": 7250,
+   "priceFrom": 6850,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LH.jpg",
    "itineraryId": "SLC-278936d3",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LH.jpg"
   },
   {
@@ -71038,7 +70951,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-02159bbc",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -71073,17 +70986,17 @@
    ],
    "departures": [
     {
-     "date": "2027-09-08",
-     "priceFrom": 9185,
-     "cruisehostId": "LI373283270925"
+     "date": "2027-07-28",
+     "priceFrom": 6840,
+     "cruisehostId": "LI373278270814"
     }
    ],
-   "priceFrom": 9185,
+   "priceFrom": 6840,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-1088c23b",
-   "syncedAt": "2026-11-12",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -71113,17 +71026,17 @@
    ],
    "departures": [
     {
-     "date": "2028-05-08",
-     "priceFrom": 7820,
-     "cruisehostId": "LG368373280520"
+     "date": "2028-04-04",
+     "priceFrom": 7020,
+     "cruisehostId": "LG368366280416"
     }
    ],
-   "priceFrom": 7820,
+   "priceFrom": 7020,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LG.jpg",
    "itineraryId": "SLC-44be5a16",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LG.jpg"
   },
   {
@@ -71153,22 +71066,17 @@
    ],
    "departures": [
     {
-     "date": "2028-04-28",
-     "priceFrom": 7635,
-     "cruisehostId": "LG368077280510"
-    },
-    {
-     "date": "2028-05-18",
-     "priceFrom": 7820,
-     "cruisehostId": "LG368108280530"
+     "date": "2028-03-25",
+     "priceFrom": 7020,
+     "cruisehostId": "LG368023280406"
     }
    ],
-   "priceFrom": 7635,
+   "priceFrom": 7020,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LG.jpg",
    "itineraryId": "SLC-f1cb2fa6",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LG.jpg"
   },
   {
@@ -71206,7 +71114,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-e77e8a4d",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -71368,7 +71276,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-1b517660",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -71453,7 +71361,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U8.jpg",
    "itineraryId": "SSE-57d0abeb",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U8.jpg"
   },
   {
@@ -71494,7 +71402,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-ef9ad2f0",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -71534,7 +71442,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T1.jpg",
    "itineraryId": "SSE-f5d280f5",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T1.jpg"
   },
   {
@@ -71563,16 +71471,16 @@
    "departures": [
     {
      "date": "2027-09-03",
-     "priceFrom": 11400,
+     "priceFrom": 11570,
      "cruisehostId": "T6367980270915"
     }
    ],
-   "priceFrom": 11400,
+   "priceFrom": 11570,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T6.jpg",
    "itineraryId": "SSE-1595d223",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T6.jpg"
   },
   {
@@ -71612,7 +71520,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T2.jpg",
    "itineraryId": "SSE-a835f873",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T2.jpg"
   },
   {
@@ -71653,7 +71561,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-ba7a73d6",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -71873,7 +71781,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L1.jpg",
    "itineraryId": "SLC-c6a35562",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L1.jpg"
   },
   {
@@ -72007,7 +71915,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LM.jpg",
    "itineraryId": "SLC-8fcec669",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LM.jpg"
   },
   {
@@ -72041,37 +71949,32 @@
    ],
    "departures": [
     {
-     "date": "2027-02-06",
-     "priceFrom": 30150,
-     "cruisehostId": "TC311974270213"
+     "date": "2027-08-21",
+     "priceFrom": 13200,
+     "cruisehostId": "TC331627270828"
     },
     {
-     "date": "2027-04-17",
-     "priceFrom": 23150,
-     "cruisehostId": "TC331613270424"
+     "date": "2027-09-18",
+     "priceFrom": 13500,
+     "cruisehostId": "TC331630270925"
     },
     {
-     "date": "2027-09-04",
-     "priceFrom": 26500,
-     "cruisehostId": "TC331628270911"
+     "date": "2027-10-30",
+     "priceFrom": 13200,
+     "cruisehostId": "TC331636271106"
     },
     {
-     "date": "2027-10-02",
-     "priceFrom": 26700,
-     "cruisehostId": "TC331632271009"
-    },
-    {
-     "date": "2027-12-25",
-     "priceFrom": 29650,
-     "cruisehostId": "TC331644280101"
+     "date": "2027-11-13",
+     "priceFrom": 13750,
+     "cruisehostId": "TC331638271120"
     }
    ],
-   "priceFrom": 23150,
+   "priceFrom": 13200,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TC.jpg",
    "itineraryId": "SSE-5f828f22",
-   "syncedAt": "2026-11-07",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TC.jpg"
   },
   {
@@ -72190,17 +72093,22 @@
    ],
    "departures": [
     {
-     "date": "2027-03-13",
-     "priceFrom": 33650,
-     "cruisehostId": "TC298542270320"
+     "date": "2027-10-09",
+     "priceFrom": 13550,
+     "cruisehostId": "TC331633271016"
+    },
+    {
+     "date": "2027-11-06",
+     "priceFrom": 13500,
+     "cruisehostId": "TC331637271113"
     }
    ],
-   "priceFrom": 33650,
+   "priceFrom": 13500,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TC.jpg",
    "itineraryId": "SSE-8a226d17",
-   "syncedAt": "2026-11-07",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TC.jpg"
   },
   {
@@ -73534,7 +73442,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U5.jpg",
    "itineraryId": "REG-7990fb78",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U5.jpg"
   },
   {
@@ -73565,16 +73473,16 @@
    "departures": [
     {
      "date": "2027-07-23",
-     "priceFrom": 18698,
+     "priceFrom": 17498,
      "cruisehostId": "KM321769270806"
     }
    ],
-   "priceFrom": 18698,
+   "priceFrom": 17498,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-5c435089",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -73618,7 +73526,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/U5.jpg",
    "itineraryId": "REG-a409be89",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/U5.jpg"
   },
   {
@@ -74434,7 +74342,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L0.jpg",
    "itineraryId": "SLC-9e380f83",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L0.jpg"
   },
   {
@@ -74608,7 +74516,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/T0.jpg",
    "itineraryId": "SSE-5ddeefeb",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/T0.jpg"
   },
   {
@@ -74678,7 +74586,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TW.jpg",
    "itineraryId": "SSE-50f116aa",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TW.jpg"
   },
   {
@@ -74792,16 +74700,16 @@
    "departures": [
     {
      "date": "2028-04-06",
-     "priceFrom": 17498,
+     "priceFrom": 16898,
      "cruisehostId": "KM352617280429"
     }
    ],
-   "priceFrom": 17498,
+   "priceFrom": 16898,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-2a535e35",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -75215,11 +75123,6 @@
      "date": "2028-04-03",
      "priceFrom": 7310,
      "cruisehostId": "LG375862280416"
-    },
-    {
-     "date": "2028-05-07",
-     "priceFrom": 7925,
-     "cruisehostId": "LG375864280520"
     }
    ],
    "priceFrom": 7310,
@@ -75227,7 +75130,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LG.jpg",
    "itineraryId": "SLC-981e8343",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LG.jpg"
   },
   {
@@ -79653,7 +79556,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L5.jpg",
    "itineraryId": "SLC-54d5badc",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L5.jpg"
   },
   {
@@ -79738,7 +79641,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L2.jpg",
    "itineraryId": "SLC-6969a6fd",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L2.jpg"
   },
   {
@@ -79775,7 +79678,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LH.jpg",
    "itineraryId": "SLC-5704bad7",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LH.jpg"
   },
   {
@@ -79812,7 +79715,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L5.jpg",
    "itineraryId": "SLC-cb850577",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L5.jpg"
   },
   {
@@ -79886,7 +79789,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LL.jpg",
    "itineraryId": "SLC-1c21513e",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LL.jpg"
   },
   {
@@ -79922,7 +79825,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LL.jpg",
    "itineraryId": "SLC-8cbebd56",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LL.jpg"
   },
   {
@@ -79961,16 +79864,16 @@
    "departures": [
     {
      "date": "2028-05-06",
-     "priceFrom": 11205,
+     "priceFrom": 10595,
      "cruisehostId": "M4359169280528"
     }
    ],
-   "priceFrom": 11205,
+   "priceFrom": 10595,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M4.jpg",
    "itineraryId": "EXP-a150f691",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M4.jpg"
   },
   {
@@ -80006,7 +79909,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LM.jpg",
    "itineraryId": "SLC-7e08f21a",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LM.jpg"
   },
   {
@@ -80047,7 +79950,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TD.jpg",
    "itineraryId": "SSE-584b9b94",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TD.jpg"
   },
   {
@@ -80089,16 +79992,16 @@
    "departures": [
     {
      "date": "2028-05-06",
-     "priceFrom": 12770,
+     "priceFrom": 12155,
      "cruisehostId": "M3357916280530"
     }
    ],
-   "priceFrom": 12770,
+   "priceFrom": 12155,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/M3.jpg",
    "itineraryId": "EXP-01e17d36",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/M3.jpg"
   },
   {
@@ -80127,16 +80030,16 @@
    "departures": [
     {
      "date": "2028-05-16",
-     "priceFrom": 13195,
+     "priceFrom": 12095,
      "cruisehostId": "LU332759280527"
     }
    ],
-   "priceFrom": 13195,
+   "priceFrom": 12095,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LU.jpg",
    "itineraryId": "SLC-bb2d7a4e",
-   "syncedAt": "2026-11-06",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LU.jpg"
   },
   {
@@ -80174,7 +80077,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LU.jpg",
    "itineraryId": "SLC-5e1434fc",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LU.jpg"
   },
   {
@@ -80242,7 +80145,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ER.jpg",
    "itineraryId": "CLP-b5af048f",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ER.jpg"
   },
   {
@@ -80272,7 +80175,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ES.jpg",
    "itineraryId": "CLP-acc96572",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ES.jpg"
   },
   {
@@ -80303,7 +80206,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ER.jpg",
    "itineraryId": "CLP-cc0ae041",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ER.jpg"
   },
   {
@@ -80483,7 +80386,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-7703b9cb",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -80530,7 +80433,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-387aa015",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -80577,7 +80480,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-58718d08",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -80617,7 +80520,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LI.jpg",
    "itineraryId": "SLC-ff01da0e",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LI.jpg"
   },
   {
@@ -80650,17 +80553,17 @@
    ],
    "departures": [
     {
-     "date": "2028-05-03",
-     "priceFrom": 5950,
-     "cruisehostId": "LO378268280516"
+     "date": "2028-04-17",
+     "priceFrom": 6785,
+     "cruisehostId": "LO378257280430"
     }
    ],
-   "priceFrom": 5950,
+   "priceFrom": 6785,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LO.jpg",
    "itineraryId": "SLC-7cc845e0",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LO.jpg"
   },
   {
@@ -80691,17 +80594,22 @@
    ],
    "departures": [
     {
-     "date": "2028-05-12",
-     "priceFrom": 5950,
-     "cruisehostId": "LO378271280525"
+     "date": "2028-04-10",
+     "priceFrom": 6785,
+     "cruisehostId": "LO378253280423"
+    },
+    {
+     "date": "2028-04-26",
+     "priceFrom": 6785,
+     "cruisehostId": "LO378262280509"
     }
    ],
-   "priceFrom": 5950,
+   "priceFrom": 6785,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LO.jpg",
    "itineraryId": "SLC-c48c899a",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LO.jpg"
   },
   {
@@ -80800,32 +80708,17 @@
    ],
    "departures": [
     {
-     "date": "2028-01-26",
-     "priceFrom": 7445,
-     "cruisehostId": "L4378194280208"
-    },
-    {
-     "date": "2028-02-11",
-     "priceFrom": 7445,
-     "cruisehostId": "L4378211280224"
-    },
-    {
-     "date": "2028-02-27",
-     "priceFrom": 7445,
-     "cruisehostId": "L4378219280311"
-    },
-    {
-     "date": "2028-03-14",
-     "priceFrom": 7445,
-     "cruisehostId": "L4378232280327"
+     "date": "2028-03-30",
+     "priceFrom": 6785,
+     "cruisehostId": "L4378244280412"
     }
    ],
-   "priceFrom": 7445,
+   "priceFrom": 6785,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L4.jpg",
    "itineraryId": "SLC-16e969fb",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L4.jpg"
   },
   {
@@ -81030,7 +80923,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TW.jpg",
    "itineraryId": "SSE-b6469b2f",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/TW.jpg"
   },
   {
@@ -81499,16 +81392,16 @@
    "departures": [
     {
      "date": "2028-04-06",
-     "priceFrom": 22498,
+     "priceFrom": 21998,
      "cruisehostId": "KM352618280506"
     }
    ],
-   "priceFrom": 22498,
+   "priceFrom": 21998,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-80f6afc3",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -81562,7 +81455,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-09af94ed",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -81607,16 +81500,16 @@
    "departures": [
     {
      "date": "2028-04-15",
-     "priceFrom": 22798,
+     "priceFrom": 22598,
      "cruisehostId": "KM352623280513"
     }
    ],
-   "priceFrom": 22798,
+   "priceFrom": 22598,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-e248c362",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -81670,7 +81563,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-b3a0935c",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -81724,16 +81617,16 @@
    "departures": [
     {
      "date": "2028-04-06",
-     "priceFrom": 28698,
+     "priceFrom": 28498,
      "cruisehostId": "KM352619280513"
     }
    ],
-   "priceFrom": 28698,
+   "priceFrom": 28498,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/KM.jpg",
    "itineraryId": "SBN-0fab669e",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/KM.jpg"
   },
   {
@@ -81765,7 +81658,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/ES.jpg",
    "itineraryId": "CLP-2a51dd93",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/ES.jpg"
   },
   {
@@ -84053,22 +83946,27 @@
    ],
    "departures": [
     {
-     "date": "2028-04-12",
-     "priceFrom": 6250,
-     "cruisehostId": "LO378255280423"
+     "date": "2028-01-23",
+     "priceFrom": 7103,
+     "cruisehostId": "LO378193280203"
     },
     {
-     "date": "2028-04-28",
-     "priceFrom": 6250,
-     "cruisehostId": "LO378265280509"
+     "date": "2028-02-08",
+     "priceFrom": 7103,
+     "cruisehostId": "LO378210280219"
+    },
+    {
+     "date": "2028-03-11",
+     "priceFrom": 6910,
+     "cruisehostId": "LO379233280322"
     }
    ],
-   "priceFrom": 6250,
+   "priceFrom": 6910,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LO.jpg",
    "itineraryId": "SLC-4ae33cf8",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LO.jpg"
   },
   {
@@ -84099,17 +83997,27 @@
    ],
    "departures": [
     {
-     "date": "2028-04-17",
-     "priceFrom": 6250,
-     "cruisehostId": "LO378256280428"
+     "date": "2028-01-12",
+     "priceFrom": 7103,
+     "cruisehostId": "LO378182280123"
+    },
+    {
+     "date": "2028-01-28",
+     "priceFrom": 6910,
+     "cruisehostId": "LO378196280208"
+    },
+    {
+     "date": "2028-02-29",
+     "priceFrom": 6910,
+     "cruisehostId": "LO378221280311"
     }
    ],
-   "priceFrom": 6250,
+   "priceFrom": 6910,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LO.jpg",
    "itineraryId": "SLC-2ac800ab",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LO.jpg"
   },
   {
@@ -84137,17 +84045,27 @@
    ],
    "departures": [
     {
-     "date": "2028-04-20",
-     "priceFrom": 6510,
-     "cruisehostId": "LO378260280428"
+     "date": "2028-01-15",
+     "priceFrom": 7073,
+     "cruisehostId": "LO378184280123"
+    },
+    {
+     "date": "2028-01-31",
+     "priceFrom": 7073,
+     "cruisehostId": "LO378201280208"
+    },
+    {
+     "date": "2028-03-03",
+     "priceFrom": 6880,
+     "cruisehostId": "LO378226280311"
     }
    ],
-   "priceFrom": 6510,
+   "priceFrom": 6880,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LO.jpg",
    "itineraryId": "SLC-98273d49",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LO.jpg"
   },
   {
@@ -84173,22 +84091,32 @@
    ],
    "departures": [
     {
-     "date": "2028-04-12",
-     "priceFrom": 6510,
-     "cruisehostId": "LO378254280420"
+     "date": "2028-01-23",
+     "priceFrom": 7073,
+     "cruisehostId": "LO378192280131"
     },
     {
-     "date": "2028-04-28",
-     "priceFrom": 6510,
-     "cruisehostId": "LO378264280506"
+     "date": "2028-02-08",
+     "priceFrom": 7073,
+     "cruisehostId": "LO378209280216"
+    },
+    {
+     "date": "2028-03-11",
+     "priceFrom": 6880,
+     "cruisehostId": "LO379607280319"
+    },
+    {
+     "date": "2028-03-27",
+     "priceFrom": 7073,
+     "cruisehostId": "LO378242280404"
     }
    ],
-   "priceFrom": 6510,
+   "priceFrom": 6880,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/LO.jpg",
    "itineraryId": "SLC-a88f7679",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/LO.jpg"
   },
   {
@@ -84323,20 +84251,15 @@
     "Istanbul",
     "Istanbul"
    ],
-   "departures": [
-    {
-     "date": "2026-11-17",
-     "priceFrom": 12069,
-     "cruisehostId": "TV278518261127"
-    }
-   ],
+   "departures": [],
    "priceFrom": 12069,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/TV.jpg",
    "itineraryId": "REG-f691a76e",
    "syncedAt": "2026-11-10",
-   "shipImage": "media/cruisehost/TV.jpg"
+   "shipImage": "media/cruisehost/TV.jpg",
+   "hidden": true
   },
   {
    "cruisehostId": "SLC-c7e5208d",
@@ -84363,17 +84286,27 @@
    ],
    "departures": [
     {
-     "date": "2028-03-24",
-     "priceFrom": 6510,
-     "cruisehostId": "L4378239280401"
+     "date": "2028-01-20",
+     "priceFrom": 6880,
+     "cruisehostId": "L4378189280128"
+    },
+    {
+     "date": "2028-02-05",
+     "priceFrom": 6880,
+     "cruisehostId": "L4378205280213"
+    },
+    {
+     "date": "2028-03-08",
+     "priceFrom": 6880,
+     "cruisehostId": "L4378229280316"
     }
    ],
-   "priceFrom": 6510,
+   "priceFrom": 6880,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L4.jpg",
    "itineraryId": "SLC-c7e5208d",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L4.jpg"
   },
   {
@@ -84399,17 +84332,32 @@
    ],
    "departures": [
     {
-     "date": "2028-04-01",
-     "priceFrom": 6510,
-     "cruisehostId": "L4378248280409"
+     "date": "2028-01-28",
+     "priceFrom": 6880,
+     "cruisehostId": "L4378199280205"
+    },
+    {
+     "date": "2028-02-13",
+     "priceFrom": 6880,
+     "cruisehostId": "L4378212280221"
+    },
+    {
+     "date": "2028-02-29",
+     "priceFrom": 6880,
+     "cruisehostId": "L4378223280308"
+    },
+    {
+     "date": "2028-03-16",
+     "priceFrom": 6880,
+     "cruisehostId": "L4378235280324"
     }
    ],
-   "priceFrom": 6510,
+   "priceFrom": 6880,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L4.jpg",
    "itineraryId": "SLC-0b427dca",
-   "syncedAt": "2026-11-17",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L4.jpg"
   },
   {
@@ -84440,17 +84388,32 @@
    ],
    "departures": [
     {
-     "date": "2028-02-18",
-     "priceFrom": 7495,
-     "cruisehostId": "L4378493280229"
+     "date": "2028-01-01",
+     "priceFrom": 6910,
+     "cruisehostId": "L4378177280112"
+    },
+    {
+     "date": "2028-01-17",
+     "priceFrom": 6910,
+     "cruisehostId": "L4378185280128"
+    },
+    {
+     "date": "2028-02-02",
+     "priceFrom": 6910,
+     "cruisehostId": "L4378202280213"
+    },
+    {
+     "date": "2028-03-05",
+     "priceFrom": 6910,
+     "cruisehostId": "L4378227280316"
     }
    ],
-   "priceFrom": 7495,
+   "priceFrom": 6910,
    "priceStrike": null,
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L4.jpg",
    "itineraryId": "SLC-558afc18",
-   "syncedAt": "2026-11-11",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L4.jpg"
   },
   {
@@ -84480,7 +84443,7 @@
    "departures": [
     {
      "date": "2028-01-28",
-     "priceFrom": 6910,
+     "priceFrom": 7103,
      "cruisehostId": "L4378200280208"
     },
     {
@@ -84504,7 +84467,7 @@
    "currency": "EUR",
    "shipImageSource": "https://images.cruisec.net/images/ships/ships/L4.jpg",
    "itineraryId": "SLC-3b4004f3",
-   "syncedAt": "2026-11-10",
+   "syncedAt": "2026-11-18",
    "shipImage": "media/cruisehost/L4.jpg"
   },
   {
@@ -84792,6 +84755,131 @@
    "itineraryId": "SSE-c2c63a07",
    "syncedAt": "2026-11-17",
    "shipImage": "media/cruisehost/TP.jpg"
+  },
+  {
+   "cruisehostId": "SSE-b3155f18",
+   "line": "Silversea",
+   "kind": "SEA",
+   "lineCode": "SSE",
+   "ship": "Silver Wind",
+   "nights": 11,
+   "region": "British Isles",
+   "route": [
+    "Leith, Edinburgh",
+    "Isle of May",
+    "Berwick-upon-Tweed",
+    "Farne Islands",
+    "Fair Isle, Shetland Islands",
+    "Lerwick, Shetland Islands",
+    "Torshavn, Faroe Islands",
+    "Rituvik, Faroe Islands",
+    "Rituvik, Faroe Islands",
+    "St. Kilda",
+    "Cruising off Boreray, St. Kilda",
+    "Shiant Islands, Scotland",
+    "Loch Ewe/Scotland",
+    "Lunga/Trishnish Islands",
+    "Iona, Scotland",
+    "Belfast",
+    "Dublin"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-20",
+     "priceFrom": 11200,
+     "cruisehostId": "TW379595270531"
+    }
+   ],
+   "priceFrom": 11200,
+   "priceStrike": null,
+   "currency": "EUR",
+   "shipImageSource": "https://images.cruisec.net/images/ships/ships/TW.jpg",
+   "itineraryId": "SSE-b3155f18",
+   "syncedAt": "2026-11-18",
+   "shipImage": "media/cruisehost/TW.jpg"
+  },
+  {
+   "cruisehostId": "SSE-be93e315",
+   "line": "Silversea",
+   "kind": "SEA",
+   "lineCode": "SSE",
+   "ship": "Silver Wind",
+   "nights": 11,
+   "region": "British Isles",
+   "route": [
+    "Dublin",
+    "Belfast",
+    "St. Kilda",
+    "Cruising off Boreray, St. Kilda",
+    "Lunga/Trishnish Islands",
+    "Iona, Scotland",
+    "Shiant Islands, Scotland",
+    "Torshavn, Faroe Islands",
+    "Rituvik, Faroe Islands",
+    "Rituvik, Faroe Islands",
+    "Lerwick, Shetland Islands",
+    "Fair Isle, Shetland Islands",
+    "Berwick-upon-Tweed",
+    "Farne Islands",
+    "Isle of May",
+    "Leith, Edinburgh"
+   ],
+   "departures": [
+    {
+     "date": "2027-05-09",
+     "priceFrom": 11500,
+     "cruisehostId": "TW379594270520"
+    }
+   ],
+   "priceFrom": 11500,
+   "priceStrike": null,
+   "currency": "EUR",
+   "shipImageSource": "https://images.cruisec.net/images/ships/ships/TW.jpg",
+   "itineraryId": "SSE-be93e315",
+   "syncedAt": "2026-11-18",
+   "shipImage": "media/cruisehost/TW.jpg"
+  },
+  {
+   "cruisehostId": "EXP-ed3e3f97",
+   "line": "Explora Journeys",
+   "kind": "SEA",
+   "lineCode": "EXP",
+   "ship": "Explora I",
+   "nights": 16,
+   "region": "Central America Caribbean",
+   "route": [
+    "San Juan",
+    "Philipsburg, St. Maarten",
+    "St. John´s",
+    "Gustavia, St. Barthelemy",
+    "Tortola",
+    "Cruising Day",
+    "Cruising Day",
+    "Miami",
+    "Cruising Day",
+    "Puerto Plata",
+    "Cayo Levantado",
+    "San Juan",
+    "Charlotte Amalie, St. Thomas",
+    "Spanish Town",
+    "Cruising Day",
+    "Cruising Day",
+    "Miami"
+   ],
+   "departures": [
+    {
+     "date": "2027-01-04",
+     "priceFrom": 11765,
+     "cruisehostId": "M1323245270120"
+    }
+   ],
+   "priceFrom": 11765,
+   "priceStrike": null,
+   "currency": "EUR",
+   "shipImageSource": "https://images.cruisec.net/images/ships/ships/M1.jpg",
+   "itineraryId": "EXP-ed3e3f97",
+   "syncedAt": "2026-11-18",
+   "shipImage": "media/cruisehost/M1.jpg"
   }
  ]
 }
