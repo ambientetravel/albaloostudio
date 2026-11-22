@@ -1,7 +1,7 @@
 {
  "_about": "Variety Cruises sailings read from varietycruises.com cruise pages (the line's own booking data). priceFrom = cheapest cabin category with cabins left, EUR per person, port charges excluded; soldOut when none are left.",
  "source": "Variety Cruises",
- "synced": "2026-11-08",
+ "synced": "2026-11-22",
  "sailings": [
   {
    "id": "VAR-antiquity-to-byzantium-canal-crossing",
@@ -77,17 +77,9 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-11-13",
-     "code": "ATB261113",
-     "ship": "Galileo",
-     "nights": 7,
-     "priceFrom": 1700,
-     "soldOut": false
-    },
     {
      "date": "2027-03-19",
      "code": "ATB270319",
@@ -227,7 +219,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -484,7 +476,7 @@
     "•    Accommodation in sea-view double or twin cabins with private en-suite facilities and individually controlled air conditioning (large windows on the Main Deck, portholes on the Lower Deck)",
     "•    Daily housekeeping service and evening turndown service",
     "•",
-    "Free Wi-Fi onboard",
+    "Free Wi-Fi (Starlink) onboard",
     "Exceptional Hospitality",
     "•    15–16 experienced English-speaking crew members (approximately 1:2 crew-to-guest ratio), delivering one of the highest levels of personalized service in the Adriatic",
     "•    Our crew are consistently rated among the highlights of the Variety Cruises experience, praised by guests for their warmth, professionalism and genuine hospitality",
@@ -623,6 +615,214 @@
      "nights": 7,
      "priceFrom": null,
      "soldOut": false
+    },
+    {
+     "date": "2028-04-21",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-04-28",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-05-05",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-05-12",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-05-19",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-05-26",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-06-02",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-06-09",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-06-16",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-06-23",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-06-30",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-07-07",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-07-14",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-07-21",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-07-28",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-08-04",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-08-11",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-08-18",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-08-25",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-09-01",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-09-08",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-09-15",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-09-22",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-09-29",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-10-06",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
+    },
+    {
+     "date": "2028-10-13",
+     "code": null,
+     "ship": "Callisto",
+     "nights": 7,
+     "priceFrom": null,
+     "soldOut": false
     }
    ]
   },
@@ -699,7 +899,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -787,6 +987,7 @@
     "and is not included in the cruise fare.",
     "Crew tips.",
     "Passenger personal expenses.",
+    "Starlink",
     "Wi-Fi (available at charge)."
    ],
    "departures": [
@@ -913,7 +1114,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -1064,7 +1265,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -1197,7 +1398,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -1475,7 +1676,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -1550,18 +1751,10 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge).",
+    "Starlink Wi-Fi (available at charge).",
     "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
    ],
    "departures": [
-    {
-     "date": "2026-11-11",
-     "code": "SEY261111D3",
-     "ship": "Pegasus",
-     "nights": 3,
-     "priceFrom": 2380,
-     "soldOut": false
-    },
     {
      "date": "2026-12-09",
      "code": "SEY261209D3",
@@ -1977,7 +2170,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge).",
+    "Starlink Wi-Fi (available at charge).",
     "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
    ],
    "departures": [
@@ -2420,7 +2613,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge).",
+    "Starlink Wi-Fi (available at charge).",
     "Tourism Environmental Sustainability Levy, 25.00 (SCR) per person, per night to be paid on board."
    ],
    "departures": [
@@ -2849,7 +3042,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -2921,17 +3114,9 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
-    {
-     "date": "2026-11-13",
-     "code": "TAH10D261113",
-     "ship": "Panorama II",
-     "nights": 10,
-     "priceFrom": 3590,
-     "soldOut": false
-    },
     {
      "date": "2026-12-18",
      "code": "TAH10D261218",
@@ -3098,7 +3283,7 @@
     "Shore excursions on the islands or other land arrangements",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -3264,7 +3449,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -3344,7 +3529,7 @@
     "Shore excursions on the islands or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -3542,7 +3727,7 @@
     "Shore excursions or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses / Passenger Visas whenever required.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -3628,7 +3813,7 @@
     "Shore excursions or other land arrangements.",
     "Crew tips.",
     "Passenger personal expenses / Passenger Visas whenever required.",
-    "Wi-Fi (available at charge)."
+    "Starlink Wi-Fi (available at charge)."
    ],
    "departures": [
     {
@@ -3739,7 +3924,7 @@
     "Shore excursions on the islands (except those mentioned above) or other land arrangements",
     "Crew tips",
     "Passenger personal expenses",
-    "Wi-Fi (available at charge)"
+    "Starlink Wi-Fi (available at charge)"
    ],
    "departures": [
     {
