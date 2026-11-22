@@ -1,4 +1,4 @@
-# Orchestration health — 2026-11-22T14:32 UTC
+# Orchestration health — 2026-11-22T15:11 UTC
 
 **0 broke · 1 need you · 1 to watch.**
 
@@ -33,15 +33,15 @@
 
 | Agent | Last result | Age | |
 |---|---|---:|---|
-| Scout | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/44984236624) |
+| Scout | ✓ success | 0.5d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/44984236624) |
 | Writer | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/44984864588) |
 | Broadcaster | ✓ success | 0.4d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/44985711486) |
-| Closer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/45028731535) |
-| Auditor+Analyst | ✗ failure | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43875362563) |
-| Cartographer | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43880329999) |
-| Watcher | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/45029941465) |
+| Closer | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/45034119157) |
+| Auditor+Analyst | ✗ failure | 6.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43875362563) |
+| Cartographer | ✓ success | 6.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43880329999) |
+| Watcher | ✓ success | 0.1d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/45029941465) |
 | Oracle | ✓ success | 21.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/41317366000) |
-| Merge-watch | ✓ success | 1.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/44917313083) |
+| Merge-watch | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/45036121289) |
 | PR gate | ✓ success | 0.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/45031814715) |
 | Dashboard | ✓ success | 6.0d | [run](https://github.com/ambientetravel/albaloostudio/actions/runs/43892110915) |
 
