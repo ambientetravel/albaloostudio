@@ -24,7 +24,8 @@ tasks:
     title: Fix "AMBTC HQ" on the quote PDF
     detail: >-
       base44 branded the quote PDF "AMBTC HQ", a name that appears nowhere else. Set the
-      correct company name and logo before any quote reaches a customer.
+      correct company name and logo before any quote reaches a customer. Ready-made base44
+      prompt: #2 in orchestrator/BASE44-CREDIT-QUEUE.md.
     owner: alireza
     priority: high
     property: ""
@@ -106,16 +107,15 @@ tasks:
     link: ""
 
   - key: partner-portal
-    title: Paste the partner portal prompt into base44, then upload the embed
+    title: Partner portal - embed is live, base44 part still to build
     detail: >-
-      GitHub side is built: the brand-neutral embed (cruise24-me/embed/enquiry.html) and
-      api/enquiry.php storing partner_id, so each agency's leads reach the app tagged.
-      Two steps left. Upload cruise24-me/api/enquiry.php and cruise24-me/embed/enquiry.html to cruise24.me
-      public_html in cPanel, then paste orchestrator/OPS-APP-PARTNER-PROMPT.md into base44.
+      cruise24.me/embed/enquiry.html is live (HTTP 200, can be embedded) and leads carry
+      partner_id, but the app has no Partner entity yet (probe 24 Nov: 404). It's #1 in
+      orchestrator/BASE44-CREDIT-QUEUE.md, for a Mac session or a paste into base44.
     owner: alireza
-    priority: medium
-    property: ""
-    link: https://github.com/ambientetravel/albaloostudio/blob/main/orchestrator/OPS-APP-PARTNER-PROMPT.md
+    priority: high
+    property: cruise24.me
+    link: https://github.com/ambientetravel/albaloostudio/blob/main/orchestrator/BASE44-CREDIT-QUEUE.md
 
   - key: social-autopost
     title: "Decide: publish approved social posts automatically?"
