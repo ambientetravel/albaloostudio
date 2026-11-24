@@ -36,6 +36,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import port_countries  # noqa: E402  (the wider port -> country rules)
+import jsonld  # noqa: E402
 import build_guides  # noqa: E402  (route and visa guides, built from the same inventory)
 
 HERE = Path(__file__).resolve().parent
@@ -423,6 +424,7 @@ def page(head, nav, foot, *, slug, title, desc, body, base="", canonical=None):
     h = re.sub(r'<script type="application/ld\+json">.*?</script>\n', "", h, flags=re.S)
     if base:
         h = h.replace('<meta charset="utf-8">', f'<meta charset="utf-8">\n<base href="{base}">', 1)
+    h += jsonld.block(slug, title, desc, url)
     return (h + "</head>\n<body data-page=\"journeys\">\n" + nav + body + foot +
             '\n<script src="assets/vendor/gsap.min.js"></script>\n<script src="assets/vendor/ScrollTrigger.min.js"></script>\n'
             '<script src="assets/site.js"></script>\n<script src="assets/journeys.js"></script>\n</body>\n</html>\n')
