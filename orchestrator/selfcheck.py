@@ -4977,5 +4977,12 @@ ok("a merged article gets its live address per site; a photo-only PR (no new art
    and _l2 == "https://exploreorient.com/journal/guides-armenia-historic-monasteries/"
    and _l3 == "https://cruise24.ir/blog/rahnamaye-bandar-galataport-istanbul/" and _l4 == "")
 
+import agent5_site_auditor as _a5
+ok("robots: a scraper-only Disallow / is not a site block; a real one still is",
+   not _a5._search_engines_blocked("User-agent: *\nAllow: /\n\nUser-agent: CCBot\nUser-agent: Scrapy\nDisallow: /\n")
+   and _a5._search_engines_blocked("User-agent: *\nDisallow: /\n")
+   and _a5._search_engines_blocked("User-agent: *\nAllow: /\n\nUser-agent: Googlebot\nDisallow: /\n"),
+   "boutimar.com's 16 Nov robots.txt tripped a false CRITICAL and failed Agent 5+6 on 23 Nov")
+
 print("\n" + ("ALL PASS" if not FAIL else f"{len(FAIL)} FAILURES: {FAIL}"))
 sys.exit(1 if FAIL else 0)

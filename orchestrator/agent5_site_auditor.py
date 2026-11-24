@@ -289,6 +289,39 @@ def fetch(session: requests.Session, url: str, **kw: Any) -> requests.Response |
 _BLOCKS_ASSETS = re.compile(r"(?im)^disallow:\s*/?(\*?\.?(js|css)|assets|static|_next|dist)\b")
 
 
+_SEARCH_AGENTS = {"*", "googlebot", "bingbot", "googlebot-image"}
+
+
+def _search_engines_blocked(body: str) -> bool:
+    """True only when a robots.txt group that applies to ordinary search engines
+    disallows the whole site. A bare ``Disallow: /`` under CCBot/Scrapy/etc. is a
+    scraper block, not a site block, and an ``Allow: /`` in the same group wins a
+    tie (Google resolves equal-length rules in favour of Allow)."""
+    groups: list[tuple[set[str], list[str]]] = []
+    agents: set[str] = set()
+    rules: list[str] = []
+    seen_rule = False
+    for raw in body.splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if ":" not in line:
+            continue
+        key, _, val = line.partition(":")
+        key, val = key.strip().lower(), val.strip()
+        if key == "user-agent":
+            if seen_rule:
+                groups.append((agents, rules))
+                agents, rules, seen_rule = set(), [], False
+            agents.add(val.lower())
+        elif key in ("disallow", "allow"):
+            seen_rule = True
+            rules.append(f"{key}:{val}")
+    groups.append((agents, rules))
+    for ag, rl in groups:
+        if ag & _SEARCH_AGENTS and "disallow:/" in rl and "allow:/" not in rl:
+            return True
+    return False
+
+
 def audit_robots(site: Site, session: requests.Session, audit: SiteAudit) -> None:
     url = urljoin(site.base_url + "/", "robots.txt")
     resp = fetch(session, url)
@@ -305,7 +338,7 @@ def audit_robots(site: Site, session: requests.Session, audit: SiteAudit) -> Non
     body = resp.text
     audit.stats["robots_bytes"] = len(body)
 
-    if re.search(r"(?im)^disallow:\s*/\s*$", body):
+    if _search_engines_blocked(body):
         audit.add(
             id="robots.blocks_everything", scope="site", area="technical", severity=CRITICAL, url=url,
             title="robots.txt blocks the entire site",
