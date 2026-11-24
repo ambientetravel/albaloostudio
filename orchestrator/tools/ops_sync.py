@@ -625,6 +625,14 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {_key(it)} · {it.get('status')} · {it.get('house_rules_verdict')} · "
                   f"body {len(str(it.get('body_markdown') or ''))} chars · notes "
                   f"{len(str(it.get('verdict_notes') or ''))} chars · {str(it.get('title') or '')[:50]}")
+        # which base44 prompts have been built: an entity that answers 200 exists
+        print("\nentities (HTTP status · rows in first page · fields seen):")
+        for name in ("ArticleReview", "Lead", "Task", "Site", "Partner", "Notification",
+                     "NotificationPreference", "SocialPost", "Quote", "Rate"):
+            c, body = nrs.b44("GET", f"/{OPS_APP}/entities/{name}/v2/list?limit=50")
+            rows = nrs._b44_items(body) if c == 200 else []
+            fields = sorted({k for r in rows for k in r})
+            print(f"  {name}: HTTP {c} · {len(rows)} · {', '.join(fields) if fields else '-'}")
         return 0 if code == 200 else 1
     if code != 200:
         return 1
